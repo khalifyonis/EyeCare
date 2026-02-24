@@ -1,0 +1,19 @@
+<svg width="600" height="240" viewBox="0 0 600 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Navy Background Square for the Icon -->
+  <rect x="20" y="20" width="160" height="160" rx="12" fill="#1B1A55"/>
+  
+  <!-- Orange "Calligraphy" Part -->
+  <rect x="35" y="45" width="45" height="15" rx="2" fill="#F97316"/>
+  <rect x="35" y="75" width="45" height="15" rx="2" fill="#F97316"/>
+  <rect x="35" y="105" width="45" height="15" rx="2" fill="#F97316"/>
+  <path d="M35 135V150H80V135H35Z" fill="#F97316"/>
+  
+  <!-- White "Calligraphy" Part -->
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M100 45H145V150H100V135H125V60H100V45ZM115 75H130V120H115V75Z" fill="white"/>
+  
+  <!-- Main Text "AL-IXSAAN" (Changed to White for visibility) -->
+  <text x="200" y="120" fill="white" style="font-family: 'Segoe UI', Arial, sans-serif; font-size: 84px; font-weight: 900; letter-spacing: -3px;">AL-IXSAAN</text>
+  
+  <!-- Subtitle Text -->
+  <text x="202" y="160" fill="#F97316" style="font-family: 'Segoe UI', Arial, sans-serif; font-size: 26px; font-weight: 700; letter-spacing: 5px;">EYE HOSPITAL DR.SOCIAL</text>
+</svg>
