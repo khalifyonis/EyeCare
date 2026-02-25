@@ -11,6 +11,7 @@ import {
     LayoutDashboard,
     ChevronUp,
     ChevronDown,
+    ChevronRight,
     LogOut,
     User2,
     Stethoscope,
@@ -74,10 +75,6 @@ const roleNavigation: Record<
                     title: 'Dashboard',
                     icon: LayoutDashboard,
                     url: '/dashboard/admin',
-                    subItems: [
-                        { title: 'Analytics', url: '#' },
-                        { title: 'Overview', url: '#' },
-                    ],
                 },
                 { title: 'Users', icon: UserCog, url: '/dashboard/admin/users' },
                 { title: 'Doctors', icon: Stethoscope, url: '#' },
@@ -119,11 +116,7 @@ const roleNavigation: Record<
                 {
                     title: 'Dashboard',
                     icon: LayoutDashboard,
-                    url: '#',
-                    subItems: [
-                        { title: 'Overview', url: '#' },
-                        { title: 'Analytics', url: '#' },
-                    ],
+                    url: '/dashboard/doctor',
                 },
             ],
         },
@@ -142,7 +135,7 @@ const roleNavigation: Record<
         {
             section: 'MENU',
             items: [
-                { title: 'Dashboard', icon: LayoutDashboard, url: '#' },
+                { title: 'Dashboard', icon: LayoutDashboard, url: '/dashboard/pharmacist' },
             ],
         },
         {
@@ -159,7 +152,7 @@ const roleNavigation: Record<
         {
             section: 'MENU',
             items: [
-                { title: 'Dashboard', icon: LayoutDashboard, url: '#' },
+                { title: 'Dashboard', icon: LayoutDashboard, url: '/dashboard/optician' },
             ],
         },
         {
@@ -180,10 +173,6 @@ const roleNavigation: Record<
                     title: 'Dashboard',
                     icon: LayoutDashboard,
                     url: '/dashboard/receptionist',
-                    subItems: [
-                        { title: 'Overview', url: '#' },
-                        { title: 'Schedule', url: '#' },
-                    ],
                 },
                 { title: 'Patients', icon: UserPlus, url: '#' },
                 { title: 'Appointments', icon: Calendar, url: '#' },
@@ -210,7 +199,6 @@ const roleIcons: Record<string, React.ElementType> = {
 
 function CollapsibleNavItem({
     item,
-    isActive,
     onSelect,
 }: {
     item: {
@@ -219,10 +207,25 @@ function CollapsibleNavItem({
         url: string
         subItems?: { title: string; url: string }[]
     }
-    isActive: boolean
     onSelect: () => void
 }) {
+    const pathname = usePathname()
+
+    // Check if the current path matches the item URL or any of its sub-items
+    const isActive = React.useMemo(() => {
+        if (item.url !== '#' && pathname === item.url) return true
+        if (item.subItems) {
+            return item.subItems.some(sub => sub.url !== '#' && pathname === sub.url)
+        }
+        return false
+    }, [pathname, item])
+
     const [open, setOpen] = React.useState(isActive)
+
+    // Sync open state with active path changes
+    React.useEffect(() => {
+        if (isActive) setOpen(true)
+    }, [isActive])
 
     if (!item.subItems) {
         return (
@@ -231,9 +234,13 @@ function CollapsibleNavItem({
                     tooltip={item.title}
                     isActive={isActive}
                     onClick={() => onSelect()}
+                    className={`transition-all duration-300 group/item ${isActive
+                        ? 'bg-blue-500/10 text-blue-400'
+                        : 'hover:bg-blue-500/10 text-sidebar-foreground/70 hover:text-blue-400'
+                        }`}
                 >
-                    <item.icon />
-                    <span>{item.title}</span>
+                    <item.icon className={`transition-colors duration-300 ${isActive ? 'text-blue-400' : 'text-slate-400 group-hover/item:text-blue-400'}`} />
+                    <span className={`font-semibold transition-colors duration-300 ${isActive ? 'text-blue-400' : ''}`}>{item.title}</span>
                 </SidebarMenuButton>
             </SidebarMenuItem>
         )
@@ -246,27 +253,96 @@ function CollapsibleNavItem({
                 isActive={isActive}
                 onClick={() => {
                     setOpen(!open)
-                    onSelect()
+                    if (item.url && item.url !== '#') onSelect()
                 }}
+                className={`transition-all duration-300 group/item ${isActive
+                    ? 'bg-blue-500/10 text-blue-400'
+                    : 'hover:bg-blue-500/10 text-sidebar-foreground/70 hover:text-blue-400'
+                    }`}
             >
-                <item.icon />
-                <span>{item.title}</span>
+                <item.icon className={`transition-colors duration-300 ${isActive ? 'text-blue-400' : 'text-slate-400 group-hover/item:text-blue-400'}`} />
+                <span className={`font-semibold transition-colors duration-300 ${isActive ? 'text-blue-400' : ''}`}>{item.title}</span>
                 <ChevronDown
-                    className={`ml-auto size-4 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+                    className={`ml-auto size-4 transition-transform duration-300 ${open ? 'rotate-180' : ''} ${isActive ? 'text-blue-400' : 'text-slate-300 group-hover/item:text-blue-400'}`}
                 />
             </SidebarMenuButton>
             {open && (
-                <SidebarMenuSub>
-                    {item.subItems.map((sub) => (
-                        <SidebarMenuSubItem key={sub.title}>
-                            <SidebarMenuSubButton href={sub.url}>
-                                <span>{sub.title}</span>
-                            </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                    ))}
+                <SidebarMenuSub className="border-sidebar-border/50">
+                    {item.subItems.map((sub) => {
+                        const isSubActive = pathname === sub.url
+                        return (
+                            <SidebarMenuSubItem key={sub.title}>
+                                <SidebarMenuSubButton
+                                    href={sub.url}
+                                    className={`transition-colors duration-200 ${isSubActive
+                                        ? 'text-blue-400 font-medium bg-blue-500/10'
+                                        : 'text-sidebar-foreground/60 hover:text-blue-400 hover:bg-blue-500/10'
+                                        }`}
+                                >
+                                    <span>{sub.title}</span>
+                                </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                        )
+                    })}
                 </SidebarMenuSub>
             )}
         </SidebarMenuItem>
+    )
+}
+
+
+function CollapsibleSection({
+    label,
+    defaultOpen = true,
+    children,
+    sectionItems = [],
+}: {
+    label: string
+    defaultOpen?: boolean
+    children: React.ReactNode
+    sectionItems?: any[]
+}) {
+    const pathname = usePathname()
+
+    // Section is active if any item in it matches the current pathname
+    const isSectionActive = React.useMemo(() => {
+        return sectionItems.some(item => {
+            if (item.url !== '#' && pathname === item.url) return true
+            if (item.subItems) {
+                return item.subItems.some((sub: any) => sub.url !== '#' && pathname === sub.url)
+            }
+            return false
+        })
+    }, [pathname, sectionItems])
+
+    const [open, setOpen] = React.useState(defaultOpen || isSectionActive)
+
+    // Ensure section opens if it becomes active via external navigation
+    React.useEffect(() => {
+        if (isSectionActive) setOpen(true)
+    }, [isSectionActive])
+
+    return (
+        <SidebarGroup>
+            <button
+                onClick={() => setOpen(!open)}
+                className="flex w-full items-center justify-between px-6 mt-10 mb-2 group/section outline-none transition-all duration-300"
+            >
+                <span className="text-[11px] font-extrabold tracking-[0.2em] uppercase transition-colors duration-300 text-slate-400 group-hover/section:text-blue-400">
+                    {label}
+                </span>
+                <ChevronRight
+                    className={`h-3 w-3 transition-all duration-300 ${open ? 'rotate-180' : ''
+                        } ${open || isSectionActive ? 'text-blue-500' : 'text-slate-300 group-hover/section:text-blue-400'
+                        }`}
+                />
+            </button>
+            {open && (
+                <SidebarGroupContent className="transition-all duration-500 ease-in-out">
+                    {children}
+                </SidebarGroupContent>
+            )}
+        </SidebarGroup>
     )
 }
 
@@ -297,20 +373,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const RoleIcon = roleIcons[role] || UserCog
 
     return (
-        <Sidebar collapsible="icon" {...props}>
-            <SidebarHeader>
+        <Sidebar collapsible="icon" className="border-sidebar-border" {...props}>
+            <SidebarHeader className="bg-sidebar text-sidebar-foreground">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton
                             size="lg"
-                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-sidebar-accent transition-all duration-300 py-6"
+                            onClick={() => router.push(`/dashboard/${role.toLowerCase()}`)}
                         >
-                            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 text-white">
-                                <Eye className="size-4" />
+                            <div className="flex aspect-square size-11 items-center justify-center rounded-xl bg-white/5 p-1 transition-transform duration-300 group-hover:scale-105 shadow-lg border border-white/10">
+                                <img src="/logo.svg" alt="Logo" className="size-full object-contain filter drop-shadow-[0_0_8px_rgba(14,165,233,0.6)]" />
                             </div>
                             <div className="grid flex-1 text-left text-sm leading-tight">
-                                <span className="truncate font-bold">EyeCare</span>
-                                <span className="truncate text-xs opacity-60">
+                                <span className="truncate font-bold text-sidebar-foreground uppercase tracking-tight">Al-Ixsaan</span>
+                                <span className="truncate text-[10px] font-black uppercase text-[#0EA5E9] tracking-widest">
                                     {role} Panel
                                 </span>
                             </div>
@@ -319,45 +396,45 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarSeparator />
+            <SidebarSeparator className="bg-sidebar-border/50" />
 
-            <SidebarContent>
-                {sections.map((section) => (
-                    <SidebarGroup key={section.section}>
-                        <SidebarGroupLabel>{section.section}</SidebarGroupLabel>
-                        <SidebarGroupContent>
-                            <SidebarMenu>
-                                {section.items.map((item) => (
-                                    <CollapsibleNavItem
-                                        key={item.title}
-                                        item={item}
-                                        isActive={activeItem === item.title}
-                                        onSelect={() => {
-                                            setActiveItem(item.title)
-                                            if (item.url && item.url !== '#') {
-                                                router.push(item.url)
-                                            }
-                                        }}
-                                    />
-                                ))}
-                            </SidebarMenu>
-                        </SidebarGroupContent>
-                    </SidebarGroup>
+            <SidebarContent className="bg-sidebar text-sidebar-foreground">
+                {sections.map((section, sIdx) => (
+                    <CollapsibleSection
+                        key={section.section}
+                        label={section.section}
+                        defaultOpen={sIdx === 0}
+                        sectionItems={section.items}
+                    >
+                        <SidebarMenu>
+                            {section.items.map((item) => (
+                                <CollapsibleNavItem
+                                    key={item.title}
+                                    item={item}
+                                    onSelect={() => {
+                                        if (item.url && item.url !== '#') {
+                                            router.push(item.url)
+                                        }
+                                    }}
+                                />
+                            ))}
+                        </SidebarMenu>
+                    </CollapsibleSection>
                 ))}
             </SidebarContent>
 
-            <SidebarSeparator />
+            <SidebarSeparator className="bg-sidebar-border/50" />
 
-            <SidebarFooter>
+            <SidebarFooter className="bg-sidebar relative z-50">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <SidebarMenuButton
                                     size="lg"
-                                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground relative z-50 w-full"
                                 >
-                                    <div className="flex aspect-square size-8 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-xs font-bold">
+                                    <div className="flex aspect-square size-8 items-center justify-center rounded-full bg-gradient-to-br from-[#0EA5E9] to-[#2563EB] text-white text-xs font-bold">
                                         {user?.fullName?.charAt(0)?.toUpperCase() || 'U'}
                                     </div>
                                     <div className="grid flex-1 text-left text-sm leading-tight">

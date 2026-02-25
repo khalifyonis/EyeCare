@@ -211,9 +211,9 @@ export default function UsersPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">User Management</h1>
-                    <p className="text-muted-foreground text-sm">Manage your professional team and system access.</p>
+                    <p className="text-muted-foreground text-sm uppercase font-bold tracking-widest opacity-70">Manage team and system access</p>
                 </div>
-                <Button onClick={() => handleOpenDialog()} className="bg-slate-900 hover:bg-slate-800 text-white">
+                <Button onClick={() => handleOpenDialog()} className="bg-[#0EA5E9] hover:bg-[#0EA5E9]/90 text-white font-bold shadow-lg shadow-blue-500/20 px-6 transition-all duration-300">
                     <Plus className="w-4 h-4 mr-2" />
                     Add User
                 </Button>
@@ -430,7 +430,7 @@ export default function UsersPage() {
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                        <Button className="bg-slate-900 hover:bg-slate-800 text-white" onClick={handleSaveUser} disabled={saving}>
+                        <Button className="bg-[#0EA5E9] hover:bg-[#0EA5E9]/90 text-white font-bold px-8 shadow-lg shadow-blue-500/15" onClick={handleSaveUser} disabled={saving}>
                             {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                             {editingUser ? 'Save Changes' : 'Create User'}
                         </Button>

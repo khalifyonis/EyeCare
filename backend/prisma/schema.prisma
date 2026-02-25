@@ -25,9 +25,11 @@ model User {
   fullName String
   username String @unique
   email    String @unique
-  password String
-  roleId   String
-  role     Role   @relation(fields: [roleId], references: [id])
+  password          String
+  resetToken        String?  @unique
+  resetTokenExpiry  DateTime?
+  roleId            String
+  role              Role     @relation(fields: [roleId], references: [id])
   doctor   Doctor?
 }
 

@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import api from '@/lib/axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ShieldCheck, User, Lock, Loader2 } from 'lucide-react';
+import { User, Lock, Loader2, ShieldCheck } from 'lucide-react';
+import Link from 'next/link';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -20,123 +21,166 @@ export default function LoginPage() {
         setLoading(true);
 
         try {
-            const response = await api.post('/auth/login', {
-                username,
-                password,
-            });
-
+            const response = await api.post('/auth/login', { username, password });
             const { token, user } = response.data;
 
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(user));
             document.cookie = `token=${token}; path=/; max-age=3600; SameSite=Strict`;
 
-            const userRole = user.role.toLowerCase();
-            router.push(`/dashboard/${userRole}`);
+            router.push(`/dashboard/${user.role.toLowerCase()}`);
         } catch (err: any) {
             console.error('Login failed', err);
-            setError(err.response?.data?.message || 'Invalid credentials or server error');
+            setError(err.response?.data?.message || 'Invalid credentials. Please try again.');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="flex h-screen w-full flex-col lg:flex-row overflow-hidden bg-white dark:bg-slate-950">
-            {/* Branding Pane - Exact Brand orange  (##F7931E) */}
-            <div className="relative flex w-full lg:w-1/2 flex-col items-center justify-center bg-[#F7931E] p-8 lg:p-12 text-white">
-                <div className="relative z-10 flex flex-col items-center justify-center w-full animate-in fade-in zoom-in duration-1000 ease-out">
-                    {/* Al-Ixsaan Logo */}
-                    <div className="group relative transition-all duration-500 hover:scale-[1.02]">
+        <div className="grid h-screen w-full grid-cols-1 md:grid-cols-2 overflow-hidden bg-white dark:bg-slate-950">
+
+            {/* ── Branding Pane ── */}
+            <div className="relative hidden md:flex flex-col items-center justify-center mesh-gradient p-8 lg:p-12 text-white overflow-hidden animate-in fade-in slide-in-from-left-full duration-1000 ease-in-out">
+                {/* Ambient glows */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(14,165,233,0.3)_0%,transparent_70%)] pointer-events-none" />
+                <div className="absolute -bottom-32 -left-32 size-[500px] bg-[#0EA5E9]/20 rounded-full blur-[120px] pointer-events-none animate-pulse duration-[12000ms]" />
+                <div className="absolute -top-32 -right-32 size-[500px] bg-indigo-500/15 rounded-full blur-[120px] pointer-events-none animate-pulse duration-[8000ms]" />
+
+                {/* Grid overlay */}
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIgY3g9IjEiIGN5PSIxIiByPSIxIi8+PC9nPjwvc3ZnPg==')] opacity-20 pointer-events-none" />
+
+                {/* Logo */}
+                <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-2xl animate-in fade-in zoom-in duration-1200 ease-out">
+                    <div className="group relative transition-all duration-1000 hover:scale-[1.02] flex items-center justify-center">
+                        <div className="absolute inset-0 bg-white/10 blur-[100px] rounded-full group-hover:bg-white/20 transition-all duration-1000" />
                         <img
-                            src="/img/lg.png"
+                            src="/logo.svg"
                             alt="Al-Ixsaan Eye Hospital"
-                            className="h-64 lg:h-[480px] w-auto drop-shadow-2xl"
+                            className="h-auto max-h-[65vh] w-auto drop-shadow-[0_0_100px_rgba(14,165,233,0.4)] relative z-10"
                         />
                     </div>
                 </div>
 
-                {/* Minimal Footer */}
-                <div className="absolute bottom-6 text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">
-                    &copy; 2026 Al-Ixsaan Medical Group
+                {/* Footer — improved contrast + centering */}
+                <div className="absolute bottom-0 left-0 right-0 z-10 flex items-center justify-center py-5 border-t border-white/10">
+                    <p className="text-white/60 text-[11px] font-bold uppercase tracking-[0.35em] text-center">
+                        © 2026 Al-Ixsaan Medical Group
+                    </p>
                 </div>
             </div>
 
-            {/* Login Pane - Equal Width (50%) */}
-            <div className="flex w-full lg:w-1/2 flex-col items-center justify-center bg-white dark:bg-slate-950 p-8 lg:p-16">
-                <div className="w-full max-w-[400px] space-y-12 animate-in slide-in-from-right-8 duration-700 ease-out">
-                    <div className="space-y-4 text-center lg:text-left">
-                        <h2 className="text-5xl font-black tracking-tighter text-[#F7931E] dark:text-white">Login</h2>
-                        <div className="h-2 w-16 bg-[#F7931E] rounded-full mx-auto lg:mx-0 shadow-lg shadow-orange-500/20" />
+            {/* ── Login Pane ── */}
+            <div className="flex flex-col items-center justify-center bg-white dark:bg-slate-950 px-6 md:px-12 lg:px-20 animate-in fade-in slide-in-from-right-full duration-1000 ease-in-out">
+                <div className="w-full max-w-[420px] space-y-8 mt-4">
+
+                    {/* Mobile logo */}
+                    <div className="flex md:hidden flex-col items-center justify-center mb-6 animate-in fade-in slide-in-from-top-4 duration-1000">
+                        <img src="/logo.svg" alt="Al-Ixsaan Logo" className="h-28 w-auto mb-4" />
+                        <div className="h-1 w-12 bg-[#0EA5E9] rounded-full shadow-lg shadow-blue-500/20" />
                     </div>
 
-                    <form onSubmit={handleLogin} className="space-y-8">
-                        <div className="space-y-6">
-                            <div className="space-y-3">
-                                <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] ml-1" htmlFor="username">
-                                    Username
-                                </label>
-                                <div className="relative group">
-                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 transition-colors group-focus-within:text-[#F7931E]">
-                                        <User className="size-5" />
-                                    </div>
-                                    <Input
-                                        id="username"
-                                        type="text"
-                                        placeholder="Enter your username"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                        required
-                                        className="h-15 pl-12 bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800 focus:ring-4 focus:ring-orange-500/10 focus:border-[#F7931E] transition-all text-base rounded-2xl"
-                                    />
-                                </div>
+                    {/* Header */}
+                    <div className="text-center lg:text-left">
+                        <div className="flex items-center gap-2 justify-center lg:justify-start mb-2">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0EA5E9]/10">
+                                <ShieldCheck className="h-4 w-4 text-[#0EA5E9]" />
                             </div>
+                            <span className="text-[11px] font-bold uppercase tracking-widest text-[#0EA5E9]">
+                                Secure Portal
+                            </span>
+                        </div>
+                        <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-800 dark:text-white leading-none">
+                            Welcome Back
+                        </h1>
+                    </div>
 
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between ml-1">
-                                    <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]" htmlFor="password">
-                                        Password
-                                    </label>
+                    {/* Form */}
+                    <form onSubmit={handleLogin} className="space-y-5">
+
+                        {/* Username */}
+                        <div className="space-y-1.5">
+                            <label
+                                className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.15em] ml-0.5"
+                                htmlFor="username"
+                            >
+                                Username
+                            </label>
+                            <div className="relative group">
+                                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 dark:text-slate-600 transition-colors duration-200 group-focus-within:text-[#0EA5E9]">
+                                    <User className="h-4 w-4" />
                                 </div>
-                                <div className="relative group">
-                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 transition-colors group-focus-within:text-[#F7931E]">
-                                        <Lock className="size-5" />
-                                    </div>
-                                    <Input
-                                        id="password"
-                                        type="password"
-                                        placeholder="••••••••"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        required
-                                        className="h-15 pl-12 bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800 focus:ring-4 focus:ring-orange-500/10 focus:border-[#F7931E] transition-all text-base rounded-2xl"
-                                    />
-                                </div>
+                                <Input
+                                    id="username"
+                                    type="text"
+                                    placeholder="Enter your username"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    required
+                                    className="h-11 pl-10 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-xl text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-[#0EA5E9]/40 focus-visible:border-[#0EA5E9] transition-all duration-200"
+                                />
                             </div>
                         </div>
 
+                        {/* Password */}
+                        <div className="space-y-1.5">
+                            <label
+                                className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.15em] ml-0.5"
+                                htmlFor="password"
+                            >
+                                Password
+                            </label>
+                            <div className="relative group">
+                                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 dark:text-slate-600 transition-colors duration-200 group-focus-within:text-[#0EA5E9]">
+                                    <Lock className="h-4 w-4" />
+                                </div>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    placeholder="••••••••"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    className="h-11 pl-10 pr-12 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-xl text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-[#0EA5E9]/40 focus-visible:border-[#0EA5E9] transition-all duration-200"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Error message */}
                         {error && (
-                            <div className="p-4 text-sm font-bold text-red-600 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 rounded-2xl animate-in shake-in duration-300">
-                                <p className="flex items-center gap-3">
-                                    <span className="size-2 rounded-full bg-red-600 block shrink-0" />
-                                    {error}
-                                </p>
+                            <div className="flex items-start gap-3 p-3.5 text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 rounded-xl animate-in fade-in slide-in-from-top-2 duration-300">
+                                <span className="mt-0.5 h-2 w-2 rounded-full bg-red-500 shrink-0" />
+                                {error}
                             </div>
                         )}
 
+                        {/* Forgot password */}
+                        <div className="flex justify-end -mt-1">
+                            <Link
+                                href="/forgot-password"
+                                className="text-xs text-slate-400 hover:text-[#0EA5E9] font-medium transition-colors duration-200"
+                            >
+                                Forgot password?
+                            </Link>
+                        </div>
+
+                        {/* Submit button — gradient + shadow + loading state */}
                         <Button
-                            className="w-full h-15 bg-[#F7931E] hover:bg-[#D97706] text-white font-black text-lg rounded-2xl shadow-xl shadow-orange-500/20 transition-all active:scale-[0.97] disabled:opacity-70"
                             type="submit"
                             disabled={loading}
+                            className="w-full h-11 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-[#0EA5E9] to-blue-600 hover:from-[#0c96d4] hover:to-blue-700 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-200 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                             {loading ? (
-                                <div className="flex items-center gap-3">
-                                    <Loader2 className="size-5 animate-spin" />
-                                    <span>Logging in...</span>
-                                </div>
-                            ) : 'Login'}
+                                <span className="flex items-center justify-center gap-2">
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    Authenticating...
+                                </span>
+                            ) : (
+                                'Login'
+                            )}
                         </Button>
                     </form>
+
                 </div>
             </div>
         </div>
