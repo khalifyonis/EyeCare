@@ -4,7 +4,8 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/s
 import { AppSidebar } from '@/components/app-sidebar'
 import { Separator } from '@/components/ui/separator'
 import { Bell, Search, Moon, Sun, Maximize } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useTheme } from '@/components/theme-provider'
 
 export default function DashboardLayout({
@@ -12,8 +13,23 @@ export default function DashboardLayout({
 }: {
     children: React.ReactNode
 }) {
+    const router = useRouter()
     const [searchFocused, setSearchFocused] = useState(false)
     const { theme, toggleTheme } = useTheme()
+
+    // ── Auth Guard & Cookie Sync ─────────────────────────────────────────────
+    useEffect(() => {
+        const token = localStorage.getItem('token')
+        if (!token) {
+            router.push('/login')
+            return
+        }
+
+        // Ensure cookie exists for middleware (in case it expired)
+        if (!document.cookie.includes('token=')) {
+            document.cookie = `token=${token}; path=/; max-age=604800; SameSite=Lax`
+        }
+    }, [router])
 
     const toggleFullscreen = () => {
         if (!document.fullscreenElement) {

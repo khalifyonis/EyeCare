@@ -26,7 +26,8 @@ export default function LoginPage() {
 
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(user));
-            document.cookie = `token=${token}; path=/; max-age=3600; SameSite=Strict`;
+            // Set cookie for middleware (7 days)
+            document.cookie = `token=${token}; path=/; max-age=604800; SameSite=Lax`;
 
             router.push(`/dashboard/${user.role.toLowerCase()}`);
         } catch (err: any) {

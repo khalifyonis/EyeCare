@@ -1,16 +1,28 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
     PieChart, Pie, Cell, ResponsiveContainer,
 } from 'recharts'
+import {
+    useReactTable,
+    getCoreRowModel,
+    flexRender,
+    type ColumnDef,
+} from '@tanstack/react-table'
 import {
     Users, Calendar, Eye, Package,
     TrendingUp, TrendingDown, ArrowUpRight, Clock, UserPlus,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableRow,
+} from '@/components/ui/table'
 
 const revenueData = [
     { month: 'Jan', revenue: 4000, appointments: 240, exams: 180 },
@@ -27,7 +39,6 @@ const revenueData = [
     { month: 'Dec', revenue: 8900, appointments: 690, exams: 420 },
 ]
 
-// Donut chart with actual patient counts
 const serviceData = [
     { name: 'Contacts', value: 35, count: 449, color: '#f59e0b' },
     { name: 'Eye Exams', value: 25, count: 321, color: '#8b5cf6' },
@@ -37,11 +48,11 @@ const serviceData = [
 ]
 const totalPatients = serviceData.reduce((s, d) => s + d.count, 0)
 
-const recentPatients = [
-    { name: 'Ahmed Ali', visit: 'Eye Exam', status: 'Completed', time: '10:00 AM', avatar: 'A' },
-    { name: 'Sarah Omer', visit: 'Follow up', status: 'In Progress', time: '11:30 AM', avatar: 'S' },
-    { name: 'Mohamed Hassan', visit: 'Consultation', status: 'Waiting', time: '2:00 PM', avatar: 'M' },
-    { name: 'Fatima Yusuf', visit: 'Glasses Fitting', status: 'Scheduled', time: '3:30 PM', avatar: 'F' },
+const recentPatientsData = [
+    { id: '1', name: 'Ahmed Ali', visit: 'Eye Exam', status: 'Completed', time: '10:00 AM', avatar: 'A' },
+    { id: '2', name: 'Sarah Omer', visit: 'Follow up', status: 'In Progress', time: '11:30 AM', avatar: 'S' },
+    { id: '3', name: 'Mohamed Hassan', visit: 'Consultation', status: 'Waiting', time: '2:00 PM', avatar: 'M' },
+    { id: '4', name: 'Fatima Yusuf', visit: 'Glasses Fitting', status: 'Scheduled', time: '3:30 PM', avatar: 'F' },
 ]
 
 const topDoctors = [
@@ -51,7 +62,6 @@ const topDoctors = [
     { name: 'Dr. Ali', specialty: 'Pediatric', rating: 4.6, patients: 98 },
 ]
 
-// WCAG AA compliant pill-shaped status badges
 const statusConfig: Record<string, { bg: string; text: string; dot: string }> = {
     'Completed': { bg: 'bg-emerald-100 dark:bg-emerald-900/40', text: 'text-emerald-800 dark:text-emerald-300', dot: 'bg-emerald-500' },
     'In Progress': { bg: 'bg-blue-100 dark:bg-blue-900/40', text: 'text-blue-800 dark:text-blue-300', dot: 'bg-blue-500' },
@@ -59,25 +69,15 @@ const statusConfig: Record<string, { bg: string; text: string; dot: string }> = 
     'Scheduled': { bg: 'bg-violet-100 dark:bg-violet-900/40', text: 'text-violet-800 dark:text-violet-300', dot: 'bg-violet-500' },
 }
 
-// Custom donut chart legend — CSS grid for perfect column alignment
 function DonutLegend() {
     return (
         <div className="pt-1 space-y-1">
             {serviceData.map((d) => (
-                <div
-                    key={d.name}
-                    className="grid items-center gap-x-2"
-                    style={{ gridTemplateColumns: '12px 1fr 45px 45px' }}
-                >
+                <div key={d.name} className="grid items-center gap-x-2" style={{ gridTemplateColumns: '12px 1fr 45px 45px' }}>
                     <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: d.color }} />
                     <span className="text-[11px] font-semibold text-foreground/80 truncate">{d.name}</span>
                     <span className="text-[10px] font-bold text-muted-foreground tabular-nums text-right">{d.count}</span>
-                    <span
-                        className="text-[10px] font-black tabular-nums text-right"
-                        style={{ color: d.color }}
-                    >
-                        {d.value}%
-                    </span>
+                    <span className="text-[10px] font-black tabular-nums text-right" style={{ color: d.color }}>{d.value}%</span>
                 </div>
             ))}
         </div>
@@ -93,6 +93,50 @@ export default function DashboardPage() {
         if (!stored) { router.push('/login'); return }
         setUser(JSON.parse(stored))
     }, [router])
+
+    // ── Recent Patients mini-table (no pagination/search) ────────────────────
+
+    const patientColumns = useMemo<ColumnDef<any>[]>(() => [
+        {
+            accessorKey: 'name',
+            cell: ({ row }) => {
+                const p = row.original;
+                return (
+                    <div className="flex items-center gap-3 group px-1">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-[#0EA5E9]/10 text-sm font-black text-[#0EA5E9] group-hover:scale-110 transition-transform">
+                            {p.avatar}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-bold truncate tracking-tight">{p.name}</p>
+                            <p className="text-xs text-muted-foreground/70 font-medium">{p.visit}</p>
+                            <p className="text-[10px] text-muted-foreground/60 font-medium mt-0.5 uppercase tracking-widest">{p.time}</p>
+                        </div>
+                    </div>
+                );
+            },
+        },
+        {
+            accessorKey: 'status',
+            cell: ({ row }) => {
+                const status = row.original.status;
+                const sc = statusConfig[status] ?? statusConfig['Scheduled'];
+                return (
+                    <div className="flex justify-end">
+                        <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${sc.bg} ${sc.text}`}>
+                            <span className={`h-1.5 w-1.5 rounded-full ${sc.dot}`} />
+                            {status}
+                        </span>
+                    </div>
+                );
+            },
+        },
+    ], []);
+
+    const table = useReactTable({
+        data: recentPatientsData,
+        columns: patientColumns,
+        getCoreRowModel: getCoreRowModel(),
+    });
 
     if (!user) return null
 
@@ -116,9 +160,7 @@ export default function DashboardPage() {
 
             {/* ── Title row ── */}
             <div className="flex items-center justify-between">
-                <h1 className="text-xl font-bold tracking-tight">
-                    Welcome back, {user.fullName} 👋
-                </h1>
+                <h1 className="text-xl font-bold tracking-tight">Welcome back, {user.fullName} 👋</h1>
                 <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground shrink-0 bg-muted/30 px-2 py-1 rounded-md">
                     <Clock className="h-3 w-3 text-[#0EA5E9]" />
                     <span>Last updated: just now</span>
@@ -137,7 +179,6 @@ export default function DashboardPage() {
                             <div className="space-y-1">
                                 <p className="text-[10px] font-bold text-white/80 uppercase tracking-widest">{s.title}</p>
                                 <p className="text-2xl font-black leading-none tracking-tight">{s.value}</p>
-                                {/* WCAG AA: white/90 text on colored background passes ≥ 4.5:1 */}
                                 <div className={`flex items-center gap-1 text-[9px] font-bold rounded-full px-1.5 py-0.5 w-fit mt-1 backdrop-blur-sm ${s.up ? 'bg-white/20 text-white' : 'bg-black/20 text-white/90'}`}>
                                     {s.up ? <TrendingUp className="h-2.5 w-2.5" /> : <TrendingDown className="h-2.5 w-2.5" />}
                                     {s.trend}
@@ -155,13 +196,10 @@ export default function DashboardPage() {
 
             {/* ── Charts row ── */}
             <div className="grid grid-cols-1 lg:grid-cols-7 gap-3">
-
-                {/* Bar chart */}
                 <Card className="lg:col-span-4 glass-card border-none overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
                     <CardHeader className="flex flex-row items-center justify-between py-3 px-4 border-b border-white/10 dark:border-white/5">
                         <div>
                             <CardTitle className="text-sm font-bold tracking-tight">Monthly Analytics</CardTitle>
-                            {/* Bar chart legend */}
                             <div className="flex items-center gap-3 mt-1">
                                 {[
                                     { color: '#0EA5E9', label: 'Revenue' },
@@ -187,7 +225,7 @@ export default function DashboardPage() {
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-muted-foreground/10" />
                                     <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10, fontWeight: 600 }} />
                                     <YAxis tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10, fontWeight: 600 }} tickFormatter={(v) => `$${v / 1000}k`} />
-                                    <Tooltip
+                                    <RechartsTooltip
                                         cursor={{ fill: 'rgba(255,255,255,0.04)' }}
                                         contentStyle={{ ...tooltipStyle }}
                                         formatter={(v: any, name?: string) => [`${name === 'revenue' ? '$' : ''}${Number(v).toLocaleString()}`, (name ?? '').charAt(0).toUpperCase() + (name ?? '').slice(1)]}
@@ -201,7 +239,6 @@ export default function DashboardPage() {
                     </CardContent>
                 </Card>
 
-                {/* Donut chart with custom legend */}
                 <Card className="lg:col-span-3 glass-card border-none overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150">
                     <CardHeader className="py-3 px-4 border-b border-white/10 dark:border-white/5">
                         <CardTitle className="text-sm font-bold tracking-tight">Service Distribution</CardTitle>
@@ -209,34 +246,17 @@ export default function DashboardPage() {
                     </CardHeader>
                     <CardContent className="px-4 pb-3 pt-2">
                         <div className="flex items-center gap-4">
-                            {/* Donut */}
                             <div className="h-[160px] w-[160px] shrink-0">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
-                                        <Pie
-                                            data={serviceData}
-                                            cx="50%"
-                                            cy="50%"
-                                            innerRadius={48}
-                                            outerRadius={72}
-                                            paddingAngle={3}
-                                            dataKey="value"
-                                            startAngle={90}
-                                            endAngle={-270}
-                                        >
+                                        <Pie data={serviceData} cx="50%" cy="50%" innerRadius={48} outerRadius={72} paddingAngle={3} dataKey="value" startAngle={90} endAngle={-270}>
                                             {serviceData.map((e, i) => <Cell key={i} fill={e.color} stroke="transparent" />)}
                                         </Pie>
-                                        <Tooltip
-                                            contentStyle={{ ...tooltipStyle }}
-                                            formatter={(v: any, _name?: string, props?: any) => [`${props?.payload?.count ?? v} patients (${v}%)`, props?.payload?.name ?? '']}
-                                        />
+                                        <RechartsTooltip contentStyle={{ ...tooltipStyle }} formatter={(v: any, _name?: string, props?: any) => [`${props?.payload?.count ?? v} patients (${v}%)`, props?.payload?.name ?? '']} />
                                     </PieChart>
                                 </ResponsiveContainer>
                             </div>
-                            {/* Custom legend */}
-                            <div className="flex-1 min-w-0">
-                                <DonutLegend />
-                            </div>
+                            <div className="flex-1 min-w-0"><DonutLegend /></div>
                         </div>
                     </CardContent>
                 </Card>
@@ -245,16 +265,12 @@ export default function DashboardPage() {
             {/* ── Bottom row ── */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pb-4">
 
-                {/* Recent Patients */}
-                <Card className="glass-card glow-hover border-border/40 shadow-sm overflow-hidden">
+                {/* Recent Patients — powered by TanStack */}
+                <Card className="glass-card glow-hover border-border/40 shadow-sm overflow-hidden flex flex-col">
                     <CardHeader className="flex flex-row items-center justify-between py-3 px-4 shrink-0 border-b border-white/10 dark:border-white/5">
                         <CardTitle className="text-sm font-bold uppercase tracking-tight">Recent Patients</CardTitle>
                         <div className="flex items-center gap-2">
-                            {/* Quick Action: Instant Register */}
-                            <button
-                                title="Quick Register Patient"
-                                className="flex items-center gap-1 bg-[#0EA5E9] hover:bg-[#0c8cc7] text-white text-[10px] font-bold px-2 py-1 rounded-md transition-colors shadow-sm"
-                            >
+                            <button title="Quick Register Patient" className="flex items-center gap-1 bg-[#0EA5E9] hover:bg-[#0c8cc7] text-white text-[10px] font-bold px-2 py-1 rounded-md transition-colors shadow-sm">
                                 <UserPlus className="h-3 w-3" />
                                 <span className="hidden sm:inline">Register</span>
                             </button>
@@ -263,27 +279,20 @@ export default function DashboardPage() {
                             </button>
                         </div>
                     </CardHeader>
-                    <CardContent className="px-3 pb-3 pt-2 space-y-1">
-                        {recentPatients.map((p, i) => {
-                            const sc = statusConfig[p.status] ?? statusConfig['Scheduled']
-                            return (
-                                <div key={i} className="flex items-center gap-3 rounded-xl px-2.5 py-2.5 hover:bg-accent transition-colors duration-150 group cursor-default">
-                                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-[#0EA5E9]/10 text-sm font-black text-[#0EA5E9] group-hover:scale-110 transition-transform">
-                                        {p.avatar}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-bold truncate tracking-tight">{p.name}</p>
-                                        <p className="text-xs text-muted-foreground/70 font-medium">{p.visit}</p>
-                                        <p className="text-[10px] text-muted-foreground/60 font-medium mt-0.5 uppercase tracking-widest">{p.time}</p>
-                                    </div>
-                                    {/* Pill-shaped WCAG AA badge */}
-                                    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${sc.bg} ${sc.text}`}>
-                                        <span className={`h-1.5 w-1.5 rounded-full ${sc.dot}`} />
-                                        {p.status}
-                                    </span>
-                                </div>
-                            )
-                        })}
+                    <CardContent className="p-0 flex-1">
+                        <Table>
+                            <TableBody>
+                                {table.getRowModel().rows.map((row) => (
+                                    <TableRow key={row.id} className="hover:bg-accent border-none transition-colors duration-150 group cursor-default">
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id} className="py-2.5">
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
                     </CardContent>
                 </Card>
 
@@ -298,9 +307,7 @@ export default function DashboardPage() {
                     <CardContent className="px-3 pb-3 pt-2 space-y-1">
                         {topDoctors.map((d, i) => (
                             <div key={i} className="flex items-center gap-3 rounded-xl px-2.5 py-2.5 hover:bg-accent transition-colors duration-150 group cursor-default">
-                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-sm font-black text-emerald-600 group-hover:scale-110 transition-transform">
-                                    {i + 1}
-                                </div>
+                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-sm font-black text-emerald-600 group-hover:scale-110 transition-transform">{i + 1}</div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-bold truncate tracking-tight">{d.name}</p>
                                     <p className="text-xs text-muted-foreground/70 font-medium">{d.specialty}</p>
