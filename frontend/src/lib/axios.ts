@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://192.168.8.126:5000/api', // Connect to Express backend
+    baseURL: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api`,
     headers: {
         'Content-Type': 'application/json',
     },

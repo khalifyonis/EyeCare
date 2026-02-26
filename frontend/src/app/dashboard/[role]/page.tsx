@@ -103,7 +103,7 @@ export default function DashboardPage() {
                 const p = row.original;
                 return (
                     <div className="flex items-center gap-3 group px-1">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-[#0EA5E9]/10 text-sm font-black text-[#0EA5E9] group-hover:scale-110 transition-transform">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#0EA5E9]/10 text-xs font-black text-[#0EA5E9] group-hover:scale-105 transition-transform">
                             {p.avatar}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -159,104 +159,112 @@ export default function DashboardPage() {
         <div className="space-y-3 animate-in fade-in duration-500">
 
             {/* ── Title row ── */}
-            <div className="flex items-center justify-between">
-                <h1 className="text-xl font-bold tracking-tight">Welcome back, {user.fullName} 👋</h1>
-                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground shrink-0 bg-muted/30 px-2 py-1 rounded-md">
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-2">
+                <div className="space-y-0.5">
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Welcome back, {user.fullName} 👋</h1>
+                    <p className="text-xs text-muted-foreground font-medium">Here's what's happening in your admin dashboard today.</p>
+                </div>
+                <div className="flex items-center gap-1.5 text-[9px] font-bold text-muted-foreground bg-slate-100 dark:bg-slate-900 px-2.5 py-1 rounded-full w-fit">
                     <Clock className="h-3 w-3 text-[#0EA5E9]" />
-                    <span>Last updated: just now</span>
+                    <span className="uppercase tracking-wider">Last updated: just now</span>
                 </div>
             </div>
 
             {/* ── Stat Cards ── */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {stats.map((s, i) => (
                     <div
                         key={s.title}
-                        className={`relative overflow-hidden rounded-xl bg-gradient-to-br ${s.gradient} p-4 text-white shadow-lg glow-hover hover:scale-[1.02] transform transition-all duration-300 animate-in fade-in slide-in-from-bottom-4`}
+                        className={`relative overflow-hidden rounded-xl bg-gradient-to-br ${s.gradient} p-4 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 animate-in fade-in slide-in-from-bottom-4 group`}
                         style={{ animationDelay: `${i * 100}ms`, animationFillMode: 'both' }}
                     >
-                        <div className="flex items-center justify-between relative z-10">
-                            <div className="space-y-1">
-                                <p className="text-[10px] font-bold text-white/80 uppercase tracking-widest">{s.title}</p>
-                                <p className="text-2xl font-black leading-none tracking-tight">{s.value}</p>
-                                <div className={`flex items-center gap-1 text-[9px] font-bold rounded-full px-1.5 py-0.5 w-fit mt-1 backdrop-blur-sm ${s.up ? 'bg-white/20 text-white' : 'bg-black/20 text-white/90'}`}>
-                                    {s.up ? <TrendingUp className="h-2.5 w-2.5" /> : <TrendingDown className="h-2.5 w-2.5" />}
-                                    {s.trend}
+                        {/* Decorative background elements */}
+                        <div className="absolute top-0 right-0 -mr-3 -mt-3 w-16 h-16 bg-white/10 rounded-full blur-xl group-hover:bg-white/20 transition-colors" />
+
+                        <div className="relative z-10 flex flex-col justify-between h-full">
+                            <div className="flex items-start justify-between">
+                                <div className="space-y-0.5">
+                                    <p className="text-[10px] font-bold text-white/70 uppercase tracking-wider">{s.title}</p>
+                                    <p className="text-2xl font-black leading-tight tracking-tight">{s.value}</p>
+                                </div>
+                                <div className="rounded-xl bg-white/20 p-2 backdrop-blur-md border border-white/10 shadow-md">
+                                    <s.icon className="h-4 w-4 text-white" />
                                 </div>
                             </div>
-                            <div className="rounded-xl bg-white/20 p-2 backdrop-blur-md border border-white/20 shadow-inner">
-                                <s.icon className="h-4 w-4" />
+
+                            <div className="mt-3 flex items-center gap-2">
+                                <div className={`flex items-center gap-1 text-[8px] font-black rounded-full px-1.5 py-0.5 backdrop-blur-md border border-white/10 ${s.up ? 'bg-white/20 text-white' : 'bg-black/20 text-white'}`}>
+                                    {s.up ? <TrendingUp className="h-2 w-2" /> : <TrendingDown className="h-2 w-2" />}
+                                    {s.trend}
+                                </div>
+                                <span className="text-[8px] font-bold text-white/50 lowercase tracking-tight">vs last month</span>
                             </div>
                         </div>
-                        <div className="absolute -right-3 -top-3 h-20 w-20 rounded-full bg-white/10 blur-xl" />
-                        <div className="absolute -right-1 -bottom-5 h-16 w-16 rounded-full bg-white/5 blur-lg" />
                     </div>
                 ))}
             </div>
 
             {/* ── Charts row ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-7 gap-3">
-                <Card className="lg:col-span-4 glass-card border-none overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
-                    <CardHeader className="flex flex-row items-center justify-between py-3 px-4 border-b border-white/10 dark:border-white/5">
+            <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
+                <Card className="lg:col-span-4 border-none shadow-xl bg-white dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
+                    <CardHeader className="flex flex-row items-center justify-between py-5 px-6 border-b border-slate-100 dark:border-slate-800">
                         <div>
-                            <CardTitle className="text-sm font-bold tracking-tight">Monthly Analytics</CardTitle>
-                            <div className="flex items-center gap-3 mt-1">
-                                {[
-                                    { color: '#0EA5E9', label: 'Revenue' },
-                                    { color: '#8b5cf6', label: 'Apts' },
-                                    { color: '#10b981', label: 'Exams' },
-                                ].map((l) => (
-                                    <div key={l.label} className="flex items-center gap-1">
-                                        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: l.color }} />
-                                        <span className="text-[10px] text-muted-foreground font-semibold">{l.label}</span>
-                                    </div>
-                                ))}
-                            </div>
+                            <CardTitle className="text-base font-bold tracking-tight">Monthly Revenue</CardTitle>
                         </div>
-                        <select className="text-[11px] font-bold rounded-lg border border-white/20 bg-white/10 dark:bg-black/20 px-2 py-1 text-muted-foreground outline-none cursor-pointer hover:bg-white/20 transition-colors">
-                            <option>This Year</option>
-                            <option>Last Year</option>
-                        </select>
+                        <div className="relative">
+                            <select className="appearance-none text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 pl-3 pr-8 py-2 text-slate-600 dark:text-slate-300 outline-none cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-all shadow-sm">
+                                <option>This Year</option>
+                                <option>Last Year</option>
+                            </select>
+                            <ArrowUpRight className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none rotate-90" />
+                        </div>
                     </CardHeader>
-                    <CardContent className="px-4 pb-3 pt-4">
-                        <div className="h-[188px]">
+                    <CardContent className="px-5 pb-5 pt-4">
+                        <div className="h-[200px]">
                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={revenueData} barGap={2} margin={{ top: 0, right: 0, left: -22, bottom: 0 }}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-muted-foreground/10" />
-                                    <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10, fontWeight: 600 }} />
-                                    <YAxis tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10, fontWeight: 600 }} tickFormatter={(v) => `$${v / 1000}k`} />
+                                <BarChart data={revenueData} barGap={0} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                                    <defs>
+                                        <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stopColor="#8b5cf6" stopOpacity={1} />
+                                            <stop offset="100%" stopColor="#6366f1" stopOpacity={1} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-slate-100 dark:stroke-slate-800" />
+                                    <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11, fontWeight: 600 }} dy={10} />
+                                    <YAxis tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11, fontWeight: 600 }} tickFormatter={(v) => `$${v / 1000}k`} />
                                     <RechartsTooltip
-                                        cursor={{ fill: 'rgba(255,255,255,0.04)' }}
-                                        contentStyle={{ ...tooltipStyle }}
-                                        formatter={(v: any, name?: string) => [`${name === 'revenue' ? '$' : ''}${Number(v).toLocaleString()}`, (name ?? '').charAt(0).toUpperCase() + (name ?? '').slice(1)]}
+                                        cursor={{ fill: 'rgba(0,0,0,0.02)' }}
+                                        contentStyle={{ ...tooltipStyle, borderRadius: '12px', border: 'none', boxShadow: '0 10px 30px -5px rgba(0,0,0,0.1)' }}
+                                        formatter={(v: any) => [`$${Number(v).toLocaleString()}`, 'Revenue']}
                                     />
-                                    <Bar dataKey="revenue" fill="#0EA5E9" radius={[4, 4, 0, 0]} minPointSize={6} name="Revenue" />
-                                    <Bar dataKey="appointments" fill="#8b5cf6" radius={[4, 4, 0, 0]} minPointSize={6} name="Appointments" />
-                                    <Bar dataKey="exams" fill="#10b981" radius={[4, 4, 0, 0]} minPointSize={6} name="Exams" />
+                                    <Bar dataKey="revenue" fill="url(#barGradient)" radius={[6, 6, 0, 0]} barSize={32} />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="lg:col-span-3 glass-card border-none overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150">
-                    <CardHeader className="py-3 px-4 border-b border-white/10 dark:border-white/5">
-                        <CardTitle className="text-sm font-bold tracking-tight">Service Distribution</CardTitle>
-                        <p className="text-[10px] text-muted-foreground font-semibold">n={totalPatients} total visits</p>
+                <Card className="lg:col-span-3 border-none shadow-xl bg-white dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150">
+                    <CardHeader className="py-4 px-5 border-b border-slate-100 dark:border-slate-800">
+                        <CardTitle className="text-sm font-bold tracking-tight uppercase">Top Services</CardTitle>
                     </CardHeader>
-                    <CardContent className="px-4 pb-3 pt-2">
-                        <div className="flex items-center gap-4">
-                            <div className="h-[160px] w-[160px] shrink-0">
+                    <CardContent className="px-5 pb-5 pt-3">
+                        <div className="flex flex-col items-center justify-center space-y-6">
+                            <div className="h-[150px] w-full max-w-[150px] relative">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
-                                        <Pie data={serviceData} cx="50%" cy="50%" innerRadius={48} outerRadius={72} paddingAngle={3} dataKey="value" startAngle={90} endAngle={-270}>
+                                        <Pie data={serviceData} cx="50%" cy="50%" innerRadius={45} outerRadius={65} paddingAngle={4} dataKey="value" startAngle={90} endAngle={-270}>
                                             {serviceData.map((e, i) => <Cell key={i} fill={e.color} stroke="transparent" />)}
                                         </Pie>
-                                        <RechartsTooltip contentStyle={{ ...tooltipStyle }} formatter={(v: any, _name?: string, props?: any) => [`${props?.payload?.count ?? v} patients (${v}%)`, props?.payload?.name ?? '']} />
+                                        <RechartsTooltip contentStyle={{ ...tooltipStyle, borderRadius: '10px', border: 'none', boxShadow: '0 8px 24px -4px rgba(0,0,0,0.1)' }} />
                                     </PieChart>
                                 </ResponsiveContainer>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                    <span className="text-[8px] uppercase font-bold text-muted-foreground tracking-widest">Total</span>
+                                    <span className="text-xl font-black text-slate-900 dark:text-white leading-none">{totalPatients}</span>
+                                </div>
                             </div>
-                            <div className="flex-1 min-w-0"><DonutLegend /></div>
+                            <div className="w-full"><DonutLegend /></div>
                         </div>
                     </CardContent>
                 </Card>
@@ -266,16 +274,16 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pb-4">
 
                 {/* Recent Patients — powered by TanStack */}
-                <Card className="glass-card glow-hover border-border/40 shadow-sm overflow-hidden flex flex-col">
-                    <CardHeader className="flex flex-row items-center justify-between py-3 px-4 shrink-0 border-b border-white/10 dark:border-white/5">
-                        <CardTitle className="text-sm font-bold uppercase tracking-tight">Recent Patients</CardTitle>
+                <Card className="border-none shadow-xl bg-white dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden flex flex-col">
+                    <CardHeader className="flex flex-row items-center justify-between py-2.5 px-4 shrink-0 border-b border-slate-100 dark:border-slate-800">
+                        <CardTitle className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Recent Patients</CardTitle>
                         <div className="flex items-center gap-2">
-                            <button title="Quick Register Patient" className="flex items-center gap-1 bg-[#0EA5E9] hover:bg-[#0c8cc7] text-white text-[10px] font-bold px-2 py-1 rounded-md transition-colors shadow-sm">
+                            <button title="Quick Register Patient" className="flex items-center gap-1 bg-[#0EA5E9] hover:bg-[#0c8cc7] text-[9px] font-bold px-2 py-1 rounded-lg transition-colors shadow-sm text-white">
                                 <UserPlus className="h-3 w-3" />
                                 <span className="hidden sm:inline">Register</span>
                             </button>
-                            <button className="text-[11px] text-[#0EA5E9] font-bold hover:text-[#0c8cc7] transition-colors flex items-center gap-1 bg-blue-500/5 px-2 py-1 rounded-md">
-                                VIEW ALL <ArrowUpRight className="h-3 w-3" />
+                            <button className="text-[9px] text-[#0EA5E9] font-bold hover:text-[#0c8cc7] transition-colors flex items-center gap-1 bg-blue-500/5 px-2 py-1 rounded-lg uppercase">
+                                VIEW ALL <ArrowUpRight className="h-2.5 w-2.5" />
                             </button>
                         </div>
                     </CardHeader>
@@ -285,7 +293,7 @@ export default function DashboardPage() {
                                 {table.getRowModel().rows.map((row) => (
                                     <TableRow key={row.id} className="hover:bg-accent border-none transition-colors duration-150 group cursor-default">
                                         {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id} className="py-2.5">
+                                            <TableCell key={cell.id} className="py-2">
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                             </TableCell>
                                         ))}
@@ -297,33 +305,33 @@ export default function DashboardPage() {
                 </Card>
 
                 {/* Top Doctors */}
-                <Card className="glass-card glow-hover border-border/40 shadow-sm overflow-hidden">
-                    <CardHeader className="flex flex-row items-center justify-between py-3 px-4 shrink-0 border-b border-white/10 dark:border-white/5">
-                        <CardTitle className="text-sm font-bold uppercase tracking-tight">Top Doctors</CardTitle>
-                        <button className="text-[11px] text-[#0EA5E9] font-bold hover:text-[#0c8cc7] transition-colors flex items-center gap-1 bg-blue-500/5 px-2 py-1 rounded-md">
-                            VIEW ALL <ArrowUpRight className="h-3 w-3" />
+                <Card className="border-none shadow-xl bg-white dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden">
+                    <CardHeader className="flex flex-row items-center justify-between py-2.5 px-4 shrink-0 border-b border-slate-100 dark:border-slate-800">
+                        <CardTitle className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Top Doctors</CardTitle>
+                        <button className="text-[9px] text-[#0EA5E9] font-bold hover:text-[#0c8cc7] transition-colors flex items-center gap-1 bg-blue-500/5 px-2 py-1 rounded-lg uppercase">
+                            VIEW ALL <ArrowUpRight className="h-2.5 w-2.5" />
                         </button>
                     </CardHeader>
-                    <CardContent className="px-3 pb-3 pt-2 space-y-1">
+                    <CardContent className="px-3 pb-2.5 pt-1.5 space-y-1">
                         {topDoctors.map((d, i) => (
-                            <div key={i} className="flex items-center gap-3 rounded-xl px-2.5 py-2.5 hover:bg-accent transition-colors duration-150 group cursor-default">
-                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-sm font-black text-emerald-600 group-hover:scale-110 transition-transform">{i + 1}</div>
+                            <div key={i} className="flex items-center gap-3 rounded-lg px-2.5 py-2 hover:bg-accent transition-colors duration-150 group cursor-default">
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-xs font-black text-emerald-600 group-hover:scale-105 transition-transform">{i + 1}</div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-bold truncate tracking-tight">{d.name}</p>
-                                    <p className="text-xs text-muted-foreground/70 font-medium">{d.specialty}</p>
+                                    <p className="text-xs font-bold truncate tracking-tight">{d.name}</p>
+                                    <p className="text-[10px] text-muted-foreground/70 font-medium">{d.specialty}</p>
                                 </div>
                                 <div className="text-right shrink-0">
-                                    <div className="flex items-center justify-end gap-1 text-sm font-black text-amber-500">
-                                        <span className="text-[10px] text-muted-foreground font-medium mr-1 uppercase">Rating</span>
-                                        ★ {d.rating}
+                                    <div className="flex items-center justify-end gap-1 text-xs font-black text-amber-500">
+                                        <span className="text-[9px] text-muted-foreground/50 font-medium mr-1 uppercase">★</span>
+                                        {d.rating}
                                     </div>
-                                    <p className="text-[10px] text-muted-foreground/60 font-bold uppercase tracking-widest leading-none mt-1">{d.patients} PATIENTS</p>
+                                    <p className="text-[9px] text-muted-foreground/60 font-bold uppercase tracking-widest leading-none mt-1">{d.patients} pts</p>
                                 </div>
                             </div>
                         ))}
                     </CardContent>
                 </Card>
             </div>
-        </div>
+        </div >
     )
 }

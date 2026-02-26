@@ -350,14 +350,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const router = useRouter()
     const params = useParams()
     const role = (params.role as string || 'ADMIN').toUpperCase()
-    const [user, setUser] = React.useState<{ fullName: string; role: string } | null>(null)
+    const [user, setUser] = React.useState<any>(null)
     const [activeItem, setActiveItem] = React.useState('Dashboard')
 
     React.useEffect(() => {
         if (typeof window !== 'undefined') {
             const storedUser = localStorage.getItem('user')
             if (storedUser) {
-                setUser(JSON.parse(storedUser))
+                try {
+                    setUser(JSON.parse(storedUser))
+                } catch (e) {
+                    console.error('Failed to parse user from local storage', e)
+                }
             }
         }
     }, [])
@@ -382,8 +386,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-sidebar-accent transition-all duration-300 py-6"
                             onClick={() => router.push(`/dashboard/${role.toLowerCase()}`)}
                         >
-                            <div className="flex aspect-square size-11 items-center justify-center rounded-xl bg-white/5 p-1 transition-transform duration-300 group-hover:scale-105 shadow-lg border border-white/10">
-                                <img src="/logo.svg" alt="Logo" className="size-full object-contain filter drop-shadow-[0_0_8px_rgba(14,165,233,0.6)]" />
+                            <div className="flex aspect-square size-11 items-center justify-center rounded-xl bg-[#0EA5E9]/10 dark:bg-white/5 transition-all duration-300 group-hover:scale-105 shadow-sm border border-[#0EA5E9]/20 dark:border-white/10 overflow-hidden">
+                                <img src="/logo-icon.svg" alt="Logo" className="size-full object-cover filter drop-shadow-[0_0_8px_rgba(14,165,233,0.3)]" />
                             </div>
                             <div className="grid flex-1 text-left text-sm leading-tight">
                                 <span className="truncate font-bold text-sidebar-foreground uppercase tracking-tight">Al-Ixsaan</span>
@@ -438,7 +442,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         <div className="flex aspect-square size-8 overflow-hidden rounded-full border border-blue-500/20">
                                             <img
                                                 src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${user.profileImage}`}
-                                                alt={user.fullName}
+                                                alt={user?.fullName || 'User'}
                                                 className="h-full w-full object-cover"
                                             />
                                         </div>
