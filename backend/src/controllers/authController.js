@@ -60,12 +60,18 @@ export const login = async (req, res, next) => {
   }
 };
 
+const validateEmail = (email) => {
+  return String(email)
+    .toLowerCase()
+    .match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+};
+
 export const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ message: 'Email is required' });
+    if (!email || !validateEmail(email)) {
+      return res.status(400).json({ message: 'A valid email address is required' });
     }
 
     const user = await prisma.user.findUnique({
@@ -135,8 +141,8 @@ export const resetPassword = async (req, res, next) => {
     const { token } = req.params;
     const { password } = req.body;
 
-    if (!password) {
-      return res.status(400).json({ message: 'New password is required' });
+    if (!password || password.length < 6) {
+      return res.status(400).json({ message: 'New password must be at least 6 characters long' });
     }
 
     const user = await prisma.user.findFirst({
@@ -166,6 +172,24 @@ export const resetPassword = async (req, res, next) => {
     });
 
     res.status(200).json({ message: 'Password reset successful' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMe = async (req, res, next) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      include: { role: true, branch: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const { password, ...sanitizedUser } = user;
+    res.status(200).json(sanitizedUser);
   } catch (error) {
     next(error);
   }

@@ -22,7 +22,7 @@ export const getBranchById = async (req, res, next) => {
     try {
         const { id } = req.params;
         const branch = await prisma.branch.findUnique({
-            where: { id: parseInt(id) },
+            where: { id },
         });
 
         if (!branch) {
@@ -39,10 +39,20 @@ export const getBranchById = async (req, res, next) => {
 
 export const createBranch = async (req, res, next) => {
     try {
-        const { branchName, address, phone } = req.body;
+        let { branchName, address, phone } = req.body;
+
+        branchName = branchName?.trim();
+        address = address?.trim();
+        phone = phone?.trim();
 
         if (!branchName || !address || !phone) {
             const error = new Error('Branch name, address, and phone are required');
+            error.statusCode = 400;
+            throw error;
+        }
+
+        if (branchName.length < 3) {
+            const error = new Error('Branch name must be at least 3 characters');
             error.statusCode = 400;
             throw error;
         }
@@ -60,18 +70,27 @@ export const createBranch = async (req, res, next) => {
 export const updateBranch = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { branchName, address, phone } = req.body;
+        let { branchName, address, phone } = req.body;
 
-        const existing = await prisma.branch.findUnique({ where: { id: parseInt(id) } });
+        const existing = await prisma.branch.findUnique({ where: { id } });
         if (!existing) {
             const error = new Error('Branch not found');
             error.statusCode = 404;
             throw error;
         }
 
+        let updateData = {};
+        if (branchName !== undefined) {
+            const trimmed = branchName.trim();
+            if (trimmed.length < 3) throw new Error('Branch name must be at least 3 characters');
+            updateData.branchName = trimmed;
+        }
+        if (address !== undefined) updateData.address = address.trim();
+        if (phone !== undefined) updateData.phone = phone.trim();
+
         const updatedBranch = await prisma.branch.update({
-            where: { id: parseInt(id) },
-            data: { branchName, address, phone },
+            where: { id },
+            data: updateData,
         });
 
         res.status(200).json({ message: 'Branch updated successfully', branch: updatedBranch });
@@ -84,14 +103,14 @@ export const deleteBranch = async (req, res, next) => {
     try {
         const { id } = req.params;
 
-        const existing = await prisma.branch.findUnique({ where: { id: parseInt(id) } });
+        const existing = await prisma.branch.findUnique({ where: { id } });
         if (!existing) {
             const error = new Error('Branch not found');
             error.statusCode = 404;
             throw error;
         }
 
-        await prisma.branch.delete({ where: { id: parseInt(id) } });
+        await prisma.branch.delete({ where: { id } });
         res.status(200).json({ message: 'Branch deleted successfully' });
     } catch (error) {
         next(error);

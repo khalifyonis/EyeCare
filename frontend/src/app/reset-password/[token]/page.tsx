@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import api from '@/lib/axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Lock, Loader2, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Lock, Loader2, ShieldCheck, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ResetPasswordPage() {
@@ -15,6 +15,8 @@ export default function ResetPasswordPage() {
 
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -100,13 +102,20 @@ export default function ResetPasswordPage() {
                                 <Lock className="h-4 w-4" />
                             </div>
                             <Input
-                                type="password"
+                                type={showPassword ? 'text' : 'password'}
                                 placeholder="••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                className="h-11 pl-10 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-xl text-sm"
+                                className="h-11 pl-10 pr-12 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-xl text-sm"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#0EA5E9] transition-colors"
+                            >
+                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
                         </div>
                     </div>
 
@@ -119,13 +128,20 @@ export default function ResetPasswordPage() {
                                 <Lock className="h-4 w-4" />
                             </div>
                             <Input
-                                type="password"
+                                type={showConfirmPassword ? 'text' : 'password'}
                                 placeholder="••••••••"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
-                                className="h-11 pl-10 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-xl text-sm"
+                                className="h-11 pl-10 pr-12 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-xl text-sm"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#0EA5E9] transition-colors"
+                            >
+                                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
                         </div>
                     </div>
 

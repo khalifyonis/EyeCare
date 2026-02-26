@@ -7,6 +7,8 @@ import { Bell, Search, Moon, Sun, Maximize } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTheme } from '@/components/theme-provider'
+import api from '@/lib/axios'
+import { toast } from 'sonner'
 
 export default function DashboardLayout({
     children,
@@ -17,18 +19,40 @@ export default function DashboardLayout({
     const [searchFocused, setSearchFocused] = useState(false)
     const { theme, toggleTheme } = useTheme()
 
-    // ── Auth Guard & Cookie Sync ─────────────────────────────────────────────
+    // ── Auth Guard & Session Sync ─────────────────────────────────────────────
     useEffect(() => {
-        const token = localStorage.getItem('token')
-        if (!token) {
-            router.push('/login')
-            return
+        const verifySession = async () => {
+            const token = localStorage.getItem('token')
+            if (!token) {
+                router.push('/login')
+                return
+            }
+
+            // Ensure cookie exists for middleware
+            if (!document.cookie.includes('token=')) {
+                document.cookie = `token=${token}; path=/; max-age=604800; SameSite=Lax`
+            }
+
+            try {
+                // Verify user still exists in DB and get fresh data
+                const response = await api.get('/auth/me')
+                const userData = {
+                    ...response.data,
+                    role: response.data.role?.name || response.data.role
+                }
+                localStorage.setItem('user', JSON.stringify(userData))
+            } catch (error: any) {
+                console.error('Session verification failed', error)
+                if (error.response?.status === 404 || error.response?.status === 401) {
+                    localStorage.removeItem('token')
+                    localStorage.removeItem('user')
+                    document.cookie = 'token=; path=/; max-age=0; SameSite=Lax'
+                    router.push('/login')
+                }
+            }
         }
 
-        // Ensure cookie exists for middleware (in case it expired)
-        if (!document.cookie.includes('token=')) {
-            document.cookie = `token=${token}; path=/; max-age=604800; SameSite=Lax`
-        }
+        verifySession()
     }, [router])
 
     const toggleFullscreen = () => {

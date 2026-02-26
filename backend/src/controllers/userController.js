@@ -26,13 +26,8 @@ function generateTemporaryPassword() {
 export const getAllUsers = async (req, res, next) => {
     try {
         const users = await prisma.user.findMany({
-            include: {
-                role: true,
-                doctor: true,
-            },
-            orderBy: {
-                fullName: 'asc',
-            },
+            include: { role: true, branch: true },
+            orderBy: { fullName: 'asc' },
         });
 
         const sanitizedUsers = users.map(user => {
@@ -44,6 +39,33 @@ export const getAllUsers = async (req, res, next) => {
         });
 
         res.status(200).json(sanitizedUsers);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const uploadProfileImage = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        if (!req.file) {
+            const error = new Error('No image file provided');
+            error.statusCode = 400;
+            throw error;
+        }
+
+        const profileImage = `/uploads/profiles/${req.file.filename}`;
+
+        const updatedUser = await prisma.user.update({
+            where: { id },
+            data: { profileImage },
+            include: { role: true }
+        });
+
+        res.status(200).json({
+            message: 'Profile image updated successfully',
+            profileImage,
+            user: updatedUser
+        });
     } catch (error) {
         next(error);
     }
@@ -73,12 +95,42 @@ export const getUserById = async (req, res, next) => {
     }
 };
 
+const validateEmail = (email) => {
+    return String(email)
+        .toLowerCase()
+        .match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+};
+
 export const createUser = async (req, res, next) => {
     try {
-        const { fullName, username, email, roleName, licenseNumber, specialization } = req.body;
+        let { fullName, username, email, password, roleName, branchId, licenseNumber, specialization } = req.body;
 
-        if (!fullName || !username || !email || !roleName) {
-            const error = new Error('Full name, username, email, and role are required');
+        // Clean and Sanitize
+        fullName = fullName?.trim();
+        username = username?.trim();
+        email = email?.trim()?.toLowerCase();
+
+        // Rigorous Validation
+        if (!fullName || !username || !email || !roleName || !branchId) {
+            const error = new Error('Full name, username, email, branch, and role are required');
+            error.statusCode = 400;
+            throw error;
+        }
+
+        if (fullName.length < 3) {
+            const error = new Error('Full name must be at least 3 characters long');
+            error.statusCode = 400;
+            throw error;
+        }
+
+        if (username.length < 3 || username.includes(' ')) {
+            const error = new Error('Username must be at least 3 characters and cannot contain spaces');
+            error.statusCode = 400;
+            throw error;
+        }
+
+        if (!validateEmail(email)) {
+            const error = new Error('Invalid email address format');
             error.statusCode = 400;
             throw error;
         }
@@ -93,9 +145,9 @@ export const createUser = async (req, res, next) => {
             throw error;
         }
 
-        // Generate a random 8-character temporary password
-        const temporaryPassword = generateTemporaryPassword();
-        const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
+        // Use provided password or generate one
+        const finalPassword = password || generateTemporaryPassword();
+        const hashedPassword = await bcrypt.hash(finalPassword, 10);
 
         const newUser = await prisma.$transaction(async (tx) => {
             const user = await tx.user.create({
@@ -104,7 +156,8 @@ export const createUser = async (req, res, next) => {
                     username,
                     email,
                     password: hashedPassword,
-                    roleId: roleRecord.id,
+                    role: { connect: { id: roleRecord.id } },
+                    branch: { connect: { id: branchId } },
                 },
             });
 
@@ -114,9 +167,10 @@ export const createUser = async (req, res, next) => {
                 }
                 await tx.doctor.create({
                     data: {
-                        userId: user.id,
+                        user: { connect: { id: user.id } },
                         licenseNumber,
                         specialization,
+                        branch: { connect: { id: branchId } },
                     },
                 });
             }
@@ -124,8 +178,8 @@ export const createUser = async (req, res, next) => {
             return user;
         });
 
-        // Send onboarding email (non-blocking — user creation succeeds even if email fails)
-        const emailResult = await sendOnboardingEmail(email, fullName, username, temporaryPassword, roleName.toUpperCase());
+        // Send onboarding email with the actual password used
+        const emailResult = await sendOnboardingEmail(email, fullName, username, finalPassword, roleName.toUpperCase());
 
         const { password: _, ...sanitizedUser } = newUser;
         res.status(201).json({
@@ -141,7 +195,7 @@ export const createUser = async (req, res, next) => {
 export const updateUser = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { fullName, username, email, password, roleName, licenseNumber, specialization } = req.body;
+        let { fullName, username, email, password, roleName, branchId, licenseNumber, specialization } = req.body;
 
         const existingUser = await prisma.user.findUnique({
             where: { id },
@@ -154,11 +208,37 @@ export const updateUser = async (req, res, next) => {
             throw error;
         }
 
-        let updateData = { fullName, username };
+        let updateData = {};
 
-        // Handle email update
-        if (email) {
-            updateData.email = email;
+        // Validate and Sanitize inputs
+        if (fullName !== undefined) {
+            const trimmedName = fullName.trim();
+            if (trimmedName.length < 3) {
+                const error = new Error('Full name must be at least 3 characters long');
+                error.statusCode = 400;
+                throw error;
+            }
+            updateData.fullName = trimmedName;
+        }
+
+        if (username !== undefined) {
+            const trimmedUsername = username.trim();
+            if (trimmedUsername.length < 3 || trimmedUsername.includes(' ')) {
+                const error = new Error('Username must be at least 3 characters and cannot contain spaces');
+                error.statusCode = 400;
+                throw error;
+            }
+            updateData.username = trimmedUsername;
+        }
+
+        if (email !== undefined) {
+            const trimmedEmail = email.trim().toLowerCase();
+            if (!validateEmail(trimmedEmail)) {
+                const error = new Error('Invalid email address format');
+                error.statusCode = 400;
+                throw error;
+            }
+            updateData.email = trimmedEmail;
         }
 
         // Enforce 6-character minimum for manual password updates
@@ -176,8 +256,12 @@ export const updateUser = async (req, res, next) => {
                 where: { name: roleName.toUpperCase() },
             });
             if (roleRecord) {
-                updateData.roleId = roleRecord.id;
+                updateData.role = { connect: { id: roleRecord.id } };
             }
+        }
+
+        if (branchId) {
+            updateData.branch = { connect: { id: branchId } };
         }
 
         const updatedUser = await prisma.$transaction(async (tx) => {
@@ -195,11 +279,13 @@ export const updateUser = async (req, res, next) => {
                     update: {
                         licenseNumber: licenseNumber || existingUser.doctor?.licenseNumber,
                         specialization: specialization || existingUser.doctor?.specialization,
+                        branch: { connect: { id: branchId || existingUser.branchId } },
                     },
                     create: {
-                        userId: id,
+                        user: { connect: { id: id } },
                         licenseNumber: licenseNumber || '',
                         specialization: specialization || '',
+                        branch: { connect: { id: branchId || existingUser.branchId } },
                     },
                 });
             } else if (currentRole === 'DOCTOR' && targetRole !== 'DOCTOR') {

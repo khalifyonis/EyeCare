@@ -44,19 +44,34 @@ export function BranchDialog({ open, onOpenChange, branch, onSuccess }: BranchDi
     }, [branch, open]);
 
     const handleSave = async () => {
-        if (!formData.branchName || !formData.address || !formData.phone) {
+        const branchName = formData.branchName.trim();
+        const address = formData.address.trim();
+        const phone = formData.phone.trim();
+
+        if (!branchName || !address || !phone) {
             toast.error('All fields are required');
+            return;
+        }
+
+        if (branchName.length < 3) {
+            toast.error('Branch name must be at least 3 characters');
+            return;
+        }
+
+        if (address.length < 5) {
+            toast.error('Please enter a more complete address');
             return;
         }
 
         setSaving(true);
         try {
+            const payload = { branchName, address, phone };
             if (branch) {
-                await api.put(`/branches/${branch.id}`, formData);
-                toast.success('Branch updated');
+                await api.put(`/branches/${branch.id}`, payload);
+                toast.success('Branch updated successfully');
             } else {
-                await api.post('/branches', formData);
-                toast.success('Branch created');
+                await api.post('/branches', payload);
+                toast.success('Branch created successfully');
             }
             onOpenChange(false);
             onSuccess();

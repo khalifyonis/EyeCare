@@ -11,6 +11,7 @@ const prisma = new PrismaClient({ adapter });
 async function seed() {
     console.log('Seeding roles...');
     const roles = [
+        { name: 'SUPERADMIN', description: 'Complete System Access' },
         { name: 'ADMIN', description: 'System Administrator' },
         { name: 'DOCTOR', description: 'Medical Professional' },
         { name: 'RECEPTIONIST', description: 'Front Desk Staff' },
@@ -26,29 +27,57 @@ async function seed() {
         });
     }
 
+    console.log('Seeding default branch...');
+    const mainBranch = await prisma.branch.upsert({
+        where: { id: 'main-branch-id' }, // Using a fixed ID for consistency in seed
+        update: {},
+        create: {
+            id: 'main-branch-id',
+            branchName: 'Main Branch',
+            address: '123 Eye St, Medical District',
+            phone: '123-456-7890',
+        }
+    });
+
     const adminRole = await prisma.role.findUnique({ where: { name: 'ADMIN' } });
     if (!adminRole) throw new Error('ADMIN role not found after seeding');
 
-    console.log('Checking for admin user...');
-    const existing = await prisma.user.findUnique({ where: { username: 'admin' } });
-    if (existing) {
-        console.log('Admin user already exists. Skipping user seed.');
-    } else {
-        const hashedPassword = await bcrypt.hash('admin123', 10);
-        const admin = await prisma.user.create({
-            data: {
-                fullName: 'System Admin',
-                username: 'admin',
-                email: 'admin@eyecare.com',
-                password: hashedPassword,
-                roleId: adminRole.id,
-            },
-        });
-        console.log('Admin user created:', { id: admin.id, username: admin.username, role: 'ADMIN' });
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+
+    const usersToSeed = [
+        {
+            fullName: 'System Admin',
+            username: 'admin',
+            email: 'admin@eyecare.com',
+            password: hashedPassword,
+            roleId: adminRole.id,
+            branchId: mainBranch.id,
+        },
+        {
+            fullName: 'Yonis',
+            username: 'yonis',
+            email: 'yonis@eyecare.com',
+            password: hashedPassword,
+            roleId: adminRole.id, // Giving admin access as requested
+            branchId: mainBranch.id,
+        }
+    ];
+
+    console.log('Checking and seeding users...');
+    for (const userData of usersToSeed) {
+        const existing = await prisma.user.findUnique({ where: { username: userData.username } });
+        if (existing) {
+            console.log(`User ${userData.username} already exists. Skipping.`);
+        } else {
+            const user = await prisma.user.create({ data: userData });
+            console.log(`User created: ${user.username}`);
+        }
     }
 
     console.log('Seeding complete.');
-    console.log('Admin credentials: username="admin", password="admin123"');
+    console.log('Credentials:');
+    console.log('- username="admin", password="admin123"');
+    console.log('- username="yonis", password="admin123"');
     await pool.end();
 }
 
