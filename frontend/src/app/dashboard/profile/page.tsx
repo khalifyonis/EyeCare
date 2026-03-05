@@ -129,7 +129,7 @@ export default function ProfilePage() {
                 <Card className="md:col-span-1 overflow-hidden shadow-xl border-blue-100/50 dark:border-slate-800">
                     <CardContent className="pt-8 pb-6 text-center space-y-4">
                         <div className="relative inline-block group">
-                            <div className="size-32 rounded-full overflow-hidden border-4 border-white dark:border-slate-900 bg-gradient-to-br from-[#0EA5E9] to-[#2563EB] shadow-2xl flex items-center justify-center">
+                            <div className="size-32 rounded-full overflow-hidden border-4 border-white dark:border-slate-900 bg-gradient-to-br from-[#0EA5E9] to-[#0c96d4] shadow-2xl flex items-center justify-center">
                                 {profileImageUrl ? (
                                     <img src={profileImageUrl} alt={user.fullName} className="size-full object-cover" />
                                 ) : (

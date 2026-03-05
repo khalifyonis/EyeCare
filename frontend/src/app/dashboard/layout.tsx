@@ -71,20 +71,20 @@ export default function DashboardLayout({
         <SidebarProvider className="h-screen overflow-hidden">
             <AppSidebar />
             <SidebarInset className="bg-background flex flex-col h-screen overflow-hidden">
-                <header className="flex h-12 shrink-0 items-center gap-2 border-b border-sidebar-border bg-sidebar/5 backdrop-blur-md px-4 sticky top-0 z-30 transition-all duration-300">
+                <header className="flex h-[60px] shrink-0 items-center gap-2 border-b border-sidebar-border bg-white dark:bg-slate-950 backdrop-blur-md px-4 sticky top-0 z-30 transition-all duration-300">
                     {/* Left: Toggle + Search */}
-                    <div className="flex flex-1 items-center gap-2">
-                        <SidebarTrigger className="-ml-1 hover:bg-[#0EA5E9]/10 hover:text-[#0EA5E9] transition-colors" />
-                        <Separator orientation="vertical" className="mr-1 h-4" />
-                        {/* Global Search Bar */}
-                        <div className={`relative hidden md:flex items-center rounded-md shadow-sm transition-all duration-300 focus-within:ring-1 focus-within:ring-blue-500/50 ${searchFocused ? 'w-72' : 'w-52'}`}>
-                            <Search className="absolute left-2.5 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                    <div className="flex flex-1 items-center gap-4">
+                        <SidebarTrigger className="-ml-1 hover:bg-[#0EA5E9]/10 hover:text-[#0EA5E9] transition-colors scale-110" />
+                        <Separator orientation="vertical" className="mr-1 h-5" />
+                        {/* Global Search Bar (Enlarged) */}
+                        <div className={`relative hidden md:flex items-center rounded-xl shadow-sm transition-all duration-300 ring-1 ring-slate-200 focus-within:ring-2 focus-within:ring-[#0EA5E9]/30 group ${searchFocused ? 'w-[450px]' : 'w-[400px]'}`}>
+                            <Search className="absolute left-3.5 h-4 w-4 text-slate-400 group-focus-within:text-[#0EA5E9] transition-colors pointer-events-none" />
                             <input
                                 type="text"
                                 placeholder="Search patients, doctors..."
                                 onFocus={() => setSearchFocused(true)}
                                 onBlur={() => setSearchFocused(false)}
-                                className="w-full pl-8 pr-3 py-1.5 text-xs rounded-md border border-border/60 bg-muted/30 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#0EA5E9]/60 focus:bg-background focus:ring-1 focus:ring-[#0EA5E9]/30 transition-all duration-200"
+                                className="w-full pl-11 pr-4 py-2.5 text-[13px] font-medium rounded-xl border-none bg-slate-50/50 text-slate-600 placeholder:text-slate-400 focus:outline-none focus:bg-white transition-all duration-200"
                             />
                         </div>
                     </div>

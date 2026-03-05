@@ -8,6 +8,10 @@
   --font-mono: var(--font-geist-mono);
 
   --radius: 0.5rem;
+  --color-brand: #0EA5E9;
+  --color-brand-hover: #0c96d4;
+  --color-brand-light: #0EA5E91a;
+  /* 10% opacity */
 
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));

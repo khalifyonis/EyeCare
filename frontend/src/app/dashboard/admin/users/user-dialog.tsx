@@ -35,7 +35,7 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
         email: '',
         password: '',
         roleName: '',
-        branchId: '',
+        branchIds: [] as string[],
     });
 
     useEffect(() => {
@@ -58,10 +58,10 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
                 email: user.email || '',
                 password: '', // Don't pre-fill password
                 roleName: user.roleName || '',
-                branchId: user.branchId?.toString() || '',
+                branchIds: user.branches ? user.branches.map((b: any) => b.id) : (user.branchId ? [user.branchId.toString()] : []),
             });
         } else {
-            setFormData({ fullName: '', username: '', email: '', password: '', roleName: '', branchId: '' });
+            setFormData({ fullName: '', username: '', email: '', password: '', roleName: '', branchIds: [] });
         }
     }, [user, open]);
 
@@ -109,8 +109,8 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
             toast.error('Please select a role');
             return;
         }
-        if (!formData.branchId) {
-            toast.error('Please select a branch');
+        if (formData.branchIds.length === 0) {
+            toast.error('Please select at least one branch');
             return;
         }
 
@@ -196,47 +196,73 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
                         </div>
                     ) : (
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 text-blue-500">Change Password</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 text-[#0EA5E9]">Change Password</label>
                             <div className="relative group">
                                 <Input
                                     type={showPassword ? "text" : "password"}
                                     placeholder="Enter new password to update"
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                    className="rounded-xl border-blue-100 focus-visible:ring-blue-500 bg-blue-50/30 pr-10"
+                                    className="rounded-xl border-blue-100 focus-visible:ring-[#0EA5E9] bg-blue-50/30 pr-10"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-500 transition-colors"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#0EA5E9] transition-colors"
                                 >
                                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                 </button>
                             </div>
                         </div>
                     )}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Role</label>
-                            <Select value={formData.roleName} onValueChange={(v) => setFormData({ ...formData, roleName: v })}>
-                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-[#0EA5E9]">
-                                    <SelectValue placeholder="Select role" />
-                                </SelectTrigger>
-                                <SelectContent className="rounded-xl">
-                                    {ROLES.map(r => <SelectItem key={r} value={r} className="font-bold text-xs">{r}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-1.5">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Branch</label>
-                            <Select value={formData.branchId} onValueChange={(v) => setFormData({ ...formData, branchId: v })}>
-                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-[#0EA5E9]">
-                                    <SelectValue placeholder="Select branch" />
-                                </SelectTrigger>
-                                <SelectContent className="rounded-xl">
-                                    {branches.map(b => <SelectItem key={b.id} value={b.id.toString()} className="font-bold text-xs">{b.branchName}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
+
+                    <div className="space-y-1.5">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">User Role</label>
+                        <Select value={formData.roleName} onValueChange={(v) => setFormData({ ...formData, roleName: v })}>
+                            <SelectTrigger className="rounded-xl border-slate-200 focus:ring-[#0EA5E9]">
+                                <SelectValue placeholder="Select role" />
+                            </SelectTrigger>
+                            <SelectContent className="rounded-xl">
+                                {ROLES.map(r => <SelectItem key={r} value={r} className="font-bold text-xs">{r}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="space-y-1.5 pt-1">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-[#0EA5E9] ml-1">Assign Branches</label>
+                        <div className="border border-slate-200 rounded-xl p-3 bg-slate-50/50 max-h-[160px] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200">
+                            <div className="grid grid-cols-2 gap-2">
+                                {branches.map((b) => (
+                                    <label
+                                        key={b.id}
+                                        className={`flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer hover:shadow-sm ${formData.branchIds.includes(b.id)
+                                            ? 'bg-blue-50 border-blue-200 ring-1 ring-blue-100'
+                                            : 'bg-white border-slate-200 hover:border-blue-100 hover:bg-slate-50/80'
+                                            }`}
+                                    >
+                                        <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all ${formData.branchIds.includes(b.id)
+                                            ? 'bg-[#0EA5E9] border-[#0EA5E9] text-white'
+                                            : 'bg-white border-slate-300'
+                                            }`}>
+                                            {formData.branchIds.includes(b.id) && <Check className="h-3.5 w-3.5 stroke-[3]" />}
+                                        </div>
+                                        <input
+                                            type="checkbox"
+                                            className="hidden"
+                                            checked={formData.branchIds.includes(b.id)}
+                                            onChange={() => {
+                                                const newIds = formData.branchIds.includes(b.id)
+                                                    ? formData.branchIds.filter(id => id !== b.id)
+                                                    : [...formData.branchIds, b.id];
+                                                setFormData({ ...formData, branchIds: newIds });
+                                            }}
+                                        />
+                                        <span className={`text-[11px] font-bold truncate ${formData.branchIds.includes(b.id) ? 'text-blue-900' : 'text-slate-600'}`}>
+                                            {b.branchName}
+                                        </span>
+                                    </label>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>

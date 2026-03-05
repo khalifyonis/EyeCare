@@ -6,11 +6,17 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowUpDown, Pencil, Trash2 } from 'lucide-react';
 
 export type User = {
-    id: number;
+    id: string; // Changed to string for consistency with backend UUIDs
     fullName: string;
     username: string;
     email: string;
     roleName: string;
+    branchName?: string;
+    branches?: Array<{
+        id: string;
+        branchName: string;
+    }>;
+    profileImage?: string;
     doctor?: {
         specialization: string;
     };
@@ -18,7 +24,7 @@ export type User = {
 
 interface UserColumnsProps {
     onEdit: (user: User) => void;
-    onDelete: (id: number) => void;
+    onDelete: (id: string) => void;
 }
 
 const getRoleBadgeColor = (role: string) => {
@@ -27,6 +33,7 @@ const getRoleBadgeColor = (role: string) => {
         case 'DOCTOR': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
         case 'PHARMACIST': return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
         case 'RECEPTIONIST': return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
+        case 'OPTICIAN': return 'bg-violet-500/10 text-violet-500 border-violet-500/20';
         default: return 'bg-slate-500/10 text-slate-500 border-slate-500/20';
     }
 };
@@ -34,30 +41,28 @@ const getRoleBadgeColor = (role: string) => {
 export const getUserColumns = ({ onEdit, onDelete }: UserColumnsProps): ColumnDef<User>[] => [
     {
         accessorKey: 'fullName',
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                className="p-0 h-auto hover:bg-transparent font-bold text-slate-500 uppercase text-[11px] tracking-wider"
-                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            >
-                Full Name
-                <ArrowUpDown className="ml-2 h-3.5 w-3.5 opacity-50" />
-            </Button>
-        ),
+        header: 'Full Name',
         cell: ({ row }) => {
             const user = row.original;
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
             return (
                 <div className="flex items-center gap-3">
-                    <div className={`flex size-9 items-center justify-center rounded-xl text-xs font-black shadow-sm ${getRoleBadgeColor(user.roleName)}`}>
-                        {user.fullName.charAt(0).toUpperCase()}
-                    </div>
+                    {user.profileImage ? (
+                        <div className="flex size-9 shrink-0 overflow-hidden rounded-full border border-slate-100 dark:border-slate-800">
+                            <img
+                                src={`${apiUrl}${user.profileImage}`}
+                                alt={user.fullName}
+                                className="h-full w-full object-cover"
+                            />
+                        </div>
+                    ) : (
+                        <div className={`flex size-9 items-center justify-center rounded-full text-xs font-bold ${getRoleBadgeColor(user.roleName)}`}>
+                            {user.fullName.charAt(0).toUpperCase()}
+                        </div>
+                    )}
                     <div className="flex flex-col">
-                        <span className="font-bold text-slate-900 dark:text-slate-100">{user.fullName}</span>
-                        {user.doctor && (
-                            <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest mt-0.5">
-                                {user.doctor.specialization}
-                            </span>
-                        )}
+                        <span className="font-semibold text-slate-900 dark:text-slate-100">{user.fullName}</span>
+                        <span className="text-xs text-muted-foreground">{user.email}</span>
                     </div>
                 </div>
             );
@@ -66,7 +71,7 @@ export const getUserColumns = ({ onEdit, onDelete }: UserColumnsProps): ColumnDe
     {
         accessorKey: 'username',
         header: 'Username',
-        cell: ({ getValue }) => <span className="font-mono text-xs font-semibold text-slate-600 dark:text-slate-400">{getValue<string>()}</span>,
+        cell: ({ getValue }) => <span className="text-sm text-slate-600 dark:text-slate-400">{getValue<string>()}</span>,
     },
     {
         accessorKey: 'roleName',
@@ -74,21 +79,48 @@ export const getUserColumns = ({ onEdit, onDelete }: UserColumnsProps): ColumnDe
         cell: ({ getValue }) => {
             const role = getValue<string>();
             return (
-                <Badge variant="outline" className={`font-bold text-[10px] uppercase tracking-tighter px-2 py-0 border-2 ${getRoleBadgeColor(role)}`}>
+                <Badge variant="outline" className={`font-semibold text-[11px] uppercase px-2.5 py-0.5 border ${getRoleBadgeColor(role)}`}>
                     {role}
                 </Badge>
             );
         },
     },
     {
+        accessorKey: 'branchName',
+        header: 'Assigned Branches',
+        cell: ({ row }) => {
+            const user = row.original;
+            const branches = user.branches || [];
+
+            if (branches.length === 0) {
+                return <span className="text-sm text-slate-400 italic">No branches</span>;
+            }
+
+            return (
+                <div className="flex flex-wrap gap-1">
+                    {branches.map((b: any) => (
+                        <Badge
+                            key={b.id}
+                            variant="secondary"
+                            className="bg-slate-100 text-slate-700 hover:bg-slate-200 border-none text-[10px] font-bold px-2 py-0"
+                        >
+                            {b.branchName}
+                        </Badge>
+                    ))}
+                </div>
+            );
+        },
+    },
+    {
         id: 'actions',
-        header: () => <span className="flex justify-end pr-2">Actions</span>,
+        header: () => <span className="flex justify-end pr-2 uppercase text-[11px] font-bold text-slate-500 tracking-wider">Actions</span>,
         cell: ({ row }) => (
-            <div className="flex items-center justify-end gap-2 pr-1">
+            <div className="flex items-center justify-end gap-1 pr-1">
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-[#0EA5E9]/10 hover:text-[#0EA5E9] transition-all"
+                    title="Edit User"
+                    className="h-8 w-8 bg-blue-50 dark:bg-blue-950/30 text-[#0EA5E9] hover:bg-blue-100 hover:text-[#0c96d4] transition-all rounded-lg"
                     onClick={() => onEdit(row.original)}
                 >
                     <Pencil className="w-4 h-4" />
@@ -96,7 +128,8 @@ export const getUserColumns = ({ onEdit, onDelete }: UserColumnsProps): ColumnDe
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-red-100 dark:hover:bg-red-950/30 hover:text-red-500 transition-all"
+                    title="Delete User"
+                    className="h-8 w-8 bg-red-50 dark:bg-red-950/30 text-red-600 hover:bg-red-100 hover:text-red-700 transition-all rounded-lg"
                     onClick={() => onDelete(row.original.id)}
                 >
                     <Trash2 className="w-4 h-4" />

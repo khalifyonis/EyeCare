@@ -69,7 +69,7 @@ const roleNavigation: Record<
 > = {
     ADMIN: [
         {
-            section: 'MENU',
+            section: 'OVERVIEW',
             items: [
                 {
                     title: 'Dashboard',
@@ -77,15 +77,15 @@ const roleNavigation: Record<
                     url: '/dashboard/admin',
                 },
                 { title: 'Users', icon: UserCog, url: '/dashboard/admin/users' },
-                { title: 'Doctors', icon: Stethoscope, url: '#' },
+                { title: 'Doctors', icon: Stethoscope, url: '/dashboard/admin/doctors' },
                 { title: 'Branches', icon: LayoutDashboard, url: '/dashboard/admin/branches' },
             ],
         },
         {
             section: 'CLINICAL',
             items: [
-                { title: 'Patients', icon: Users, url: '#' },
-                { title: 'Appointments', icon: Calendar, url: '#' },
+                { title: 'Patients', icon: Users, url: '/dashboard/patients' },
+                { title: 'Appointments', icon: Calendar, url: '/dashboard/appointments' },
                 { title: 'Examinations', icon: Eye, url: '#' },
                 { title: 'Prescriptions', icon: FileText, url: '#' },
                 { title: 'Medical Reports', icon: BarChart3, url: '#' },
@@ -111,7 +111,7 @@ const roleNavigation: Record<
     ],
     DOCTOR: [
         {
-            section: 'MENU',
+            section: 'OVERVIEW',
             items: [
                 {
                     title: 'Dashboard',
@@ -123,8 +123,8 @@ const roleNavigation: Record<
         {
             section: 'CLINICAL',
             items: [
-                { title: 'Patients', icon: Users, url: '#' },
-                { title: 'Appointments', icon: Calendar, url: '#' },
+                { title: 'Patients', icon: Users, url: '/dashboard/patients' },
+                { title: 'Appointments', icon: Calendar, url: '/dashboard/appointments' },
                 { title: 'Examinations', icon: Eye, url: '#' },
                 { title: 'Prescriptions', icon: FileText, url: '#' },
                 { title: 'Reports', icon: BarChart3, url: '#' },
@@ -133,7 +133,7 @@ const roleNavigation: Record<
     ],
     PHARMACIST: [
         {
-            section: 'MENU',
+            section: 'OVERVIEW',
             items: [
                 { title: 'Dashboard', icon: LayoutDashboard, url: '/dashboard/pharmacist' },
             ],
@@ -150,7 +150,7 @@ const roleNavigation: Record<
     ],
     OPTICIAN: [
         {
-            section: 'MENU',
+            section: 'OVERVIEW',
             items: [
                 { title: 'Dashboard', icon: LayoutDashboard, url: '/dashboard/optician' },
             ],
@@ -167,19 +167,19 @@ const roleNavigation: Record<
     ],
     RECEPTIONIST: [
         {
-            section: 'MENU',
+            section: 'OVERVIEW',
             items: [
                 {
                     title: 'Dashboard',
                     icon: LayoutDashboard,
                     url: '/dashboard/receptionist',
                 },
-                { title: 'Patients', icon: UserPlus, url: '#' },
-                { title: 'Appointments', icon: Calendar, url: '#' },
+                { title: 'Patients', icon: UserPlus, url: '/dashboard/patients' },
+                { title: 'Appointments', icon: Calendar, url: '/dashboard/appointments' },
             ],
         },
         {
-            section: 'OFFICE',
+            section: 'OPERATIONS',
             items: [
                 { title: 'Messages', icon: MessageSquare, url: '#' },
                 { title: 'Billing', icon: Receipt, url: '#' },
@@ -234,13 +234,13 @@ function CollapsibleNavItem({
                     tooltip={item.title}
                     isActive={isActive}
                     onClick={() => onSelect()}
-                    className={`transition-all duration-300 group/item ${isActive
-                        ? 'bg-blue-500/10 text-blue-400'
-                        : 'hover:bg-blue-500/10 text-sidebar-foreground/70 hover:text-blue-400'
+                    className={`h-[42px] px-3.5 transition-all duration-200 group/item rounded-lg ${isActive
+                        ? '!bg-[#0EA5E9] !text-white shadow-[0_4px_12px_rgba(14,165,233,0.3)]'
+                        : 'hover:bg-slate-50 text-slate-700 hover:text-[#0EA5E9]'
                         }`}
                 >
-                    <item.icon className={`transition-colors duration-300 ${isActive ? 'text-blue-400' : 'text-slate-400 group-hover/item:text-blue-400'}`} />
-                    <span className={`font-semibold transition-colors duration-300 ${isActive ? 'text-blue-400' : ''}`}>{item.title}</span>
+                    <item.icon className={`h-[21px] w-[21px] shrink-0 transition-colors duration-200 ${isActive ? '!text-white' : 'text-slate-500/80 group-hover/item:text-[#0EA5E9]'}`} />
+                    <span className={`text-[15px] font-semibold tracking-tight transition-colors duration-200 ml-1 ${isActive ? '!text-white' : ''}`}>{item.title}</span>
                 </SidebarMenuButton>
             </SidebarMenuItem>
         )
@@ -323,22 +323,22 @@ function CollapsibleSection({
     }, [isSectionActive])
 
     return (
-        <SidebarGroup>
+        <SidebarGroup className="p-0">
             <button
                 onClick={() => setOpen(!open)}
-                className="flex w-full items-center justify-between px-6 mt-10 mb-2 group/section outline-none transition-all duration-300"
+                className="flex w-full items-center justify-between px-5 mt-5 mb-1.5 group/section outline-none"
             >
-                <span className="text-[11px] font-extrabold tracking-[0.2em] uppercase transition-colors duration-300 text-slate-400 group-hover/section:text-blue-400">
+                <span className="text-[12px] font-black tracking-[0.15em] uppercase text-slate-500/80 group-hover/section:text-[#0EA5E9] transition-all">
                     {label}
                 </span>
                 <ChevronRight
-                    className={`h-3 w-3 transition-all duration-300 ${open ? 'rotate-180' : ''
-                        } ${open || isSectionActive ? 'text-blue-500' : 'text-slate-300 group-hover/section:text-blue-400'
+                    className={`h-3.5 w-3.5 transition-transform duration-300 ${open ? 'rotate-90' : ''
+                        } ${open || isSectionActive ? 'text-[#0EA5E9]' : 'text-slate-300 group-hover/section:text-[#0EA5E9]'
                         }`}
                 />
             </button>
             {open && (
-                <SidebarGroupContent className="transition-all duration-500 ease-in-out">
+                <SidebarGroupContent>
                     {children}
                 </SidebarGroupContent>
             )}
@@ -378,26 +378,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     return (
         <Sidebar collapsible="icon" className="border-sidebar-border" {...props}>
-            <SidebarHeader className="bg-sidebar text-sidebar-foreground">
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton
-                            size="lg"
-                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-sidebar-accent transition-all duration-300 py-6"
-                            onClick={() => router.push(`/dashboard/${role.toLowerCase()}`)}
-                        >
-                            <div className="flex aspect-square size-11 items-center justify-center rounded-xl bg-[#0EA5E9]/10 dark:bg-white/5 transition-all duration-300 group-hover:scale-105 shadow-sm border border-[#0EA5E9]/20 dark:border-white/10 overflow-hidden">
-                                <img src="/logo-icon.svg" alt="Logo" className="size-full object-cover filter drop-shadow-[0_0_8px_rgba(14,165,233,0.3)]" />
-                            </div>
-                            <div className="grid flex-1 text-left text-sm leading-tight">
-                                <span className="truncate font-bold text-sidebar-foreground uppercase tracking-tight">Al-Ixsaan</span>
-                                <span className="truncate text-[10px] font-black uppercase text-[#0EA5E9] tracking-widest">
-                                    {role} Panel
-                                </span>
-                            </div>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+            <SidebarHeader className="bg-white border-b border-slate-100 px-5 py-4 shrink-0">
+                <div
+                    className="flex items-center gap-3.5 cursor-pointer hover:opacity-90 transition-opacity"
+                    onClick={() => router.push(`/dashboard/${role.toLowerCase()}`)}
+                >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-50 border border-slate-100 shadow-sm overflow-hidden">
+                        <img src="/logo-icon.svg" alt="Logo" className="h-7 w-7 object-contain" />
+                    </div>
+                    <div className="flex flex-col text-left leading-none">
+                        <span className="text-[19px] font-black text-slate-900 tracking-tight uppercase">Al-Ixsaan</span>
+                        <span className="text-[9px] font-bold uppercase text-[#0EA5E9] tracking-[0.2em] mt-0.5">{role} PANEL</span>
+                    </div>
+                </div>
             </SidebarHeader>
 
             <SidebarSeparator className="bg-sidebar-border/50" />
@@ -447,7 +440,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                             />
                                         </div>
                                     ) : (
-                                        <div className="flex aspect-square size-8 items-center justify-center rounded-full bg-gradient-to-br from-[#0EA5E9] to-[#2563EB] text-white text-xs font-bold">
+                                        <div className="flex aspect-square size-8 items-center justify-center rounded-full bg-gradient-to-br from-[#0EA5E9] to-[#0c96d4] text-white text-xs font-bold">
                                             {user?.fullName?.charAt(0)?.toUpperCase() || 'U'}
                                         </div>
                                     )}

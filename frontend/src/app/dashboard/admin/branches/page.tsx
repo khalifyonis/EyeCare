@@ -8,6 +8,7 @@ import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { BranchDialog } from './branch-dialog';
+import Link from 'next/link';
 
 export default function BranchesPage() {
     const [branches, setBranches] = useState<Branch[]>([]);
@@ -54,8 +55,12 @@ export default function BranchesPage() {
         <div className="p-6 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Branch Management</h1>
-                    <p className="text-xs text-muted-foreground uppercase font-bold tracking-[0.2em] opacity-60">Manage clinic locations and info</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Clinical Branches</h1>
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-0.5">
+                        <Link href="/dashboard" className="hover:text-[#0EA5E9] transition-colors">Dashboard</Link>
+                        <span>›</span>
+                        <span>Clinical Branches</span>
+                    </div>
                 </div>
                 <Button onClick={() => { setEditingBranch(null); setIsDialogOpen(true); }} className="bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold shadow-lg shadow-blue-500/20 px-6 rounded-xl transition-all active:scale-[0.98]">
                     <Plus className="w-4 h-4 mr-2" />

@@ -8,6 +8,7 @@ import { UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { UserDialog } from './user-dialog';
+import Link from 'next/link';
 
 export default function UsersPage() {
     const [users, setUsers] = useState<User[]>([]);
@@ -34,7 +35,7 @@ export default function UsersPage() {
         setIsDialogOpen(true);
     };
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (id: string) => {
         if (!confirm('Are you sure?')) return;
         try {
             await api.delete(`/users/${id}`);
@@ -54,8 +55,12 @@ export default function UsersPage() {
         <div className="p-6 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">User Management</h1>
-                    <p className="text-xs text-muted-foreground uppercase font-bold tracking-[0.2em] opacity-60">Control access and platform roles</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">User Management</h1>
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-0.5">
+                        <Link href="/dashboard" className="hover:text-[#0EA5E9] transition-colors">Dashboard</Link>
+                        <span>›</span>
+                        <span>User Management</span>
+                    </div>
                 </div>
                 <Button onClick={() => { setEditingUser(null); setIsDialogOpen(true); }} className="bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold shadow-lg shadow-blue-500/20 px-6 rounded-xl transition-all active:scale-[0.98]">
                     <UserPlus className="w-4 h-4 mr-2" />

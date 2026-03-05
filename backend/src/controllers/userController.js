@@ -26,15 +26,22 @@ function generateTemporaryPassword() {
 export const getAllUsers = async (req, res, next) => {
     try {
         const users = await prisma.user.findMany({
-            include: { role: true, branch: true },
+            include: {
+                role: true,
+                branch: true,
+                staffAssignments: { include: { branch: true } }
+            },
             orderBy: { fullName: 'asc' },
         });
 
         const sanitizedUsers = users.map(user => {
             const { password, ...rest } = user;
+            const branches = user.staffAssignments.map(sa => sa.branch);
             return {
                 ...rest,
                 roleName: user.role.name,
+                branchName: user.branch?.branchName || '',
+                branches
             };
         });
 
@@ -79,6 +86,7 @@ export const getUserById = async (req, res, next) => {
             include: {
                 role: true,
                 doctor: true,
+                staffAssignments: { include: { branch: true } }
             },
         });
 
@@ -88,8 +96,13 @@ export const getUserById = async (req, res, next) => {
             throw error;
         }
 
-        const { password, ...sanitizedUser } = user;
-        res.status(200).json({ ...sanitizedUser, roleName: user.role.name });
+        const { password, staffAssignments, ...sanitizedUser } = user;
+        const branches = staffAssignments.map(sa => sa.branch);
+        res.status(200).json({
+            ...sanitizedUser,
+            roleName: user.role.name,
+            branches
+        });
     } catch (error) {
         next(error);
     }
@@ -103,7 +116,10 @@ const validateEmail = (email) => {
 
 export const createUser = async (req, res, next) => {
     try {
-        let { fullName, username, email, password, roleName, branchId, licenseNumber, specialization } = req.body;
+        let { fullName, username, email, password, roleName, branchId, branchIds, licenseNumber, specialization } = req.body;
+
+        // Ensure branchIds is an array
+        const finalBranchIds = Array.isArray(branchIds) ? branchIds : (branchId ? [branchId] : []);
 
         // Clean and Sanitize
         fullName = fullName?.trim();
@@ -111,8 +127,8 @@ export const createUser = async (req, res, next) => {
         email = email?.trim()?.toLowerCase();
 
         // Rigorous Validation
-        if (!fullName || !username || !email || !roleName || !branchId) {
-            const error = new Error('Full name, username, email, branch, and role are required');
+        if (!fullName || !username || !email || !roleName || finalBranchIds.length === 0) {
+            const error = new Error('Full name, username, email, at least one branch, and role are required');
             error.statusCode = 400;
             throw error;
         }
@@ -157,7 +173,10 @@ export const createUser = async (req, res, next) => {
                     email,
                     password: hashedPassword,
                     role: { connect: { id: roleRecord.id } },
-                    branch: { connect: { id: branchId } },
+                    branch: { connect: { id: finalBranchIds[0] } }, // Default primary branch
+                    staffAssignments: {
+                        create: finalBranchIds.map(id => ({ branchId: id }))
+                    }
                 },
             });
 
@@ -170,7 +189,7 @@ export const createUser = async (req, res, next) => {
                         user: { connect: { id: user.id } },
                         licenseNumber,
                         specialization,
-                        branch: { connect: { id: branchId } },
+                        branch: { connect: { id: finalBranchIds[0] } },
                     },
                 });
             }
@@ -195,7 +214,7 @@ export const createUser = async (req, res, next) => {
 export const updateUser = async (req, res, next) => {
     try {
         const { id } = req.params;
-        let { fullName, username, email, password, roleName, branchId, licenseNumber, specialization } = req.body;
+        let { fullName, username, email, password, roleName, branchId, branchIds, licenseNumber, specialization } = req.body;
 
         const existingUser = await prisma.user.findUnique({
             where: { id },
@@ -260,7 +279,9 @@ export const updateUser = async (req, res, next) => {
             }
         }
 
-        if (branchId) {
+        if (branchIds && Array.isArray(branchIds)) {
+            // We'll update the staff assignments in the transaction
+        } else if (branchId) {
             updateData.branch = { connect: { id: branchId } };
         }
 
@@ -269,6 +290,29 @@ export const updateUser = async (req, res, next) => {
                 where: { id },
                 data: updateData,
             });
+
+            // Update multi-branch assignments if provided
+            if (branchIds && Array.isArray(branchIds)) {
+                // Remove old assignments
+                await tx.staffAssignment.deleteMany({
+                    where: { userId: id }
+                });
+                // Create new assignments
+                await tx.staffAssignment.createMany({
+                    data: branchIds.map(bId => ({
+                        userId: id,
+                        branchId: bId
+                    }))
+                });
+
+                // Also update the primary branchId if the first one changed
+                if (branchIds.length > 0) {
+                    await tx.user.update({
+                        where: { id },
+                        data: { branchId: branchIds[0] }
+                    });
+                }
+            }
 
             const currentRole = existingUser.role.name;
             const targetRole = roleName ? roleName.toUpperCase() : currentRole;

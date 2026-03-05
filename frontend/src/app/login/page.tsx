@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { User, Lock, Loader2, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 
+import { BranchSelectorDialog } from '@/components/auth/branch-selector-dialog';
+
 export default function LoginPage() {
     const router = useRouter();
     const [username, setUsername] = useState('');
@@ -15,6 +17,10 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+
+    // Multi-branch selection
+    const [tempAuthData, setTempAuthData] = useState<{ token: string, user: any } | null>(null);
+    const [showBranchSelector, setShowBranchSelector] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -25,17 +31,42 @@ export default function LoginPage() {
             const response = await api.post('/auth/login', { username, password });
             const { token, user } = response.data;
 
-            localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(user));
-            // Set cookie for middleware (7 days)
-            document.cookie = `token=${token}; path=/; max-age=604800; SameSite=Lax`;
+            // If user has multiple branches, show selector
+            if (user.role !== 'SUPERADMIN' && user.branches && user.branches.length > 1) {
+                setTempAuthData({ token, user });
+                setShowBranchSelector(true);
+                setLoading(false);
+                return;
+            }
 
-            router.push(`/dashboard/${user.role.toLowerCase()}`);
+            // Single branch or SUPERADMIN logic
+            const activeBranch = user.branches && user.branches.length > 0 ? user.branches[0] : null;
+            completeLogin(token, user, activeBranch);
         } catch (err: any) {
             console.error('Login failed', err);
             setError(err.response?.data?.message || 'Invalid credentials. Please try again.');
-        } finally {
             setLoading(false);
+        }
+    };
+
+    const completeLogin = (token: string, user: any, branch: any) => {
+        const userToStore = {
+            ...user,
+            activeBranch: branch,
+            branchId: branch?.id || user.branchId
+        };
+
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(userToStore));
+        // Set cookie for middleware (7 days)
+        document.cookie = `token=${token}; path=/; max-age=604800; SameSite=Lax`;
+
+        router.push(`/dashboard/${user.role.toLowerCase()}`);
+    };
+
+    const handleBranchSelect = (branch: any) => {
+        if (tempAuthData) {
+            completeLogin(tempAuthData.token, tempAuthData.user, branch);
         }
     };
 
@@ -192,6 +223,12 @@ export default function LoginPage() {
 
                 </div>
             </div>
+
+            <BranchSelectorDialog
+                open={showBranchSelector}
+                branches={tempAuthData?.user?.branches || []}
+                onSelect={handleBranchSelect}
+            />
         </div>
     );
 }

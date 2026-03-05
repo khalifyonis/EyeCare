@@ -5,6 +5,10 @@ import morgan from 'morgan';
 import authRoutes from './src/routes/authRoutes.js';
 import userRoutes from './src/routes/userRoutes.js';
 import branchRoutes from './src/routes/branchRoutes.js';
+import patientRoutes from './src/routes/patientRoutes.js';
+import appointmentRoutes from './src/routes/appointmentRoutes.js';
+import doctorRoutes from './src/routes/doctorRoutes.js';
+import dashboardRoutes from './src/routes/dashboardRoutes.js';
 import errorMiddleware from './src/middlewares/errorMiddleware.js';
 
 const app = express();
@@ -20,6 +24,10 @@ app.use('/uploads', express.static('uploads'));
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/branches', branchRoutes);
+app.use('/api/patients', patientRoutes);
+app.use('/api/appointments', appointmentRoutes);
+app.use('/api/doctors', doctorRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Health check
 app.get('/', (req, res) => {

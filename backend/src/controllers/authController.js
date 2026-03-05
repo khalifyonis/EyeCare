@@ -23,7 +23,12 @@ export const login = async (req, res, next) => {
     // Find user by username and include role
     const user = await prisma.user.findUnique({
       where: { username },
-      include: { role: true },
+      include: {
+        role: true,
+        staffAssignments: {
+          include: { branch: true }
+        }
+      },
     });
 
     if (!user) {
@@ -48,12 +53,13 @@ export const login = async (req, res, next) => {
       { expiresIn: '8h' }
     );
 
-    const { password: _, roleId: __, role: ___, ...userDetails } = user;
+    const branches = user.staffAssignments.map(sa => sa.branch);
+    const { password: _, roleId: __, role: ___, staffAssignments: ____, ...userDetails } = user;
 
     res.status(200).json({
       message: 'Login successful',
       token,
-      user: { ...userDetails, role: user.role.name },
+      user: { ...userDetails, role: user.role.name, branches },
     });
   } catch (error) {
     next(error);
@@ -181,15 +187,22 @@ export const getMe = async (req, res, next) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },
-      include: { role: true, branch: true },
+      include: {
+        role: true,
+        branch: true,
+        staffAssignments: {
+          include: { branch: true }
+        }
+      },
     });
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const { password, ...sanitizedUser } = user;
-    res.status(200).json(sanitizedUser);
+    const { password: _, staffAssignments, ...sanitizedUser } = user;
+    const branches = staffAssignments.map(sa => sa.branch);
+    res.status(200).json({ ...sanitizedUser, branches });
   } catch (error) {
     next(error);
   }
