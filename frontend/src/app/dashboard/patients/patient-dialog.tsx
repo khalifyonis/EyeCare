@@ -26,20 +26,18 @@ interface PatientDialogProps {
 export function PatientDialog({ open, onOpenChange, patient, onSuccess }: PatientDialogProps) {
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
+        fullName: '',
         phone: '',
         email: '',
         dateOfBirth: '',
-        gender: 'MALE', // Default to MALE
+        gender: 'MALE',
         address: '',
     });
 
     useEffect(() => {
         if (patient) {
             setFormData({
-                firstName: patient.firstName || '',
-                lastName: patient.lastName || '',
+                fullName: patient.fullName || '',
                 phone: patient.phone || '',
                 email: patient.email || '',
                 dateOfBirth: patient.dateOfBirth ? new Date(patient.dateOfBirth).toISOString().split('T')[0] : '',
@@ -47,20 +45,20 @@ export function PatientDialog({ open, onOpenChange, patient, onSuccess }: Patien
                 address: patient.address || '',
             });
         } else {
-            setFormData({ firstName: '', lastName: '', phone: '', email: '', dateOfBirth: '', gender: 'MALE', address: '' });
+            setFormData({ fullName: '', phone: '', email: '', dateOfBirth: '', gender: 'MALE', address: '' });
         }
     }, [patient, open]);
 
     const handleSave = async () => {
         const nameRegex = /^[a-zA-Z\s]+$/;
 
-        if (!formData.firstName.trim() || !formData.lastName.trim()) {
-            toast.error('First & Last name required');
+        if (!formData.fullName.trim()) {
+            toast.error('Full name is required');
             return;
         }
 
-        if (!nameRegex.test(formData.firstName) || !nameRegex.test(formData.lastName)) {
-            toast.error('Names must contain only letters');
+        if (!nameRegex.test(formData.fullName.trim())) {
+            toast.error('Name must contain only letters and spaces');
             return;
         }
 
@@ -85,11 +83,14 @@ export function PatientDialog({ open, onOpenChange, patient, onSuccess }: Patien
 
         setSaving(true);
         try {
-            // Remove empty strings for optional fields to keep Joi happy
-            const payload: any = { ...formData };
-            if (!payload.email) delete payload.email;
-            if (!payload.address) delete payload.address;
-
+            const payload = {
+                fullName: formData.fullName.trim(),
+                phone: formData.phone.trim(),
+                email: formData.email?.trim() || undefined,
+                dateOfBirth: formData.dateOfBirth || undefined,
+                gender: formData.gender,
+                address: formData.address?.trim() || undefined,
+            };
             if (patient) {
                 await api.put(`/patients/${patient.id}`, payload);
                 toast.success('Patient updated successfully');
@@ -112,21 +113,15 @@ export function PatientDialog({ open, onOpenChange, patient, onSuccess }: Patien
                 <DialogHeader className="p-6 pb-2">
                     <DialogTitle className="text-xl font-black">{patient ? 'Edit Patient' : 'Add New Patient'}</DialogTitle>
                     <DialogDescription className="font-medium">
-                        {patient ? `Updating clinical records for ${patient.patientId}` : 'Create a new digital medical record for the patient.'}
+                        {patient ? `Updating clinical records for this patient.` : 'Create a new digital medical record for the patient.'}
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="flex-1 overflow-y-auto px-6 py-2 h-[calc(90vh-140px)]">
                     <div className="grid gap-4 py-2">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">First Name</label>
-                                <Input placeholder="John" value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} className="rounded-xl border-slate-200 focus-visible:ring-[#0EA5E9]" />
-                            </div>
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Last Name</label>
-                                <Input placeholder="Doe" value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} className="rounded-xl border-slate-200 focus-visible:ring-[#0EA5E9]" />
-                            </div>
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Full Name</label>
+                            <Input placeholder="e.g. John Doe" value={formData.fullName} onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} className="rounded-xl border-slate-200 focus-visible:ring-[#0EA5E9]" />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">

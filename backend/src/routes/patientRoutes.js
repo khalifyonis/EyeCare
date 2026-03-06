@@ -13,8 +13,8 @@ import { patientSchema, updatePatientSchema } from '../middlewares/validationSch
 
 const router = express.Router();
 
-// All staff roles can view patients
-router.get('/stats', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR'), getPatientStats);
+// Stats: same roles that can view the list (so the patients page loads without 403)
+router.get('/stats', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), getPatientStats);
 router.get('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), getAllPatients);
 router.get('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), getPatientById);
 

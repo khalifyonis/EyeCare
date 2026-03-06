@@ -1,47 +1,74 @@
+'use client';
+
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { LucideIcon } from 'lucide-react';
+import { LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+export type StatsCardColor = 'blue' | 'emerald' | 'purple' | 'amber' | 'rose' | 'orange';
 
 interface StatsCardProps {
     title: string;
     value: string | number;
     icon: LucideIcon;
-    color: 'blue' | 'emerald' | 'purple' | 'amber' | 'rose';
+    color: StatsCardColor;
     trend?: {
-        value: string;
+        text: string;
         isUp: boolean;
     };
+    className?: string;
 }
 
-const colorStyles = {
-    blue: "text-blue-600 bg-blue-50 dark:bg-blue-900/20",
-    emerald: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20",
-    purple: "text-purple-600 bg-purple-50 dark:bg-purple-900/20",
-    amber: "text-amber-600 bg-amber-50 dark:bg-amber-900/20",
-    rose: "text-rose-600 bg-rose-50 dark:bg-rose-900/20",
+const iconBgMap: Record<StatsCardColor, string> = {
+    blue: 'bg-blue-500',
+    emerald: 'bg-emerald-500',
+    purple: 'bg-purple-500',
+    amber: 'bg-amber-500',
+    rose: 'bg-rose-500',
+    orange: 'bg-orange-500',
 };
 
-export function StatsCard({ title, value, icon: Icon, color, trend }: StatsCardProps) {
+const trendColorMap: Record<string, string> = {
+    up: 'text-emerald-600 dark:text-emerald-400',
+    down: 'text-rose-500 dark:text-rose-400',
+};
+
+export function StatsCard({
+    title,
+    value,
+    icon: Icon,
+    color,
+    trend,
+    className,
+}: StatsCardProps) {
     return (
-        <Card className="border-none shadow-sm bg-white dark:bg-slate-900 overflow-hidden group hover:shadow-md transition-all duration-300">
-            <CardContent className="p-5">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <p className="text-[11px] font-black uppercase tracking-widest text-slate-400 mb-1">{title}</p>
-                        <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{value}</h3>
-                        {trend && (
-                            <div className="flex items-center gap-1.5 mt-2">
-                                <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${colorStyles[color]}`}>
-                                    {trend.value}
-                                </span>
-                            </div>
-                        )}
-                    </div>
-                    <div className={`p-3 rounded-2xl transition-transform group-hover:scale-110 duration-300 ${colorStyles[color]}`}>
-                        <Icon strokeWidth={2.5} size={20} />
-                    </div>
+        <div
+            className={cn(
+                'rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 min-w-0',
+                className
+            )}
+        >
+            {/* Row 1: icon + title */}
+            <div className="flex items-center gap-3 mb-4">
+                <div className={cn('flex shrink-0 w-10 h-10 rounded-lg items-center justify-center', iconBgMap[color])}>
+                    <Icon className="w-5 h-5 text-white" strokeWidth={2} />
                 </div>
-            </CardContent>
-        </Card>
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-tight">
+                    {title}
+                </span>
+            </div>
+
+            {/* Row 2: value */}
+            <p className="text-[1.75rem] font-bold text-slate-900 dark:text-white tracking-tight tabular-nums leading-none mb-3">
+                {value}
+            </p>
+
+            {/* Row 3: trend */}
+            {trend && (
+                <div className={cn('flex items-center gap-1.5 text-xs font-medium', trend.isUp ? trendColorMap.up : trendColorMap.down)}>
+                    {trend.isUp ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
+                    <span>{trend.text}</span>
+                </div>
+            )}
+        </div>
     );
 }

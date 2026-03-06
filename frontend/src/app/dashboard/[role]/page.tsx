@@ -155,8 +155,8 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="flex-1 overflow-auto bg-slate-50/50">
-            <div className="max-w-[1600px] mx-auto">
+        <div className="flex-1 overflow-auto min-w-0 bg-muted/30 dark:bg-background/50">
+            <div className="max-w-[1600px] mx-auto w-full min-w-0">
                 {/* ── Dashboard Content ── */}
                 <div className="px-6 lg:px-8 pb-8 pt-6 space-y-6">
                     {/* ── Stat Cards Grid (Aligned with OVERVIEW) ── */}
@@ -261,7 +261,7 @@ export default function DashboardPage() {
                         {/* Recent Patients Table */}
                         <Card className="lg:col-span-4 border-none shadow-xl bg-white dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden flex flex-col">
                             <CardHeader className="flex flex-row items-center justify-between py-2.5 px-4 shrink-0 border-b border-slate-100 dark:border-slate-800">
-                                <CardTitle className="text-[12px] font-black uppercase tracking-[0.1em] text-slate-500/80">Recent Patients</CardTitle>
+                                <CardTitle className="text-[12px] font-black uppercase tracking-[0.1em] text-muted-foreground">Recent Patients</CardTitle>
                                 <div className="flex items-center gap-2">
                                     <button title="Quick Register Patient" className="flex items-center gap-1 bg-[#0EA5E9] hover:bg-[#0c8cc7] text-[9px] font-bold px-2 py-1 rounded-lg transition-colors shadow-sm text-white">
                                         <UserPlus className="h-3 w-3" />
@@ -292,7 +292,7 @@ export default function DashboardPage() {
                         {/* Top Doctors List */}
                         <Card className="lg:col-span-3 border-none shadow-xl bg-white dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden">
                             <CardHeader className="flex flex-row items-center justify-between py-2.5 px-4 shrink-0 border-b border-slate-100 dark:border-slate-800">
-                                <CardTitle className="text-[12px] font-black uppercase tracking-[0.1em] text-slate-500/80">Top Doctors</CardTitle>
+                                <CardTitle className="text-[12px] font-black uppercase tracking-[0.1em] text-muted-foreground">Top Doctors</CardTitle>
                                 <button className="text-[9px] text-[#0EA5E9] font-bold hover:text-[#0c8cc7] transition-colors flex items-center gap-1 bg-blue-500/5 px-2 py-1 rounded-lg uppercase">
                                     VIEW ALL <ArrowUpRight className="h-2.5 w-2.5" />
                                 </button>

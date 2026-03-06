@@ -62,7 +62,8 @@ export default function PatientDetailPage() {
 
     if (!patient) return null;
 
-    const initials = `${patient.firstName?.charAt(0) || ''}${patient.lastName?.charAt(0) || ''}`;
+    const fullName = patient.fullName || '';
+    const initials = fullName.split(/\s+/).map((s: string) => s.charAt(0)).join('').slice(0, 2).toUpperCase() || fullName.charAt(0).toUpperCase();
 
     return (
         <div className="p-4 md:p-6 max-w-6xl mx-auto space-y-6 animate-in fade-in duration-500">
@@ -80,7 +81,7 @@ export default function PatientDetailPage() {
                     <div>
                         <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Patient Profile</h1>
                         <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">ID: {patient.patientId}</span>
+                            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">ID: #{String(patient.id).slice(0, 8)}</span>
                         </div>
                     </div>
                 </div>
@@ -103,7 +104,7 @@ export default function PatientDetailPage() {
                         </div>
                         <div className="space-y-1">
                             <h2 className="text-xl font-bold text-slate-800 dark:text-white uppercase tracking-tight">
-                                {patient.firstName} {patient.lastName}
+                                {fullName}
                             </h2>
                             <p className="text-xs font-black uppercase tracking-widest text-slate-500">
                                 {patient.gender} • {patient.dateOfBirth ? `${new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear()} YRS` : 'N/A'}

@@ -29,11 +29,6 @@ export type Branch = $Result.DefaultSelection<Prisma.$BranchPayload>
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
- * Model StaffAssignment
- * 
- */
-export type StaffAssignment = $Result.DefaultSelection<Prisma.$StaffAssignmentPayload>
-/**
  * Model Doctor
  * 
  */
@@ -93,6 +88,11 @@ export type OpticalStockTransaction = $Result.DefaultSelection<Prisma.$OpticalSt
  * 
  */
 export type Billing = $Result.DefaultSelection<Prisma.$BillingPayload>
+/**
+ * Model StaffAssignment
+ * 
+ */
+export type StaffAssignment = $Result.DefaultSelection<Prisma.$StaffAssignmentPayload>
 
 /**
  * Enums
@@ -288,16 +288,6 @@ export class PrismaClient<
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.staffAssignment`: Exposes CRUD operations for the **StaffAssignment** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more StaffAssignments
-    * const staffAssignments = await prisma.staffAssignment.findMany()
-    * ```
-    */
-  get staffAssignment(): Prisma.StaffAssignmentDelegate<ExtArgs, ClientOptions>;
-
-  /**
    * `prisma.doctor`: Exposes CRUD operations for the **Doctor** model.
     * Example usage:
     * ```ts
@@ -416,6 +406,16 @@ export class PrismaClient<
     * ```
     */
   get billing(): Prisma.BillingDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.staffAssignment`: Exposes CRUD operations for the **StaffAssignment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more StaffAssignments
+    * const staffAssignments = await prisma.staffAssignment.findMany()
+    * ```
+    */
+  get staffAssignment(): Prisma.StaffAssignmentDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -860,7 +860,6 @@ export namespace Prisma {
     Role: 'Role',
     Branch: 'Branch',
     User: 'User',
-    StaffAssignment: 'StaffAssignment',
     Doctor: 'Doctor',
     Patient: 'Patient',
     Appointment: 'Appointment',
@@ -872,7 +871,8 @@ export namespace Prisma {
     PharmacyStockTransaction: 'PharmacyStockTransaction',
     OpticalItem: 'OpticalItem',
     OpticalStockTransaction: 'OpticalStockTransaction',
-    Billing: 'Billing'
+    Billing: 'Billing',
+    StaffAssignment: 'StaffAssignment'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -891,7 +891,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "role" | "branch" | "user" | "staffAssignment" | "doctor" | "patient" | "appointment" | "eRExamination" | "clinicalExamination" | "surgery" | "prescription" | "pharmacyItem" | "pharmacyStockTransaction" | "opticalItem" | "opticalStockTransaction" | "billing"
+      modelProps: "role" | "branch" | "user" | "doctor" | "patient" | "appointment" | "eRExamination" | "clinicalExamination" | "surgery" | "prescription" | "pharmacyItem" | "pharmacyStockTransaction" | "opticalItem" | "opticalStockTransaction" | "billing" | "staffAssignment"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1114,80 +1114,6 @@ export namespace Prisma {
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
-          }
-        }
-      }
-      StaffAssignment: {
-        payload: Prisma.$StaffAssignmentPayload<ExtArgs>
-        fields: Prisma.StaffAssignmentFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.StaffAssignmentFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.StaffAssignmentFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>
-          }
-          findFirst: {
-            args: Prisma.StaffAssignmentFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.StaffAssignmentFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>
-          }
-          findMany: {
-            args: Prisma.StaffAssignmentFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>[]
-          }
-          create: {
-            args: Prisma.StaffAssignmentCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>
-          }
-          createMany: {
-            args: Prisma.StaffAssignmentCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.StaffAssignmentCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>[]
-          }
-          delete: {
-            args: Prisma.StaffAssignmentDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>
-          }
-          update: {
-            args: Prisma.StaffAssignmentUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>
-          }
-          deleteMany: {
-            args: Prisma.StaffAssignmentDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.StaffAssignmentUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.StaffAssignmentUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>[]
-          }
-          upsert: {
-            args: Prisma.StaffAssignmentUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>
-          }
-          aggregate: {
-            args: Prisma.StaffAssignmentAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateStaffAssignment>
-          }
-          groupBy: {
-            args: Prisma.StaffAssignmentGroupByArgs<ExtArgs>
-            result: $Utils.Optional<StaffAssignmentGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.StaffAssignmentCountArgs<ExtArgs>
-            result: $Utils.Optional<StaffAssignmentCountAggregateOutputType> | number
           }
         }
       }
@@ -2079,6 +2005,80 @@ export namespace Prisma {
           }
         }
       }
+      StaffAssignment: {
+        payload: Prisma.$StaffAssignmentPayload<ExtArgs>
+        fields: Prisma.StaffAssignmentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.StaffAssignmentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.StaffAssignmentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>
+          }
+          findFirst: {
+            args: Prisma.StaffAssignmentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.StaffAssignmentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>
+          }
+          findMany: {
+            args: Prisma.StaffAssignmentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>[]
+          }
+          create: {
+            args: Prisma.StaffAssignmentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>
+          }
+          createMany: {
+            args: Prisma.StaffAssignmentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.StaffAssignmentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>[]
+          }
+          delete: {
+            args: Prisma.StaffAssignmentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>
+          }
+          update: {
+            args: Prisma.StaffAssignmentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>
+          }
+          deleteMany: {
+            args: Prisma.StaffAssignmentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.StaffAssignmentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.StaffAssignmentUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>[]
+          }
+          upsert: {
+            args: Prisma.StaffAssignmentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>
+          }
+          aggregate: {
+            args: Prisma.StaffAssignmentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateStaffAssignment>
+          }
+          groupBy: {
+            args: Prisma.StaffAssignmentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<StaffAssignmentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.StaffAssignmentCountArgs<ExtArgs>
+            result: $Utils.Optional<StaffAssignmentCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2178,7 +2178,6 @@ export namespace Prisma {
     role?: RoleOmit
     branch?: BranchOmit
     user?: UserOmit
-    staffAssignment?: StaffAssignmentOmit
     doctor?: DoctorOmit
     patient?: PatientOmit
     appointment?: AppointmentOmit
@@ -2191,6 +2190,7 @@ export namespace Prisma {
     opticalItem?: OpticalItemOmit
     opticalStockTransaction?: OpticalStockTransactionOmit
     billing?: BillingOmit
+    staffAssignment?: StaffAssignmentOmit
   }
 
   /* Types for Logging */
@@ -2432,21 +2432,21 @@ export namespace Prisma {
    */
 
   export type UserCountOutputType = {
-    staffAssignments: number
     createdAppointments: number
     recordedERExams: number
     pharmacyTransactions: number
     opticalTransactions: number
     createdBillings: number
+    staffAssignments: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    staffAssignments?: boolean | UserCountOutputTypeCountStaffAssignmentsArgs
     createdAppointments?: boolean | UserCountOutputTypeCountCreatedAppointmentsArgs
     recordedERExams?: boolean | UserCountOutputTypeCountRecordedERExamsArgs
     pharmacyTransactions?: boolean | UserCountOutputTypeCountPharmacyTransactionsArgs
     opticalTransactions?: boolean | UserCountOutputTypeCountOpticalTransactionsArgs
     createdBillings?: boolean | UserCountOutputTypeCountCreatedBillingsArgs
+    staffAssignments?: boolean | UserCountOutputTypeCountStaffAssignmentsArgs
   }
 
   // Custom InputTypes
@@ -2458,13 +2458,6 @@ export namespace Prisma {
      * Select specific fields to fetch from the UserCountOutputType
      */
     select?: UserCountOutputTypeSelect<ExtArgs> | null
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountStaffAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: StaffAssignmentWhereInput
   }
 
   /**
@@ -2500,6 +2493,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountCreatedBillingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: BillingWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountStaffAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StaffAssignmentWhereInput
   }
 
 
@@ -5517,13 +5517,13 @@ export namespace Prisma {
     updatedAt?: boolean
     role?: boolean | RoleDefaultArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
-    staffAssignments?: boolean | User$staffAssignmentsArgs<ExtArgs>
     doctor?: boolean | User$doctorArgs<ExtArgs>
     createdAppointments?: boolean | User$createdAppointmentsArgs<ExtArgs>
     recordedERExams?: boolean | User$recordedERExamsArgs<ExtArgs>
     pharmacyTransactions?: boolean | User$pharmacyTransactionsArgs<ExtArgs>
     opticalTransactions?: boolean | User$opticalTransactionsArgs<ExtArgs>
     createdBillings?: boolean | User$createdBillingsArgs<ExtArgs>
+    staffAssignments?: boolean | User$staffAssignmentsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -5586,13 +5586,13 @@ export namespace Prisma {
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     role?: boolean | RoleDefaultArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
-    staffAssignments?: boolean | User$staffAssignmentsArgs<ExtArgs>
     doctor?: boolean | User$doctorArgs<ExtArgs>
     createdAppointments?: boolean | User$createdAppointmentsArgs<ExtArgs>
     recordedERExams?: boolean | User$recordedERExamsArgs<ExtArgs>
     pharmacyTransactions?: boolean | User$pharmacyTransactionsArgs<ExtArgs>
     opticalTransactions?: boolean | User$opticalTransactionsArgs<ExtArgs>
     createdBillings?: boolean | User$createdBillingsArgs<ExtArgs>
+    staffAssignments?: boolean | User$staffAssignmentsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5609,13 +5609,13 @@ export namespace Prisma {
     objects: {
       role: Prisma.$RolePayload<ExtArgs>
       branch: Prisma.$BranchPayload<ExtArgs>
-      staffAssignments: Prisma.$StaffAssignmentPayload<ExtArgs>[]
       doctor: Prisma.$DoctorPayload<ExtArgs> | null
       createdAppointments: Prisma.$AppointmentPayload<ExtArgs>[]
       recordedERExams: Prisma.$ERExaminationPayload<ExtArgs>[]
       pharmacyTransactions: Prisma.$PharmacyStockTransactionPayload<ExtArgs>[]
       opticalTransactions: Prisma.$OpticalStockTransactionPayload<ExtArgs>[]
       createdBillings: Prisma.$BillingPayload<ExtArgs>[]
+      staffAssignments: Prisma.$StaffAssignmentPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -6028,13 +6028,13 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     role<T extends RoleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, RoleDefaultArgs<ExtArgs>>): Prisma__RoleClient<$Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    staffAssignments<T extends User$staffAssignmentsArgs<ExtArgs> = {}>(args?: Subset<T, User$staffAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     doctor<T extends User$doctorArgs<ExtArgs> = {}>(args?: Subset<T, User$doctorArgs<ExtArgs>>): Prisma__DoctorClient<$Result.GetResult<Prisma.$DoctorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     createdAppointments<T extends User$createdAppointmentsArgs<ExtArgs> = {}>(args?: Subset<T, User$createdAppointmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     recordedERExams<T extends User$recordedERExamsArgs<ExtArgs> = {}>(args?: Subset<T, User$recordedERExamsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ERExaminationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     pharmacyTransactions<T extends User$pharmacyTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, User$pharmacyTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PharmacyStockTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     opticalTransactions<T extends User$opticalTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, User$opticalTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpticalStockTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     createdBillings<T extends User$createdBillingsArgs<ExtArgs> = {}>(args?: Subset<T, User$createdBillingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    staffAssignments<T extends User$staffAssignmentsArgs<ExtArgs> = {}>(args?: Subset<T, User$staffAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6474,30 +6474,6 @@ export namespace Prisma {
   }
 
   /**
-   * User.staffAssignments
-   */
-  export type User$staffAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StaffAssignment
-     */
-    select?: StaffAssignmentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StaffAssignment
-     */
-    omit?: StaffAssignmentOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StaffAssignmentInclude<ExtArgs> | null
-    where?: StaffAssignmentWhereInput
-    orderBy?: StaffAssignmentOrderByWithRelationInput | StaffAssignmentOrderByWithRelationInput[]
-    cursor?: StaffAssignmentWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: StaffAssignmentScalarFieldEnum | StaffAssignmentScalarFieldEnum[]
-  }
-
-  /**
    * User.doctor
    */
   export type User$doctorArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6637,6 +6613,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.staffAssignments
+   */
+  export type User$staffAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    where?: StaffAssignmentWhereInput
+    orderBy?: StaffAssignmentOrderByWithRelationInput | StaffAssignmentOrderByWithRelationInput[]
+    cursor?: StaffAssignmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: StaffAssignmentScalarFieldEnum | StaffAssignmentScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6652,1072 +6652,6 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UserInclude<ExtArgs> | null
-  }
-
-
-  /**
-   * Model StaffAssignment
-   */
-
-  export type AggregateStaffAssignment = {
-    _count: StaffAssignmentCountAggregateOutputType | null
-    _min: StaffAssignmentMinAggregateOutputType | null
-    _max: StaffAssignmentMaxAggregateOutputType | null
-  }
-
-  export type StaffAssignmentMinAggregateOutputType = {
-    id: string | null
-    userId: string | null
-    branchId: string | null
-    isPrimary: boolean | null
-    assignedAt: Date | null
-  }
-
-  export type StaffAssignmentMaxAggregateOutputType = {
-    id: string | null
-    userId: string | null
-    branchId: string | null
-    isPrimary: boolean | null
-    assignedAt: Date | null
-  }
-
-  export type StaffAssignmentCountAggregateOutputType = {
-    id: number
-    userId: number
-    branchId: number
-    isPrimary: number
-    assignedAt: number
-    _all: number
-  }
-
-
-  export type StaffAssignmentMinAggregateInputType = {
-    id?: true
-    userId?: true
-    branchId?: true
-    isPrimary?: true
-    assignedAt?: true
-  }
-
-  export type StaffAssignmentMaxAggregateInputType = {
-    id?: true
-    userId?: true
-    branchId?: true
-    isPrimary?: true
-    assignedAt?: true
-  }
-
-  export type StaffAssignmentCountAggregateInputType = {
-    id?: true
-    userId?: true
-    branchId?: true
-    isPrimary?: true
-    assignedAt?: true
-    _all?: true
-  }
-
-  export type StaffAssignmentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which StaffAssignment to aggregate.
-     */
-    where?: StaffAssignmentWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of StaffAssignments to fetch.
-     */
-    orderBy?: StaffAssignmentOrderByWithRelationInput | StaffAssignmentOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: StaffAssignmentWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` StaffAssignments from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` StaffAssignments.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned StaffAssignments
-    **/
-    _count?: true | StaffAssignmentCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: StaffAssignmentMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: StaffAssignmentMaxAggregateInputType
-  }
-
-  export type GetStaffAssignmentAggregateType<T extends StaffAssignmentAggregateArgs> = {
-        [P in keyof T & keyof AggregateStaffAssignment]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateStaffAssignment[P]>
-      : GetScalarType<T[P], AggregateStaffAssignment[P]>
-  }
-
-
-
-
-  export type StaffAssignmentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: StaffAssignmentWhereInput
-    orderBy?: StaffAssignmentOrderByWithAggregationInput | StaffAssignmentOrderByWithAggregationInput[]
-    by: StaffAssignmentScalarFieldEnum[] | StaffAssignmentScalarFieldEnum
-    having?: StaffAssignmentScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: StaffAssignmentCountAggregateInputType | true
-    _min?: StaffAssignmentMinAggregateInputType
-    _max?: StaffAssignmentMaxAggregateInputType
-  }
-
-  export type StaffAssignmentGroupByOutputType = {
-    id: string
-    userId: string
-    branchId: string
-    isPrimary: boolean
-    assignedAt: Date
-    _count: StaffAssignmentCountAggregateOutputType | null
-    _min: StaffAssignmentMinAggregateOutputType | null
-    _max: StaffAssignmentMaxAggregateOutputType | null
-  }
-
-  type GetStaffAssignmentGroupByPayload<T extends StaffAssignmentGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<StaffAssignmentGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof StaffAssignmentGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], StaffAssignmentGroupByOutputType[P]>
-            : GetScalarType<T[P], StaffAssignmentGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type StaffAssignmentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    userId?: boolean
-    branchId?: boolean
-    isPrimary?: boolean
-    assignedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["staffAssignment"]>
-
-  export type StaffAssignmentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    userId?: boolean
-    branchId?: boolean
-    isPrimary?: boolean
-    assignedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["staffAssignment"]>
-
-  export type StaffAssignmentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    userId?: boolean
-    branchId?: boolean
-    isPrimary?: boolean
-    assignedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["staffAssignment"]>
-
-  export type StaffAssignmentSelectScalar = {
-    id?: boolean
-    userId?: boolean
-    branchId?: boolean
-    isPrimary?: boolean
-    assignedAt?: boolean
-  }
-
-  export type StaffAssignmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "branchId" | "isPrimary" | "assignedAt", ExtArgs["result"]["staffAssignment"]>
-  export type StaffAssignmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
-  }
-  export type StaffAssignmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
-  }
-  export type StaffAssignmentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
-  }
-
-  export type $StaffAssignmentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "StaffAssignment"
-    objects: {
-      user: Prisma.$UserPayload<ExtArgs>
-      branch: Prisma.$BranchPayload<ExtArgs>
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      userId: string
-      branchId: string
-      isPrimary: boolean
-      assignedAt: Date
-    }, ExtArgs["result"]["staffAssignment"]>
-    composites: {}
-  }
-
-  type StaffAssignmentGetPayload<S extends boolean | null | undefined | StaffAssignmentDefaultArgs> = $Result.GetResult<Prisma.$StaffAssignmentPayload, S>
-
-  type StaffAssignmentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<StaffAssignmentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: StaffAssignmentCountAggregateInputType | true
-    }
-
-  export interface StaffAssignmentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['StaffAssignment'], meta: { name: 'StaffAssignment' } }
-    /**
-     * Find zero or one StaffAssignment that matches the filter.
-     * @param {StaffAssignmentFindUniqueArgs} args - Arguments to find a StaffAssignment
-     * @example
-     * // Get one StaffAssignment
-     * const staffAssignment = await prisma.staffAssignment.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends StaffAssignmentFindUniqueArgs>(args: SelectSubset<T, StaffAssignmentFindUniqueArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one StaffAssignment that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {StaffAssignmentFindUniqueOrThrowArgs} args - Arguments to find a StaffAssignment
-     * @example
-     * // Get one StaffAssignment
-     * const staffAssignment = await prisma.staffAssignment.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends StaffAssignmentFindUniqueOrThrowArgs>(args: SelectSubset<T, StaffAssignmentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first StaffAssignment that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StaffAssignmentFindFirstArgs} args - Arguments to find a StaffAssignment
-     * @example
-     * // Get one StaffAssignment
-     * const staffAssignment = await prisma.staffAssignment.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends StaffAssignmentFindFirstArgs>(args?: SelectSubset<T, StaffAssignmentFindFirstArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first StaffAssignment that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StaffAssignmentFindFirstOrThrowArgs} args - Arguments to find a StaffAssignment
-     * @example
-     * // Get one StaffAssignment
-     * const staffAssignment = await prisma.staffAssignment.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends StaffAssignmentFindFirstOrThrowArgs>(args?: SelectSubset<T, StaffAssignmentFindFirstOrThrowArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more StaffAssignments that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StaffAssignmentFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all StaffAssignments
-     * const staffAssignments = await prisma.staffAssignment.findMany()
-     * 
-     * // Get first 10 StaffAssignments
-     * const staffAssignments = await prisma.staffAssignment.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const staffAssignmentWithIdOnly = await prisma.staffAssignment.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends StaffAssignmentFindManyArgs>(args?: SelectSubset<T, StaffAssignmentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a StaffAssignment.
-     * @param {StaffAssignmentCreateArgs} args - Arguments to create a StaffAssignment.
-     * @example
-     * // Create one StaffAssignment
-     * const StaffAssignment = await prisma.staffAssignment.create({
-     *   data: {
-     *     // ... data to create a StaffAssignment
-     *   }
-     * })
-     * 
-     */
-    create<T extends StaffAssignmentCreateArgs>(args: SelectSubset<T, StaffAssignmentCreateArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many StaffAssignments.
-     * @param {StaffAssignmentCreateManyArgs} args - Arguments to create many StaffAssignments.
-     * @example
-     * // Create many StaffAssignments
-     * const staffAssignment = await prisma.staffAssignment.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends StaffAssignmentCreateManyArgs>(args?: SelectSubset<T, StaffAssignmentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many StaffAssignments and returns the data saved in the database.
-     * @param {StaffAssignmentCreateManyAndReturnArgs} args - Arguments to create many StaffAssignments.
-     * @example
-     * // Create many StaffAssignments
-     * const staffAssignment = await prisma.staffAssignment.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many StaffAssignments and only return the `id`
-     * const staffAssignmentWithIdOnly = await prisma.staffAssignment.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends StaffAssignmentCreateManyAndReturnArgs>(args?: SelectSubset<T, StaffAssignmentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a StaffAssignment.
-     * @param {StaffAssignmentDeleteArgs} args - Arguments to delete one StaffAssignment.
-     * @example
-     * // Delete one StaffAssignment
-     * const StaffAssignment = await prisma.staffAssignment.delete({
-     *   where: {
-     *     // ... filter to delete one StaffAssignment
-     *   }
-     * })
-     * 
-     */
-    delete<T extends StaffAssignmentDeleteArgs>(args: SelectSubset<T, StaffAssignmentDeleteArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one StaffAssignment.
-     * @param {StaffAssignmentUpdateArgs} args - Arguments to update one StaffAssignment.
-     * @example
-     * // Update one StaffAssignment
-     * const staffAssignment = await prisma.staffAssignment.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends StaffAssignmentUpdateArgs>(args: SelectSubset<T, StaffAssignmentUpdateArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more StaffAssignments.
-     * @param {StaffAssignmentDeleteManyArgs} args - Arguments to filter StaffAssignments to delete.
-     * @example
-     * // Delete a few StaffAssignments
-     * const { count } = await prisma.staffAssignment.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends StaffAssignmentDeleteManyArgs>(args?: SelectSubset<T, StaffAssignmentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more StaffAssignments.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StaffAssignmentUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many StaffAssignments
-     * const staffAssignment = await prisma.staffAssignment.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends StaffAssignmentUpdateManyArgs>(args: SelectSubset<T, StaffAssignmentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more StaffAssignments and returns the data updated in the database.
-     * @param {StaffAssignmentUpdateManyAndReturnArgs} args - Arguments to update many StaffAssignments.
-     * @example
-     * // Update many StaffAssignments
-     * const staffAssignment = await prisma.staffAssignment.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more StaffAssignments and only return the `id`
-     * const staffAssignmentWithIdOnly = await prisma.staffAssignment.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends StaffAssignmentUpdateManyAndReturnArgs>(args: SelectSubset<T, StaffAssignmentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one StaffAssignment.
-     * @param {StaffAssignmentUpsertArgs} args - Arguments to update or create a StaffAssignment.
-     * @example
-     * // Update or create a StaffAssignment
-     * const staffAssignment = await prisma.staffAssignment.upsert({
-     *   create: {
-     *     // ... data to create a StaffAssignment
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the StaffAssignment we want to update
-     *   }
-     * })
-     */
-    upsert<T extends StaffAssignmentUpsertArgs>(args: SelectSubset<T, StaffAssignmentUpsertArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of StaffAssignments.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StaffAssignmentCountArgs} args - Arguments to filter StaffAssignments to count.
-     * @example
-     * // Count the number of StaffAssignments
-     * const count = await prisma.staffAssignment.count({
-     *   where: {
-     *     // ... the filter for the StaffAssignments we want to count
-     *   }
-     * })
-    **/
-    count<T extends StaffAssignmentCountArgs>(
-      args?: Subset<T, StaffAssignmentCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], StaffAssignmentCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a StaffAssignment.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StaffAssignmentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends StaffAssignmentAggregateArgs>(args: Subset<T, StaffAssignmentAggregateArgs>): Prisma.PrismaPromise<GetStaffAssignmentAggregateType<T>>
-
-    /**
-     * Group by StaffAssignment.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StaffAssignmentGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends StaffAssignmentGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: StaffAssignmentGroupByArgs['orderBy'] }
-        : { orderBy?: StaffAssignmentGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, StaffAssignmentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStaffAssignmentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the StaffAssignment model
-   */
-  readonly fields: StaffAssignmentFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for StaffAssignment.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__StaffAssignmentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the StaffAssignment model
-   */
-  interface StaffAssignmentFieldRefs {
-    readonly id: FieldRef<"StaffAssignment", 'String'>
-    readonly userId: FieldRef<"StaffAssignment", 'String'>
-    readonly branchId: FieldRef<"StaffAssignment", 'String'>
-    readonly isPrimary: FieldRef<"StaffAssignment", 'Boolean'>
-    readonly assignedAt: FieldRef<"StaffAssignment", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * StaffAssignment findUnique
-   */
-  export type StaffAssignmentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StaffAssignment
-     */
-    select?: StaffAssignmentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StaffAssignment
-     */
-    omit?: StaffAssignmentOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StaffAssignmentInclude<ExtArgs> | null
-    /**
-     * Filter, which StaffAssignment to fetch.
-     */
-    where: StaffAssignmentWhereUniqueInput
-  }
-
-  /**
-   * StaffAssignment findUniqueOrThrow
-   */
-  export type StaffAssignmentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StaffAssignment
-     */
-    select?: StaffAssignmentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StaffAssignment
-     */
-    omit?: StaffAssignmentOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StaffAssignmentInclude<ExtArgs> | null
-    /**
-     * Filter, which StaffAssignment to fetch.
-     */
-    where: StaffAssignmentWhereUniqueInput
-  }
-
-  /**
-   * StaffAssignment findFirst
-   */
-  export type StaffAssignmentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StaffAssignment
-     */
-    select?: StaffAssignmentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StaffAssignment
-     */
-    omit?: StaffAssignmentOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StaffAssignmentInclude<ExtArgs> | null
-    /**
-     * Filter, which StaffAssignment to fetch.
-     */
-    where?: StaffAssignmentWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of StaffAssignments to fetch.
-     */
-    orderBy?: StaffAssignmentOrderByWithRelationInput | StaffAssignmentOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for StaffAssignments.
-     */
-    cursor?: StaffAssignmentWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` StaffAssignments from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` StaffAssignments.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of StaffAssignments.
-     */
-    distinct?: StaffAssignmentScalarFieldEnum | StaffAssignmentScalarFieldEnum[]
-  }
-
-  /**
-   * StaffAssignment findFirstOrThrow
-   */
-  export type StaffAssignmentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StaffAssignment
-     */
-    select?: StaffAssignmentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StaffAssignment
-     */
-    omit?: StaffAssignmentOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StaffAssignmentInclude<ExtArgs> | null
-    /**
-     * Filter, which StaffAssignment to fetch.
-     */
-    where?: StaffAssignmentWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of StaffAssignments to fetch.
-     */
-    orderBy?: StaffAssignmentOrderByWithRelationInput | StaffAssignmentOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for StaffAssignments.
-     */
-    cursor?: StaffAssignmentWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` StaffAssignments from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` StaffAssignments.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of StaffAssignments.
-     */
-    distinct?: StaffAssignmentScalarFieldEnum | StaffAssignmentScalarFieldEnum[]
-  }
-
-  /**
-   * StaffAssignment findMany
-   */
-  export type StaffAssignmentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StaffAssignment
-     */
-    select?: StaffAssignmentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StaffAssignment
-     */
-    omit?: StaffAssignmentOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StaffAssignmentInclude<ExtArgs> | null
-    /**
-     * Filter, which StaffAssignments to fetch.
-     */
-    where?: StaffAssignmentWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of StaffAssignments to fetch.
-     */
-    orderBy?: StaffAssignmentOrderByWithRelationInput | StaffAssignmentOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing StaffAssignments.
-     */
-    cursor?: StaffAssignmentWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` StaffAssignments from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` StaffAssignments.
-     */
-    skip?: number
-    distinct?: StaffAssignmentScalarFieldEnum | StaffAssignmentScalarFieldEnum[]
-  }
-
-  /**
-   * StaffAssignment create
-   */
-  export type StaffAssignmentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StaffAssignment
-     */
-    select?: StaffAssignmentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StaffAssignment
-     */
-    omit?: StaffAssignmentOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StaffAssignmentInclude<ExtArgs> | null
-    /**
-     * The data needed to create a StaffAssignment.
-     */
-    data: XOR<StaffAssignmentCreateInput, StaffAssignmentUncheckedCreateInput>
-  }
-
-  /**
-   * StaffAssignment createMany
-   */
-  export type StaffAssignmentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many StaffAssignments.
-     */
-    data: StaffAssignmentCreateManyInput | StaffAssignmentCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * StaffAssignment createManyAndReturn
-   */
-  export type StaffAssignmentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StaffAssignment
-     */
-    select?: StaffAssignmentSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the StaffAssignment
-     */
-    omit?: StaffAssignmentOmit<ExtArgs> | null
-    /**
-     * The data used to create many StaffAssignments.
-     */
-    data: StaffAssignmentCreateManyInput | StaffAssignmentCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StaffAssignmentIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * StaffAssignment update
-   */
-  export type StaffAssignmentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StaffAssignment
-     */
-    select?: StaffAssignmentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StaffAssignment
-     */
-    omit?: StaffAssignmentOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StaffAssignmentInclude<ExtArgs> | null
-    /**
-     * The data needed to update a StaffAssignment.
-     */
-    data: XOR<StaffAssignmentUpdateInput, StaffAssignmentUncheckedUpdateInput>
-    /**
-     * Choose, which StaffAssignment to update.
-     */
-    where: StaffAssignmentWhereUniqueInput
-  }
-
-  /**
-   * StaffAssignment updateMany
-   */
-  export type StaffAssignmentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update StaffAssignments.
-     */
-    data: XOR<StaffAssignmentUpdateManyMutationInput, StaffAssignmentUncheckedUpdateManyInput>
-    /**
-     * Filter which StaffAssignments to update
-     */
-    where?: StaffAssignmentWhereInput
-    /**
-     * Limit how many StaffAssignments to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * StaffAssignment updateManyAndReturn
-   */
-  export type StaffAssignmentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StaffAssignment
-     */
-    select?: StaffAssignmentSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the StaffAssignment
-     */
-    omit?: StaffAssignmentOmit<ExtArgs> | null
-    /**
-     * The data used to update StaffAssignments.
-     */
-    data: XOR<StaffAssignmentUpdateManyMutationInput, StaffAssignmentUncheckedUpdateManyInput>
-    /**
-     * Filter which StaffAssignments to update
-     */
-    where?: StaffAssignmentWhereInput
-    /**
-     * Limit how many StaffAssignments to update.
-     */
-    limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StaffAssignmentIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * StaffAssignment upsert
-   */
-  export type StaffAssignmentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StaffAssignment
-     */
-    select?: StaffAssignmentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StaffAssignment
-     */
-    omit?: StaffAssignmentOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StaffAssignmentInclude<ExtArgs> | null
-    /**
-     * The filter to search for the StaffAssignment to update in case it exists.
-     */
-    where: StaffAssignmentWhereUniqueInput
-    /**
-     * In case the StaffAssignment found by the `where` argument doesn't exist, create a new StaffAssignment with this data.
-     */
-    create: XOR<StaffAssignmentCreateInput, StaffAssignmentUncheckedCreateInput>
-    /**
-     * In case the StaffAssignment was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<StaffAssignmentUpdateInput, StaffAssignmentUncheckedUpdateInput>
-  }
-
-  /**
-   * StaffAssignment delete
-   */
-  export type StaffAssignmentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StaffAssignment
-     */
-    select?: StaffAssignmentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StaffAssignment
-     */
-    omit?: StaffAssignmentOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StaffAssignmentInclude<ExtArgs> | null
-    /**
-     * Filter which StaffAssignment to delete.
-     */
-    where: StaffAssignmentWhereUniqueInput
-  }
-
-  /**
-   * StaffAssignment deleteMany
-   */
-  export type StaffAssignmentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which StaffAssignments to delete
-     */
-    where?: StaffAssignmentWhereInput
-    /**
-     * Limit how many StaffAssignments to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * StaffAssignment without action
-   */
-  export type StaffAssignmentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StaffAssignment
-     */
-    select?: StaffAssignmentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StaffAssignment
-     */
-    omit?: StaffAssignmentOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StaffAssignmentInclude<ExtArgs> | null
   }
 
 
@@ -8924,9 +7858,7 @@ export namespace Prisma {
 
   export type PatientMinAggregateOutputType = {
     id: string | null
-    patientId: string | null
-    firstName: string | null
-    lastName: string | null
+    fullName: string | null
     gender: string | null
     dateOfBirth: Date | null
     phone: string | null
@@ -8939,9 +7871,7 @@ export namespace Prisma {
 
   export type PatientMaxAggregateOutputType = {
     id: string | null
-    patientId: string | null
-    firstName: string | null
-    lastName: string | null
+    fullName: string | null
     gender: string | null
     dateOfBirth: Date | null
     phone: string | null
@@ -8954,9 +7884,7 @@ export namespace Prisma {
 
   export type PatientCountAggregateOutputType = {
     id: number
-    patientId: number
-    firstName: number
-    lastName: number
+    fullName: number
     gender: number
     dateOfBirth: number
     phone: number
@@ -8971,9 +7899,7 @@ export namespace Prisma {
 
   export type PatientMinAggregateInputType = {
     id?: true
-    patientId?: true
-    firstName?: true
-    lastName?: true
+    fullName?: true
     gender?: true
     dateOfBirth?: true
     phone?: true
@@ -8986,9 +7912,7 @@ export namespace Prisma {
 
   export type PatientMaxAggregateInputType = {
     id?: true
-    patientId?: true
-    firstName?: true
-    lastName?: true
+    fullName?: true
     gender?: true
     dateOfBirth?: true
     phone?: true
@@ -9001,9 +7925,7 @@ export namespace Prisma {
 
   export type PatientCountAggregateInputType = {
     id?: true
-    patientId?: true
-    firstName?: true
-    lastName?: true
+    fullName?: true
     gender?: true
     dateOfBirth?: true
     phone?: true
@@ -9089,9 +8011,7 @@ export namespace Prisma {
 
   export type PatientGroupByOutputType = {
     id: string
-    patientId: string
-    firstName: string
-    lastName: string
+    fullName: string
     gender: string | null
     dateOfBirth: Date
     phone: string
@@ -9121,9 +8041,7 @@ export namespace Prisma {
 
   export type PatientSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    patientId?: boolean
-    firstName?: boolean
-    lastName?: boolean
+    fullName?: boolean
     gender?: boolean
     dateOfBirth?: boolean
     phone?: boolean
@@ -9140,9 +8058,7 @@ export namespace Prisma {
 
   export type PatientSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    patientId?: boolean
-    firstName?: boolean
-    lastName?: boolean
+    fullName?: boolean
     gender?: boolean
     dateOfBirth?: boolean
     phone?: boolean
@@ -9156,9 +8072,7 @@ export namespace Prisma {
 
   export type PatientSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    patientId?: boolean
-    firstName?: boolean
-    lastName?: boolean
+    fullName?: boolean
     gender?: boolean
     dateOfBirth?: boolean
     phone?: boolean
@@ -9172,9 +8086,7 @@ export namespace Prisma {
 
   export type PatientSelectScalar = {
     id?: boolean
-    patientId?: boolean
-    firstName?: boolean
-    lastName?: boolean
+    fullName?: boolean
     gender?: boolean
     dateOfBirth?: boolean
     phone?: boolean
@@ -9185,7 +8097,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type PatientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "firstName" | "lastName" | "gender" | "dateOfBirth" | "phone" | "email" | "address" | "branchId" | "createdAt" | "updatedAt", ExtArgs["result"]["patient"]>
+  export type PatientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "fullName" | "gender" | "dateOfBirth" | "phone" | "email" | "address" | "branchId" | "createdAt" | "updatedAt", ExtArgs["result"]["patient"]>
   export type PatientInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     appointments?: boolean | Patient$appointmentsArgs<ExtArgs>
@@ -9208,9 +8120,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      patientId: string
-      firstName: string
-      lastName: string
+      fullName: string
       gender: string | null
       dateOfBirth: Date
       phone: string
@@ -9646,9 +8556,7 @@ export namespace Prisma {
    */
   interface PatientFieldRefs {
     readonly id: FieldRef<"Patient", 'String'>
-    readonly patientId: FieldRef<"Patient", 'String'>
-    readonly firstName: FieldRef<"Patient", 'String'>
-    readonly lastName: FieldRef<"Patient", 'String'>
+    readonly fullName: FieldRef<"Patient", 'String'>
     readonly gender: FieldRef<"Patient", 'String'>
     readonly dateOfBirth: FieldRef<"Patient", 'DateTime'>
     readonly phone: FieldRef<"Patient", 'String'>
@@ -10322,7 +9230,7 @@ export namespace Prisma {
 
   export type AppointmentGroupByOutputType = {
     id: string
-    bookingNumber: string
+    bookingNumber: string | null
     appointmentDate: Date
     status: $Enums.AppointmentStatus
     amount: Decimal
@@ -10465,7 +9373,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      bookingNumber: string
+      bookingNumber: string | null
       appointmentDate: Date
       status: $Enums.AppointmentStatus
       amount: Prisma.Decimal
@@ -22552,6 +21460,1072 @@ export namespace Prisma {
 
 
   /**
+   * Model StaffAssignment
+   */
+
+  export type AggregateStaffAssignment = {
+    _count: StaffAssignmentCountAggregateOutputType | null
+    _min: StaffAssignmentMinAggregateOutputType | null
+    _max: StaffAssignmentMaxAggregateOutputType | null
+  }
+
+  export type StaffAssignmentMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    branchId: string | null
+    isPrimary: boolean | null
+    assignedAt: Date | null
+  }
+
+  export type StaffAssignmentMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    branchId: string | null
+    isPrimary: boolean | null
+    assignedAt: Date | null
+  }
+
+  export type StaffAssignmentCountAggregateOutputType = {
+    id: number
+    userId: number
+    branchId: number
+    isPrimary: number
+    assignedAt: number
+    _all: number
+  }
+
+
+  export type StaffAssignmentMinAggregateInputType = {
+    id?: true
+    userId?: true
+    branchId?: true
+    isPrimary?: true
+    assignedAt?: true
+  }
+
+  export type StaffAssignmentMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    branchId?: true
+    isPrimary?: true
+    assignedAt?: true
+  }
+
+  export type StaffAssignmentCountAggregateInputType = {
+    id?: true
+    userId?: true
+    branchId?: true
+    isPrimary?: true
+    assignedAt?: true
+    _all?: true
+  }
+
+  export type StaffAssignmentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StaffAssignment to aggregate.
+     */
+    where?: StaffAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StaffAssignments to fetch.
+     */
+    orderBy?: StaffAssignmentOrderByWithRelationInput | StaffAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: StaffAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StaffAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StaffAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned StaffAssignments
+    **/
+    _count?: true | StaffAssignmentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: StaffAssignmentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: StaffAssignmentMaxAggregateInputType
+  }
+
+  export type GetStaffAssignmentAggregateType<T extends StaffAssignmentAggregateArgs> = {
+        [P in keyof T & keyof AggregateStaffAssignment]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateStaffAssignment[P]>
+      : GetScalarType<T[P], AggregateStaffAssignment[P]>
+  }
+
+
+
+
+  export type StaffAssignmentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StaffAssignmentWhereInput
+    orderBy?: StaffAssignmentOrderByWithAggregationInput | StaffAssignmentOrderByWithAggregationInput[]
+    by: StaffAssignmentScalarFieldEnum[] | StaffAssignmentScalarFieldEnum
+    having?: StaffAssignmentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: StaffAssignmentCountAggregateInputType | true
+    _min?: StaffAssignmentMinAggregateInputType
+    _max?: StaffAssignmentMaxAggregateInputType
+  }
+
+  export type StaffAssignmentGroupByOutputType = {
+    id: string
+    userId: string
+    branchId: string
+    isPrimary: boolean | null
+    assignedAt: Date
+    _count: StaffAssignmentCountAggregateOutputType | null
+    _min: StaffAssignmentMinAggregateOutputType | null
+    _max: StaffAssignmentMaxAggregateOutputType | null
+  }
+
+  type GetStaffAssignmentGroupByPayload<T extends StaffAssignmentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<StaffAssignmentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof StaffAssignmentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], StaffAssignmentGroupByOutputType[P]>
+            : GetScalarType<T[P], StaffAssignmentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type StaffAssignmentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    branchId?: boolean
+    isPrimary?: boolean
+    assignedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["staffAssignment"]>
+
+  export type StaffAssignmentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    branchId?: boolean
+    isPrimary?: boolean
+    assignedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["staffAssignment"]>
+
+  export type StaffAssignmentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    branchId?: boolean
+    isPrimary?: boolean
+    assignedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["staffAssignment"]>
+
+  export type StaffAssignmentSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    branchId?: boolean
+    isPrimary?: boolean
+    assignedAt?: boolean
+  }
+
+  export type StaffAssignmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "branchId" | "isPrimary" | "assignedAt", ExtArgs["result"]["staffAssignment"]>
+  export type StaffAssignmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+  }
+  export type StaffAssignmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+  }
+  export type StaffAssignmentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+  }
+
+  export type $StaffAssignmentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "StaffAssignment"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      branch: Prisma.$BranchPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      branchId: string
+      isPrimary: boolean | null
+      assignedAt: Date
+    }, ExtArgs["result"]["staffAssignment"]>
+    composites: {}
+  }
+
+  type StaffAssignmentGetPayload<S extends boolean | null | undefined | StaffAssignmentDefaultArgs> = $Result.GetResult<Prisma.$StaffAssignmentPayload, S>
+
+  type StaffAssignmentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<StaffAssignmentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: StaffAssignmentCountAggregateInputType | true
+    }
+
+  export interface StaffAssignmentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['StaffAssignment'], meta: { name: 'StaffAssignment' } }
+    /**
+     * Find zero or one StaffAssignment that matches the filter.
+     * @param {StaffAssignmentFindUniqueArgs} args - Arguments to find a StaffAssignment
+     * @example
+     * // Get one StaffAssignment
+     * const staffAssignment = await prisma.staffAssignment.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends StaffAssignmentFindUniqueArgs>(args: SelectSubset<T, StaffAssignmentFindUniqueArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one StaffAssignment that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {StaffAssignmentFindUniqueOrThrowArgs} args - Arguments to find a StaffAssignment
+     * @example
+     * // Get one StaffAssignment
+     * const staffAssignment = await prisma.staffAssignment.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends StaffAssignmentFindUniqueOrThrowArgs>(args: SelectSubset<T, StaffAssignmentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first StaffAssignment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StaffAssignmentFindFirstArgs} args - Arguments to find a StaffAssignment
+     * @example
+     * // Get one StaffAssignment
+     * const staffAssignment = await prisma.staffAssignment.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends StaffAssignmentFindFirstArgs>(args?: SelectSubset<T, StaffAssignmentFindFirstArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first StaffAssignment that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StaffAssignmentFindFirstOrThrowArgs} args - Arguments to find a StaffAssignment
+     * @example
+     * // Get one StaffAssignment
+     * const staffAssignment = await prisma.staffAssignment.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends StaffAssignmentFindFirstOrThrowArgs>(args?: SelectSubset<T, StaffAssignmentFindFirstOrThrowArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more StaffAssignments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StaffAssignmentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all StaffAssignments
+     * const staffAssignments = await prisma.staffAssignment.findMany()
+     * 
+     * // Get first 10 StaffAssignments
+     * const staffAssignments = await prisma.staffAssignment.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const staffAssignmentWithIdOnly = await prisma.staffAssignment.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends StaffAssignmentFindManyArgs>(args?: SelectSubset<T, StaffAssignmentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a StaffAssignment.
+     * @param {StaffAssignmentCreateArgs} args - Arguments to create a StaffAssignment.
+     * @example
+     * // Create one StaffAssignment
+     * const StaffAssignment = await prisma.staffAssignment.create({
+     *   data: {
+     *     // ... data to create a StaffAssignment
+     *   }
+     * })
+     * 
+     */
+    create<T extends StaffAssignmentCreateArgs>(args: SelectSubset<T, StaffAssignmentCreateArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many StaffAssignments.
+     * @param {StaffAssignmentCreateManyArgs} args - Arguments to create many StaffAssignments.
+     * @example
+     * // Create many StaffAssignments
+     * const staffAssignment = await prisma.staffAssignment.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends StaffAssignmentCreateManyArgs>(args?: SelectSubset<T, StaffAssignmentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many StaffAssignments and returns the data saved in the database.
+     * @param {StaffAssignmentCreateManyAndReturnArgs} args - Arguments to create many StaffAssignments.
+     * @example
+     * // Create many StaffAssignments
+     * const staffAssignment = await prisma.staffAssignment.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many StaffAssignments and only return the `id`
+     * const staffAssignmentWithIdOnly = await prisma.staffAssignment.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends StaffAssignmentCreateManyAndReturnArgs>(args?: SelectSubset<T, StaffAssignmentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a StaffAssignment.
+     * @param {StaffAssignmentDeleteArgs} args - Arguments to delete one StaffAssignment.
+     * @example
+     * // Delete one StaffAssignment
+     * const StaffAssignment = await prisma.staffAssignment.delete({
+     *   where: {
+     *     // ... filter to delete one StaffAssignment
+     *   }
+     * })
+     * 
+     */
+    delete<T extends StaffAssignmentDeleteArgs>(args: SelectSubset<T, StaffAssignmentDeleteArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one StaffAssignment.
+     * @param {StaffAssignmentUpdateArgs} args - Arguments to update one StaffAssignment.
+     * @example
+     * // Update one StaffAssignment
+     * const staffAssignment = await prisma.staffAssignment.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends StaffAssignmentUpdateArgs>(args: SelectSubset<T, StaffAssignmentUpdateArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more StaffAssignments.
+     * @param {StaffAssignmentDeleteManyArgs} args - Arguments to filter StaffAssignments to delete.
+     * @example
+     * // Delete a few StaffAssignments
+     * const { count } = await prisma.staffAssignment.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends StaffAssignmentDeleteManyArgs>(args?: SelectSubset<T, StaffAssignmentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more StaffAssignments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StaffAssignmentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many StaffAssignments
+     * const staffAssignment = await prisma.staffAssignment.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends StaffAssignmentUpdateManyArgs>(args: SelectSubset<T, StaffAssignmentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more StaffAssignments and returns the data updated in the database.
+     * @param {StaffAssignmentUpdateManyAndReturnArgs} args - Arguments to update many StaffAssignments.
+     * @example
+     * // Update many StaffAssignments
+     * const staffAssignment = await prisma.staffAssignment.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more StaffAssignments and only return the `id`
+     * const staffAssignmentWithIdOnly = await prisma.staffAssignment.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends StaffAssignmentUpdateManyAndReturnArgs>(args: SelectSubset<T, StaffAssignmentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one StaffAssignment.
+     * @param {StaffAssignmentUpsertArgs} args - Arguments to update or create a StaffAssignment.
+     * @example
+     * // Update or create a StaffAssignment
+     * const staffAssignment = await prisma.staffAssignment.upsert({
+     *   create: {
+     *     // ... data to create a StaffAssignment
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the StaffAssignment we want to update
+     *   }
+     * })
+     */
+    upsert<T extends StaffAssignmentUpsertArgs>(args: SelectSubset<T, StaffAssignmentUpsertArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of StaffAssignments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StaffAssignmentCountArgs} args - Arguments to filter StaffAssignments to count.
+     * @example
+     * // Count the number of StaffAssignments
+     * const count = await prisma.staffAssignment.count({
+     *   where: {
+     *     // ... the filter for the StaffAssignments we want to count
+     *   }
+     * })
+    **/
+    count<T extends StaffAssignmentCountArgs>(
+      args?: Subset<T, StaffAssignmentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], StaffAssignmentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a StaffAssignment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StaffAssignmentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends StaffAssignmentAggregateArgs>(args: Subset<T, StaffAssignmentAggregateArgs>): Prisma.PrismaPromise<GetStaffAssignmentAggregateType<T>>
+
+    /**
+     * Group by StaffAssignment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StaffAssignmentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends StaffAssignmentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: StaffAssignmentGroupByArgs['orderBy'] }
+        : { orderBy?: StaffAssignmentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, StaffAssignmentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStaffAssignmentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the StaffAssignment model
+   */
+  readonly fields: StaffAssignmentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for StaffAssignment.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__StaffAssignmentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the StaffAssignment model
+   */
+  interface StaffAssignmentFieldRefs {
+    readonly id: FieldRef<"StaffAssignment", 'String'>
+    readonly userId: FieldRef<"StaffAssignment", 'String'>
+    readonly branchId: FieldRef<"StaffAssignment", 'String'>
+    readonly isPrimary: FieldRef<"StaffAssignment", 'Boolean'>
+    readonly assignedAt: FieldRef<"StaffAssignment", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * StaffAssignment findUnique
+   */
+  export type StaffAssignmentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which StaffAssignment to fetch.
+     */
+    where: StaffAssignmentWhereUniqueInput
+  }
+
+  /**
+   * StaffAssignment findUniqueOrThrow
+   */
+  export type StaffAssignmentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which StaffAssignment to fetch.
+     */
+    where: StaffAssignmentWhereUniqueInput
+  }
+
+  /**
+   * StaffAssignment findFirst
+   */
+  export type StaffAssignmentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which StaffAssignment to fetch.
+     */
+    where?: StaffAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StaffAssignments to fetch.
+     */
+    orderBy?: StaffAssignmentOrderByWithRelationInput | StaffAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StaffAssignments.
+     */
+    cursor?: StaffAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StaffAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StaffAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StaffAssignments.
+     */
+    distinct?: StaffAssignmentScalarFieldEnum | StaffAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * StaffAssignment findFirstOrThrow
+   */
+  export type StaffAssignmentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which StaffAssignment to fetch.
+     */
+    where?: StaffAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StaffAssignments to fetch.
+     */
+    orderBy?: StaffAssignmentOrderByWithRelationInput | StaffAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StaffAssignments.
+     */
+    cursor?: StaffAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StaffAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StaffAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StaffAssignments.
+     */
+    distinct?: StaffAssignmentScalarFieldEnum | StaffAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * StaffAssignment findMany
+   */
+  export type StaffAssignmentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which StaffAssignments to fetch.
+     */
+    where?: StaffAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StaffAssignments to fetch.
+     */
+    orderBy?: StaffAssignmentOrderByWithRelationInput | StaffAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing StaffAssignments.
+     */
+    cursor?: StaffAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StaffAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StaffAssignments.
+     */
+    skip?: number
+    distinct?: StaffAssignmentScalarFieldEnum | StaffAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * StaffAssignment create
+   */
+  export type StaffAssignmentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a StaffAssignment.
+     */
+    data: XOR<StaffAssignmentCreateInput, StaffAssignmentUncheckedCreateInput>
+  }
+
+  /**
+   * StaffAssignment createMany
+   */
+  export type StaffAssignmentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many StaffAssignments.
+     */
+    data: StaffAssignmentCreateManyInput | StaffAssignmentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * StaffAssignment createManyAndReturn
+   */
+  export type StaffAssignmentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * The data used to create many StaffAssignments.
+     */
+    data: StaffAssignmentCreateManyInput | StaffAssignmentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * StaffAssignment update
+   */
+  export type StaffAssignmentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a StaffAssignment.
+     */
+    data: XOR<StaffAssignmentUpdateInput, StaffAssignmentUncheckedUpdateInput>
+    /**
+     * Choose, which StaffAssignment to update.
+     */
+    where: StaffAssignmentWhereUniqueInput
+  }
+
+  /**
+   * StaffAssignment updateMany
+   */
+  export type StaffAssignmentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update StaffAssignments.
+     */
+    data: XOR<StaffAssignmentUpdateManyMutationInput, StaffAssignmentUncheckedUpdateManyInput>
+    /**
+     * Filter which StaffAssignments to update
+     */
+    where?: StaffAssignmentWhereInput
+    /**
+     * Limit how many StaffAssignments to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * StaffAssignment updateManyAndReturn
+   */
+  export type StaffAssignmentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * The data used to update StaffAssignments.
+     */
+    data: XOR<StaffAssignmentUpdateManyMutationInput, StaffAssignmentUncheckedUpdateManyInput>
+    /**
+     * Filter which StaffAssignments to update
+     */
+    where?: StaffAssignmentWhereInput
+    /**
+     * Limit how many StaffAssignments to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * StaffAssignment upsert
+   */
+  export type StaffAssignmentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the StaffAssignment to update in case it exists.
+     */
+    where: StaffAssignmentWhereUniqueInput
+    /**
+     * In case the StaffAssignment found by the `where` argument doesn't exist, create a new StaffAssignment with this data.
+     */
+    create: XOR<StaffAssignmentCreateInput, StaffAssignmentUncheckedCreateInput>
+    /**
+     * In case the StaffAssignment was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<StaffAssignmentUpdateInput, StaffAssignmentUncheckedUpdateInput>
+  }
+
+  /**
+   * StaffAssignment delete
+   */
+  export type StaffAssignmentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter which StaffAssignment to delete.
+     */
+    where: StaffAssignmentWhereUniqueInput
+  }
+
+  /**
+   * StaffAssignment deleteMany
+   */
+  export type StaffAssignmentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StaffAssignments to delete
+     */
+    where?: StaffAssignmentWhereInput
+    /**
+     * Limit how many StaffAssignments to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * StaffAssignment without action
+   */
+  export type StaffAssignmentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -22607,17 +22581,6 @@ export namespace Prisma {
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
-  export const StaffAssignmentScalarFieldEnum: {
-    id: 'id',
-    userId: 'userId',
-    branchId: 'branchId',
-    isPrimary: 'isPrimary',
-    assignedAt: 'assignedAt'
-  };
-
-  export type StaffAssignmentScalarFieldEnum = (typeof StaffAssignmentScalarFieldEnum)[keyof typeof StaffAssignmentScalarFieldEnum]
-
-
   export const DoctorScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
@@ -22634,9 +22597,7 @@ export namespace Prisma {
 
   export const PatientScalarFieldEnum: {
     id: 'id',
-    patientId: 'patientId',
-    firstName: 'firstName',
-    lastName: 'lastName',
+    fullName: 'fullName',
     gender: 'gender',
     dateOfBirth: 'dateOfBirth',
     phone: 'phone',
@@ -22824,6 +22785,17 @@ export namespace Prisma {
   };
 
   export type BillingScalarFieldEnum = (typeof BillingScalarFieldEnum)[keyof typeof BillingScalarFieldEnum]
+
+
+  export const StaffAssignmentScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    branchId: 'branchId',
+    isPrimary: 'isPrimary',
+    assignedAt: 'assignedAt'
+  };
+
+  export type StaffAssignmentScalarFieldEnum = (typeof StaffAssignmentScalarFieldEnum)[keyof typeof StaffAssignmentScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -23140,13 +23112,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"User"> | Date | string
     role?: XOR<RoleScalarRelationFilter, RoleWhereInput>
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
-    staffAssignments?: StaffAssignmentListRelationFilter
     doctor?: XOR<DoctorNullableScalarRelationFilter, DoctorWhereInput> | null
     createdAppointments?: AppointmentListRelationFilter
     recordedERExams?: ERExaminationListRelationFilter
     pharmacyTransactions?: PharmacyStockTransactionListRelationFilter
     opticalTransactions?: OpticalStockTransactionListRelationFilter
     createdBillings?: BillingListRelationFilter
+    staffAssignments?: StaffAssignmentListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -23166,13 +23138,13 @@ export namespace Prisma {
     updatedAt?: SortOrder
     role?: RoleOrderByWithRelationInput
     branch?: BranchOrderByWithRelationInput
-    staffAssignments?: StaffAssignmentOrderByRelationAggregateInput
     doctor?: DoctorOrderByWithRelationInput
     createdAppointments?: AppointmentOrderByRelationAggregateInput
     recordedERExams?: ERExaminationOrderByRelationAggregateInput
     pharmacyTransactions?: PharmacyStockTransactionOrderByRelationAggregateInput
     opticalTransactions?: OpticalStockTransactionOrderByRelationAggregateInput
     createdBillings?: BillingOrderByRelationAggregateInput
+    staffAssignments?: StaffAssignmentOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -23195,13 +23167,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"User"> | Date | string
     role?: XOR<RoleScalarRelationFilter, RoleWhereInput>
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
-    staffAssignments?: StaffAssignmentListRelationFilter
     doctor?: XOR<DoctorNullableScalarRelationFilter, DoctorWhereInput> | null
     createdAppointments?: AppointmentListRelationFilter
     recordedERExams?: ERExaminationListRelationFilter
     pharmacyTransactions?: PharmacyStockTransactionListRelationFilter
     opticalTransactions?: OpticalStockTransactionListRelationFilter
     createdBillings?: BillingListRelationFilter
+    staffAssignments?: StaffAssignmentListRelationFilter
   }, "id" | "username" | "email" | "resetToken">
 
   export type UserOrderByWithAggregationInput = {
@@ -23242,65 +23214,6 @@ export namespace Prisma {
     branchId?: StringWithAggregatesFilter<"User"> | string
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
-  }
-
-  export type StaffAssignmentWhereInput = {
-    AND?: StaffAssignmentWhereInput | StaffAssignmentWhereInput[]
-    OR?: StaffAssignmentWhereInput[]
-    NOT?: StaffAssignmentWhereInput | StaffAssignmentWhereInput[]
-    id?: StringFilter<"StaffAssignment"> | string
-    userId?: StringFilter<"StaffAssignment"> | string
-    branchId?: StringFilter<"StaffAssignment"> | string
-    isPrimary?: BoolFilter<"StaffAssignment"> | boolean
-    assignedAt?: DateTimeFilter<"StaffAssignment"> | Date | string
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
-    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
-  }
-
-  export type StaffAssignmentOrderByWithRelationInput = {
-    id?: SortOrder
-    userId?: SortOrder
-    branchId?: SortOrder
-    isPrimary?: SortOrder
-    assignedAt?: SortOrder
-    user?: UserOrderByWithRelationInput
-    branch?: BranchOrderByWithRelationInput
-  }
-
-  export type StaffAssignmentWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    userId_branchId?: StaffAssignmentUserIdBranchIdCompoundUniqueInput
-    AND?: StaffAssignmentWhereInput | StaffAssignmentWhereInput[]
-    OR?: StaffAssignmentWhereInput[]
-    NOT?: StaffAssignmentWhereInput | StaffAssignmentWhereInput[]
-    userId?: StringFilter<"StaffAssignment"> | string
-    branchId?: StringFilter<"StaffAssignment"> | string
-    isPrimary?: BoolFilter<"StaffAssignment"> | boolean
-    assignedAt?: DateTimeFilter<"StaffAssignment"> | Date | string
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
-    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
-  }, "id" | "userId_branchId">
-
-  export type StaffAssignmentOrderByWithAggregationInput = {
-    id?: SortOrder
-    userId?: SortOrder
-    branchId?: SortOrder
-    isPrimary?: SortOrder
-    assignedAt?: SortOrder
-    _count?: StaffAssignmentCountOrderByAggregateInput
-    _max?: StaffAssignmentMaxOrderByAggregateInput
-    _min?: StaffAssignmentMinOrderByAggregateInput
-  }
-
-  export type StaffAssignmentScalarWhereWithAggregatesInput = {
-    AND?: StaffAssignmentScalarWhereWithAggregatesInput | StaffAssignmentScalarWhereWithAggregatesInput[]
-    OR?: StaffAssignmentScalarWhereWithAggregatesInput[]
-    NOT?: StaffAssignmentScalarWhereWithAggregatesInput | StaffAssignmentScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"StaffAssignment"> | string
-    userId?: StringWithAggregatesFilter<"StaffAssignment"> | string
-    branchId?: StringWithAggregatesFilter<"StaffAssignment"> | string
-    isPrimary?: BoolWithAggregatesFilter<"StaffAssignment"> | boolean
-    assignedAt?: DateTimeWithAggregatesFilter<"StaffAssignment"> | Date | string
   }
 
   export type DoctorWhereInput = {
@@ -23390,9 +23303,7 @@ export namespace Prisma {
     OR?: PatientWhereInput[]
     NOT?: PatientWhereInput | PatientWhereInput[]
     id?: StringFilter<"Patient"> | string
-    patientId?: StringFilter<"Patient"> | string
-    firstName?: StringFilter<"Patient"> | string
-    lastName?: StringFilter<"Patient"> | string
+    fullName?: StringFilter<"Patient"> | string
     gender?: StringNullableFilter<"Patient"> | string | null
     dateOfBirth?: DateTimeFilter<"Patient"> | Date | string
     phone?: StringFilter<"Patient"> | string
@@ -23408,9 +23319,7 @@ export namespace Prisma {
 
   export type PatientOrderByWithRelationInput = {
     id?: SortOrder
-    patientId?: SortOrder
-    firstName?: SortOrder
-    lastName?: SortOrder
+    fullName?: SortOrder
     gender?: SortOrderInput | SortOrder
     dateOfBirth?: SortOrder
     phone?: SortOrder
@@ -23426,13 +23335,11 @@ export namespace Prisma {
 
   export type PatientWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    patientId?: string
     phone?: string
     AND?: PatientWhereInput | PatientWhereInput[]
     OR?: PatientWhereInput[]
     NOT?: PatientWhereInput | PatientWhereInput[]
-    firstName?: StringFilter<"Patient"> | string
-    lastName?: StringFilter<"Patient"> | string
+    fullName?: StringFilter<"Patient"> | string
     gender?: StringNullableFilter<"Patient"> | string | null
     dateOfBirth?: DateTimeFilter<"Patient"> | Date | string
     email?: StringNullableFilter<"Patient"> | string | null
@@ -23443,13 +23350,11 @@ export namespace Prisma {
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     appointments?: AppointmentListRelationFilter
     billings?: BillingListRelationFilter
-  }, "id" | "patientId" | "phone">
+  }, "id" | "phone">
 
   export type PatientOrderByWithAggregationInput = {
     id?: SortOrder
-    patientId?: SortOrder
-    firstName?: SortOrder
-    lastName?: SortOrder
+    fullName?: SortOrder
     gender?: SortOrderInput | SortOrder
     dateOfBirth?: SortOrder
     phone?: SortOrder
@@ -23468,9 +23373,7 @@ export namespace Prisma {
     OR?: PatientScalarWhereWithAggregatesInput[]
     NOT?: PatientScalarWhereWithAggregatesInput | PatientScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Patient"> | string
-    patientId?: StringWithAggregatesFilter<"Patient"> | string
-    firstName?: StringWithAggregatesFilter<"Patient"> | string
-    lastName?: StringWithAggregatesFilter<"Patient"> | string
+    fullName?: StringWithAggregatesFilter<"Patient"> | string
     gender?: StringNullableWithAggregatesFilter<"Patient"> | string | null
     dateOfBirth?: DateTimeWithAggregatesFilter<"Patient"> | Date | string
     phone?: StringWithAggregatesFilter<"Patient"> | string
@@ -23486,7 +23389,7 @@ export namespace Prisma {
     OR?: AppointmentWhereInput[]
     NOT?: AppointmentWhereInput | AppointmentWhereInput[]
     id?: StringFilter<"Appointment"> | string
-    bookingNumber?: StringFilter<"Appointment"> | string
+    bookingNumber?: StringNullableFilter<"Appointment"> | string | null
     appointmentDate?: DateTimeFilter<"Appointment"> | Date | string
     status?: EnumAppointmentStatusFilter<"Appointment"> | $Enums.AppointmentStatus
     amount?: DecimalFilter<"Appointment"> | Decimal | DecimalJsLike | number | string
@@ -23508,7 +23411,7 @@ export namespace Prisma {
 
   export type AppointmentOrderByWithRelationInput = {
     id?: SortOrder
-    bookingNumber?: SortOrder
+    bookingNumber?: SortOrderInput | SortOrder
     appointmentDate?: SortOrder
     status?: SortOrder
     amount?: SortOrder
@@ -23555,7 +23458,7 @@ export namespace Prisma {
 
   export type AppointmentOrderByWithAggregationInput = {
     id?: SortOrder
-    bookingNumber?: SortOrder
+    bookingNumber?: SortOrderInput | SortOrder
     appointmentDate?: SortOrder
     status?: SortOrder
     amount?: SortOrder
@@ -23577,7 +23480,7 @@ export namespace Prisma {
     OR?: AppointmentScalarWhereWithAggregatesInput[]
     NOT?: AppointmentScalarWhereWithAggregatesInput | AppointmentScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Appointment"> | string
-    bookingNumber?: StringWithAggregatesFilter<"Appointment"> | string
+    bookingNumber?: StringNullableWithAggregatesFilter<"Appointment"> | string | null
     appointmentDate?: DateTimeWithAggregatesFilter<"Appointment"> | Date | string
     status?: EnumAppointmentStatusWithAggregatesFilter<"Appointment"> | $Enums.AppointmentStatus
     amount?: DecimalWithAggregatesFilter<"Appointment"> | Decimal | DecimalJsLike | number | string
@@ -24477,6 +24380,65 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"Billing"> | Date | string
   }
 
+  export type StaffAssignmentWhereInput = {
+    AND?: StaffAssignmentWhereInput | StaffAssignmentWhereInput[]
+    OR?: StaffAssignmentWhereInput[]
+    NOT?: StaffAssignmentWhereInput | StaffAssignmentWhereInput[]
+    id?: StringFilter<"StaffAssignment"> | string
+    userId?: StringFilter<"StaffAssignment"> | string
+    branchId?: StringFilter<"StaffAssignment"> | string
+    isPrimary?: BoolNullableFilter<"StaffAssignment"> | boolean | null
+    assignedAt?: DateTimeFilter<"StaffAssignment"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+  }
+
+  export type StaffAssignmentOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    branchId?: SortOrder
+    isPrimary?: SortOrderInput | SortOrder
+    assignedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    branch?: BranchOrderByWithRelationInput
+  }
+
+  export type StaffAssignmentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_branchId?: StaffAssignmentUserIdBranchIdCompoundUniqueInput
+    AND?: StaffAssignmentWhereInput | StaffAssignmentWhereInput[]
+    OR?: StaffAssignmentWhereInput[]
+    NOT?: StaffAssignmentWhereInput | StaffAssignmentWhereInput[]
+    userId?: StringFilter<"StaffAssignment"> | string
+    branchId?: StringFilter<"StaffAssignment"> | string
+    isPrimary?: BoolNullableFilter<"StaffAssignment"> | boolean | null
+    assignedAt?: DateTimeFilter<"StaffAssignment"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+  }, "id" | "userId_branchId">
+
+  export type StaffAssignmentOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    branchId?: SortOrder
+    isPrimary?: SortOrderInput | SortOrder
+    assignedAt?: SortOrder
+    _count?: StaffAssignmentCountOrderByAggregateInput
+    _max?: StaffAssignmentMaxOrderByAggregateInput
+    _min?: StaffAssignmentMinOrderByAggregateInput
+  }
+
+  export type StaffAssignmentScalarWhereWithAggregatesInput = {
+    AND?: StaffAssignmentScalarWhereWithAggregatesInput | StaffAssignmentScalarWhereWithAggregatesInput[]
+    OR?: StaffAssignmentScalarWhereWithAggregatesInput[]
+    NOT?: StaffAssignmentScalarWhereWithAggregatesInput | StaffAssignmentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"StaffAssignment"> | string
+    userId?: StringWithAggregatesFilter<"StaffAssignment"> | string
+    branchId?: StringWithAggregatesFilter<"StaffAssignment"> | string
+    isPrimary?: BoolNullableWithAggregatesFilter<"StaffAssignment"> | boolean | null
+    assignedAt?: DateTimeWithAggregatesFilter<"StaffAssignment"> | Date | string
+  }
+
   export type RoleCreateInput = {
     id?: string
     name: string
@@ -24656,13 +24618,13 @@ export namespace Prisma {
     updatedAt?: Date | string
     role: RoleCreateNestedOneWithoutUsersInput
     branch: BranchCreateNestedOneWithoutUsersInput
-    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
     doctor?: DoctorCreateNestedOneWithoutUserInput
     createdAppointments?: AppointmentCreateNestedManyWithoutCreatedByInput
     recordedERExams?: ERExaminationCreateNestedManyWithoutRecordedByInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutPerformedByInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -24680,13 +24642,13 @@ export namespace Prisma {
     branchId: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
     doctor?: DoctorUncheckedCreateNestedOneWithoutUserInput
     createdAppointments?: AppointmentUncheckedCreateNestedManyWithoutCreatedByInput
     recordedERExams?: ERExaminationUncheckedCreateNestedManyWithoutRecordedByInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -24704,13 +24666,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: RoleUpdateOneRequiredWithoutUsersNestedInput
     branch?: BranchUpdateOneRequiredWithoutUsersNestedInput
-    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
     doctor?: DoctorUpdateOneWithoutUserNestedInput
     createdAppointments?: AppointmentUpdateManyWithoutCreatedByNestedInput
     recordedERExams?: ERExaminationUpdateManyWithoutRecordedByNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutPerformedByNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -24728,13 +24690,13 @@ export namespace Prisma {
     branchId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
     doctor?: DoctorUncheckedUpdateOneWithoutUserNestedInput
     createdAppointments?: AppointmentUncheckedUpdateManyWithoutCreatedByNestedInput
     recordedERExams?: ERExaminationUncheckedUpdateManyWithoutRecordedByNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -24784,60 +24746,6 @@ export namespace Prisma {
     branchId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type StaffAssignmentCreateInput = {
-    id?: string
-    isPrimary?: boolean
-    assignedAt?: Date | string
-    user: UserCreateNestedOneWithoutStaffAssignmentsInput
-    branch: BranchCreateNestedOneWithoutStaffAssignmentsInput
-  }
-
-  export type StaffAssignmentUncheckedCreateInput = {
-    id?: string
-    userId: string
-    branchId: string
-    isPrimary?: boolean
-    assignedAt?: Date | string
-  }
-
-  export type StaffAssignmentUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    isPrimary?: BoolFieldUpdateOperationsInput | boolean
-    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutStaffAssignmentsNestedInput
-    branch?: BranchUpdateOneRequiredWithoutStaffAssignmentsNestedInput
-  }
-
-  export type StaffAssignmentUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    branchId?: StringFieldUpdateOperationsInput | string
-    isPrimary?: BoolFieldUpdateOperationsInput | boolean
-    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type StaffAssignmentCreateManyInput = {
-    id?: string
-    userId: string
-    branchId: string
-    isPrimary?: boolean
-    assignedAt?: Date | string
-  }
-
-  export type StaffAssignmentUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    isPrimary?: BoolFieldUpdateOperationsInput | boolean
-    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type StaffAssignmentUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    branchId?: StringFieldUpdateOperationsInput | string
-    isPrimary?: BoolFieldUpdateOperationsInput | boolean
-    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type DoctorCreateInput = {
@@ -24929,9 +24837,7 @@ export namespace Prisma {
 
   export type PatientCreateInput = {
     id?: string
-    patientId: string
-    firstName: string
-    lastName: string
+    fullName: string
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
@@ -24946,9 +24852,7 @@ export namespace Prisma {
 
   export type PatientUncheckedCreateInput = {
     id?: string
-    patientId: string
-    firstName: string
-    lastName: string
+    fullName: string
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
@@ -24963,9 +24867,7 @@ export namespace Prisma {
 
   export type PatientUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    patientId?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
@@ -24980,9 +24882,7 @@ export namespace Prisma {
 
   export type PatientUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    patientId?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
@@ -24997,9 +24897,7 @@ export namespace Prisma {
 
   export type PatientCreateManyInput = {
     id?: string
-    patientId: string
-    firstName: string
-    lastName: string
+    fullName: string
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
@@ -25012,9 +24910,7 @@ export namespace Prisma {
 
   export type PatientUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    patientId?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
@@ -25026,9 +24922,7 @@ export namespace Prisma {
 
   export type PatientUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    patientId?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
@@ -25041,7 +24935,7 @@ export namespace Prisma {
 
   export type AppointmentCreateInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -25059,7 +24953,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedCreateInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -25077,7 +24971,7 @@ export namespace Prisma {
 
   export type AppointmentUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -25095,7 +24989,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -25113,7 +25007,7 @@ export namespace Prisma {
 
   export type AppointmentCreateManyInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -25127,7 +25021,7 @@ export namespace Prisma {
 
   export type AppointmentUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -25137,7 +25031,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -26079,6 +25973,60 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type StaffAssignmentCreateInput = {
+    id?: string
+    isPrimary?: boolean | null
+    assignedAt?: Date | string
+    user: UserCreateNestedOneWithoutStaffAssignmentsInput
+    branch: BranchCreateNestedOneWithoutStaffAssignmentsInput
+  }
+
+  export type StaffAssignmentUncheckedCreateInput = {
+    id?: string
+    userId: string
+    branchId: string
+    isPrimary?: boolean | null
+    assignedAt?: Date | string
+  }
+
+  export type StaffAssignmentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    isPrimary?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutStaffAssignmentsNestedInput
+    branch?: BranchUpdateOneRequiredWithoutStaffAssignmentsNestedInput
+  }
+
+  export type StaffAssignmentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    isPrimary?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StaffAssignmentCreateManyInput = {
+    id?: string
+    userId: string
+    branchId: string
+    isPrimary?: boolean | null
+    assignedAt?: Date | string
+  }
+
+  export type StaffAssignmentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    isPrimary?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StaffAssignmentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    isPrimary?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -26462,35 +26410,6 @@ export namespace Prisma {
     isNot?: UserWhereInput
   }
 
-  export type StaffAssignmentUserIdBranchIdCompoundUniqueInput = {
-    userId: string
-    branchId: string
-  }
-
-  export type StaffAssignmentCountOrderByAggregateInput = {
-    id?: SortOrder
-    userId?: SortOrder
-    branchId?: SortOrder
-    isPrimary?: SortOrder
-    assignedAt?: SortOrder
-  }
-
-  export type StaffAssignmentMaxOrderByAggregateInput = {
-    id?: SortOrder
-    userId?: SortOrder
-    branchId?: SortOrder
-    isPrimary?: SortOrder
-    assignedAt?: SortOrder
-  }
-
-  export type StaffAssignmentMinOrderByAggregateInput = {
-    id?: SortOrder
-    userId?: SortOrder
-    branchId?: SortOrder
-    isPrimary?: SortOrder
-    assignedAt?: SortOrder
-  }
-
   export type ClinicalExaminationListRelationFilter = {
     every?: ClinicalExaminationWhereInput
     some?: ClinicalExaminationWhereInput
@@ -26536,9 +26455,7 @@ export namespace Prisma {
 
   export type PatientCountOrderByAggregateInput = {
     id?: SortOrder
-    patientId?: SortOrder
-    firstName?: SortOrder
-    lastName?: SortOrder
+    fullName?: SortOrder
     gender?: SortOrder
     dateOfBirth?: SortOrder
     phone?: SortOrder
@@ -26551,9 +26468,7 @@ export namespace Prisma {
 
   export type PatientMaxOrderByAggregateInput = {
     id?: SortOrder
-    patientId?: SortOrder
-    firstName?: SortOrder
-    lastName?: SortOrder
+    fullName?: SortOrder
     gender?: SortOrder
     dateOfBirth?: SortOrder
     phone?: SortOrder
@@ -26566,9 +26481,7 @@ export namespace Prisma {
 
   export type PatientMinOrderByAggregateInput = {
     id?: SortOrder
-    patientId?: SortOrder
-    firstName?: SortOrder
-    lastName?: SortOrder
+    fullName?: SortOrder
     gender?: SortOrder
     dateOfBirth?: SortOrder
     phone?: SortOrder
@@ -27348,6 +27261,48 @@ export namespace Prisma {
     _max?: NestedEnumBillingStatusFilter<$PrismaModel>
   }
 
+  export type BoolNullableFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
+    not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
+  }
+
+  export type StaffAssignmentUserIdBranchIdCompoundUniqueInput = {
+    userId: string
+    branchId: string
+  }
+
+  export type StaffAssignmentCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    branchId?: SortOrder
+    isPrimary?: SortOrder
+    assignedAt?: SortOrder
+  }
+
+  export type StaffAssignmentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    branchId?: SortOrder
+    isPrimary?: SortOrder
+    assignedAt?: SortOrder
+  }
+
+  export type StaffAssignmentMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    branchId?: SortOrder
+    isPrimary?: SortOrder
+    assignedAt?: SortOrder
+  }
+
+  export type BoolNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
+    not?: NestedBoolNullableWithAggregatesFilter<$PrismaModel> | boolean | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedBoolNullableFilter<$PrismaModel>
+    _max?: NestedBoolNullableFilter<$PrismaModel>
+  }
+
   export type UserCreateNestedManyWithoutRoleInput = {
     create?: XOR<UserCreateWithoutRoleInput, UserUncheckedCreateWithoutRoleInput> | UserCreateWithoutRoleInput[] | UserUncheckedCreateWithoutRoleInput[]
     connectOrCreate?: UserCreateOrConnectWithoutRoleInput | UserCreateOrConnectWithoutRoleInput[]
@@ -27922,13 +27877,6 @@ export namespace Prisma {
     connect?: BranchWhereUniqueInput
   }
 
-  export type StaffAssignmentCreateNestedManyWithoutUserInput = {
-    create?: XOR<StaffAssignmentCreateWithoutUserInput, StaffAssignmentUncheckedCreateWithoutUserInput> | StaffAssignmentCreateWithoutUserInput[] | StaffAssignmentUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: StaffAssignmentCreateOrConnectWithoutUserInput | StaffAssignmentCreateOrConnectWithoutUserInput[]
-    createMany?: StaffAssignmentCreateManyUserInputEnvelope
-    connect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
-  }
-
   export type DoctorCreateNestedOneWithoutUserInput = {
     create?: XOR<DoctorCreateWithoutUserInput, DoctorUncheckedCreateWithoutUserInput>
     connectOrCreate?: DoctorCreateOrConnectWithoutUserInput
@@ -27970,7 +27918,7 @@ export namespace Prisma {
     connect?: BillingWhereUniqueInput | BillingWhereUniqueInput[]
   }
 
-  export type StaffAssignmentUncheckedCreateNestedManyWithoutUserInput = {
+  export type StaffAssignmentCreateNestedManyWithoutUserInput = {
     create?: XOR<StaffAssignmentCreateWithoutUserInput, StaffAssignmentUncheckedCreateWithoutUserInput> | StaffAssignmentCreateWithoutUserInput[] | StaffAssignmentUncheckedCreateWithoutUserInput[]
     connectOrCreate?: StaffAssignmentCreateOrConnectWithoutUserInput | StaffAssignmentCreateOrConnectWithoutUserInput[]
     createMany?: StaffAssignmentCreateManyUserInputEnvelope
@@ -28018,6 +27966,13 @@ export namespace Prisma {
     connect?: BillingWhereUniqueInput | BillingWhereUniqueInput[]
   }
 
+  export type StaffAssignmentUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<StaffAssignmentCreateWithoutUserInput, StaffAssignmentUncheckedCreateWithoutUserInput> | StaffAssignmentCreateWithoutUserInput[] | StaffAssignmentUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: StaffAssignmentCreateOrConnectWithoutUserInput | StaffAssignmentCreateOrConnectWithoutUserInput[]
+    createMany?: StaffAssignmentCreateManyUserInputEnvelope
+    connect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+  }
+
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
   }
@@ -28036,20 +27991,6 @@ export namespace Prisma {
     upsert?: BranchUpsertWithoutUsersInput
     connect?: BranchWhereUniqueInput
     update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutUsersInput, BranchUpdateWithoutUsersInput>, BranchUncheckedUpdateWithoutUsersInput>
-  }
-
-  export type StaffAssignmentUpdateManyWithoutUserNestedInput = {
-    create?: XOR<StaffAssignmentCreateWithoutUserInput, StaffAssignmentUncheckedCreateWithoutUserInput> | StaffAssignmentCreateWithoutUserInput[] | StaffAssignmentUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: StaffAssignmentCreateOrConnectWithoutUserInput | StaffAssignmentCreateOrConnectWithoutUserInput[]
-    upsert?: StaffAssignmentUpsertWithWhereUniqueWithoutUserInput | StaffAssignmentUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: StaffAssignmentCreateManyUserInputEnvelope
-    set?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
-    disconnect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
-    delete?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
-    connect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
-    update?: StaffAssignmentUpdateWithWhereUniqueWithoutUserInput | StaffAssignmentUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: StaffAssignmentUpdateManyWithWhereWithoutUserInput | StaffAssignmentUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: StaffAssignmentScalarWhereInput | StaffAssignmentScalarWhereInput[]
   }
 
   export type DoctorUpdateOneWithoutUserNestedInput = {
@@ -28132,7 +28073,7 @@ export namespace Prisma {
     deleteMany?: BillingScalarWhereInput | BillingScalarWhereInput[]
   }
 
-  export type StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput = {
+  export type StaffAssignmentUpdateManyWithoutUserNestedInput = {
     create?: XOR<StaffAssignmentCreateWithoutUserInput, StaffAssignmentUncheckedCreateWithoutUserInput> | StaffAssignmentCreateWithoutUserInput[] | StaffAssignmentUncheckedCreateWithoutUserInput[]
     connectOrCreate?: StaffAssignmentCreateOrConnectWithoutUserInput | StaffAssignmentCreateOrConnectWithoutUserInput[]
     upsert?: StaffAssignmentUpsertWithWhereUniqueWithoutUserInput | StaffAssignmentUpsertWithWhereUniqueWithoutUserInput[]
@@ -28226,32 +28167,18 @@ export namespace Prisma {
     deleteMany?: BillingScalarWhereInput | BillingScalarWhereInput[]
   }
 
-  export type UserCreateNestedOneWithoutStaffAssignmentsInput = {
-    create?: XOR<UserCreateWithoutStaffAssignmentsInput, UserUncheckedCreateWithoutStaffAssignmentsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutStaffAssignmentsInput
-    connect?: UserWhereUniqueInput
-  }
-
-  export type BranchCreateNestedOneWithoutStaffAssignmentsInput = {
-    create?: XOR<BranchCreateWithoutStaffAssignmentsInput, BranchUncheckedCreateWithoutStaffAssignmentsInput>
-    connectOrCreate?: BranchCreateOrConnectWithoutStaffAssignmentsInput
-    connect?: BranchWhereUniqueInput
-  }
-
-  export type UserUpdateOneRequiredWithoutStaffAssignmentsNestedInput = {
-    create?: XOR<UserCreateWithoutStaffAssignmentsInput, UserUncheckedCreateWithoutStaffAssignmentsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutStaffAssignmentsInput
-    upsert?: UserUpsertWithoutStaffAssignmentsInput
-    connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutStaffAssignmentsInput, UserUpdateWithoutStaffAssignmentsInput>, UserUncheckedUpdateWithoutStaffAssignmentsInput>
-  }
-
-  export type BranchUpdateOneRequiredWithoutStaffAssignmentsNestedInput = {
-    create?: XOR<BranchCreateWithoutStaffAssignmentsInput, BranchUncheckedCreateWithoutStaffAssignmentsInput>
-    connectOrCreate?: BranchCreateOrConnectWithoutStaffAssignmentsInput
-    upsert?: BranchUpsertWithoutStaffAssignmentsInput
-    connect?: BranchWhereUniqueInput
-    update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutStaffAssignmentsInput, BranchUpdateWithoutStaffAssignmentsInput>, BranchUncheckedUpdateWithoutStaffAssignmentsInput>
+  export type StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<StaffAssignmentCreateWithoutUserInput, StaffAssignmentUncheckedCreateWithoutUserInput> | StaffAssignmentCreateWithoutUserInput[] | StaffAssignmentUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: StaffAssignmentCreateOrConnectWithoutUserInput | StaffAssignmentCreateOrConnectWithoutUserInput[]
+    upsert?: StaffAssignmentUpsertWithWhereUniqueWithoutUserInput | StaffAssignmentUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: StaffAssignmentCreateManyUserInputEnvelope
+    set?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    disconnect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    delete?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    connect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    update?: StaffAssignmentUpdateWithWhereUniqueWithoutUserInput | StaffAssignmentUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: StaffAssignmentUpdateManyWithWhereWithoutUserInput | StaffAssignmentUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: StaffAssignmentScalarWhereInput | StaffAssignmentScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutDoctorInput = {
@@ -29454,6 +29381,38 @@ export namespace Prisma {
     deleteMany?: OpticalStockTransactionScalarWhereInput | OpticalStockTransactionScalarWhereInput[]
   }
 
+  export type UserCreateNestedOneWithoutStaffAssignmentsInput = {
+    create?: XOR<UserCreateWithoutStaffAssignmentsInput, UserUncheckedCreateWithoutStaffAssignmentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutStaffAssignmentsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type BranchCreateNestedOneWithoutStaffAssignmentsInput = {
+    create?: XOR<BranchCreateWithoutStaffAssignmentsInput, BranchUncheckedCreateWithoutStaffAssignmentsInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutStaffAssignmentsInput
+    connect?: BranchWhereUniqueInput
+  }
+
+  export type NullableBoolFieldUpdateOperationsInput = {
+    set?: boolean | null
+  }
+
+  export type UserUpdateOneRequiredWithoutStaffAssignmentsNestedInput = {
+    create?: XOR<UserCreateWithoutStaffAssignmentsInput, UserUncheckedCreateWithoutStaffAssignmentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutStaffAssignmentsInput
+    upsert?: UserUpsertWithoutStaffAssignmentsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutStaffAssignmentsInput, UserUpdateWithoutStaffAssignmentsInput>, UserUncheckedUpdateWithoutStaffAssignmentsInput>
+  }
+
+  export type BranchUpdateOneRequiredWithoutStaffAssignmentsNestedInput = {
+    create?: XOR<BranchCreateWithoutStaffAssignmentsInput, BranchUncheckedCreateWithoutStaffAssignmentsInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutStaffAssignmentsInput
+    upsert?: BranchUpsertWithoutStaffAssignmentsInput
+    connect?: BranchWhereUniqueInput
+    update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutStaffAssignmentsInput, BranchUpdateWithoutStaffAssignmentsInput>, BranchUncheckedUpdateWithoutStaffAssignmentsInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -29760,6 +29719,19 @@ export namespace Prisma {
     _max?: NestedEnumBillingStatusFilter<$PrismaModel>
   }
 
+  export type NestedBoolNullableFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
+    not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
+  }
+
+  export type NestedBoolNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
+    not?: NestedBoolNullableWithAggregatesFilter<$PrismaModel> | boolean | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedBoolNullableFilter<$PrismaModel>
+    _max?: NestedBoolNullableFilter<$PrismaModel>
+  }
+
   export type UserCreateWithoutRoleInput = {
     id?: string
     fullName: string
@@ -29774,13 +29746,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     branch: BranchCreateNestedOneWithoutUsersInput
-    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
     doctor?: DoctorCreateNestedOneWithoutUserInput
     createdAppointments?: AppointmentCreateNestedManyWithoutCreatedByInput
     recordedERExams?: ERExaminationCreateNestedManyWithoutRecordedByInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutPerformedByInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutRoleInput = {
@@ -29797,13 +29769,13 @@ export namespace Prisma {
     branchId: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
     doctor?: DoctorUncheckedCreateNestedOneWithoutUserInput
     createdAppointments?: AppointmentUncheckedCreateNestedManyWithoutCreatedByInput
     recordedERExams?: ERExaminationUncheckedCreateNestedManyWithoutRecordedByInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutRoleInput = {
@@ -29866,13 +29838,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     role: RoleCreateNestedOneWithoutUsersInput
-    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
     doctor?: DoctorCreateNestedOneWithoutUserInput
     createdAppointments?: AppointmentCreateNestedManyWithoutCreatedByInput
     recordedERExams?: ERExaminationCreateNestedManyWithoutRecordedByInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutPerformedByInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutBranchInput = {
@@ -29889,13 +29861,13 @@ export namespace Prisma {
     roleId: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
     doctor?: DoctorUncheckedCreateNestedOneWithoutUserInput
     createdAppointments?: AppointmentUncheckedCreateNestedManyWithoutCreatedByInput
     recordedERExams?: ERExaminationUncheckedCreateNestedManyWithoutRecordedByInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutBranchInput = {
@@ -29910,7 +29882,7 @@ export namespace Prisma {
 
   export type StaffAssignmentCreateWithoutBranchInput = {
     id?: string
-    isPrimary?: boolean
+    isPrimary?: boolean | null
     assignedAt?: Date | string
     user: UserCreateNestedOneWithoutStaffAssignmentsInput
   }
@@ -29918,7 +29890,7 @@ export namespace Prisma {
   export type StaffAssignmentUncheckedCreateWithoutBranchInput = {
     id?: string
     userId: string
-    isPrimary?: boolean
+    isPrimary?: boolean | null
     assignedAt?: Date | string
   }
 
@@ -29970,9 +29942,7 @@ export namespace Prisma {
 
   export type PatientCreateWithoutBranchInput = {
     id?: string
-    patientId: string
-    firstName: string
-    lastName: string
+    fullName: string
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
@@ -29986,9 +29956,7 @@ export namespace Prisma {
 
   export type PatientUncheckedCreateWithoutBranchInput = {
     id?: string
-    patientId: string
-    firstName: string
-    lastName: string
+    fullName: string
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
@@ -30012,7 +29980,7 @@ export namespace Prisma {
 
   export type AppointmentCreateWithoutBranchInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -30029,7 +29997,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedCreateWithoutBranchInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -30367,7 +30335,7 @@ export namespace Prisma {
     id?: StringFilter<"StaffAssignment"> | string
     userId?: StringFilter<"StaffAssignment"> | string
     branchId?: StringFilter<"StaffAssignment"> | string
-    isPrimary?: BoolFilter<"StaffAssignment"> | boolean
+    isPrimary?: BoolNullableFilter<"StaffAssignment"> | boolean | null
     assignedAt?: DateTimeFilter<"StaffAssignment"> | Date | string
   }
 
@@ -30422,9 +30390,7 @@ export namespace Prisma {
     OR?: PatientScalarWhereInput[]
     NOT?: PatientScalarWhereInput | PatientScalarWhereInput[]
     id?: StringFilter<"Patient"> | string
-    patientId?: StringFilter<"Patient"> | string
-    firstName?: StringFilter<"Patient"> | string
-    lastName?: StringFilter<"Patient"> | string
+    fullName?: StringFilter<"Patient"> | string
     gender?: StringNullableFilter<"Patient"> | string | null
     dateOfBirth?: DateTimeFilter<"Patient"> | Date | string
     phone?: StringFilter<"Patient"> | string
@@ -30456,7 +30422,7 @@ export namespace Prisma {
     OR?: AppointmentScalarWhereInput[]
     NOT?: AppointmentScalarWhereInput | AppointmentScalarWhereInput[]
     id?: StringFilter<"Appointment"> | string
-    bookingNumber?: StringFilter<"Appointment"> | string
+    bookingNumber?: StringNullableFilter<"Appointment"> | string | null
     appointmentDate?: DateTimeFilter<"Appointment"> | Date | string
     status?: EnumAppointmentStatusFilter<"Appointment"> | $Enums.AppointmentStatus
     amount?: DecimalFilter<"Appointment"> | Decimal | DecimalJsLike | number | string
@@ -30768,30 +30734,6 @@ export namespace Prisma {
     create: XOR<BranchCreateWithoutUsersInput, BranchUncheckedCreateWithoutUsersInput>
   }
 
-  export type StaffAssignmentCreateWithoutUserInput = {
-    id?: string
-    isPrimary?: boolean
-    assignedAt?: Date | string
-    branch: BranchCreateNestedOneWithoutStaffAssignmentsInput
-  }
-
-  export type StaffAssignmentUncheckedCreateWithoutUserInput = {
-    id?: string
-    branchId: string
-    isPrimary?: boolean
-    assignedAt?: Date | string
-  }
-
-  export type StaffAssignmentCreateOrConnectWithoutUserInput = {
-    where: StaffAssignmentWhereUniqueInput
-    create: XOR<StaffAssignmentCreateWithoutUserInput, StaffAssignmentUncheckedCreateWithoutUserInput>
-  }
-
-  export type StaffAssignmentCreateManyUserInputEnvelope = {
-    data: StaffAssignmentCreateManyUserInput | StaffAssignmentCreateManyUserInput[]
-    skipDuplicates?: boolean
-  }
-
   export type DoctorCreateWithoutUserInput = {
     id?: string
     licenseNumber: string
@@ -30825,7 +30767,7 @@ export namespace Prisma {
 
   export type AppointmentCreateWithoutCreatedByInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -30842,7 +30784,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedCreateWithoutCreatedByInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -31017,6 +30959,30 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type StaffAssignmentCreateWithoutUserInput = {
+    id?: string
+    isPrimary?: boolean | null
+    assignedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutStaffAssignmentsInput
+  }
+
+  export type StaffAssignmentUncheckedCreateWithoutUserInput = {
+    id?: string
+    branchId: string
+    isPrimary?: boolean | null
+    assignedAt?: Date | string
+  }
+
+  export type StaffAssignmentCreateOrConnectWithoutUserInput = {
+    where: StaffAssignmentWhereUniqueInput
+    create: XOR<StaffAssignmentCreateWithoutUserInput, StaffAssignmentUncheckedCreateWithoutUserInput>
+  }
+
+  export type StaffAssignmentCreateManyUserInputEnvelope = {
+    data: StaffAssignmentCreateManyUserInput | StaffAssignmentCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type RoleUpsertWithoutUsersInput = {
     update: XOR<RoleUpdateWithoutUsersInput, RoleUncheckedUpdateWithoutUsersInput>
     create: XOR<RoleCreateWithoutUsersInput, RoleUncheckedCreateWithoutUsersInput>
@@ -31091,22 +31057,6 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
-  }
-
-  export type StaffAssignmentUpsertWithWhereUniqueWithoutUserInput = {
-    where: StaffAssignmentWhereUniqueInput
-    update: XOR<StaffAssignmentUpdateWithoutUserInput, StaffAssignmentUncheckedUpdateWithoutUserInput>
-    create: XOR<StaffAssignmentCreateWithoutUserInput, StaffAssignmentUncheckedCreateWithoutUserInput>
-  }
-
-  export type StaffAssignmentUpdateWithWhereUniqueWithoutUserInput = {
-    where: StaffAssignmentWhereUniqueInput
-    data: XOR<StaffAssignmentUpdateWithoutUserInput, StaffAssignmentUncheckedUpdateWithoutUserInput>
-  }
-
-  export type StaffAssignmentUpdateManyWithWhereWithoutUserInput = {
-    where: StaffAssignmentScalarWhereInput
-    data: XOR<StaffAssignmentUpdateManyMutationInput, StaffAssignmentUncheckedUpdateManyWithoutUserInput>
   }
 
   export type DoctorUpsertWithoutUserInput = {
@@ -31243,212 +31193,20 @@ export namespace Prisma {
     data: XOR<BillingUpdateManyMutationInput, BillingUncheckedUpdateManyWithoutCreatedByInput>
   }
 
-  export type UserCreateWithoutStaffAssignmentsInput = {
-    id?: string
-    fullName: string
-    username: string
-    email: string
-    password: string
-    phone?: string | null
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
-    profileImage?: string | null
-    isActive?: boolean
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    role: RoleCreateNestedOneWithoutUsersInput
-    branch: BranchCreateNestedOneWithoutUsersInput
-    doctor?: DoctorCreateNestedOneWithoutUserInput
-    createdAppointments?: AppointmentCreateNestedManyWithoutCreatedByInput
-    recordedERExams?: ERExaminationCreateNestedManyWithoutRecordedByInput
-    pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutPerformedByInput
-    opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
-    createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
+  export type StaffAssignmentUpsertWithWhereUniqueWithoutUserInput = {
+    where: StaffAssignmentWhereUniqueInput
+    update: XOR<StaffAssignmentUpdateWithoutUserInput, StaffAssignmentUncheckedUpdateWithoutUserInput>
+    create: XOR<StaffAssignmentCreateWithoutUserInput, StaffAssignmentUncheckedCreateWithoutUserInput>
   }
 
-  export type UserUncheckedCreateWithoutStaffAssignmentsInput = {
-    id?: string
-    fullName: string
-    username: string
-    email: string
-    password: string
-    phone?: string | null
-    resetToken?: string | null
-    resetTokenExpiry?: Date | string | null
-    profileImage?: string | null
-    isActive?: boolean
-    roleId: string
-    branchId: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    doctor?: DoctorUncheckedCreateNestedOneWithoutUserInput
-    createdAppointments?: AppointmentUncheckedCreateNestedManyWithoutCreatedByInput
-    recordedERExams?: ERExaminationUncheckedCreateNestedManyWithoutRecordedByInput
-    pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
-    opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
-    createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
+  export type StaffAssignmentUpdateWithWhereUniqueWithoutUserInput = {
+    where: StaffAssignmentWhereUniqueInput
+    data: XOR<StaffAssignmentUpdateWithoutUserInput, StaffAssignmentUncheckedUpdateWithoutUserInput>
   }
 
-  export type UserCreateOrConnectWithoutStaffAssignmentsInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutStaffAssignmentsInput, UserUncheckedCreateWithoutStaffAssignmentsInput>
-  }
-
-  export type BranchCreateWithoutStaffAssignmentsInput = {
-    id?: string
-    branchName: string
-    address: string
-    phone: string
-    isActive?: boolean
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    users?: UserCreateNestedManyWithoutBranchInput
-    doctors?: DoctorCreateNestedManyWithoutBranchInput
-    patients?: PatientCreateNestedManyWithoutBranchInput
-    appointments?: AppointmentCreateNestedManyWithoutBranchInput
-    surgeries?: SurgeryCreateNestedManyWithoutBranchInput
-    prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
-    pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
-    pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
-    opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
-    opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
-    billings?: BillingCreateNestedManyWithoutBranchInput
-  }
-
-  export type BranchUncheckedCreateWithoutStaffAssignmentsInput = {
-    id?: string
-    branchName: string
-    address: string
-    phone: string
-    isActive?: boolean
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    users?: UserUncheckedCreateNestedManyWithoutBranchInput
-    doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
-    patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
-    appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
-    surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
-    prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
-    pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
-    pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
-    opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
-    opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
-    billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
-  }
-
-  export type BranchCreateOrConnectWithoutStaffAssignmentsInput = {
-    where: BranchWhereUniqueInput
-    create: XOR<BranchCreateWithoutStaffAssignmentsInput, BranchUncheckedCreateWithoutStaffAssignmentsInput>
-  }
-
-  export type UserUpsertWithoutStaffAssignmentsInput = {
-    update: XOR<UserUpdateWithoutStaffAssignmentsInput, UserUncheckedUpdateWithoutStaffAssignmentsInput>
-    create: XOR<UserCreateWithoutStaffAssignmentsInput, UserUncheckedCreateWithoutStaffAssignmentsInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutStaffAssignmentsInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutStaffAssignmentsInput, UserUncheckedUpdateWithoutStaffAssignmentsInput>
-  }
-
-  export type UserUpdateWithoutStaffAssignmentsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    fullName?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    profileImage?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    role?: RoleUpdateOneRequiredWithoutUsersNestedInput
-    branch?: BranchUpdateOneRequiredWithoutUsersNestedInput
-    doctor?: DoctorUpdateOneWithoutUserNestedInput
-    createdAppointments?: AppointmentUpdateManyWithoutCreatedByNestedInput
-    recordedERExams?: ERExaminationUpdateManyWithoutRecordedByNestedInput
-    pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutPerformedByNestedInput
-    opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
-    createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutStaffAssignmentsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    fullName?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
-    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    profileImage?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    roleId?: StringFieldUpdateOperationsInput | string
-    branchId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    doctor?: DoctorUncheckedUpdateOneWithoutUserNestedInput
-    createdAppointments?: AppointmentUncheckedUpdateManyWithoutCreatedByNestedInput
-    recordedERExams?: ERExaminationUncheckedUpdateManyWithoutRecordedByNestedInput
-    pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
-    opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
-    createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
-  }
-
-  export type BranchUpsertWithoutStaffAssignmentsInput = {
-    update: XOR<BranchUpdateWithoutStaffAssignmentsInput, BranchUncheckedUpdateWithoutStaffAssignmentsInput>
-    create: XOR<BranchCreateWithoutStaffAssignmentsInput, BranchUncheckedCreateWithoutStaffAssignmentsInput>
-    where?: BranchWhereInput
-  }
-
-  export type BranchUpdateToOneWithWhereWithoutStaffAssignmentsInput = {
-    where?: BranchWhereInput
-    data: XOR<BranchUpdateWithoutStaffAssignmentsInput, BranchUncheckedUpdateWithoutStaffAssignmentsInput>
-  }
-
-  export type BranchUpdateWithoutStaffAssignmentsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    branchName?: StringFieldUpdateOperationsInput | string
-    address?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    users?: UserUpdateManyWithoutBranchNestedInput
-    doctors?: DoctorUpdateManyWithoutBranchNestedInput
-    patients?: PatientUpdateManyWithoutBranchNestedInput
-    appointments?: AppointmentUpdateManyWithoutBranchNestedInput
-    surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
-    prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
-    pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
-    pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
-    opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
-    opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
-    billings?: BillingUpdateManyWithoutBranchNestedInput
-  }
-
-  export type BranchUncheckedUpdateWithoutStaffAssignmentsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    branchName?: StringFieldUpdateOperationsInput | string
-    address?: StringFieldUpdateOperationsInput | string
-    phone?: StringFieldUpdateOperationsInput | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    users?: UserUncheckedUpdateManyWithoutBranchNestedInput
-    doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
-    patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
-    appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
-    surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
-    prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
-    pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
-    pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
-    opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
-    opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
-    billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+  export type StaffAssignmentUpdateManyWithWhereWithoutUserInput = {
+    where: StaffAssignmentScalarWhereInput
+    data: XOR<StaffAssignmentUpdateManyMutationInput, StaffAssignmentUncheckedUpdateManyWithoutUserInput>
   }
 
   export type UserCreateWithoutDoctorInput = {
@@ -31466,12 +31224,12 @@ export namespace Prisma {
     updatedAt?: Date | string
     role: RoleCreateNestedOneWithoutUsersInput
     branch: BranchCreateNestedOneWithoutUsersInput
-    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
     createdAppointments?: AppointmentCreateNestedManyWithoutCreatedByInput
     recordedERExams?: ERExaminationCreateNestedManyWithoutRecordedByInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutPerformedByInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutDoctorInput = {
@@ -31489,12 +31247,12 @@ export namespace Prisma {
     branchId: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
     createdAppointments?: AppointmentUncheckedCreateNestedManyWithoutCreatedByInput
     recordedERExams?: ERExaminationUncheckedCreateNestedManyWithoutRecordedByInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutDoctorInput = {
@@ -31551,7 +31309,7 @@ export namespace Prisma {
 
   export type AppointmentCreateWithoutDoctorInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -31568,7 +31326,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedCreateWithoutDoctorInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -31699,12 +31457,12 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: RoleUpdateOneRequiredWithoutUsersNestedInput
     branch?: BranchUpdateOneRequiredWithoutUsersNestedInput
-    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
     createdAppointments?: AppointmentUpdateManyWithoutCreatedByNestedInput
     recordedERExams?: ERExaminationUpdateManyWithoutRecordedByNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutPerformedByNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDoctorInput = {
@@ -31722,12 +31480,12 @@ export namespace Prisma {
     branchId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
     createdAppointments?: AppointmentUncheckedUpdateManyWithoutCreatedByNestedInput
     recordedERExams?: ERExaminationUncheckedUpdateManyWithoutRecordedByNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type BranchUpsertWithoutDoctorsInput = {
@@ -31898,7 +31656,7 @@ export namespace Prisma {
 
   export type AppointmentCreateWithoutPatientInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -31915,7 +31673,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedCreateWithoutPatientInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -32124,9 +31882,7 @@ export namespace Prisma {
 
   export type PatientCreateWithoutAppointmentsInput = {
     id?: string
-    patientId: string
-    firstName: string
-    lastName: string
+    fullName: string
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
@@ -32140,9 +31896,7 @@ export namespace Prisma {
 
   export type PatientUncheckedCreateWithoutAppointmentsInput = {
     id?: string
-    patientId: string
-    firstName: string
-    lastName: string
+    fullName: string
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
@@ -32205,12 +31959,12 @@ export namespace Prisma {
     updatedAt?: Date | string
     role: RoleCreateNestedOneWithoutUsersInput
     branch: BranchCreateNestedOneWithoutUsersInput
-    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
     doctor?: DoctorCreateNestedOneWithoutUserInput
     recordedERExams?: ERExaminationCreateNestedManyWithoutRecordedByInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutPerformedByInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCreatedAppointmentsInput = {
@@ -32228,12 +31982,12 @@ export namespace Prisma {
     branchId: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
     doctor?: DoctorUncheckedCreateNestedOneWithoutUserInput
     recordedERExams?: ERExaminationUncheckedCreateNestedManyWithoutRecordedByInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutCreatedAppointmentsInput = {
@@ -32459,9 +32213,7 @@ export namespace Prisma {
 
   export type PatientUpdateWithoutAppointmentsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    patientId?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
@@ -32475,9 +32227,7 @@ export namespace Prisma {
 
   export type PatientUncheckedUpdateWithoutAppointmentsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    patientId?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
@@ -32552,12 +32302,12 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: RoleUpdateOneRequiredWithoutUsersNestedInput
     branch?: BranchUpdateOneRequiredWithoutUsersNestedInput
-    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
     doctor?: DoctorUpdateOneWithoutUserNestedInput
     recordedERExams?: ERExaminationUpdateManyWithoutRecordedByNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutPerformedByNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreatedAppointmentsInput = {
@@ -32575,12 +32325,12 @@ export namespace Prisma {
     branchId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
     doctor?: DoctorUncheckedUpdateOneWithoutUserNestedInput
     recordedERExams?: ERExaminationUncheckedUpdateManyWithoutRecordedByNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ERExaminationUpsertWithoutAppointmentInput = {
@@ -32697,7 +32447,7 @@ export namespace Prisma {
 
   export type AppointmentCreateWithoutErExaminationInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -32714,7 +32464,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedCreateWithoutErExaminationInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -32749,12 +32499,12 @@ export namespace Prisma {
     updatedAt?: Date | string
     role: RoleCreateNestedOneWithoutUsersInput
     branch: BranchCreateNestedOneWithoutUsersInput
-    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
     doctor?: DoctorCreateNestedOneWithoutUserInput
     createdAppointments?: AppointmentCreateNestedManyWithoutCreatedByInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutPerformedByInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutRecordedERExamsInput = {
@@ -32772,12 +32522,12 @@ export namespace Prisma {
     branchId: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
     doctor?: DoctorUncheckedCreateNestedOneWithoutUserInput
     createdAppointments?: AppointmentUncheckedCreateNestedManyWithoutCreatedByInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutRecordedERExamsInput = {
@@ -32798,7 +32548,7 @@ export namespace Prisma {
 
   export type AppointmentUpdateWithoutErExaminationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -32815,7 +32565,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedUpdateWithoutErExaminationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -32856,12 +32606,12 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: RoleUpdateOneRequiredWithoutUsersNestedInput
     branch?: BranchUpdateOneRequiredWithoutUsersNestedInput
-    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
     doctor?: DoctorUpdateOneWithoutUserNestedInput
     createdAppointments?: AppointmentUpdateManyWithoutCreatedByNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutPerformedByNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRecordedERExamsInput = {
@@ -32879,17 +32629,17 @@ export namespace Prisma {
     branchId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
     doctor?: DoctorUncheckedUpdateOneWithoutUserNestedInput
     createdAppointments?: AppointmentUncheckedUpdateManyWithoutCreatedByNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type AppointmentCreateWithoutClinicalExaminationInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -32906,7 +32656,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedCreateWithoutClinicalExaminationInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -33037,7 +32787,7 @@ export namespace Prisma {
 
   export type AppointmentUpdateWithoutClinicalExaminationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -33054,7 +32804,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedUpdateWithoutClinicalExaminationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -33477,7 +33227,7 @@ export namespace Prisma {
 
   export type AppointmentCreateWithoutPrescriptionsInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -33494,7 +33244,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedCreateWithoutPrescriptionsInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -33661,7 +33411,7 @@ export namespace Prisma {
 
   export type AppointmentUpdateWithoutPrescriptionsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -33678,7 +33428,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedUpdateWithoutPrescriptionsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -34101,12 +33851,12 @@ export namespace Prisma {
     updatedAt?: Date | string
     role: RoleCreateNestedOneWithoutUsersInput
     branch: BranchCreateNestedOneWithoutUsersInput
-    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
     doctor?: DoctorCreateNestedOneWithoutUserInput
     createdAppointments?: AppointmentCreateNestedManyWithoutCreatedByInput
     recordedERExams?: ERExaminationCreateNestedManyWithoutRecordedByInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPharmacyTransactionsInput = {
@@ -34124,12 +33874,12 @@ export namespace Prisma {
     branchId: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
     doctor?: DoctorUncheckedCreateNestedOneWithoutUserInput
     createdAppointments?: AppointmentUncheckedCreateNestedManyWithoutCreatedByInput
     recordedERExams?: ERExaminationUncheckedCreateNestedManyWithoutRecordedByInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutPharmacyTransactionsInput = {
@@ -34314,12 +34064,12 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: RoleUpdateOneRequiredWithoutUsersNestedInput
     branch?: BranchUpdateOneRequiredWithoutUsersNestedInput
-    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
     doctor?: DoctorUpdateOneWithoutUserNestedInput
     createdAppointments?: AppointmentUpdateManyWithoutCreatedByNestedInput
     recordedERExams?: ERExaminationUpdateManyWithoutRecordedByNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPharmacyTransactionsInput = {
@@ -34337,12 +34087,12 @@ export namespace Prisma {
     branchId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
     doctor?: DoctorUncheckedUpdateOneWithoutUserNestedInput
     createdAppointments?: AppointmentUncheckedUpdateManyWithoutCreatedByNestedInput
     recordedERExams?: ERExaminationUncheckedUpdateManyWithoutRecordedByNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type BranchCreateWithoutOpticalItemsInput = {
@@ -34637,12 +34387,12 @@ export namespace Prisma {
     updatedAt?: Date | string
     role: RoleCreateNestedOneWithoutUsersInput
     branch: BranchCreateNestedOneWithoutUsersInput
-    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
     doctor?: DoctorCreateNestedOneWithoutUserInput
     createdAppointments?: AppointmentCreateNestedManyWithoutCreatedByInput
     recordedERExams?: ERExaminationCreateNestedManyWithoutRecordedByInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOpticalTransactionsInput = {
@@ -34660,12 +34410,12 @@ export namespace Prisma {
     branchId: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
     doctor?: DoctorUncheckedCreateNestedOneWithoutUserInput
     createdAppointments?: AppointmentUncheckedCreateNestedManyWithoutCreatedByInput
     recordedERExams?: ERExaminationUncheckedCreateNestedManyWithoutRecordedByInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOpticalTransactionsInput = {
@@ -34846,12 +34596,12 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: RoleUpdateOneRequiredWithoutUsersNestedInput
     branch?: BranchUpdateOneRequiredWithoutUsersNestedInput
-    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
     doctor?: DoctorUpdateOneWithoutUserNestedInput
     createdAppointments?: AppointmentUpdateManyWithoutCreatedByNestedInput
     recordedERExams?: ERExaminationUpdateManyWithoutRecordedByNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOpticalTransactionsInput = {
@@ -34869,19 +34619,17 @@ export namespace Prisma {
     branchId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
     doctor?: DoctorUncheckedUpdateOneWithoutUserNestedInput
     createdAppointments?: AppointmentUncheckedUpdateManyWithoutCreatedByNestedInput
     recordedERExams?: ERExaminationUncheckedUpdateManyWithoutRecordedByNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type PatientCreateWithoutBillingsInput = {
     id?: string
-    patientId: string
-    firstName: string
-    lastName: string
+    fullName: string
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
@@ -34895,9 +34643,7 @@ export namespace Prisma {
 
   export type PatientUncheckedCreateWithoutBillingsInput = {
     id?: string
-    patientId: string
-    firstName: string
-    lastName: string
+    fullName: string
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
@@ -34963,7 +34709,7 @@ export namespace Prisma {
 
   export type AppointmentCreateWithoutBillingsInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -34980,7 +34726,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedCreateWithoutBillingsInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -35077,12 +34823,12 @@ export namespace Prisma {
     updatedAt?: Date | string
     role: RoleCreateNestedOneWithoutUsersInput
     branch: BranchCreateNestedOneWithoutUsersInput
-    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
     doctor?: DoctorCreateNestedOneWithoutUserInput
     createdAppointments?: AppointmentCreateNestedManyWithoutCreatedByInput
     recordedERExams?: ERExaminationCreateNestedManyWithoutRecordedByInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutPerformedByInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCreatedBillingsInput = {
@@ -35100,12 +34846,12 @@ export namespace Prisma {
     branchId: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
     doctor?: DoctorUncheckedCreateNestedOneWithoutUserInput
     createdAppointments?: AppointmentUncheckedCreateNestedManyWithoutCreatedByInput
     recordedERExams?: ERExaminationUncheckedCreateNestedManyWithoutRecordedByInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutCreatedBillingsInput = {
@@ -35190,9 +34936,7 @@ export namespace Prisma {
 
   export type PatientUpdateWithoutBillingsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    patientId?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
@@ -35206,9 +34950,7 @@ export namespace Prisma {
 
   export type PatientUncheckedUpdateWithoutBillingsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    patientId?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
@@ -35286,7 +35028,7 @@ export namespace Prisma {
 
   export type AppointmentUpdateWithoutBillingsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -35303,7 +35045,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedUpdateWithoutBillingsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -35418,12 +35160,12 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: RoleUpdateOneRequiredWithoutUsersNestedInput
     branch?: BranchUpdateOneRequiredWithoutUsersNestedInput
-    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
     doctor?: DoctorUpdateOneWithoutUserNestedInput
     createdAppointments?: AppointmentUpdateManyWithoutCreatedByNestedInput
     recordedERExams?: ERExaminationUpdateManyWithoutRecordedByNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutPerformedByNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreatedBillingsInput = {
@@ -35441,12 +35183,12 @@ export namespace Prisma {
     branchId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
     doctor?: DoctorUncheckedUpdateOneWithoutUserNestedInput
     createdAppointments?: AppointmentUncheckedUpdateManyWithoutCreatedByNestedInput
     recordedERExams?: ERExaminationUncheckedUpdateManyWithoutRecordedByNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type PharmacyStockTransactionUpsertWithWhereUniqueWithoutBillingInput = {
@@ -35481,6 +35223,214 @@ export namespace Prisma {
     data: XOR<OpticalStockTransactionUpdateManyMutationInput, OpticalStockTransactionUncheckedUpdateManyWithoutBillingInput>
   }
 
+  export type UserCreateWithoutStaffAssignmentsInput = {
+    id?: string
+    fullName: string
+    username: string
+    email: string
+    password: string
+    phone?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
+    profileImage?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    role: RoleCreateNestedOneWithoutUsersInput
+    branch: BranchCreateNestedOneWithoutUsersInput
+    doctor?: DoctorCreateNestedOneWithoutUserInput
+    createdAppointments?: AppointmentCreateNestedManyWithoutCreatedByInput
+    recordedERExams?: ERExaminationCreateNestedManyWithoutRecordedByInput
+    pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutPerformedByInput
+    opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
+    createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
+  }
+
+  export type UserUncheckedCreateWithoutStaffAssignmentsInput = {
+    id?: string
+    fullName: string
+    username: string
+    email: string
+    password: string
+    phone?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
+    profileImage?: string | null
+    isActive?: boolean
+    roleId: string
+    branchId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    doctor?: DoctorUncheckedCreateNestedOneWithoutUserInput
+    createdAppointments?: AppointmentUncheckedCreateNestedManyWithoutCreatedByInput
+    recordedERExams?: ERExaminationUncheckedCreateNestedManyWithoutRecordedByInput
+    pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
+    opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
+    createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
+  }
+
+  export type UserCreateOrConnectWithoutStaffAssignmentsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutStaffAssignmentsInput, UserUncheckedCreateWithoutStaffAssignmentsInput>
+  }
+
+  export type BranchCreateWithoutStaffAssignmentsInput = {
+    id?: string
+    branchName: string
+    address: string
+    phone: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserCreateNestedManyWithoutBranchInput
+    doctors?: DoctorCreateNestedManyWithoutBranchInput
+    patients?: PatientCreateNestedManyWithoutBranchInput
+    appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    surgeries?: SurgeryCreateNestedManyWithoutBranchInput
+    prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
+    pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
+    opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
+    opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
+    billings?: BillingCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchUncheckedCreateWithoutStaffAssignmentsInput = {
+    id?: string
+    branchName: string
+    address: string
+    phone: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserUncheckedCreateNestedManyWithoutBranchInput
+    doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
+    patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
+    prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
+    pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
+    opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
+    opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
+    billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchCreateOrConnectWithoutStaffAssignmentsInput = {
+    where: BranchWhereUniqueInput
+    create: XOR<BranchCreateWithoutStaffAssignmentsInput, BranchUncheckedCreateWithoutStaffAssignmentsInput>
+  }
+
+  export type UserUpsertWithoutStaffAssignmentsInput = {
+    update: XOR<UserUpdateWithoutStaffAssignmentsInput, UserUncheckedUpdateWithoutStaffAssignmentsInput>
+    create: XOR<UserCreateWithoutStaffAssignmentsInput, UserUncheckedCreateWithoutStaffAssignmentsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutStaffAssignmentsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutStaffAssignmentsInput, UserUncheckedUpdateWithoutStaffAssignmentsInput>
+  }
+
+  export type UserUpdateWithoutStaffAssignmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    profileImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: RoleUpdateOneRequiredWithoutUsersNestedInput
+    branch?: BranchUpdateOneRequiredWithoutUsersNestedInput
+    doctor?: DoctorUpdateOneWithoutUserNestedInput
+    createdAppointments?: AppointmentUpdateManyWithoutCreatedByNestedInput
+    recordedERExams?: ERExaminationUpdateManyWithoutRecordedByNestedInput
+    pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutPerformedByNestedInput
+    opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
+    createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutStaffAssignmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    profileImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    roleId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    doctor?: DoctorUncheckedUpdateOneWithoutUserNestedInput
+    createdAppointments?: AppointmentUncheckedUpdateManyWithoutCreatedByNestedInput
+    recordedERExams?: ERExaminationUncheckedUpdateManyWithoutRecordedByNestedInput
+    pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
+    opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
+    createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
+  }
+
+  export type BranchUpsertWithoutStaffAssignmentsInput = {
+    update: XOR<BranchUpdateWithoutStaffAssignmentsInput, BranchUncheckedUpdateWithoutStaffAssignmentsInput>
+    create: XOR<BranchCreateWithoutStaffAssignmentsInput, BranchUncheckedCreateWithoutStaffAssignmentsInput>
+    where?: BranchWhereInput
+  }
+
+  export type BranchUpdateToOneWithWhereWithoutStaffAssignmentsInput = {
+    where?: BranchWhereInput
+    data: XOR<BranchUpdateWithoutStaffAssignmentsInput, BranchUncheckedUpdateWithoutStaffAssignmentsInput>
+  }
+
+  export type BranchUpdateWithoutStaffAssignmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchName?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUpdateManyWithoutBranchNestedInput
+    doctors?: DoctorUpdateManyWithoutBranchNestedInput
+    patients?: PatientUpdateManyWithoutBranchNestedInput
+    appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
+    prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
+    pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
+    opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
+    opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
+    billings?: BillingUpdateManyWithoutBranchNestedInput
+  }
+
+  export type BranchUncheckedUpdateWithoutStaffAssignmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchName?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUncheckedUpdateManyWithoutBranchNestedInput
+    doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
+    patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
+    appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
+    prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
+    pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
+    opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
+    billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+  }
+
   export type UserCreateManyRoleInput = {
     id?: string
     fullName: string
@@ -35511,13 +35461,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     branch?: BranchUpdateOneRequiredWithoutUsersNestedInput
-    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
     doctor?: DoctorUpdateOneWithoutUserNestedInput
     createdAppointments?: AppointmentUpdateManyWithoutCreatedByNestedInput
     recordedERExams?: ERExaminationUpdateManyWithoutRecordedByNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutPerformedByNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRoleInput = {
@@ -35534,13 +35484,13 @@ export namespace Prisma {
     branchId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
     doctor?: DoctorUncheckedUpdateOneWithoutUserNestedInput
     createdAppointments?: AppointmentUncheckedUpdateManyWithoutCreatedByNestedInput
     recordedERExams?: ERExaminationUncheckedUpdateManyWithoutRecordedByNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutRoleInput = {
@@ -35578,7 +35528,7 @@ export namespace Prisma {
   export type StaffAssignmentCreateManyBranchInput = {
     id?: string
     userId: string
-    isPrimary?: boolean
+    isPrimary?: boolean | null
     assignedAt?: Date | string
   }
 
@@ -35594,9 +35544,7 @@ export namespace Prisma {
 
   export type PatientCreateManyBranchInput = {
     id?: string
-    patientId: string
-    firstName: string
-    lastName: string
+    fullName: string
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
@@ -35608,7 +35556,7 @@ export namespace Prisma {
 
   export type AppointmentCreateManyBranchInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -35729,13 +35677,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: RoleUpdateOneRequiredWithoutUsersNestedInput
-    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
     doctor?: DoctorUpdateOneWithoutUserNestedInput
     createdAppointments?: AppointmentUpdateManyWithoutCreatedByNestedInput
     recordedERExams?: ERExaminationUpdateManyWithoutRecordedByNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutPerformedByNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBranchInput = {
@@ -35752,13 +35700,13 @@ export namespace Prisma {
     roleId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
     doctor?: DoctorUncheckedUpdateOneWithoutUserNestedInput
     createdAppointments?: AppointmentUncheckedUpdateManyWithoutCreatedByNestedInput
     recordedERExams?: ERExaminationUncheckedUpdateManyWithoutRecordedByNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutBranchInput = {
@@ -35779,7 +35727,7 @@ export namespace Prisma {
 
   export type StaffAssignmentUpdateWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
-    isPrimary?: BoolFieldUpdateOperationsInput | boolean
+    isPrimary?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStaffAssignmentsNestedInput
   }
@@ -35787,14 +35735,14 @@ export namespace Prisma {
   export type StaffAssignmentUncheckedUpdateWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    isPrimary?: BoolFieldUpdateOperationsInput | boolean
+    isPrimary?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StaffAssignmentUncheckedUpdateManyWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    isPrimary?: BoolFieldUpdateOperationsInput | boolean
+    isPrimary?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -35836,9 +35784,7 @@ export namespace Prisma {
 
   export type PatientUpdateWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
-    patientId?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
@@ -35852,9 +35798,7 @@ export namespace Prisma {
 
   export type PatientUncheckedUpdateWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
-    patientId?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
@@ -35868,9 +35812,7 @@ export namespace Prisma {
 
   export type PatientUncheckedUpdateManyWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
-    patientId?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
@@ -35882,7 +35824,7 @@ export namespace Prisma {
 
   export type AppointmentUpdateWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -35899,7 +35841,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedUpdateWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -35916,7 +35858,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedUpdateManyWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -36227,16 +36169,9 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StaffAssignmentCreateManyUserInput = {
-    id?: string
-    branchId: string
-    isPrimary?: boolean
-    assignedAt?: Date | string
-  }
-
   export type AppointmentCreateManyCreatedByInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -36300,30 +36235,16 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
-  export type StaffAssignmentUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    isPrimary?: BoolFieldUpdateOperationsInput | boolean
-    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    branch?: BranchUpdateOneRequiredWithoutStaffAssignmentsNestedInput
-  }
-
-  export type StaffAssignmentUncheckedUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    branchId?: StringFieldUpdateOperationsInput | string
-    isPrimary?: BoolFieldUpdateOperationsInput | boolean
-    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type StaffAssignmentUncheckedUpdateManyWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    branchId?: StringFieldUpdateOperationsInput | string
-    isPrimary?: BoolFieldUpdateOperationsInput | boolean
-    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  export type StaffAssignmentCreateManyUserInput = {
+    id?: string
+    branchId: string
+    isPrimary?: boolean | null
+    assignedAt?: Date | string
   }
 
   export type AppointmentUpdateWithoutCreatedByInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -36340,7 +36261,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedUpdateWithoutCreatedByInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -36357,7 +36278,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedUpdateManyWithoutCreatedByInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -36531,9 +36452,30 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type StaffAssignmentUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    isPrimary?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutStaffAssignmentsNestedInput
+  }
+
+  export type StaffAssignmentUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    isPrimary?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StaffAssignmentUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    isPrimary?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type AppointmentCreateManyDoctorInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -36573,7 +36515,7 @@ export namespace Prisma {
 
   export type AppointmentUpdateWithoutDoctorInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -36590,7 +36532,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedUpdateWithoutDoctorInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -36607,7 +36549,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedUpdateManyWithoutDoctorInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -36707,7 +36649,7 @@ export namespace Prisma {
 
   export type AppointmentCreateManyPatientInput = {
     id?: string
-    bookingNumber: string
+    bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
@@ -36738,7 +36680,7 @@ export namespace Prisma {
 
   export type AppointmentUpdateWithoutPatientInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -36755,7 +36697,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedUpdateWithoutPatientInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -36772,7 +36714,7 @@ export namespace Prisma {
 
   export type AppointmentUncheckedUpdateManyWithoutPatientInput = {
     id?: StringFieldUpdateOperationsInput | string
-    bookingNumber?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string

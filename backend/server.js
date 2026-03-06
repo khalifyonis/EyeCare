@@ -11,6 +11,14 @@ import doctorRoutes from './src/routes/doctorRoutes.js';
 import dashboardRoutes from './src/routes/dashboardRoutes.js';
 import errorMiddleware from './src/middlewares/errorMiddleware.js';
 
+// Keep process alive on uncaught errors (log and continue)
+process.on('uncaughtException', (err) => {
+    console.error('[uncaughtException]', err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('[unhandledRejection]', reason);
+});
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -37,7 +45,18 @@ app.get('/', (req, res) => {
 // Error Handling Middleware (Should be last)
 app.use(errorMiddleware);
 
-// Start server
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+// Start server – if port in use, try next (5001, 5002, ...)
+function tryListen(port) {
+    const p = Number(port) || 5000;
+    const server = app.listen(p, () => {
+        console.log(`Server is running on port ${p}`);
+    });
+    server.on('error', (err) => {
+        if (err.code === 'EADDRINUSE' && p < 5010) {
+            server.close(() => tryListen(p + 1));
+        } else {
+            console.error('Server error:', err);
+        }
+    });
+}
+tryListen(PORT);

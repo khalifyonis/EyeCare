@@ -10,8 +10,8 @@ import { authenticate, authorize } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
-// All branch routes require authentication and ADMIN role
-router.use(authenticate, authorize('ADMIN'));
+// Branch management: ADMIN and SUPERADMIN only
+router.use(authenticate, authorize('ADMIN', 'SUPERADMIN'));
 
 router.get('/', getAllBranches);
 router.get('/:id', getBranchById);

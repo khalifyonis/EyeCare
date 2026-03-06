@@ -5,15 +5,17 @@ import { Button } from '@/components/ui/button';
 import { ArrowUpDown, Pencil, Trash2 } from 'lucide-react';
 
 export type Branch = {
-    id: number;
+    id: string;
     branchName: string;
     address: string;
     phone: string;
+    isActive?: boolean;
+    createdAt?: string;
 };
 
 interface BranchColumnsProps {
     onEdit: (branch: Branch) => void;
-    onDelete: (id: number) => void;
+    onDelete: (id: string) => void;
 }
 
 export const getBranchColumns = ({ onEdit, onDelete }: BranchColumnsProps): ColumnDef<Branch>[] => [

@@ -68,11 +68,8 @@ export const updateUserSchema = Joi.object({
 const phoneRegex = /^[+]?[(]?[0-9]{1,3}[)]?[-s./0-9]*$/;
 
 export const patientSchema = Joi.object({
-    firstName: Joi.string().regex(nameRegex).required().messages({
-        'string.pattern.base': 'Letters only'
-    }),
-    lastName: Joi.string().regex(nameRegex).required().messages({
-        'string.pattern.base': 'Letters only'
+    fullName: Joi.string().min(2).max(120).required().messages({
+        'string.min': 'Full name is required'
     }),
     gender: Joi.string().valid('MALE', 'FEMALE').required(),
     dateOfBirth: Joi.date().iso().max('now').required().messages({
@@ -87,12 +84,7 @@ export const patientSchema = Joi.object({
 }).options({ stripUnknown: true });
 
 export const updatePatientSchema = Joi.object({
-    firstName: Joi.string().regex(nameRegex).optional().messages({
-        'string.pattern.base': 'Letters only'
-    }),
-    lastName: Joi.string().regex(nameRegex).optional().messages({
-        'string.pattern.base': 'Letters only'
-    }),
+    fullName: Joi.string().min(2).max(120).optional(),
     gender: Joi.string().valid('MALE', 'FEMALE').optional(),
     dateOfBirth: Joi.date().iso().max('now').optional().messages({
         'date.max': 'Invalid birth date'

@@ -40,7 +40,7 @@ export const createAppointment = async (req, res, next) => {
                 createdById: req.user.id
             },
             include: {
-                patient: { select: { firstName: true, lastName: true, patientId: true } },
+                patient: { select: { id: true, fullName: true } },
                 doctor: { include: { user: { select: { fullName: true } } } },
                 branch: { select: { branchName: true } }
             }
@@ -56,8 +56,9 @@ export const getAppointments = async (req, res, next) => {
     try {
         const { patientId, doctorId, date, status, search, sortBy = 'appointmentDate', sortOrder = 'desc' } = req.query;
 
+        const branchFilter = (req.user.role === 'SUPERADMIN' || !req.user.branchId) ? {} : { branchId: req.user.branchId };
         const whereClause = {
-            ...(req.user.role !== 'SUPERADMIN' ? { branchId: req.user.branchId } : {}),
+            ...branchFilter,
             ...(patientId ? { patientId } : {}),
             ...(doctorId ? { doctorId } : {}),
             ...(status ? { status } : {}),
@@ -67,18 +68,20 @@ export const getAppointments = async (req, res, next) => {
                     lte: new Date(new Date(date).setHours(23, 59, 59, 999))
                 }
             } : {}),
-            OR: search ? [
-                { bookingNumber: { contains: search, mode: 'insensitive' } },
-                { patient: { firstName: { contains: search, mode: 'insensitive' } } },
-                { patient: { lastName: { contains: search, mode: 'insensitive' } } },
-            ] : undefined
+            ...(search ? {
+                OR: [
+                    { bookingNumber: { contains: search, mode: 'insensitive' } },
+                    { patient: { fullName: { contains: search, mode: 'insensitive' } } },
+                    { patient: { phone: { contains: search, mode: 'insensitive' } } },
+                ]
+            } : {})
         };
 
         const appointments = await prisma.appointment.findMany({
             where: whereClause,
             orderBy: { [sortBy]: sortOrder },
             include: {
-                patient: { select: { firstName: true, lastName: true, patientId: true, phone: true } },
+                patient: { select: { id: true, fullName: true, phone: true } },
                 doctor: { include: { user: { select: { fullName: true } } } },
                 branch: { select: { branchName: true } },
                 createdBy: { select: { fullName: true } }
@@ -94,17 +97,25 @@ export const getAppointments = async (req, res, next) => {
 export const getAppointmentStats = async (req, res, next) => {
     try {
         const now = new Date();
-        const startOfToday = new Date(now.setHours(0, 0, 0, 0));
-        const endOfToday = new Date(now.setHours(23, 59, 59, 999));
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+        const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 
-        const branchFilter = req.user.role !== 'SUPERADMIN' ? { branchId: req.user.branchId } : {};
+        const branchFilter = (req.user.role === 'SUPERADMIN' || !req.user.branchId) ? {} : { branchId: req.user.branchId };
 
-        const [pending, completed, revenueToday] = await Promise.all([
+        const [total, pending, completedToday, cancelled, revenueToday] = await Promise.all([
+            prisma.appointment.count({ where: branchFilter }),
             prisma.appointment.count({
                 where: { ...branchFilter, status: 'PENDING' }
             }),
             prisma.appointment.count({
-                where: { ...branchFilter, status: 'COMPLETED' }
+                where: {
+                    ...branchFilter,
+                    status: 'COMPLETED',
+                    appointmentDate: { gte: startOfToday, lte: endOfToday }
+                }
+            }),
+            prisma.appointment.count({
+                where: { ...branchFilter, status: 'CANCELLED' }
             }),
             prisma.appointment.aggregate({
                 where: {
@@ -117,8 +128,10 @@ export const getAppointmentStats = async (req, res, next) => {
         ]);
 
         res.status(200).json({
+            total,
             pending,
-            completed,
+            completed: completedToday,
+            cancelled,
             revenueToday: revenueToday._sum.amount || 0
         });
     } catch (error) {
@@ -128,10 +141,8 @@ export const getAppointmentStats = async (req, res, next) => {
 
 export const getAppointmentById = async (req, res, next) => {
     try {
-        const whereClause = {
-            id: req.params.id,
-            ...(req.user.role !== 'SUPERADMIN' ? { branchId: req.user.branchId } : {})
-        };
+        const branchFilter = (req.user.role === 'SUPERADMIN' || !req.user.branchId) ? {} : { branchId: req.user.branchId };
+        const whereClause = { id: req.params.id, ...branchFilter };
 
         const appointment = await prisma.appointment.findFirst({
             where: whereClause,
@@ -172,7 +183,7 @@ export const updateAppointment = async (req, res, next) => {
                 amount: amount !== undefined ? amount : undefined
             },
             include: {
-                patient: { select: { firstName: true, lastName: true, patientId: true } },
+                patient: { select: { id: true, fullName: true } },
                 doctor: { include: { user: { select: { fullName: true } } } },
                 branch: { select: { branchName: true } }
             }

@@ -3,7 +3,7 @@ import moment from 'moment';
 
 export const getDashboardStats = async (req, res, next) => {
     try {
-        const branchFilter = req.user.role !== 'SUPERADMIN' ? { branchId: req.user.branchId } : {};
+        const branchFilter = (req.user.role === 'SUPERADMIN' || !req.user.branchId) ? {} : { branchId: req.user.branchId };
 
         const now = moment();
         const startOfToday = now.clone().startOf('day').toDate();

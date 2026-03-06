@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/client"
 }
 
 datasource db {
@@ -139,8 +140,10 @@ enum AppointmentStatus {
 
 model Appointment {
   id              String            @id @default(uuid())
+  bookingNumber   String?           @unique @map("booking_number")
   appointmentDate DateTime          @map("appointment_date")
   status          AppointmentStatus @default(PENDING)
+  amount          Decimal           @default(0) @db.Decimal(10, 2)
   
   branchId        String            @map("branch_id")
   branch          Branch            @relation(fields: [branchId], references: [id])

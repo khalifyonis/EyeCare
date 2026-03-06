@@ -12,8 +12,8 @@ import { upload } from '../middlewares/uploadMiddleware.js'; // Added upload mid
 
 const router = express.Router();
 
-// All routes here are restricted to ADMIN and require authentication
-router.use(authenticate, authorize('ADMIN'));
+// User management: ADMIN and SUPERADMIN only
+router.use(authenticate, authorize('ADMIN', 'SUPERADMIN'));
 
 router.get('/', getAllUsers);
 router.get('/:id', getUserById);

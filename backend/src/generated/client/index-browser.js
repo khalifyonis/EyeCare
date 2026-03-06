@@ -154,14 +154,6 @@ exports.Prisma.UserScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.StaffAssignmentScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  branchId: 'branchId',
-  isPrimary: 'isPrimary',
-  assignedAt: 'assignedAt'
-};
-
 exports.Prisma.DoctorScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -175,9 +167,7 @@ exports.Prisma.DoctorScalarFieldEnum = {
 
 exports.Prisma.PatientScalarFieldEnum = {
   id: 'id',
-  patientId: 'patientId',
-  firstName: 'firstName',
-  lastName: 'lastName',
+  fullName: 'fullName',
   gender: 'gender',
   dateOfBirth: 'dateOfBirth',
   phone: 'phone',
@@ -334,6 +324,14 @@ exports.Prisma.BillingScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.StaffAssignmentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  branchId: 'branchId',
+  isPrimary: 'isPrimary',
+  assignedAt: 'assignedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -371,7 +369,6 @@ exports.Prisma.ModelName = {
   Role: 'Role',
   Branch: 'Branch',
   User: 'User',
-  StaffAssignment: 'StaffAssignment',
   Doctor: 'Doctor',
   Patient: 'Patient',
   Appointment: 'Appointment',
@@ -383,7 +380,8 @@ exports.Prisma.ModelName = {
   PharmacyStockTransaction: 'PharmacyStockTransaction',
   OpticalItem: 'OpticalItem',
   OpticalStockTransaction: 'OpticalStockTransaction',
-  Billing: 'Billing'
+  Billing: 'Billing',
+  StaffAssignment: 'StaffAssignment'
 };
 
 /**

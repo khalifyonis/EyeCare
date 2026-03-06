@@ -13,11 +13,11 @@ export interface PatientColumnsProps {
 
 export const getPatientColumns = ({ onEdit, onDelete, onBook }: PatientColumnsProps): ColumnDef<any>[] => [
     {
-        accessorKey: 'patientId',
-        header: 'Patient ID',
+        accessorKey: 'id',
+        header: 'ID',
         cell: ({ row }) => (
             <span className="text-[12px] font-bold text-slate-500 font-mono tracking-tight py-2 block">
-                #{row.original.patientId}
+                #{String(row.original.id).slice(0, 8)}
             </span>
         ),
     },
@@ -26,15 +26,16 @@ export const getPatientColumns = ({ onEdit, onDelete, onBook }: PatientColumnsPr
         header: 'Patient Name',
         cell: ({ row }) => {
             const p = row.original;
-            const fullName = `${p.firstName} ${p.lastName}`;
+            const fullName = p.fullName || '';
+            const initial = fullName.charAt(0).toUpperCase();
             return (
                 <Link href={`/dashboard/patients/${p.id}`} className="flex items-center gap-3.5 py-1.5 group cursor-pointer hover:bg-slate-50/50 dark:hover:bg-slate-800/20 -ml-2 pl-2 rounded-xl transition-all">
                     <div className="flex size-10 shrink-0 items-center justify-center rounded-xl text-[13px] font-black bg-[#0EA5E9]/10 text-[#0EA5E9] transition-transform group-hover:scale-105 group-hover:bg-[#0EA5E9] group-hover:text-white shadow-sm shadow-blue-500/0 group-hover:shadow-blue-500/20">
-                        {p.firstName?.charAt(0).toUpperCase()}
+                        {initial}
                     </div>
                     <div className="flex flex-col min-w-0">
-                        <span className="font-bold text-[13px] text-slate-900 dark:text-white leading-tight truncate group-hover:text-[#0EA5E9] transition-colors">{p.firstName} {p.lastName}</span>
-                        <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest mt-0.5">{p.gender?.toLowerCase()}</span>
+                        <span className="font-bold text-[13px] text-slate-900 dark:text-white leading-tight truncate group-hover:text-[#0EA5E9] transition-colors">{fullName}</span>
+                        <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest mt-0.5">{p.gender?.toLowerCase() || '—'}</span>
                     </div>
                 </Link>
             );

@@ -236,10 +236,10 @@ function CollapsibleNavItem({
                     onClick={() => onSelect()}
                     className={`h-[42px] px-3.5 transition-all duration-200 group/item rounded-lg ${isActive
                         ? '!bg-[#0EA5E9] !text-white shadow-[0_4px_12px_rgba(14,165,233,0.3)]'
-                        : 'hover:bg-slate-50 text-slate-700 hover:text-[#0EA5E9]'
+                        : 'hover:bg-sidebar-accent text-sidebar-foreground hover:text-[#0EA5E9] dark:text-sidebar-foreground dark:hover:bg-sidebar-accent dark:hover:text-[#0EA5E9]'
                         }`}
                 >
-                    <item.icon className={`h-[21px] w-[21px] shrink-0 transition-colors duration-200 ${isActive ? '!text-white' : 'text-slate-500/80 group-hover/item:text-[#0EA5E9]'}`} />
+                    <item.icon className={`h-[21px] w-[21px] shrink-0 transition-colors duration-200 ${isActive ? '!text-white' : 'text-sidebar-foreground/70 group-hover/item:text-[#0EA5E9] dark:text-sidebar-foreground/80'}`} />
                     <span className={`text-[15px] font-semibold tracking-tight transition-colors duration-200 ml-1 ${isActive ? '!text-white' : ''}`}>{item.title}</span>
                 </SidebarMenuButton>
             </SidebarMenuItem>
@@ -256,14 +256,14 @@ function CollapsibleNavItem({
                     if (item.url && item.url !== '#') onSelect()
                 }}
                 className={`transition-all duration-300 group/item ${isActive
-                    ? 'bg-blue-500/10 text-blue-400'
-                    : 'hover:bg-blue-500/10 text-sidebar-foreground/70 hover:text-blue-400'
+                    ? 'bg-sidebar-accent text-[#0EA5E9]'
+                    : 'hover:bg-sidebar-accent text-sidebar-foreground/70 hover:text-[#0EA5E9] dark:text-sidebar-foreground/80'
                     }`}
             >
-                <item.icon className={`transition-colors duration-300 ${isActive ? 'text-blue-400' : 'text-slate-400 group-hover/item:text-blue-400'}`} />
-                <span className={`font-semibold transition-colors duration-300 ${isActive ? 'text-blue-400' : ''}`}>{item.title}</span>
+                <item.icon className={`transition-colors duration-300 ${isActive ? 'text-[#0EA5E9]' : 'text-sidebar-foreground/70 group-hover/item:text-[#0EA5E9] dark:text-sidebar-foreground/60'}`} />
+                <span className={`font-semibold transition-colors duration-300 ${isActive ? 'text-[#0EA5E9]' : ''}`}>{item.title}</span>
                 <ChevronDown
-                    className={`ml-auto size-4 transition-transform duration-300 ${open ? 'rotate-180' : ''} ${isActive ? 'text-blue-400' : 'text-slate-300 group-hover/item:text-blue-400'}`}
+                    className={`ml-auto size-4 transition-transform duration-300 ${open ? 'rotate-180' : ''} ${isActive ? 'text-[#0EA5E9]' : 'text-sidebar-foreground/60 group-hover/item:text-[#0EA5E9]'}`}
                 />
             </SidebarMenuButton>
             {open && (
@@ -275,8 +275,8 @@ function CollapsibleNavItem({
                                 <SidebarMenuSubButton
                                     href={sub.url}
                                     className={`transition-colors duration-200 ${isSubActive
-                                        ? 'text-blue-400 font-medium bg-blue-500/10'
-                                        : 'text-sidebar-foreground/60 hover:text-blue-400 hover:bg-blue-500/10'
+                                        ? 'text-[#0EA5E9] font-medium bg-sidebar-accent'
+                                        : 'text-sidebar-foreground/60 hover:text-[#0EA5E9] hover:bg-sidebar-accent'
                                         }`}
                                 >
                                     <span>{sub.title}</span>
@@ -326,15 +326,13 @@ function CollapsibleSection({
         <SidebarGroup className="p-0">
             <button
                 onClick={() => setOpen(!open)}
-                className="flex w-full items-center justify-between px-5 mt-5 mb-1.5 group/section outline-none"
+                className="flex w-full items-center justify-between px-5 mt-5 mb-1.5 group/section outline-none rounded-md hover:bg-sidebar-accent/50 transition-colors"
             >
-                <span className="text-[12px] font-black tracking-[0.15em] uppercase text-slate-500/80 group-hover/section:text-[#0EA5E9] transition-all">
+                <span className="text-[12px] font-black tracking-[0.15em] uppercase text-sidebar-foreground/70 group-hover/section:text-[#0EA5E9] transition-all dark:text-sidebar-foreground/60">
                     {label}
                 </span>
                 <ChevronRight
-                    className={`h-3.5 w-3.5 transition-transform duration-300 ${open ? 'rotate-90' : ''
-                        } ${open || isSectionActive ? 'text-[#0EA5E9]' : 'text-slate-300 group-hover/section:text-[#0EA5E9]'
-                        }`}
+                    className={`h-3.5 w-3.5 transition-transform duration-300 ${open ? 'rotate-90' : ''} ${open || isSectionActive ? 'text-[#0EA5E9]' : 'text-sidebar-foreground/50 group-hover/section:text-[#0EA5E9]'}`}
                 />
             </button>
             {open && (
@@ -377,17 +375,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const RoleIcon = roleIcons[role] || UserCog
 
     return (
-        <Sidebar collapsible="icon" className="border-sidebar-border" {...props}>
-            <SidebarHeader className="bg-white border-b border-slate-100 px-5 py-4 shrink-0">
+        <Sidebar collapsible="icon" className="border-sidebar-border shrink-0" {...props}>
+            <SidebarHeader className="bg-sidebar border-b border-sidebar-border px-4 sm:px-5 py-4 shrink-0">
                 <div
-                    className="flex items-center gap-3.5 cursor-pointer hover:opacity-90 transition-opacity"
+                    className="flex items-center gap-3.5 cursor-pointer hover:opacity-90 transition-opacity min-w-0"
                     onClick={() => router.push(`/dashboard/${role.toLowerCase()}`)}
                 >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-50 border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sidebar-accent border border-sidebar-border overflow-hidden">
                         <img src="/logo-icon.svg" alt="Logo" className="h-7 w-7 object-contain" />
                     </div>
-                    <div className="flex flex-col text-left leading-none">
-                        <span className="text-[19px] font-black text-slate-900 tracking-tight uppercase">Al-Ixsaan</span>
+                    <div className="flex flex-col text-left leading-none min-w-0">
+                        <span className="text-[19px] font-black text-sidebar-foreground tracking-tight uppercase truncate">Al-Ixsaan</span>
                         <span className="text-[9px] font-bold uppercase text-[#0EA5E9] tracking-[0.2em] mt-0.5">{role} PANEL</span>
                     </div>
                 </div>
@@ -395,7 +393,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
             <SidebarSeparator className="bg-sidebar-border/50" />
 
-            <SidebarContent className="bg-sidebar text-sidebar-foreground">
+            <SidebarContent className="bg-sidebar text-sidebar-foreground overflow-y-auto overflow-x-hidden flex-1 min-h-0">
                 {sections.map((section, sIdx) => (
                     <CollapsibleSection
                         key={section.section}
@@ -422,14 +420,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
             <SidebarSeparator className="bg-sidebar-border/50" />
 
-            <SidebarFooter className="bg-sidebar relative z-50">
+            <SidebarFooter className="bg-sidebar border-t border-sidebar-border relative z-50 shrink-0">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <SidebarMenuButton
                                     size="lg"
-                                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground relative z-50 w-full"
+                                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground relative z-50 w-full min-w-0"
                                 >
                                     {user?.profileImage ? (
                                         <div className="flex aspect-square size-8 overflow-hidden rounded-full border border-blue-500/20">

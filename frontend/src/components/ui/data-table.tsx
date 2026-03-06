@@ -38,6 +38,7 @@ interface DataTableProps<TData> {
     onRefresh?: () => void;
     pageSize?: number;
     itemLabel?: string;
+    hideSearch?: boolean;
 }
 
 export function DataTable<TData>({
@@ -48,6 +49,7 @@ export function DataTable<TData>({
     onRefresh,
     pageSize = 10,
     itemLabel = 'rows',
+    hideSearch = false,
 }: DataTableProps<TData>) {
     const [globalFilter, setGlobalFilter] = useState('');
     const [sorting, setSorting] = useState<SortingState>([]);
@@ -69,28 +71,30 @@ export function DataTable<TData>({
 
     return (
         <div className="space-y-4">
-            <div className="flex items-center gap-4 bg-background/50 backdrop-blur pb-4 border-b">
-                <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        placeholder={searchPlaceholder}
-                        className="pl-9 h-10 border-slate-200 dark:border-slate-800 focus-visible:ring-[#0EA5E9]"
-                        value={globalFilter ?? ''}
-                        onChange={(e) => setGlobalFilter(e.target.value)}
-                    />
+            {!hideSearch && (
+                <div className="flex items-center gap-4 bg-background/50 backdrop-blur pb-4 border-b">
+                    <div className="relative flex-1 max-w-sm">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder={searchPlaceholder}
+                            className="pl-9 h-10 border-slate-200 dark:border-slate-800 focus-visible:ring-[#0EA5E9]"
+                            value={globalFilter ?? ''}
+                            onChange={(e) => setGlobalFilter(e.target.value)}
+                        />
+                    </div>
+                    {onRefresh && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={onRefresh}
+                            disabled={loading}
+                            className="hover:bg-slate-100 dark:hover:bg-slate-800"
+                        >
+                            <RefreshCcw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                        </Button>
+                    )}
                 </div>
-                {onRefresh && (
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={onRefresh}
-                        disabled={loading}
-                        className="hover:bg-slate-100 dark:hover:bg-slate-800"
-                    >
-                        <RefreshCcw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                    </Button>
-                )}
-            </div>
+            )}
 
             <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-card shadow-sm overflow-hidden">
                 <Table>

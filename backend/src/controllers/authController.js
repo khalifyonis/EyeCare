@@ -46,9 +46,9 @@ export const login = async (req, res, next) => {
       throw new Error('JWT_SECRET is not defined');
     }
 
-    // Use role.name in token
+    // Use role.name and branchId in token (branchId needed for list filtering)
     const token = jwt.sign(
-      { id: user.id, role: user.role.name },
+      { id: user.id, role: user.role.name, branchId: user.branchId ?? null },
       process.env.JWT_SECRET,
       { expiresIn: '8h' }
     );

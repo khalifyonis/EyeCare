@@ -1,25 +1,10 @@
 import prisma from '../lib/prisma.js';
 import moment from 'moment';
 
-// Generate unique Patient ID like 'P-0001'
-const generatePatientId = async () => {
-    const lastPatient = await prisma.patient.findFirst({
-        orderBy: { patientId: 'desc' },
-    });
-
-    if (!lastPatient || !lastPatient.patientId) return 'P-0001';
-
-    const lastNum = parseInt(lastPatient.patientId.split('-')[1]);
-    return `P-${(lastNum + 1).toString().padStart(4, '0')}`;
-};
-
 export const createPatient = async (req, res, next) => {
     try {
-        const { firstName, lastName, phone, email, dateOfBirth, gender, address, branchId } = req.body;
+        const { fullName, phone, email, dateOfBirth, gender, address, branchId } = req.body;
 
-        const patientId = await generatePatientId();
-
-        // Use branchId from body if provided, otherwise fallback to user's branch
         const activeBranchId = branchId || req.user.branchId;
 
         if (!activeBranchId) {
@@ -28,14 +13,12 @@ export const createPatient = async (req, res, next) => {
 
         const patient = await prisma.patient.create({
             data: {
-                patientId,
-                firstName,
-                lastName,
+                fullName: (fullName || '').trim(),
                 phone,
-                email,
-                dateOfBirth: dateOfBirth ? moment(dateOfBirth).toDate() : null,
-                gender,
-                address,
+                email: email || undefined,
+                dateOfBirth: dateOfBirth ? moment(dateOfBirth).toDate() : undefined,
+                gender: gender || undefined,
+                address: address || undefined,
                 branchId: activeBranchId,
             }
         });
@@ -50,17 +33,21 @@ export const getAllPatients = async (req, res, next) => {
     try {
         const { search, branchId, gender, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
 
+        // SUPERADMIN sees all; others filter by branch (skip branch filter if branchId missing, e.g. old token)
+        const branchFilter = req.user.role === 'SUPERADMIN' || !req.user.branchId
+            ? {}
+            : { branchId: req.user.branchId };
         const whereClause = {
-            ...(req.user.role !== 'SUPERADMIN' ? { branchId: req.user.branchId } : {}),
-            ...(branchId ? { branchId } : {}), // Specific branch filter
+            ...branchFilter,
+            ...(branchId ? { branchId } : {}),
             ...(gender ? { gender } : {}),
-            OR: search ? [
-                { firstName: { contains: search, mode: 'insensitive' } },
-                { lastName: { contains: search, mode: 'insensitive' } },
-                { patientId: { contains: search, mode: 'insensitive' } },
-                { phone: { contains: search, mode: 'insensitive' } },
-                { email: { contains: search, mode: 'insensitive' } },
-            ] : undefined
+            ...(search ? {
+                OR: [
+                    { fullName: { contains: search, mode: 'insensitive' } },
+                    { phone: { contains: search, mode: 'insensitive' } },
+                    { email: { contains: search, mode: 'insensitive' } },
+                ]
+            } : {})
         };
 
         const patients = await prisma.patient.findMany({
@@ -83,16 +70,23 @@ export const getPatientStats = async (req, res, next) => {
     try {
         const now = moment();
         const startOfToday = now.clone().startOf('day').toDate();
+        const startOfWeek = now.clone().startOf('week').toDate();
         const startOfMonth = now.clone().startOf('month').toDate();
 
-        const branchFilter = req.user.role !== 'SUPERADMIN' ? { branchId: req.user.branchId } : {};
+        const branchFilter = (req.user.role === 'SUPERADMIN' || !req.user.branchId) ? {} : { branchId: req.user.branchId };
 
-        const [total, today, month] = await Promise.all([
+        const [total, today, week, month] = await Promise.all([
             prisma.patient.count({ where: branchFilter }),
             prisma.patient.count({
                 where: {
                     ...branchFilter,
                     createdAt: { gte: startOfToday }
+                }
+            }),
+            prisma.patient.count({
+                where: {
+                    ...branchFilter,
+                    createdAt: { gte: startOfWeek }
                 }
             }),
             prisma.patient.count({
@@ -106,6 +100,7 @@ export const getPatientStats = async (req, res, next) => {
         res.status(200).json({
             total,
             today,
+            week,
             month,
         });
     } catch (error) {
@@ -148,14 +143,19 @@ export const getPatientById = async (req, res, next) => {
 
 export const updatePatient = async (req, res, next) => {
     try {
-        const { dateOfBirth, branch, id, ...updateData } = req.body;
+        const { fullName, phone, email, dateOfBirth, gender, address } = req.body;
+
+        const data = {};
+        if (fullName !== undefined) data.fullName = fullName.trim();
+        if (phone !== undefined) data.phone = phone;
+        if (email !== undefined) data.email = email || null;
+        if (dateOfBirth !== undefined) data.dateOfBirth = moment(dateOfBirth).toDate();
+        if (gender !== undefined) data.gender = gender;
+        if (address !== undefined) data.address = address || null;
 
         const patient = await prisma.patient.update({
             where: { id: req.params.id },
-            data: {
-                ...updateData,
-                dateOfBirth: dateOfBirth ? moment(dateOfBirth).toDate() : undefined,
-            }
+            data
         });
         res.status(200).json(patient);
     } catch (error) {

@@ -28,17 +28,18 @@ export const getAppointmentColumns = ({ onEdit, onDelete }: AppointmentColumnsPr
             const p = apt.patient;
             if (!p) return <span className="text-xs text-slate-400">Unknown Patient</span>;
 
-            const fullName = `${p.firstName} ${p.lastName}`;
+            const fullName = p.fullName || 'Unknown';
+            const initial = fullName.charAt(0).toUpperCase();
             return (
-                <Link href={`/dashboard/patients/${p.patientId}`} className="flex items-center gap-3.5 py-1.5 group cursor-pointer hover:bg-slate-50/50 dark:hover:bg-slate-800/20 -ml-2 pl-2 rounded-xl transition-all">
+                <Link href={`/dashboard/patients/${p.id}`} className="flex items-center gap-3.5 py-1.5 group cursor-pointer hover:bg-slate-50/50 dark:hover:bg-slate-800/20 -ml-2 pl-2 rounded-xl transition-all">
                     <div className="flex size-10 shrink-0 items-center justify-center rounded-xl text-[13px] font-black bg-[#0EA5E9]/10 text-[#0EA5E9] transition-transform group-hover:scale-105 group-hover:bg-[#0EA5E9] group-hover:text-white shadow-sm shadow-blue-500/0 group-hover:shadow-blue-500/20">
-                        {p.firstName?.charAt(0).toUpperCase() || 'U'}
+                        {initial}
                     </div>
                     <div className="flex flex-col min-w-0">
-                        <span className="font-bold text-[13px] text-slate-900 dark:text-white leading-tight truncate group-hover:text-[#0EA5E9] transition-colors">{p.firstName} {p.lastName}</span>
+                        <span className="font-bold text-[13px] text-slate-900 dark:text-white leading-tight truncate group-hover:text-[#0EA5E9] transition-colors">{fullName}</span>
                         <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 uppercase tracking-widest">#{p.patientId}</span>
-                            <span className="text-[11px] font-medium text-slate-500">{p.phone}</span>
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 uppercase tracking-widest">#{String(p.id).slice(0, 8)}</span>
+                            {p.phone && <span className="text-[11px] font-medium text-slate-500">{p.phone}</span>}
                         </div>
                     </div>
                 </Link>
