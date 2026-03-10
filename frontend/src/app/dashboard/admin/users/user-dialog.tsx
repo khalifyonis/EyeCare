@@ -35,14 +35,19 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
         email: '',
         password: '',
         roleName: '',
+        licenseNumber: '',
+        specialization: '',
         branchIds: [] as string[],
     });
+
+    const isDoctorRole = formData.roleName === 'DOCTOR';
 
     useEffect(() => {
         const fetchBranches = async () => {
             try {
-                const res = await api.get('/branches');
-                setBranches(res.data);
+                const res = await api.get('/branches?limit=500');
+                const body = res.data as { data?: unknown[] };
+                setBranches(Array.isArray(body?.data) ? body.data : []);
             } catch (err) {
                 console.error('Failed to load branches');
             }
@@ -58,10 +63,12 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
                 email: user.email || '',
                 password: '', // Don't pre-fill password
                 roleName: user.roleName || '',
+                licenseNumber: user.doctor?.licenseNumber || '',
+                specialization: user.doctor?.specialization || '',
                 branchIds: user.branches ? user.branches.map((b: any) => b.id) : (user.branchId ? [user.branchId.toString()] : []),
             });
         } else {
-            setFormData({ fullName: '', username: '', email: '', password: '', roleName: '', branchIds: [] });
+            setFormData({ fullName: '', username: '', email: '', password: '', roleName: '', licenseNumber: '', specialization: '', branchIds: [] });
         }
     }, [user, open]);
 
@@ -109,6 +116,16 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
             toast.error('Please select a role');
             return;
         }
+        if (isDoctorRole) {
+            if (!formData.licenseNumber.trim()) {
+                toast.error('Doctor license number is required');
+                return;
+            }
+            if (!formData.specialization.trim()) {
+                toast.error('Doctor specialization is required');
+                return;
+            }
+        }
         if (formData.branchIds.length === 0) {
             toast.error('Please select at least one branch');
             return;
@@ -121,6 +138,8 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
                 fullName: formData.fullName.trim(),
                 username: formData.username.trim(),
                 email: formData.email.trim().toLowerCase(),
+                licenseNumber: formData.licenseNumber.trim(),
+                specialization: formData.specialization.trim(),
             };
             if (user) {
                 await api.put(`/users/${user.id}`, payload);
@@ -227,6 +246,29 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
                             </SelectContent>
                         </Select>
                     </div>
+
+                    {isDoctorRole && (
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">License Number</label>
+                                <Input
+                                    placeholder="DOC-12345"
+                                    value={formData.licenseNumber}
+                                    onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
+                                    className="rounded-xl border-slate-200 focus-visible:ring-[#0EA5E9]"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Specialization</label>
+                                <Input
+                                    placeholder="Ophthalmology"
+                                    value={formData.specialization}
+                                    onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
+                                    className="rounded-xl border-slate-200 focus-visible:ring-[#0EA5E9]"
+                                />
+                            </div>
+                        </div>
+                    )}
 
                     <div className="space-y-1.5 pt-1">
                         <label className="text-[10px] font-black uppercase tracking-widest text-[#0EA5E9] ml-1">Assign Branches</label>

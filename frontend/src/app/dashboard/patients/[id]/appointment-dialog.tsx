@@ -46,8 +46,9 @@ export function AppointmentDialog({ open, onOpenChange, patientId, onSuccess }: 
     const fetchDoctors = async () => {
         setLoadingDoctors(true);
         try {
-            const res = await api.get('/doctors');
-            setDoctors(res.data);
+            const res = await api.get('/doctors?limit=100');
+            const body = res.data as { data?: unknown[] };
+            setDoctors(Array.isArray(body?.data) ? body.data : []);
         } catch (error) {
             toast.error('Failed to load doctors list');
         } finally {

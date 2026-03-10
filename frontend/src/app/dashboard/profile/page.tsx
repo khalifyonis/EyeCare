@@ -4,16 +4,21 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/axios';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Camera, Mail, User, ShieldCheck, Loader2, Check, Upload, Trash2 } from 'lucide-react';
+import { Camera, Mail, User, ShieldCheck, Loader2, Check, Upload, Trash2, Pencil, Phone } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function ProfilePage() {
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
+    const [editing, setEditing] = useState(false);
+    const [editFullName, setEditFullName] = useState('');
+    const [editPhone, setEditPhone] = useState('');
+    const [saving, setSaving] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const router = useRouter(); // Initialize useRouter
+    const router = useRouter();
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -102,6 +107,38 @@ export default function ProfilePage() {
         }
     };
 
+    const startEdit = () => {
+        setEditFullName(user?.fullName ?? '');
+        setEditPhone(user?.phone ?? '');
+        setEditing(true);
+    };
+
+    const cancelEdit = () => {
+        setEditing(false);
+    };
+
+    const saveProfile = async () => {
+        const name = editFullName?.trim();
+        if (!name || name.length < 2) {
+            toast.error('Full name must be at least 2 characters');
+            return;
+        }
+        setSaving(true);
+        try {
+            const res = await api.put('/auth/me', { fullName: name, phone: editPhone?.trim() || null });
+            const updated = { ...res.data, role: res.data.role?.name ?? res.data.role };
+            setUser(updated);
+            localStorage.setItem('user', JSON.stringify(updated));
+            setEditing(false);
+            toast.success('Profile updated');
+        } catch (e: unknown) {
+            const msg = e && typeof e === 'object' && 'response' in e && (e as { response?: { data?: { message?: string } } }).response?.data?.message;
+            toast.error(typeof msg === 'string' ? msg : 'Failed to update profile');
+        } finally {
+            setSaving(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex h-[60vh] items-center justify-center">
@@ -169,10 +206,41 @@ export default function ProfilePage() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Full Name</label>
-                                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800">
-                                    <User className="w-4 h-4 text-[#0EA5E9]" />
-                                    <span className="text-sm font-medium">{user.fullName}</span>
-                                </div>
+                                {editing ? (
+                                    <div className="flex items-center gap-2">
+                                        <User className="w-4 h-4 text-[#0EA5E9] shrink-0" />
+                                        <Input
+                                            value={editFullName}
+                                            onChange={(e) => setEditFullName(e.target.value)}
+                                            placeholder="Full name"
+                                            className="rounded-xl"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800">
+                                        <User className="w-4 h-4 text-[#0EA5E9]" />
+                                        <span className="text-sm font-medium">{user.fullName}</span>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Phone</label>
+                                {editing ? (
+                                    <div className="flex items-center gap-2">
+                                        <Phone className="w-4 h-4 text-[#0EA5E9] shrink-0" />
+                                        <Input
+                                            value={editPhone}
+                                            onChange={(e) => setEditPhone(e.target.value)}
+                                            placeholder="Phone"
+                                            className="rounded-xl"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800">
+                                        <Phone className="w-4 h-4 text-[#0EA5E9]" />
+                                        <span className="text-sm font-medium">{user.phone || '—'}</span>
+                                    </div>
+                                )}
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Username</label>
@@ -197,10 +265,23 @@ export default function ProfilePage() {
                             </div>
                         </div>
 
-                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
-                            <Button variant="outline" className="rounded-xl" onClick={() => toast.info('Profile editing is restricted to admin')}>
-                                Request Data Update
-                            </Button>
+                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+                            {editing ? (
+                                <>
+                                    <Button variant="outline" className="rounded-xl" onClick={cancelEdit} disabled={saving}>
+                                        Cancel
+                                    </Button>
+                                    <Button className="rounded-xl bg-[#0EA5E9] hover:bg-[#0c96d4]" onClick={saveProfile} disabled={saving}>
+                                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4 mr-1" />}
+                                        Save
+                                    </Button>
+                                </>
+                            ) : (
+                                <Button variant="outline" className="rounded-xl" onClick={startEdit}>
+                                    <Pencil className="w-4 h-4 mr-2" />
+                                    Edit profile
+                                </Button>
+                            )}
                         </div>
                     </CardContent>
                 </Card>

@@ -1,7 +1,7 @@
 'use client'
 
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
-import { AppSidebar } from '@/components/app-sidebar'
+import { AppSidebar } from '@/components/layout/app-sidebar'
 import { Separator } from '@/components/ui/separator'
 import { Bell, Search, Moon, Sun, Maximize } from 'lucide-react'
 import { useState, useEffect } from 'react'
@@ -9,36 +9,14 @@ import { useRouter, usePathname } from 'next/navigation'
 import { useTheme } from '@/components/theme-provider'
 import api from '@/lib/axios'
 import { toast } from 'sonner'
+import { getDefaultDashboardPath, resolveRoleName } from '@/lib/auth'
+import { isPathAllowedForRole } from '@/lib/permissions'
 
-// ── Role-based route access: path prefix → allowed roles ──
-const ROLE_ROUTES: Record<string, string[]> = {
-    '/dashboard/admin': ['ADMIN', 'SUPERADMIN'],
-    '/dashboard/doctor': ['DOCTOR'],
-    '/dashboard/receptionist': ['RECEPTIONIST'],
-    '/dashboard/pharmacist': ['PHARMACIST'],
-    '/dashboard/optician': ['OPTICIAN'],
-}
-
-const SHARED_PREFIXES = ['/dashboard/patients', '/dashboard/appointments', '/dashboard/profile']
-
-function isPathAllowedForRole(pathname: string, role: string): boolean {
-    const roleUpper = (role || '').toUpperCase()
-    if (!roleUpper) return false
-    for (const prefix of SHARED_PREFIXES) {
-        if (pathname === prefix || pathname.startsWith(prefix + '/')) return true
-    }
-    if (pathname === '/dashboard') return true
-    for (const [pathPrefix, allowedRoles] of Object.entries(ROLE_ROUTES)) {
-        if (pathname === pathPrefix || pathname.startsWith(pathPrefix + '/')) {
-            return allowedRoles.includes(roleUpper)
-        }
-    }
-    return true
-}
-
-function getDefaultDashboardForRole(role: string): string {
-    const r = (role || 'admin').toLowerCase()
-    return `/dashboard/${r}`
+function getHttpStatus(error: unknown): number | undefined {
+    if (!error || typeof error !== 'object') return undefined
+    const maybe = error as { response?: { status?: unknown } }
+    const status = maybe.response?.status
+    return typeof status === 'number' ? status : undefined
 }
 
 export default function DashboardLayout({
@@ -71,18 +49,19 @@ export default function DashboardLayout({
                     role: response.data.role?.name || response.data.role
                 }
                 localStorage.setItem('user', JSON.stringify(userData))
-                const role = userData.role
-                const currentPath = pathname || '/dashboard'
+                const role = resolveRoleName(userData)
+                const currentPath = (typeof window !== 'undefined' ? window.location.pathname : '/dashboard') || '/dashboard'
 
                 if (!isPathAllowedForRole(currentPath, role)) {
                     toast.error('You do not have permission to view this page.')
-                    router.replace(getDefaultDashboardForRole(role))
+                    router.replace(getDefaultDashboardPath(role))
                     setAuthReady(true)
                     return
                 }
                 setAuthReady(true)
-            } catch (error: any) {
-                if (error.response?.status === 404 || error.response?.status === 401) {
+            } catch (error: unknown) {
+                const status = getHttpStatus(error)
+                if (status === 404 || status === 401) {
                     localStorage.removeItem('token')
                     localStorage.removeItem('user')
                     document.cookie = 'token=; path=/; max-age=0; SameSite=Lax'
@@ -100,18 +79,18 @@ export default function DashboardLayout({
     useEffect(() => {
         if (!authReady) return
         const currentPath = pathname || '/dashboard'
-        let user: { role?: string } | null = null
+        let user: unknown = null
         try {
             const raw = localStorage.getItem('user')
             if (raw) user = JSON.parse(raw)
         } catch {
             return
         }
-        const role = user?.role
+        const role = resolveRoleName(user)
         if (!role || !currentPath.startsWith('/dashboard')) return
         if (!isPathAllowedForRole(currentPath, role)) {
             toast.error('You do not have permission to view this page.')
-            router.replace(getDefaultDashboardForRole(role))
+            router.replace(getDefaultDashboardPath(role))
         }
     }, [pathname, authReady, router])
 

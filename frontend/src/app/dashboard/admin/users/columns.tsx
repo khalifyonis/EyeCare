@@ -18,6 +18,7 @@ export type User = {
     }>;
     profileImage?: string;
     doctor?: {
+        licenseNumber?: string;
         specialization: string;
     };
 };

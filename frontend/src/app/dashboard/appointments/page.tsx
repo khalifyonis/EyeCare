@@ -5,113 +5,177 @@ import { useRouter } from 'next/navigation';
 import api from '@/lib/axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { CalendarPlus, Clock, CheckCircle2, Calendar, XCircle, Search } from 'lucide-react';
+import { CalendarPlus, Clock, CheckCircle2, Calendar, DollarSign, Search } from 'lucide-react';
 import { DataTable } from '@/components/ui/data-table';
-import { getAppointmentColumns } from './columns';
+import { getAppointmentColumns, type AppointmentRow } from './columns';
 import { EditAppointmentDialog } from './edit-appointment-dialog';
+import { NewAppointmentDialog } from './new-appointment-dialog';
 import { toast } from 'sonner';
 import { StatsCard } from '@/components/dashboard/stats-card';
-import {
-    Select, SelectContent, SelectItem, SelectTrigger, SelectValue
-} from '@/components/ui/select';
+import { PageBreadcrumb } from '@/components/dashboard/page-breadcrumb';
+import { ServerPagination } from '@/components/dashboard/server-pagination';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { readStoredUser, resolveRoleName } from '@/lib/auth';
+
+type AppointmentStats = {
+    total: number;
+    pending: number;
+    completed: number;
+    cancelled: number;
+    revenueToday: number;
+};
+
+function getApiErrorMessage(error: unknown, fallback: string): string {
+    if (!error || typeof error !== 'object') return fallback;
+
+    const maybe = error as {
+        response?: {
+            data?: {
+                message?: unknown;
+            };
+        };
+    };
+
+    const msg = maybe.response?.data?.message;
+    return typeof msg === 'string' && msg.trim().length > 0 ? msg : fallback;
+}
 
 export default function AppointmentsPage() {
     const router = useRouter();
-    const [appointments, setAppointments] = useState<any[]>([]);
-    const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0, cancelled: 0, revenueToday: 0 });
+    const [role, setRole] = useState('');
+    const [appointments, setAppointments] = useState<AppointmentRow[]>([]);
+    const [stats, setStats] = useState<AppointmentStats>({ total: 0, pending: 0, completed: 0, cancelled: 0, revenueToday: 0 });
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [dateFilter, setDateFilter] = useState('');
     const [doctorFilter, setDoctorFilter] = useState('all');
+    const [createOpen, setCreateOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
-    const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+    const [selectedAppointment, setSelectedAppointment] = useState<AppointmentRow | null>(null);
+    const [page, setPage] = useState(1);
+    const [total, setTotal] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+    const pageSize = 20;
 
-    const fetchStats = async () => {
-        try {
-            const res = await api.get('/appointments/stats');
-            setStats(res.data);
-        } catch (err) { console.error('Stats fetch failed'); }
-    };
-
-    const fetchAppointments = useCallback(async (searchTerm = '', status = 'all') => {
-        setLoading(true);
-        try {
-            let url = `/appointments?search=${searchTerm}`;
-            if (status !== 'all') url += `&status=${status}`;
-            const res = await api.get(url);
-            setAppointments(res.data);
-        } catch (error) { toast.error('Failed to load appointments'); }
-        finally { setLoading(false); }
+    useEffect(() => {
+        setRole(resolveRoleName(readStoredUser()));
     }, []);
 
-    useEffect(() => { fetchAppointments(search, statusFilter); fetchStats(); }, [fetchAppointments]);
+    const canManage = useMemo(() => ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST'].includes(role), [role]);
+    const canRecordER = useMemo(() => ['ADMIN', 'SUPERADMIN', 'DOCTOR'].includes(role), [role]);
+    const canRecordClinical = useMemo(() => ['ADMIN', 'SUPERADMIN', 'DOCTOR'].includes(role), [role]);
+
+    const fetchStats = useCallback(async () => {
+        try {
+            const res = await api.get('/appointments/stats');
+            setStats(res.data as AppointmentStats);
+        } catch {
+            console.error('Stats fetch failed');
+        }
+    }, []);
+
+    const fetchAppointments = useCallback(async (searchTerm = '', status = 'all', pageNum = 1) => {
+        setLoading(true);
+        try {
+            const params = new URLSearchParams();
+            if (searchTerm) params.set('search', searchTerm);
+            if (status !== 'all') params.set('status', status);
+            if (dateFilter) params.set('date', dateFilter);
+            if (doctorFilter !== 'all') params.set('doctorId', doctorFilter);
+            params.set('page', String(pageNum));
+            params.set('limit', String(pageSize));
+            const res = await api.get(`/appointments?${params.toString()}`);
+            const body = res.data as { data?: AppointmentRow[]; total?: number; page?: number; totalPages?: number };
+            setAppointments(Array.isArray(body.data) ? body.data : []);
+            setTotal(typeof body.total === 'number' ? body.total : 0);
+            setPage(typeof body.page === 'number' ? body.page : 1);
+            setTotalPages(typeof body.totalPages === 'number' ? body.totalPages : 1);
+        } catch {
+            toast.error('Failed to load appointments');
+        } finally {
+            setLoading(false);
+        }
+    }, [dateFilter, doctorFilter]);
+
     useEffect(() => {
-        const timer = setTimeout(() => { fetchAppointments(search, statusFilter); }, 300);
-        return () => clearTimeout(timer);
-    }, [search, statusFilter, fetchAppointments]);
+        setPage(1);
+    }, [search, statusFilter, dateFilter, doctorFilter]);
+
+    useEffect(() => {
+        fetchAppointments(search, statusFilter, page);
+        fetchStats();
+    }, [fetchAppointments, fetchStats, search, statusFilter, page, dateFilter, doctorFilter]);
 
     const doctors = useMemo(() => {
         const map = new Map<string, string>();
-        appointments.forEach(a => {
-            const doc = a.doctor;
-            if (doc) map.set(doc.id || doc.userId, doc.user?.fullName || doc.fullName || 'Unknown');
+        appointments.forEach((appointment) => {
+            const doctor = appointment.doctor;
+            if (doctor) {
+                map.set(doctor.id || doctor.userId || '', doctor.user?.fullName || doctor.fullName || 'Unknown');
+            }
         });
-        return Array.from(map.entries()).sort((a, b) => a[1].localeCompare(b[1]));
+        return Array.from(map.entries()).filter(([id]) => id).sort((a, b) => a[1].localeCompare(b[1]));
     }, [appointments]);
 
-    const filtered = useMemo(() => {
-        let list = [...appointments];
-        if (dateFilter) {
-            list = list.filter(a => a.appointmentDate?.startsWith(dateFilter));
-        }
-        if (doctorFilter !== 'all') {
-            list = list.filter(a => {
-                const docId = a.doctor?.id || a.doctor?.userId;
-                return docId === doctorFilter;
-            });
-        }
-        return list;
-    }, [appointments, dateFilter, doctorFilter]);
+    const filtered = appointments;
 
-    const handleEdit = (appointment: any) => { setSelectedAppointment(appointment); setEditOpen(true); };
-    const handleDelete = async (id: string) => {
+    const handleEdit = useCallback((appointment: AppointmentRow) => {
+        setSelectedAppointment(appointment);
+        setEditOpen(true);
+    }, []);
+
+    const handleDelete = useCallback(async (id: string) => {
         if (!confirm('Are you sure you want to delete this appointment?')) return;
         try {
             await api.delete(`/appointments/${id}`);
             toast.success('Appointment deleted');
-            fetchAppointments(search, statusFilter); fetchStats();
-        } catch (error: any) { toast.error(error.response?.data?.message || 'Delete failed'); }
-    };
+            fetchAppointments(search, statusFilter, page);
+            fetchStats();
+        } catch (error) {
+            toast.error(getApiErrorMessage(error, 'Delete failed'));
+        }
+    }, [fetchAppointments, fetchStats, search, statusFilter, page]);
 
-    const columns = useMemo(() => getAppointmentColumns({ onEdit: handleEdit, onDelete: handleDelete }), []);
+    const columns = useMemo(
+        () =>
+            getAppointmentColumns({
+                onEdit: handleEdit,
+                onDelete: handleDelete,
+                canManage,
+                canRecordER,
+                canRecordClinical,
+                onOpenER: (appointmentId) => router.push(`/dashboard/examinations/er?appointmentId=${appointmentId}`),
+                onOpenClinical: (appointmentId) => router.push(`/dashboard/examinations/clinical?appointmentId=${appointmentId}`),
+            }),
+        [canManage, canRecordER, canRecordClinical, handleDelete, handleEdit, router]
+    );
 
     return (
         <div className="w-full min-w-0 p-4 sm:p-5 md:p-6 lg:p-8 space-y-6 animate-in fade-in duration-300">
-            {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Appointments Management</h1>
-                    <p className="text-sm text-muted-foreground mt-0.5">Manage all appointments in the system</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Appointments</h1>
+                    <PageBreadcrumb current="Appointments" />
                 </div>
-                <Button
-                    onClick={() => router.push('/dashboard/patients')}
-                    className="bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold shadow-lg shadow-blue-500/20 px-6 rounded-xl transition-all active:scale-[0.98]"
-                >
-                    <CalendarPlus className="w-4 h-4 mr-2" />
-                    New Booking
-                </Button>
+                {canManage && (
+                    <Button
+                        onClick={() => setCreateOpen(true)}
+                        className="bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold shadow-lg shadow-blue-500/20 px-6 rounded-xl transition-all active:scale-[0.98]"
+                    >
+                        <CalendarPlus className="w-4 h-4 mr-2" />
+                        New Booking
+                    </Button>
+                )}
             </div>
 
-            {/* Stats cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 w-full min-w-0">
                 <StatsCard title="Total Appointments" value={stats.total.toLocaleString()} icon={Calendar} color="blue" trend={{ text: 'Growth', isUp: true }} />
                 <StatsCard title="Pending" value={stats.pending.toLocaleString()} icon={Clock} color="amber" trend={{ text: 'Growth', isUp: true }} />
-                <StatsCard title="Today's Appointments" value={stats.completed.toLocaleString()} icon={CheckCircle2} color="emerald" trend={{ text: 'Growth', isUp: true }} />
-                <StatsCard title="Revenue Today" value={`$${(stats.revenueToday ?? 0).toLocaleString()}`} icon={XCircle} color="rose" trend={{ text: '0 appointments today', isUp: false }} />
+                <StatsCard title="Completed" value={stats.completed.toLocaleString()} icon={CheckCircle2} color="emerald" trend={{ text: 'Growth', isUp: true }} />
+                <StatsCard title="Revenue Today" value={`$${(stats.revenueToday ?? 0).toLocaleString()}`} icon={DollarSign} color="rose" trend={{ text: 'Growth', isUp: true }} />
             </div>
 
-            {/* Filter row: Search | Status | Date | Doctor */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div>
                     <label className="text-xs font-medium text-slate-500 mb-1 block">Search</label>
@@ -156,25 +220,55 @@ export default function AppointmentsPage() {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All Doctors</SelectItem>
-                            {doctors.map(([id, name]) => <SelectItem key={id} value={id}>{name}</SelectItem>)}
+                            {doctors.map(([id, name]) => (
+                                <SelectItem key={id} value={id}>
+                                    {name}
+                                </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>
             </div>
 
-            {/* Table */}
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-x-auto min-w-0">
                 <DataTable
                     columns={columns}
                     data={filtered}
                     loading={loading}
-                    onRefresh={() => { fetchAppointments(search, statusFilter); fetchStats(); }}
+                    onRefresh={() => {
+                        fetchAppointments(search, statusFilter, page);
+                        fetchStats();
+                    }}
                     itemLabel="appointments"
                     hideSearch
                 />
+                <ServerPagination
+                    page={page}
+                    limit={pageSize}
+                    total={total}
+                    totalPages={totalPages}
+                    onPageChange={setPage}
+                    disabled={loading}
+                />
             </div>
 
-            <EditAppointmentDialog open={editOpen} onOpenChange={setEditOpen} appointment={selectedAppointment} onSuccess={() => { fetchAppointments(search, statusFilter); fetchStats(); }} />
+            <EditAppointmentDialog
+                open={editOpen}
+                onOpenChange={setEditOpen}
+                appointment={selectedAppointment}
+                onSuccess={() => {
+                    fetchAppointments(search, statusFilter, page);
+                    fetchStats();
+                }}
+            />
+            <NewAppointmentDialog
+                open={createOpen}
+                onOpenChange={setCreateOpen}
+                onSuccess={() => {
+                    fetchAppointments(search, statusFilter, page);
+                    fetchStats();
+                }}
+            />
         </div>
     );
 }

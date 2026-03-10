@@ -1,41 +1,101 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import api from '@/lib/axios';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, ArrowLeft, CalendarPlus, Phone, Mail, MapPin, Activity, Calendar as CalendarIcon, Clock, User } from 'lucide-react';
+import { Loader2, ArrowLeft, CalendarPlus, Phone, Mail, MapPin, Activity, Calendar as CalendarIcon, Clock, User, Stethoscope, Scissors } from 'lucide-react';
 import { toast } from 'sonner';
 import { AppointmentDialog } from './appointment-dialog';
+import { PageBreadcrumb } from '@/components/dashboard/page-breadcrumb';
+
+type SurgeryRecord = {
+    id: string;
+    eyeSide?: string | null;
+    surgeryType?: string | null;
+    surgeryDate?: string | null;
+    status?: string | null;
+    surgeon?: { user?: { fullName?: string | null } | null } | null;
+};
+
+type ClinicalExaminationRecord = {
+    id: string;
+    diagnosis?: string | null;
+    managementPlan?: string | null;
+    examinedAt?: string | null;
+    examinedBy?: { user?: { fullName?: string | null } | null } | null;
+    surgery?: SurgeryRecord | null;
+    prescriptions?: Array<{ id: string }>;
+};
+
+type ERExaminationRecord = {
+    id: string;
+    createdAt?: string | null;
+    recordedBy?: { fullName?: string | null } | null;
+};
+
+type AppointmentRecord = {
+    id: string;
+    bookingNumber?: string | null;
+    appointmentDate?: string | null;
+    amount?: number | string | null;
+    status?: string | null;
+    doctor?: { user?: { fullName?: string | null } | null } | null;
+    clinicalExamination?: ClinicalExaminationRecord | null;
+    erExamination?: ERExaminationRecord | null;
+};
+
+type PatientDetail = {
+    id: string;
+    fullName?: string | null;
+    phone?: string | null;
+    email?: string | null;
+    dateOfBirth?: string | null;
+    gender?: string | null;
+    address?: string | null;
+    appointments?: AppointmentRecord[];
+};
+
+const money = (value?: number | string | null) => {
+    const amount = typeof value === 'number' ? value : Number(value ?? 0);
+    return Number.isFinite(amount) ? amount.toFixed(2) : '0.00';
+};
+
+const statusClass = (status?: string | null) => {
+    const value = (status || 'PENDING').toUpperCase();
+    if (value === 'COMPLETED') return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400';
+    if (value === 'CANCELLED') return 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400';
+    return 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400';
+};
 
 export default function PatientDetailPage() {
     const params = useParams();
     const router = useRouter();
     const id = params.id as string;
 
-    const [patient, setPatient] = useState<any>(null);
+    const [patient, setPatient] = useState<PatientDetail | null>(null);
     const [loading, setLoading] = useState(true);
     const [bookingOpen, setBookingOpen] = useState(false);
 
-    const fetchPatientDetails = async () => {
+    const fetchPatientDetails = useCallback(async () => {
         setLoading(true);
         try {
             const res = await api.get(`/patients/${id}`);
             setPatient(res.data);
-        } catch (error: any) {
+        } catch {
             toast.error('Failed to load patient details');
             router.push('/dashboard/patients');
         } finally {
             setLoading(false);
         }
-    };
+    }, [id, router]);
 
     useEffect(() => {
         if (id) fetchPatientDetails();
-    }, [id]);
+    }, [id, fetchPatientDetails]);
 
-    const formatDate = (dateString: string) => {
+    const formatDate = (dateString?: string | null) => {
         if (!dateString) return 'N/A';
         return new Intl.DateTimeFormat('en-US', {
             year: 'numeric',
@@ -44,7 +104,7 @@ export default function PatientDetailPage() {
         }).format(new Date(dateString));
     };
 
-    const formatTime = (dateString: string) => {
+    const formatTime = (dateString?: string | null) => {
         if (!dateString) return 'N/A';
         return new Intl.DateTimeFormat('en-US', {
             hour: '2-digit',
@@ -79,7 +139,8 @@ export default function PatientDetailPage() {
                         <ArrowLeft className="h-5 w-5" />
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Patient Profile</h1>
+                        <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Patient Record</h1>
+                        <PageBreadcrumb current="Patient Record" />
                         <div className="flex items-center gap-2 mt-1">
                             <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">ID: #{String(patient.id).slice(0, 8)}</span>
                         </div>
@@ -142,9 +203,9 @@ export default function PatientDetailPage() {
                     <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-4">
                         <CardTitle className="flex items-center gap-2 text-lg">
                             <Activity className="w-5 h-5 text-[#0EA5E9]" />
-                            Clinical History
+                            Digital Medical Record
                         </CardTitle>
-                        <CardDescription>Recent appointments and clinical visits</CardDescription>
+                        <CardDescription>Appointments, exams, surgeries</CardDescription>
                     </CardHeader>
                     <CardContent className="pt-6">
                         {(!patient.appointments || patient.appointments.length === 0) ? (
@@ -152,12 +213,18 @@ export default function PatientDetailPage() {
                                 <div className="size-16 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center mb-4">
                                     <CalendarIcon className="w-8 h-8 text-slate-300 dark:text-slate-600" />
                                 </div>
-                                <p className="text-sm font-bold text-slate-600 dark:text-slate-400">No appointments found</p>
-                                <p className="text-xs text-slate-500 mt-1">Schedule an appointment to start tracking history.</p>
+                                <p className="text-sm font-bold text-slate-600 dark:text-slate-400">No record yet</p>
+                                <p className="text-xs text-slate-500 mt-1">Create an appointment to start.</p>
                             </div>
                         ) : (
                             <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 dark:before:via-slate-800 before:to-transparent">
-                                {patient.appointments.map((apt: any) => (
+                                {patient.appointments.map((apt) => {
+                                    const clinical = apt.clinicalExamination;
+                                    const surgery = clinical?.surgery;
+                                    const hasER = !!apt.erExamination;
+                                    const hasClinical = !!clinical;
+
+                                    return (
                                     <div key={apt.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
                                         {/* Marker */}
                                         <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white dark:border-slate-950 bg-blue-100 dark:bg-blue-900/50 text-[#0EA5E9] shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 transition-transform duration-300 group-hover:scale-110">
@@ -175,11 +242,8 @@ export default function PatientDetailPage() {
                                                         {formatDate(apt.appointmentDate)}
                                                     </span>
                                                 </div>
-                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest ${apt.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400' :
-                                                    apt.status === 'CANCELLED' ? 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400' :
-                                                        'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400'
-                                                    }`}>
-                                                    {apt.status}
+                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest ${statusClass(apt.status)}`}>
+                                                    {apt.status || 'PENDING'}
                                                 </span>
                                             </div>
                                             <div className="space-y-2 mt-3">
@@ -193,22 +257,48 @@ export default function PatientDetailPage() {
                                                 </div>
                                                 <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
                                                     <span className="w-4 text-center font-bold text-emerald-500">$</span>
-                                                    {apt.amount ? parseFloat(apt.amount).toFixed(2) : '0.00'}
+                                                    {money(apt.amount)}
                                                 </div>
                                             </div>
-                                            {/* Action button inside card */}
-                                            <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-8 text-xs font-black uppercase tracking-widest text-[#0EA5E9] bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/30 dark:hover:bg-blue-950/50 transition-all rounded-lg px-4 border border-blue-100 dark:border-blue-900/50 active:scale-95 shadow-sm"
-                                                >
-                                                    View Case
-                                                </Button>
+
+                                            <div className="mt-3 flex flex-wrap gap-2">
+                                                {hasER && (
+                                                    <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-sky-50 text-sky-700 dark:bg-sky-950/30 dark:text-sky-300 uppercase tracking-wider">
+                                                        ER
+                                                    </span>
+                                                )}
+                                                {hasClinical && (
+                                                    <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-300 uppercase tracking-wider">
+                                                        <Stethoscope className="w-3 h-3" />
+                                                        Clinical
+                                                    </span>
+                                                )}
+                                                {surgery && (
+                                                    <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300 uppercase tracking-wider">
+                                                        <Scissors className="w-3 h-3" />
+                                                        Surgery {surgery.status || 'PENDING'}
+                                                    </span>
+                                                )}
                                             </div>
+
+                                            {(clinical?.diagnosis || clinical?.managementPlan || surgery || (clinical?.prescriptions?.length || 0) > 0) && (
+                                                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2 text-xs font-medium text-slate-600 dark:text-slate-300">
+                                                    {clinical?.diagnosis && <p><span className="font-bold">Dx:</span> {clinical.diagnosis}</p>}
+                                                    {clinical?.managementPlan && <p><span className="font-bold">Plan:</span> {clinical.managementPlan}</p>}
+                                                    {surgery && (
+                                                        <p>
+                                                            <span className="font-bold">Surgery:</span> {surgery.surgeryType || 'N/A'} ({surgery.eyeSide || 'N/A'}) • {formatDate(surgery.surgeryDate)} • Dr. {surgery.surgeon?.user?.fullName || 'Unknown'}
+                                                        </p>
+                                                    )}
+                                                    {(clinical?.prescriptions?.length || 0) > 0 && (
+                                                        <p><span className="font-bold">Rx:</span> {clinical?.prescriptions?.length} item(s)</p>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </CardContent>

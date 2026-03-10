@@ -1,5 +1,6 @@
 import prisma from '../lib/prisma.js';
 import moment from 'moment';
+import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
 
 export const createPatient = async (req, res, next) => {
     try {
@@ -32,6 +33,7 @@ export const createPatient = async (req, res, next) => {
 export const getAllPatients = async (req, res, next) => {
     try {
         const { search, branchId, gender, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
+        const { skip, take, page, limit } = getPaginationParams(req.query);
 
         // SUPERADMIN sees all; others filter by branch (skip branch filter if branchId missing, e.g. old token)
         const branchFilter = req.user.role === 'SUPERADMIN' || !req.user.branchId
@@ -50,17 +52,22 @@ export const getAllPatients = async (req, res, next) => {
             } : {})
         };
 
-        const patients = await prisma.patient.findMany({
-            where: whereClause,
-            orderBy: { [sortBy]: sortOrder },
-            include: {
-                branch: {
-                    select: { branchName: true }
+        const [patients, total] = await Promise.all([
+            prisma.patient.findMany({
+                where: whereClause,
+                orderBy: { [sortBy]: sortOrder },
+                skip,
+                take,
+                include: {
+                    branch: {
+                        select: { branchName: true }
+                    }
                 }
-            }
-        });
+            }),
+            prisma.patient.count({ where: whereClause })
+        ]);
 
-        res.status(200).json(patients);
+        sendPaginated(res, patients, total, page, limit);
     } catch (error) {
         next(error);
     }
@@ -110,8 +117,15 @@ export const getPatientStats = async (req, res, next) => {
 
 export const getPatientById = async (req, res, next) => {
     try {
-        const patient = await prisma.patient.findUnique({
-            where: { id: req.params.id },
+        const branchFilter = req.user.role === 'SUPERADMIN' || !req.user.branchId
+            ? {}
+            : { branchId: req.user.branchId };
+
+        const patient = await prisma.patient.findFirst({
+            where: {
+                id: req.params.id,
+                ...branchFilter,
+            },
             include: {
                 appointments: {
                     include: {
@@ -122,8 +136,51 @@ export const getPatientById = async (req, res, next) => {
                                 }
                             }
                         },
-                        clinicalExamination: true,
-                        erExamination: true
+                        clinicalExamination: {
+                            include: {
+                                examinedBy: {
+                                    include: {
+                                        user: {
+                                            select: {
+                                                fullName: true
+                                            }
+                                        }
+                                    }
+                                },
+                                surgery: {
+                                    include: {
+                                        surgeon: {
+                                            include: {
+                                                user: {
+                                                    select: {
+                                                        fullName: true
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                prescriptions: {
+                                    select: {
+                                        id: true,
+                                        itemType: true,
+                                        itemId: true,
+                                        quantity: true,
+                                        instructions: true,
+                                        createdAt: true,
+                                    }
+                                }
+                            }
+                        },
+                        erExamination: {
+                            include: {
+                                recordedBy: {
+                                    select: {
+                                        fullName: true,
+                                    }
+                                }
+                            }
+                        }
                     },
                     orderBy: {
                         appointmentDate: 'desc'

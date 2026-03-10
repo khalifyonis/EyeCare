@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { sendOnboardingEmail } from '../services/emailService.js';
+import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -25,14 +26,32 @@ function generateTemporaryPassword() {
 
 export const getAllUsers = async (req, res, next) => {
     try {
-        const users = await prisma.user.findMany({
-            include: {
-                role: true,
-                branch: true,
-                staffAssignments: { include: { branch: true } }
-            },
-            orderBy: { fullName: 'asc' },
-        });
+        const whereClause = (req.user.role === 'SUPERADMIN' || !req.user.branchId)
+            ? {}
+            : {
+                staffAssignments: {
+                    some: {
+                        branchId: req.user.branchId,
+                    }
+                }
+            };
+
+        const { skip, take, page, limit } = getPaginationParams(req.query);
+
+        const [users, total] = await Promise.all([
+            prisma.user.findMany({
+                where: whereClause,
+                skip,
+                take,
+                include: {
+                    role: true,
+                    branch: true,
+                    staffAssignments: { include: { branch: true } }
+                },
+                orderBy: { fullName: 'asc' },
+            }),
+            prisma.user.count({ where: whereClause })
+        ]);
 
         const sanitizedUsers = users.map(user => {
             const { password, ...rest } = user;
@@ -45,7 +64,7 @@ export const getAllUsers = async (req, res, next) => {
             };
         });
 
-        res.status(200).json(sanitizedUsers);
+        sendPaginated(res, sanitizedUsers, total, page, limit);
     } catch (error) {
         next(error);
     }
@@ -81,8 +100,21 @@ export const uploadProfileImage = async (req, res, next) => {
 export const getUserById = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const user = await prisma.user.findUnique({
-            where: { id },
+        const whereClause = {
+            id,
+            ...((req.user.role === 'SUPERADMIN' || !req.user.branchId)
+                ? {}
+                : {
+                    staffAssignments: {
+                        some: {
+                            branchId: req.user.branchId,
+                        }
+                    }
+                })
+        };
+
+        const user = await prisma.user.findFirst({
+            where: whereClause,
             include: {
                 role: true,
                 doctor: true,

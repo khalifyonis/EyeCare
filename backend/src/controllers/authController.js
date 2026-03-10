@@ -207,3 +207,32 @@ export const getMe = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateMe = async (req, res, next) => {
+  try {
+    const { fullName, phone } = req.body;
+    const updateData = {};
+    if (fullName !== undefined) updateData.fullName = fullName.trim();
+    if (phone !== undefined) updateData.phone = phone?.trim() || null;
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: 'No valid fields to update' });
+    }
+
+    const user = await prisma.user.update({
+      where: { id: req.user.id },
+      data: updateData,
+      include: {
+        role: true,
+        branch: true,
+        staffAssignments: { include: { branch: true } },
+      },
+    });
+
+    const { password: _, staffAssignments, ...sanitizedUser } = user;
+    const branches = staffAssignments.map(sa => sa.branch);
+    res.status(200).json({ ...sanitizedUser, branches });
+  } catch (error) {
+    next(error);
+  }
+};

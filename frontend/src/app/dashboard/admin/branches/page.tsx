@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { BranchDialog } from './branch-dialog';
+import { PageBreadcrumb } from '@/components/dashboard/page-breadcrumb';
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
@@ -25,8 +26,9 @@ export default function BranchesPage() {
     const fetchBranches = async () => {
         setLoading(true);
         try {
-            const response = await api.get('/branches');
-            setBranches(response.data);
+            const response = await api.get('/branches?limit=1000');
+            const body = response.data as { data?: Branch[]; total?: number };
+            setBranches(Array.isArray(body?.data) ? body.data : []);
         } catch (error) {
             toast.error('Failed to load branches');
         } finally {
@@ -74,8 +76,8 @@ export default function BranchesPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Branches Management</h1>
-                    <p className="text-sm text-muted-foreground mt-0.5">Manage all clinic branches</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Branches</h1>
+                    <PageBreadcrumb current="Branches" />
                 </div>
                 <Button onClick={() => { setEditingBranch(null); setIsDialogOpen(true); }} className="bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold shadow-lg shadow-blue-500/20 px-6 rounded-xl transition-all active:scale-[0.98]">
                     <Plus className="w-4 h-4 mr-2" />

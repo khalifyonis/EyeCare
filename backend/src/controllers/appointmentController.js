@@ -1,4 +1,5 @@
 import prisma from '../lib/prisma.js';
+import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
 
 // Generate next booking number like APT-0001, APT-0002, etc.
 const generateBookingNumber = async () => {
@@ -54,20 +55,32 @@ export const createAppointment = async (req, res, next) => {
 
 export const getAppointments = async (req, res, next) => {
     try {
-        const { patientId, doctorId, date, status, search, sortBy = 'appointmentDate', sortOrder = 'desc' } = req.query;
+        const { patientId, doctorId, date, from, to, status, search, sortBy = 'appointmentDate', sortOrder = 'desc' } = req.query;
 
         const branchFilter = (req.user.role === 'SUPERADMIN' || !req.user.branchId) ? {} : { branchId: req.user.branchId };
+
+        let dateFilter = {};
+        if (from && to) {
+            const fromStart = new Date(from);
+            fromStart.setHours(0, 0, 0, 0);
+            const toEnd = new Date(to);
+            toEnd.setHours(23, 59, 59, 999);
+            dateFilter = { appointmentDate: { gte: fromStart, lte: toEnd } };
+        } else if (date) {
+            dateFilter = {
+                appointmentDate: {
+                    gte: new Date(new Date(date).setHours(0, 0, 0, 0)),
+                    lte: new Date(new Date(date).setHours(23, 59, 59, 999))
+                }
+            };
+        }
+
         const whereClause = {
             ...branchFilter,
             ...(patientId ? { patientId } : {}),
             ...(doctorId ? { doctorId } : {}),
             ...(status ? { status } : {}),
-            ...(date ? {
-                appointmentDate: {
-                    gte: new Date(new Date(date).setHours(0, 0, 0, 0)),
-                    lte: new Date(new Date(date).setHours(23, 59, 59, 999))
-                }
-            } : {}),
+            ...dateFilter,
             ...(search ? {
                 OR: [
                     { bookingNumber: { contains: search, mode: 'insensitive' } },
@@ -77,18 +90,25 @@ export const getAppointments = async (req, res, next) => {
             } : {})
         };
 
-        const appointments = await prisma.appointment.findMany({
-            where: whereClause,
-            orderBy: { [sortBy]: sortOrder },
-            include: {
-                patient: { select: { id: true, fullName: true, phone: true } },
-                doctor: { include: { user: { select: { fullName: true } } } },
-                branch: { select: { branchName: true } },
-                createdBy: { select: { fullName: true } }
-            }
-        });
+        const { skip, take, page, limit } = getPaginationParams(req.query);
 
-        res.status(200).json(appointments);
+        const [appointments, total] = await Promise.all([
+            prisma.appointment.findMany({
+                where: whereClause,
+                orderBy: { [sortBy]: sortOrder },
+                skip,
+                take,
+                include: {
+                    patient: { select: { id: true, fullName: true, phone: true } },
+                    doctor: { include: { user: { select: { fullName: true } } } },
+                    branch: { select: { branchName: true } },
+                    createdBy: { select: { fullName: true } }
+                }
+            }),
+            prisma.appointment.count({ where: whereClause })
+        ]);
+
+        sendPaginated(res, appointments, total, page, limit);
     } catch (error) {
         next(error);
     }

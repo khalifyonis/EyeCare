@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { UserDialog } from '../users/user-dialog';
-import Link from 'next/link';
+import { PageBreadcrumb } from '@/components/dashboard/page-breadcrumb';
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
@@ -27,8 +27,9 @@ export default function DoctorsPage() {
     const fetchDoctors = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await api.get('/doctors');
-            setDoctors(res.data);
+            const res = await api.get('/doctors?limit=1000');
+            const body = res.data as { data?: any[]; total?: number };
+            setDoctors(Array.isArray(body?.data) ? body.data : []);
         } catch (err: any) {
             toast.error('Failed to load doctors list');
         } finally {
@@ -82,8 +83,8 @@ export default function DoctorsPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Doctors Management</h1>
-                    <p className="text-sm text-muted-foreground mt-0.5">Manage all doctors in the system</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Doctors</h1>
+                    <PageBreadcrumb current="Doctors" />
                 </div>
                 <Button
                     onClick={() => { setSelectedDoctor(null); setDialogOpen(true); }}

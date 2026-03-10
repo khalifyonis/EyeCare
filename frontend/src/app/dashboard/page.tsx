@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { getDefaultDashboardPath, resolveRoleName } from '@/lib/auth';
 
 export default function DashboardRoot() {
     const router = useRouter();
@@ -15,12 +16,7 @@ export default function DashboardRoot() {
 
         try {
             const user = JSON.parse(storedUser);
-            const role = (user.roleName || user.role || 'user').toLowerCase();
-
-            // Map common roles to their dashboard paths
-            // If the role-based dashboard is at /dashboard/[role]/page.tsx,
-            // we redirect to /dashboard/admin, /dashboard/doctor, etc.
-            router.replace(`/dashboard/${role}`);
+            router.replace(getDefaultDashboardPath(resolveRoleName(user)));
         } catch (error) {
             console.error('Failed to parse user for redirection', error);
             router.push('/login');

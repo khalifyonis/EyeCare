@@ -2,6 +2,7 @@ import 'dotenv/config';
 import pg from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
+import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -9,10 +10,17 @@ const prisma = new PrismaClient({ adapter });
 
 export const getAllBranches = async (req, res, next) => {
     try {
-        const branches = await prisma.branch.findMany({
-            orderBy: { branchName: 'asc' },
-        });
-        res.status(200).json(branches);
+        const { skip, take, page, limit } = getPaginationParams(req.query);
+
+        const [branches, total] = await Promise.all([
+            prisma.branch.findMany({
+                orderBy: { branchName: 'asc' },
+                skip,
+                take,
+            }),
+            prisma.branch.count()
+        ]);
+        sendPaginated(res, branches, total, page, limit);
     } catch (error) {
         next(error);
     }

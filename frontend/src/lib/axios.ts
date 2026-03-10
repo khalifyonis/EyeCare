@@ -15,6 +15,24 @@ api.interceptors.request.use(
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;
             }
+
+            const activeBranchId = localStorage.getItem('activeBranchId');
+            if (activeBranchId) {
+                config.headers['x-branch-id'] = activeBranchId;
+            } else {
+                const rawUser = localStorage.getItem('user');
+                if (rawUser) {
+                    try {
+                        const parsed = JSON.parse(rawUser);
+                        const fallbackBranchId = parsed?.activeBranch?.id || parsed?.branchId;
+                        if (fallbackBranchId) {
+                            config.headers['x-branch-id'] = fallbackBranchId;
+                        }
+                    } catch {
+                        // Ignore malformed user data in storage
+                    }
+                }
+            }
         }
         return config;
     },

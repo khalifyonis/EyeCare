@@ -1,5 +1,8 @@
 const { execSync } = require('child_process');
-const ports = [3000, 5000];
+const fs = require('fs');
+const path = require('path');
+
+const ports = [3000, 3001, 5000];
 
 function killPort(port) {
     try {
@@ -28,3 +31,10 @@ function killPort(port) {
 }
 
 ports.forEach(killPort);
+
+// Next.js (Turbopack) can leave a stale lock that prevents restart.
+// Best-effort cleanup; ignore failures.
+try {
+    const nextDevLockPath = path.join(__dirname, '..', 'frontend', '.next', 'dev', 'lock');
+    fs.rmSync(nextDevLockPath, { force: true });
+} catch (_) {}

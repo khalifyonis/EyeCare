@@ -1,33 +1,44 @@
 import prisma from '../lib/prisma.js';
+import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
 
 export const getAllDoctors = async (req, res, next) => {
     try {
         const { search, specialization } = req.query;
 
         const whereClause = {
+            ...((req.user.role === 'SUPERADMIN' || !req.user.branchId) ? {} : { branchId: req.user.branchId }),
             ...(specialization ? { specialization: { contains: specialization, mode: 'insensitive' } } : {}),
-            OR: search ? [
-                { user: { fullName: { contains: search, mode: 'insensitive' } } },
-                { user: { email: { contains: search, mode: 'insensitive' } } },
-                { licenseNumber: { contains: search, mode: 'insensitive' } },
-            ] : undefined
+            ...(search ? {
+                OR: [
+                    { user: { fullName: { contains: search, mode: 'insensitive' } } },
+                    { user: { email: { contains: search, mode: 'insensitive' } } },
+                    { licenseNumber: { contains: search, mode: 'insensitive' } },
+                ]
+            } : {})
         };
 
-        const doctors = await prisma.doctor.findMany({
-            where: whereClause,
-            include: {
-                user: {
-                    include: {
-                        branch: true,
-                    }
+        const { skip, take, page, limit } = getPaginationParams(req.query);
+
+        const [doctors, total] = await Promise.all([
+            prisma.doctor.findMany({
+                where: whereClause,
+                skip,
+                take,
+                include: {
+                    user: {
+                        include: {
+                            branch: true,
+                        }
+                    },
                 },
-            },
-            orderBy: {
-                user: {
-                    fullName: 'asc',
+                orderBy: {
+                    user: {
+                        fullName: 'asc',
+                    },
                 },
-            },
-        });
+            }),
+            prisma.doctor.count({ where: whereClause })
+        ]);
 
         const formattedDoctors = doctors.map((doc) => {
             if (!doc.user) {
@@ -56,7 +67,7 @@ export const getAllDoctors = async (req, res, next) => {
             };
         }).filter(Boolean);
 
-        res.status(200).json(formattedDoctors);
+        sendPaginated(res, formattedDoctors, total, page, limit);
     } catch (error) {
         console.error('Error fetching doctors:', error);
         next(error);

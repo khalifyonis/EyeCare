@@ -7,8 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { User, Lock, Loader2, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
-
 import { BranchSelectorDialog } from '@/components/auth/branch-selector-dialog';
+import { getDefaultDashboardPath, persistSession, resolveRoleName, type BranchSummary, type StoredUser } from '@/lib/auth';
+
+
 
 export default function LoginPage() {
     const router = useRouter();
@@ -19,7 +21,7 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
 
     // Multi-branch selection
-    const [tempAuthData, setTempAuthData] = useState<{ token: string, user: any } | null>(null);
+    const [tempAuthData, setTempAuthData] = useState<{ token: string, user: StoredUser } | null>(null);
     const [showBranchSelector, setShowBranchSelector] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
@@ -49,22 +51,12 @@ export default function LoginPage() {
         }
     };
 
-    const completeLogin = (token: string, user: any, branch: any) => {
-        const userToStore = {
-            ...user,
-            activeBranch: branch,
-            branchId: branch?.id || user.branchId
-        };
-
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(userToStore));
-        // Set cookie for middleware (7 days)
-        document.cookie = `token=${token}; path=/; max-age=604800; SameSite=Lax`;
-
-        router.push(`/dashboard/${user.role.toLowerCase()}`);
+    const completeLogin = (token: string, user: StoredUser, branch: BranchSummary | null) => {
+        const storedUser = persistSession(token, user, branch);
+        router.push(getDefaultDashboardPath(resolveRoleName(storedUser)));
     };
 
-    const handleBranchSelect = (branch: any) => {
+    const handleBranchSelect = (branch: BranchSummary) => {
         if (tempAuthData) {
             completeLogin(tempAuthData.token, tempAuthData.user, branch);
         }

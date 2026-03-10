@@ -3,39 +3,40 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { MapPin, Building2, ArrowRight } from 'lucide-react'
+import { getDefaultDashboardPath, readStoredUser, resolveRoleName, type BranchSummary, type StoredUser } from '@/lib/auth'
+import { persistActiveBranch } from '@/lib/branches'
 
-interface Branch {
-    id: string
-    branchName: string
-    isPrimary: boolean
-}
-
-export default function SelectBranchPage() {
+export function SelectBranchView() {
     const router = useRouter()
-    const [branches, setBranches] = useState<Branch[]>([])
-    const [user, setUser] = useState<any>(null)
+    const [branches, setBranches] = useState<BranchSummary[]>([])
+    const [user, setUser] = useState<StoredUser | null>(null)
 
     useEffect(() => {
-        const storedBranches = localStorage.getItem('branches')
-        const storedUser = localStorage.getItem('user')
+        const storedUser = readStoredUser()
 
-        if (!storedBranches || !storedUser) {
-            router.push('/login')
+        if (!storedUser) {
+            router.replace('/login')
             return
         }
 
-        setBranches(JSON.parse(storedBranches))
-        setUser(JSON.parse(storedUser))
+        const availableBranches = storedUser.branches || []
+
+        if (!availableBranches.length) {
+            router.replace('/login')
+            return
+        }
+
+        setBranches(availableBranches)
+        setUser(storedUser)
     }, [router])
 
     const handleSelect = (branchId: string) => {
-        // In a real app, you might want to call an API to update the active branch in the session
-        // For now, we update local storage and redirect
-        localStorage.setItem('activeBranchId', branchId)
-        const dashboardPath = user.roleName.toLowerCase()
-        router.push(`/dashboard/${dashboardPath}`)
+        if (!user) return
+
+        const { nextUser } = persistActiveBranch(user, branchId)
+        const role = resolveRoleName(nextUser)
+        router.push(getDefaultDashboardPath(role))
     }
 
     return (
@@ -56,7 +57,12 @@ export default function SelectBranchPage() {
                             onClick={() => handleSelect(branch.id)}
                         >
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-lg font-bold">{branch.branchName}</CardTitle>
+                                <div>
+                                    <CardTitle className="text-lg font-bold">{branch.branchName}</CardTitle>
+                                    {branch.address ? (
+                                        <CardDescription className="mt-1 truncate">{branch.address}</CardDescription>
+                                    ) : null}
+                                </div>
                                 <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
                                     <Building2 size={20} />
                                 </div>
@@ -64,7 +70,7 @@ export default function SelectBranchPage() {
                             <CardContent>
                                 <div className="flex items-center text-sm text-muted-foreground mt-2">
                                     <MapPin size={14} className="mr-1" />
-                                    <span>Main Hospital Location</span>
+                                    <span>{branch.address || 'Main Hospital Location'}</span>
                                 </div>
                                 {branch.isPrimary && (
                                     <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary mt-4">

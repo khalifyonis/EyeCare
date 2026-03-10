@@ -1,17 +1,30 @@
 import * as React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { Badge } from '@/components/ui/badge';
-import { Phone, Calendar, ArrowUpDown, Pencil, Trash2, CalendarPlus } from 'lucide-react';
+import { Pencil, Trash2, CalendarPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
-export interface PatientColumnsProps {
-    onEdit: (patient: any) => void;
-    onDelete: (id: string) => void;
-    onBook: (patient: any) => void;
+export interface PatientRow {
+    id: string;
+    fullName?: string | null;
+    gender?: string | null;
+    phone?: string | null;
+    email?: string | null;
+    dateOfBirth?: string | null;
+    createdAt?: string;
+    isActive?: boolean;
+    branch?: { branchName?: string | null } | null;
 }
 
-export const getPatientColumns = ({ onEdit, onDelete, onBook }: PatientColumnsProps): ColumnDef<any>[] => [
+export interface PatientColumnsProps {
+    onEdit: (patient: PatientRow) => void;
+    onDelete: (id: string) => void;
+    onBook: (patient: PatientRow) => void;
+    canManage: boolean;
+}
+
+export const getPatientColumns = ({ onEdit, onDelete, onBook, canManage }: PatientColumnsProps): ColumnDef<PatientRow>[] => {
+    const baseColumns: ColumnDef<PatientRow>[] = [
     {
         accessorKey: 'id',
         header: 'ID',
@@ -70,56 +83,47 @@ export const getPatientColumns = ({ onEdit, onDelete, onBook }: PatientColumnsPr
             </span>
         ),
     },
+    ];
+
+    if (!canManage) return baseColumns;
+
+    return [
+        ...baseColumns,
     {
         id: 'actions',
         header: () => <span className="flex justify-end pr-2 uppercase text-[11px] font-bold text-slate-500 tracking-wider">Actions</span>,
-        cell: ({ row }) => {
-            const [user, setUser] = React.useState<any>(null);
-
-            React.useEffect(() => {
-                const storedUser = localStorage.getItem('user');
-                if (storedUser) setUser(JSON.parse(storedUser));
-            }, []);
-
-            const role = user?.roleName?.toUpperCase() || user?.role?.toUpperCase();
-            const canManage = role === 'ADMIN' || role === 'SUPERADMIN' || role === 'RECEPTIONIST';
-
-            return (
-                <div className="flex items-center justify-end gap-1 px-1">
-                    {canManage && (
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            title="Book Appointment"
-                            className="h-8 w-8 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 transition-all active:scale-90 rounded-lg shadow-sm shadow-emerald-200/50"
-                            onClick={() => onBook(row.original)}
-                        >
-                            <CalendarPlus className="w-4 h-4" />
-                        </Button>
-                    )}
-                    {canManage && (
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            title="Edit Patient"
-                            className="h-8 w-8 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 transition-all active:scale-90 rounded-lg shadow-sm shadow-blue-200/50"
-                            onClick={() => onEdit(row.original)}
-                        >
-                            <Pencil className="w-4 h-4" />
-                        </Button>
-                    )}
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        title="Delete Patient"
-                        className="h-8 w-8 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition-all active:scale-90 rounded-lg shadow-sm shadow-red-200/50"
-                        onClick={() => onDelete(row.original.id)}
-                    >
-                        <Trash2 className="w-4 h-4" />
-                    </Button>
-                </div>
-            );
-        },
+        cell: ({ row }) => (
+            <div className="flex items-center justify-end gap-1 px-1">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    title="Book Appointment"
+                    className="h-8 w-8 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 transition-all active:scale-90 rounded-lg shadow-sm shadow-emerald-200/50"
+                    onClick={() => onBook(row.original)}
+                >
+                    <CalendarPlus className="w-4 h-4" />
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    title="Edit Patient"
+                    className="h-8 w-8 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 transition-all active:scale-90 rounded-lg shadow-sm shadow-blue-200/50"
+                    onClick={() => onEdit(row.original)}
+                >
+                    <Pencil className="w-4 h-4" />
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    title="Delete Patient"
+                    className="h-8 w-8 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition-all active:scale-90 rounded-lg shadow-sm shadow-red-200/50"
+                    onClick={() => onDelete(row.original.id)}
+                >
+                    <Trash2 className="w-4 h-4" />
+                </Button>
+            </div>
+        ),
     },
-];
+    ];
+};
 

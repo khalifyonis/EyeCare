@@ -26,6 +26,14 @@ export const resetPasswordSchema = Joi.object({
     })
 });
 
+// Profile update (current user only: fullName, phone)
+export const updateProfileSchema = Joi.object({
+    fullName: Joi.string().min(2).max(120).optional().messages({
+        'string.min': 'Full name must be at least 2 characters',
+    }),
+    phone: Joi.string().max(30).allow('', null).optional(),
+}).min(1).options({ stripUnknown: true });
+
 // ── User Schemas ──
 const nameRegex = /^[a-zA-Z\s]+$/;
 
@@ -128,3 +136,193 @@ export const updateAppointmentSchema = Joi.object({
     }),
     status: Joi.string().valid('PENDING', 'COMPLETED', 'CANCELLED').optional()
 });
+
+// ── Examination Schemas ──
+export const erExaminationSchema = Joi.object({
+    appointmentId: Joi.string().uuid().required(),
+    vaRight: Joi.string().allow('', null).optional(),
+    vaLeft: Joi.string().allow('', null).optional(),
+    phRight: Joi.string().allow('', null).optional(),
+    phLeft: Joi.string().allow('', null).optional(),
+    iopRight: Joi.number().optional(),
+    iopLeft: Joi.number().optional(),
+    notes: Joi.string().allow('', null).optional()
+}).options({ stripUnknown: true });
+
+export const clinicalExaminationSchema = Joi.object({
+    appointmentId: Joi.string().uuid().required(),
+    sphRight: Joi.number().optional(),
+    cylRight: Joi.number().optional(),
+    axisRight: Joi.number().integer().min(0).max(180).optional(),
+    sphLeft: Joi.number().optional(),
+    cylLeft: Joi.number().optional(),
+    axisLeft: Joi.number().integer().min(0).max(180).optional(),
+    diagnosis: Joi.string().allow('', null).optional(),
+    managementPlan: Joi.string().allow('', null).optional(),
+    examinedById: Joi.string().uuid().allow('', null).optional()
+}).options({ stripUnknown: true });
+
+export const updateERExaminationSchema = Joi.object({
+    vaRight: Joi.string().allow('', null).optional(),
+    vaLeft: Joi.string().allow('', null).optional(),
+    phRight: Joi.string().allow('', null).optional(),
+    phLeft: Joi.string().allow('', null).optional(),
+    iopRight: Joi.number().optional(),
+    iopLeft: Joi.number().optional(),
+    notes: Joi.string().allow('', null).optional()
+}).min(1).options({ stripUnknown: true });
+
+export const updateClinicalExaminationSchema = Joi.object({
+    sphRight: Joi.number().optional(),
+    cylRight: Joi.number().optional(),
+    axisRight: Joi.number().integer().min(0).max(180).optional(),
+    sphLeft: Joi.number().optional(),
+    cylLeft: Joi.number().optional(),
+    axisLeft: Joi.number().integer().min(0).max(180).optional(),
+    diagnosis: Joi.string().allow('', null).optional(),
+    managementPlan: Joi.string().allow('', null).optional(),
+    examinedById: Joi.string().uuid().optional()
+}).min(1).options({ stripUnknown: true });
+
+// ── Surgery Schemas ──
+export const createSurgerySchema = Joi.object({
+    examId: Joi.string().uuid().required(),
+    branchId: Joi.string().uuid().allow('', null).optional(),
+    eyeSide: Joi.string().valid('RIGHT', 'LEFT', 'BOTH').required(),
+    surgeryType: Joi.string().min(2).max(200).required(),
+    surgeryDate: Joi.date().iso().required().messages({
+        'date.iso': 'Invalid date'
+    }),
+    cost: Joi.number().min(0).required().messages({
+        'number.min': 'Invalid cost'
+    }),
+    status: Joi.string().valid('PENDING', 'COMPLETED', 'CANCELLED').optional(),
+    notes: Joi.string().allow('', null).optional(),
+    surgeonId: Joi.string().uuid().required(),
+}).options({ stripUnknown: true });
+
+export const updateSurgerySchema = Joi.object({
+    eyeSide: Joi.string().valid('RIGHT', 'LEFT', 'BOTH').optional(),
+    surgeryType: Joi.string().min(2).max(200).optional(),
+    surgeryDate: Joi.date().iso().optional().messages({
+        'date.iso': 'Invalid date'
+    }),
+    cost: Joi.number().min(0).optional().messages({
+        'number.min': 'Invalid cost'
+    }),
+    status: Joi.string().valid('PENDING', 'COMPLETED', 'CANCELLED').optional(),
+    notes: Joi.string().allow('', null).optional(),
+    surgeonId: Joi.string().uuid().optional(),
+}).min(1).options({ stripUnknown: true });
+
+// ── Prescription Schemas ──
+export const createPrescriptionSchema = Joi.object({
+    examId: Joi.string().uuid().required(),
+    itemType: Joi.string().valid('PHARMACY', 'OPTICAL').required(),
+    itemId: Joi.string().allow('', null).optional(),
+    quantity: Joi.number().integer().min(1).required().messages({
+        'number.base': 'Quantity must be a number',
+        'number.integer': 'Quantity must be a whole number',
+        'number.min': 'Quantity must be at least 1'
+    }),
+    instructions: Joi.string().allow('', null).optional(),
+}).options({ stripUnknown: true });
+
+export const updatePrescriptionSchema = Joi.object({
+    examId: Joi.string().uuid().optional(),
+    itemType: Joi.string().valid('PHARMACY', 'OPTICAL').optional(),
+    itemId: Joi.string().allow('', null).optional(),
+    quantity: Joi.number().integer().min(1).optional().messages({
+        'number.base': 'Quantity must be a number',
+        'number.integer': 'Quantity must be a whole number',
+        'number.min': 'Quantity must be at least 1'
+    }),
+    instructions: Joi.string().allow('', null).optional(),
+}).min(1).options({ stripUnknown: true });
+
+// ── Billing Schemas ──
+export const createBillingSchema = Joi.object({
+    patientId: Joi.string().uuid().required(),
+    branchId: Joi.string().uuid().allow('', null).optional(),
+    appointmentId: Joi.string().uuid().allow('', null).optional(),
+    surgeryId: Joi.string().uuid().allow('', null).optional(),
+    prescriptionId: Joi.string().uuid().allow('', null).optional(),
+    serviceType: Joi.string().valid('APPOINTMENT', 'PHARMACY', 'OPTICAL', 'SURGERY').required(),
+    totalAmount: Joi.number().min(0).required().messages({
+        'number.min': 'Total amount must be 0 or more',
+    }),
+    discount: Joi.number().min(0).optional().default(0).messages({
+        'number.min': 'Discount cannot be negative',
+    }),
+    paymentMethod: Joi.string().allow('', null).optional(),
+    referenceNumber: Joi.string().allow('', null).optional(),
+    status: Joi.string().valid('PAID', 'UNPAID', 'PARTIAL').optional().default('UNPAID'),
+}).options({ stripUnknown: true });
+
+export const updateBillingSchema = Joi.object({
+    totalAmount: Joi.number().min(0).optional().messages({
+        'number.min': 'Total amount must be 0 or more',
+    }),
+    discount: Joi.number().min(0).optional().messages({
+        'number.min': 'Discount cannot be negative',
+    }),
+    paymentMethod: Joi.string().allow('', null).optional(),
+    referenceNumber: Joi.string().allow('', null).optional(),
+    status: Joi.string().valid('PAID', 'UNPAID', 'PARTIAL').optional(),
+}).min(1).options({ stripUnknown: true });
+
+// ── Pharmacy Item Schemas ──
+export const createPharmacyItemSchema = Joi.object({
+    branchId: Joi.string().uuid().allow('', null).optional(),
+    itemName: Joi.string().min(2).required(),
+    itemType: Joi.string().allow('', null).optional(),
+    category: Joi.string().allow('', null).optional(),
+    manufacturer: Joi.string().allow('', null).optional(),
+    supplierName: Joi.string().allow('', null).optional(),
+    batchNumber: Joi.string().allow('', null).optional(),
+    stockQuantity: Joi.number().integer().min(0).optional().default(0),
+    reorderLevel: Joi.number().integer().min(0).optional().default(10),
+    purchasePrice: Joi.number().min(0).optional().default(0),
+    sellingPrice: Joi.number().min(0).optional().default(0),
+    expiryDate: Joi.date().iso().allow('', null).optional(),
+}).options({ stripUnknown: true });
+
+export const updatePharmacyItemSchema = Joi.object({
+    itemName: Joi.string().min(2).optional(),
+    itemType: Joi.string().allow('', null).optional(),
+    category: Joi.string().allow('', null).optional(),
+    manufacturer: Joi.string().allow('', null).optional(),
+    supplierName: Joi.string().allow('', null).optional(),
+    batchNumber: Joi.string().allow('', null).optional(),
+    stockQuantity: Joi.number().integer().min(0).optional(),
+    reorderLevel: Joi.number().integer().min(0).optional(),
+    purchasePrice: Joi.number().min(0).optional(),
+    sellingPrice: Joi.number().min(0).optional(),
+    expiryDate: Joi.date().iso().allow('', null).optional(),
+}).min(1).options({ stripUnknown: true });
+
+// ── Optical Item Schemas ──
+export const createOpticalItemSchema = Joi.object({
+    branchId: Joi.string().uuid().allow('', null).optional(),
+    itemName: Joi.string().min(2).required(),
+    itemType: Joi.string().allow('', null).optional(),
+    brand: Joi.string().allow('', null).optional(),
+    manufacturer: Joi.string().allow('', null).optional(),
+    supplierName: Joi.string().allow('', null).optional(),
+    stockQuantity: Joi.number().integer().min(0).optional().default(0),
+    reorderLevel: Joi.number().integer().min(0).optional().default(5),
+    purchasePrice: Joi.number().min(0).optional().default(0),
+    sellingPrice: Joi.number().min(0).optional().default(0),
+}).options({ stripUnknown: true });
+
+export const updateOpticalItemSchema = Joi.object({
+    itemName: Joi.string().min(2).optional(),
+    itemType: Joi.string().allow('', null).optional(),
+    brand: Joi.string().allow('', null).optional(),
+    manufacturer: Joi.string().allow('', null).optional(),
+    supplierName: Joi.string().allow('', null).optional(),
+    stockQuantity: Joi.number().integer().min(0).optional(),
+    reorderLevel: Joi.number().integer().min(0).optional(),
+    purchasePrice: Joi.number().min(0).optional(),
+    sellingPrice: Joi.number().min(0).optional(),
+}).min(1).options({ stripUnknown: true });
