@@ -214,7 +214,8 @@ export function DashboardHome() {
         { title: 'Total Patients', value: stats.totalPatients, trend: '+12.5%', up: true, icon: Users, gradient: 'from-violet-600 to-indigo-600' },
         { title: 'Appointments Today', value: stats.appointmentsToday, trend: '+3', up: true, icon: Calendar, gradient: 'from-cyan-500 to-[#0EA5E9]' },
         { title: 'Doctors', value: stats.totalDoctors, trend: '+8.3%', up: true, icon: Users, gradient: 'from-emerald-500 to-teal-600' },
-        { title: 'Clinical Exams', value: stats.totalExams, trend: '-2.1%', up: false, icon: Eye, gradient: 'from-amber-500 to-orange-500' },
+        // Last card uses a warmer, near-red gradient like the sample dashboard
+        { title: 'Clinical Exams', value: stats.totalExams, trend: '-2.1%', up: false, icon: Eye, gradient: 'from-rose-500 to-red-500' },
     ]
 
     const totalPatientsForDonut = serviceData.reduce((sum, item) => sum + item.count, 0)
@@ -266,12 +267,14 @@ export function DashboardHome() {
 
                     <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
                         <Card className="lg:col-span-4 border-none shadow-xl bg-white dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
-                            <CardHeader className="flex flex-row items-center justify-between py-5 px-6 border-b border-slate-100 dark:border-slate-800">
+                            <CardHeader className="flex flex-row items-center justify-between py-4 px-6 border-b border-slate-100 dark:border-slate-800">
                                 <div>
-                                    <CardTitle className="text-base font-bold tracking-tight">Monthly Revenue</CardTitle>
+                                    <CardTitle className="text-sm font-bold tracking-tight">
+                                        Monthly Analytics
+                                    </CardTitle>
                                 </div>
                                 <div className="relative">
-                                    <select className="appearance-none text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 pl-3 pr-8 py-2 text-slate-600 dark:text-slate-300 outline-none cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-all shadow-sm">
+                                    <select className="appearance-none text-[11px] font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 pl-3 pr-8 py-1.5 text-slate-600 dark:text-slate-300 outline-none cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-all shadow-sm">
                                         <option>This Year</option>
                                         <option>Last Year</option>
                                     </select>
@@ -279,24 +282,61 @@ export function DashboardHome() {
                                 </div>
                             </CardHeader>
                             <CardContent className="px-5 pb-5 pt-4">
-                                <div className="h-[200px]">
+                                <div className="h-[220px]">
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={revenueData} barGap={0} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                                            <defs>
-                                                <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="0%" stopColor="#8b5cf6" stopOpacity={1} />
-                                                    <stop offset="100%" stopColor="#6366f1" stopOpacity={1} />
-                                                </linearGradient>
-                                            </defs>
+                                        <BarChart
+                                            data={revenueData}
+                                            barCategoryGap={24}
+                                            barGap={3}
+                                            margin={{ top: 10, right: 8, left: -10, bottom: 0 }}
+                                        >
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-slate-100 dark:stroke-slate-800" />
-                                            <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11, fontWeight: 600 }} dy={10} />
-                                            <YAxis tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11, fontWeight: 600 }} tickFormatter={(value) => `$${value / 1000}k`} />
-                                            <RechartsTooltip
-                                                cursor={{ fill: 'rgba(0,0,0,0.02)' }}
-                                                contentStyle={{ ...tooltipStyle, borderRadius: '12px', border: 'none', boxShadow: '0 10px 30px -5px rgba(0,0,0,0.1)' }}
-                                                formatter={(value?: number) => [`$${Number(value || 0).toLocaleString()}`, 'Revenue']}
+                                            <XAxis
+                                                dataKey="month"
+                                                tickLine={false}
+                                                axisLine={false}
+                                                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11, fontWeight: 600 }}
+                                                dy={10}
                                             />
-                                            <Bar dataKey="revenue" fill="url(#barGradient)" radius={[6, 6, 0, 0]} barSize={32} />
+                                            <YAxis
+                                                tickLine={false}
+                                                axisLine={false}
+                                                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11, fontWeight: 600 }}
+                                                domain={[0, 10000]}
+                                                ticks={[0, 2500, 5000, 7500, 10000]}
+                                                tickFormatter={(value) => `$${value / 1000}k`}
+                                            />
+                                            <RechartsTooltip
+                                                cursor={{ fill: 'rgba(15, 23, 42, 0.04)' }}
+                                                contentStyle={{
+                                                    ...tooltipStyle,
+                                                    borderRadius: '12px',
+                                                    border: 'none',
+                                                    boxShadow: '0 10px 30px -5px rgba(15,23,42,0.15)',
+                                                }}
+                                            />
+                                            {/* Sample: tall blue bar, then two short bars (purple, green) to its right */}
+                                            <Bar
+                                                dataKey="revenue"
+                                                name="Revenue"
+                                                fill="#7C3AED"
+                                                radius={[8, 8, 8, 8]}
+                                                maxBarSize={20}
+                                            />
+                                            <Bar
+                                                dataKey="appointments"
+                                                name="Appointments"
+                                                fill="#a855f7"
+                                                radius={[4, 4, 4, 4]}
+                                                maxBarSize={5}
+                                            />
+                                            <Bar
+                                                dataKey="exams"
+                                                name="Exams"
+                                                fill="#22c55e"
+                                                radius={[4, 4, 4, 4]}
+                                                maxBarSize={5}
+                                            />
                                         </BarChart>
                                     </ResponsiveContainer>
                                 </div>

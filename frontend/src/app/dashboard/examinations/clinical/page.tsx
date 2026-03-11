@@ -275,8 +275,8 @@ export default function ClinicalExaminationsPage() {
     ]);
 
     return (
-        <div className="w-full min-w-0 p-4 sm:p-5 md:p-6 lg:p-8 space-y-6 animate-in fade-in duration-300">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="w-full min-w-0 p-4 sm:p-5 md:p-6 lg:p-8 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Clinical Examinations</h1>
                     <PageBreadcrumb current="Clinical Examinations" />
@@ -284,7 +284,7 @@ export default function ClinicalExaminationsPage() {
                 {canManage && (
                     <Button
                         onClick={openCreate}
-                        className="bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold shadow-lg shadow-blue-500/20 px-6 rounded-xl transition-all active:scale-[0.98]"
+                        className="h-10 rounded-lg bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-semibold px-4"
                     >
                         <Plus className="w-4 h-4 mr-2" />
                         New Clinical Record
@@ -292,46 +292,35 @@ export default function ClinicalExaminationsPage() {
                 )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                <div>
-                    <label className="text-xs font-medium text-slate-500 mb-1 block">Search</label>
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <Input
-                            placeholder="Search by booking, patient, diagnosis..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="pl-9 h-10 rounded-lg border-slate-200 dark:border-slate-800 text-sm"
-                        />
-                    </div>
-                </div>
-                <div>
-                    <label className="text-xs font-medium text-slate-500 mb-1 block">Status</label>
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="h-10 rounded-lg border-slate-200 dark:border-slate-800 text-sm">
-                            <SelectValue placeholder="All Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Status</SelectItem>
-                            <SelectItem value="PENDING">Pending</SelectItem>
-                            <SelectItem value="COMPLETED">Completed</SelectItem>
-                            <SelectItem value="CANCELLED">Cancelled</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div>
-                    <label className="text-xs font-medium text-slate-500 mb-1 block">Date</label>
+            <div className="flex flex-col md:flex-row md:items-center gap-3 sm:gap-4">
+                <div className="relative w-full md:w-[260px]">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                     <Input
-                        type="date"
-                        value={dateFilter}
-                        onChange={(e) => setDateFilter(e.target.value)}
-                        className="h-10 rounded-lg border-slate-200 dark:border-slate-800 text-sm"
+                        placeholder="Search clinical records..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="pl-9 h-9 w-full rounded-md border border-slate-200 bg-white text-sm shadow-sm focus-visible:ring-1 focus-visible:ring-slate-300 dark:border-slate-700 dark:bg-slate-900"
                     />
                 </div>
-                <div>
-                    <label className="text-xs font-medium text-slate-500 mb-1 block">Sort By</label>
-                    <Select value={sortBy} onValueChange={setSortBy}>
-                        <SelectTrigger className="h-10 rounded-lg border-slate-200 dark:border-slate-800 text-sm">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="h-10 w-full md:w-[150px] rounded-md border border-slate-200 bg-white text-sm shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                        <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="PENDING">Pending</SelectItem>
+                        <SelectItem value="COMPLETED">Completed</SelectItem>
+                        <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Input
+                    type="date"
+                    value={dateFilter}
+                    onChange={(e) => setDateFilter(e.target.value)}
+                    className="h-10 w-full md:w-[150px] rounded-md border border-slate-200 bg-white text-sm shadow-sm dark:border-slate-700 dark:bg-slate-900"
+                />
+                <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="h-10 w-full md:w-[150px] rounded-md border border-slate-200 bg-white text-sm shadow-sm dark:border-slate-700 dark:bg-slate-900">
                             <SelectValue placeholder="Newest First" />
                         </SelectTrigger>
                         <SelectContent>
@@ -341,10 +330,9 @@ export default function ClinicalExaminationsPage() {
                             <SelectItem value="patient-desc">Patient (Z-A)</SelectItem>
                         </SelectContent>
                     </Select>
-                </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-x-auto min-w-0">
+            <div className="min-w-0">
                 <DataTable
                     columns={columns}
                     data={filtered}
@@ -355,6 +343,10 @@ export default function ClinicalExaminationsPage() {
                     }}
                     itemLabel="clinical examinations"
                     hideSearch
+                    hidePagination
+                    enableRowSelection
+                    emptyMessage="No clinical examinations yet"
+                    emptyDescription="Click 'New Clinical Exam' to record the first clinical examination."
                 />
                 <ServerPagination
                     page={page}

@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Package, AlertTriangle } from 'lucide-react';
 import { PageBreadcrumb } from '@/components/dashboard/page-breadcrumb';
 import { ServerPagination } from '@/components/dashboard/server-pagination';
 
@@ -33,6 +33,16 @@ type ClinicalExamForSelection = {
         bookingNumber?: string | null;
         patient?: { id: string; fullName?: string | null } | null;
     } | null;
+};
+
+type InventoryItem = {
+    id: string;
+    itemName: string;
+    itemType?: string | null;
+    category?: string | null;
+    brand?: string | null;
+    stockQuantity: number;
+    sellingPrice?: number | string | null;
 };
 
 const initialForm = {
@@ -69,6 +79,8 @@ export default function PrescriptionsPage() {
     const [prefillHandled, setPrefillHandled] = useState(false);
 
     const [clinicalExams, setClinicalExams] = useState<ClinicalExamForSelection[]>([]);
+    const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
+    const [itemSearch, setItemSearch] = useState('');
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
@@ -114,6 +126,20 @@ export default function PrescriptionsPage() {
         }
     }, []);
 
+    const fetchInventoryItems = useCallback(async (type: string, searchTerm = '') => {
+        try {
+            const endpoint = type === 'OPTICAL' ? '/inventory/optical' : '/inventory/pharmacy';
+            const params = new URLSearchParams();
+            params.set('limit', '200');
+            if (searchTerm) params.set('search', searchTerm);
+            const res = await api.get(`${endpoint}?${params.toString()}`);
+            const body = res.data as { data?: InventoryItem[] };
+            setInventoryItems(Array.isArray(body?.data) ? body.data : []);
+        } catch {
+            setInventoryItems([]);
+        }
+    }, []);
+
     useEffect(() => {
         setPage(1);
     }, [search, itemTypeFilter, dateFilter]);
@@ -127,6 +153,12 @@ export default function PrescriptionsPage() {
         fetchClinicalExams();
     }, [fetchClinicalExams]);
 
+    useEffect(() => {
+        if (open) {
+            fetchInventoryItems(form.itemType, itemSearch);
+        }
+    }, [open, form.itemType, itemSearch, fetchInventoryItems]);
+
     const preselectedExamId = searchParams.get('examId') || '';
     useEffect(() => {
         if (!canManage || !preselectedExamId || prefillHandled) return;
@@ -139,6 +171,7 @@ export default function PrescriptionsPage() {
     const openCreate = useCallback(() => {
         setEditing(null);
         setForm({ ...initialForm, examId: preselectedExamId || '' });
+        setItemSearch('');
         setOpen(true);
     }, [preselectedExamId]);
 
@@ -151,11 +184,12 @@ export default function PrescriptionsPage() {
             quantity: String(row.quantity || 1),
             instructions: row.instructions || '',
         });
+        setItemSearch('');
         setOpen(true);
     }, []);
 
     const handleDelete = useCallback(async (id: string) => {
-        if (!confirm('Delete this prescription?')) return;
+        if (!confirm('Delete this prescription? Stock will be restored if an item was linked.')) return;
         try {
             await api.delete(`/prescriptions/${id}`);
             toast.success('Prescription deleted');
@@ -163,7 +197,7 @@ export default function PrescriptionsPage() {
         } catch (error: unknown) {
             toast.error(getApiErrorMessage(error, 'Delete failed'));
         }
-    }, [fetchRows, search, itemTypeFilter, dateFilter]);
+    }, [fetchRows, search, itemTypeFilter, dateFilter, page]);
 
     const handleSave = async () => {
         if (!form.examId) {
@@ -234,9 +268,14 @@ export default function PrescriptionsPage() {
         return `${booking} - ${patient}`;
     }, [editing]);
 
+    const selectedItem = useMemo(() => {
+        if (!form.itemId) return null;
+        return inventoryItems.find((i) => i.id === form.itemId) ?? null;
+    }, [form.itemId, inventoryItems]);
+
     return (
-        <div className="w-full min-w-0 p-4 sm:p-5 md:p-6 lg:p-8 space-y-6 animate-in fade-in duration-300">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="w-full min-w-0 p-4 sm:p-5 md:p-6 lg:p-8 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Prescriptions</h1>
                     <PageBreadcrumb current="Prescriptions" />
@@ -244,7 +283,7 @@ export default function PrescriptionsPage() {
                 {canManage && (
                     <Button
                         onClick={openCreate}
-                        className="bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold shadow-lg shadow-blue-500/20 px-6 rounded-xl transition-all active:scale-[0.98]"
+                        className="h-10 rounded-lg bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-semibold px-4"
                     >
                         <Plus className="w-4 h-4 mr-2" />
                         New Prescription
@@ -252,58 +291,46 @@ export default function PrescriptionsPage() {
                 )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                <div>
-                    <label className="text-xs font-medium text-slate-500 mb-1 block">Search</label>
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <Input
-                            placeholder="Search by patient, booking, instructions..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="pl-9 h-10 rounded-lg border-slate-200 dark:border-slate-800 text-sm"
-                        />
-                    </div>
-                </div>
-                <div>
-                    <label className="text-xs font-medium text-slate-500 mb-1 block">Type</label>
-                    <Select value={itemTypeFilter} onValueChange={setItemTypeFilter}>
-                        <SelectTrigger className="h-10 rounded-lg border-slate-200 dark:border-slate-800 text-sm">
-                            <SelectValue placeholder="All Types" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Types</SelectItem>
-                            <SelectItem value="PHARMACY">Pharmacy</SelectItem>
-                            <SelectItem value="OPTICAL">Optical</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div>
-                    <label className="text-xs font-medium text-slate-500 mb-1 block">Date</label>
+            <div className="flex flex-col md:flex-row md:items-center gap-3 sm:gap-4">
+                <div className="relative w-full md:w-[260px]">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                     <Input
-                        type="date"
-                        value={dateFilter}
-                        onChange={(e) => setDateFilter(e.target.value)}
-                        className="h-10 rounded-lg border-slate-200 dark:border-slate-800 text-sm"
+                        placeholder="Search prescriptions..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="pl-9 h-9 w-full rounded-md border border-slate-200 bg-white text-sm shadow-sm focus-visible:ring-1 focus-visible:ring-slate-300 dark:border-slate-700 dark:bg-slate-900"
                     />
                 </div>
-                <div>
-                    <label className="text-xs font-medium text-slate-500 mb-1 block">Sort By</label>
-                    <Select value={sortBy} onValueChange={setSortBy}>
-                        <SelectTrigger className="h-10 rounded-lg border-slate-200 dark:border-slate-800 text-sm">
-                            <SelectValue placeholder="Newest First" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="newest">Newest First</SelectItem>
-                            <SelectItem value="oldest">Oldest First</SelectItem>
-                            <SelectItem value="patient-asc">Patient (A-Z)</SelectItem>
-                            <SelectItem value="patient-desc">Patient (Z-A)</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
+                <Select value={itemTypeFilter} onValueChange={setItemTypeFilter}>
+                    <SelectTrigger className="h-10 w-full md:w-[150px] rounded-md border border-slate-200 bg-white text-sm shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                        <SelectValue placeholder="Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="PHARMACY">Pharmacy</SelectItem>
+                        <SelectItem value="OPTICAL">Optical</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Input
+                    type="date"
+                    value={dateFilter}
+                    onChange={(e) => setDateFilter(e.target.value)}
+                    className="h-10 w-full md:w-[150px] rounded-md border border-slate-200 bg-white text-sm shadow-sm dark:border-slate-700 dark:bg-slate-900"
+                />
+                <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="h-10 w-full md:w-[150px] rounded-md border border-slate-200 bg-white text-sm shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                        <SelectValue placeholder="Sort" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="newest">Newest First</SelectItem>
+                        <SelectItem value="oldest">Oldest First</SelectItem>
+                        <SelectItem value="patient-asc">Patient (A-Z)</SelectItem>
+                        <SelectItem value="patient-desc">Patient (Z-A)</SelectItem>
+                    </SelectContent>
+                </Select>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-x-auto min-w-0">
+            <div className="min-w-0">
                 <DataTable
                     columns={columns}
                     data={filtered}
@@ -311,6 +338,10 @@ export default function PrescriptionsPage() {
                     onRefresh={() => fetchRows(search, itemTypeFilter, dateFilter, page)}
                     itemLabel="prescriptions"
                     hideSearch
+                    hidePagination
+                    enableRowSelection
+                    emptyMessage="No prescriptions yet"
+                    emptyDescription="Click 'New Prescription' to write the first prescription from a clinical examination."
                 />
                 <ServerPagination
                     page={page}
@@ -345,7 +376,8 @@ export default function PrescriptionsPage() {
                                         <SelectContent>
                                             {clinicalExams.map((exam) => (
                                                 <SelectItem key={exam.id} value={exam.id}>
-                                                    {(exam.appointment?.bookingNumber || 'N/A') + ' - ' + (exam.appointment?.patient?.fullName || 'Unknown')}
+                                                    {(exam.appointment?.bookingNumber || 'N/A') + ' — ' + (exam.appointment?.patient?.fullName || 'Unknown')}
+                                                    {exam.diagnosis ? ` (${exam.diagnosis.slice(0, 40)})` : ''}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
@@ -355,13 +387,19 @@ export default function PrescriptionsPage() {
 
                             <div>
                                 <label className="text-xs font-medium text-slate-500 mb-1 block">Item Type</label>
-                                <Select value={form.itemType} onValueChange={(value) => setForm((prev) => ({ ...prev, itemType: value }))}>
+                                <Select
+                                    value={form.itemType}
+                                    onValueChange={(value) => {
+                                        setForm((prev) => ({ ...prev, itemType: value, itemId: '' }));
+                                        setItemSearch('');
+                                    }}
+                                >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="PHARMACY">Pharmacy</SelectItem>
-                                        <SelectItem value="OPTICAL">Optical</SelectItem>
+                                        <SelectItem value="PHARMACY">Pharmacy (Medication)</SelectItem>
+                                        <SelectItem value="OPTICAL">Optical (Eyewear / Lens)</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -377,19 +415,88 @@ export default function PrescriptionsPage() {
                                 />
                             </div>
 
-                            <div className="sm:col-span-2">
-                                <label className="text-xs font-medium text-slate-500 mb-1 block">Item ID (Optional)</label>
-                                <Input
-                                    placeholder="e.g. stock item id"
-                                    value={form.itemId}
-                                    onChange={(e) => setForm((prev) => ({ ...prev, itemId: e.target.value }))}
-                                />
+                            <div className="sm:col-span-2 space-y-2">
+                                <label className="text-xs font-medium text-slate-500 block">
+                                    {form.itemType === 'PHARMACY' ? 'Select Medication' : 'Select Optical Item'}
+                                </label>
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <Input
+                                        placeholder={form.itemType === 'PHARMACY' ? 'Search medications...' : 'Search optical items...'}
+                                        value={itemSearch}
+                                        onChange={(e) => setItemSearch(e.target.value)}
+                                        className="pl-9 h-10 rounded-lg text-sm"
+                                    />
+                                </div>
+                                <div className="border rounded-lg max-h-48 overflow-y-auto bg-white dark:bg-slate-950">
+                                    {inventoryItems.length === 0 ? (
+                                        <div className="p-4 text-center text-sm text-slate-400">
+                                            No {form.itemType === 'PHARMACY' ? 'medications' : 'optical items'} found.
+                                            Add items in Inventory first.
+                                        </div>
+                                    ) : (
+                                        inventoryItems.map((item) => {
+                                            const isSelected = form.itemId === item.id;
+                                            const lowStock = Number(item.stockQuantity) <= 0;
+                                            const price = typeof item.sellingPrice === 'number' ? item.sellingPrice : parseFloat(String(item.sellingPrice || '0'));
+                                            return (
+                                                <button
+                                                    key={item.id}
+                                                    type="button"
+                                                    onClick={() => setForm((prev) => ({ ...prev, itemId: isSelected ? '' : item.id }))}
+                                                    className={`w-full text-left px-3 py-2.5 flex items-center gap-3 border-b last:border-b-0 transition-colors ${
+                                                        isSelected
+                                                            ? 'bg-blue-50 dark:bg-blue-950/30 border-blue-200'
+                                                            : 'hover:bg-slate-50 dark:hover:bg-slate-900'
+                                                    } ${lowStock ? 'opacity-60' : ''}`}
+                                                >
+                                                    <div className={`flex size-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
+                                                        isSelected ? 'bg-[#0EA5E9] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                                                    }`}>
+                                                        <Package className="w-3.5 h-3.5" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="text-sm font-semibold text-slate-800 dark:text-white truncate">
+                                                            {item.itemName}
+                                                            {item.itemType ? <span className="text-xs font-normal text-slate-400 ml-1">({item.itemType})</span> : ''}
+                                                        </div>
+                                                        <div className="text-xs text-slate-500 truncate">
+                                                            {form.itemType === 'PHARMACY'
+                                                                ? (item.category || 'Uncategorized')
+                                                                : (item.brand || 'No brand')
+                                                            }
+                                                            {' · '}
+                                                            ${price.toFixed(2)}
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right shrink-0">
+                                                        <div className={`text-xs font-bold ${lowStock ? 'text-red-500' : 'text-emerald-600'}`}>
+                                                            {item.stockQuantity} in stock
+                                                        </div>
+                                                        {lowStock && <AlertTriangle className="inline h-3 w-3 text-red-400" />}
+                                                    </div>
+                                                </button>
+                                            );
+                                        })
+                                    )}
+                                </div>
+                                {selectedItem && (
+                                    <div className="mt-2 p-2.5 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800 text-sm">
+                                        <span className="font-semibold text-blue-700 dark:text-blue-300">Selected: </span>
+                                        <span className="text-blue-600 dark:text-blue-400">
+                                            {selectedItem.itemName}
+                                            {selectedItem.itemType ? ` (${selectedItem.itemType})` : ''}
+                                            {' — '}
+                                            {selectedItem.stockQuantity} in stock
+                                        </span>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="sm:col-span-2">
                                 <label className="text-xs font-medium text-slate-500 mb-1 block">Instructions</label>
                                 <Textarea
-                                    placeholder="Usage instructions"
+                                    placeholder="e.g. Take 1 tablet twice daily after meals"
                                     value={form.instructions}
                                     onChange={(e) => setForm((prev) => ({ ...prev, instructions: e.target.value }))}
                                     className="min-h-[88px]"

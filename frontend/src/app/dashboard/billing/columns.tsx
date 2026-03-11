@@ -8,7 +8,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
+import { StatusPill, statusToVariant } from '@/components/ui/status-pill';
 
 export type BillingStatus = 'PAID' | 'UNPAID' | 'PARTIAL' | (string & {});
 export type ServiceType = 'APPOINTMENT' | 'PHARMACY' | 'OPTICAL' | 'SURGERY' | (string & {});
@@ -78,7 +78,7 @@ export function getBillingColumns({
                 const amount = row.original.finalAmount;
                 const num = typeof amount === 'number' ? amount : parseFloat(String(amount || 0));
                 return (
-                    <span className="font-semibold tabular-nums">
+                    <span className="tabular-nums">
                         ${num.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </span>
                 );
@@ -88,24 +88,13 @@ export function getBillingColumns({
             accessorKey: 'status',
             header: 'Status',
             cell: ({ row }) => {
-                const status = row.original.status;
-                const variant =
-                    status === 'PAID' ? 'default' : status === 'PARTIAL' ? 'secondary' : 'outline';
+                const status = row.original.status || 'UNPAID';
                 return (
-                    <Badge variant={variant} className="capitalize">
-                        {status || 'UNPAID'}
-                    </Badge>
+                    <StatusPill variant={statusToVariant(status)}>
+                        {status}
+                    </StatusPill>
                 );
             },
-        },
-        {
-            accessorKey: 'referenceNumber',
-            header: 'Ref #',
-            cell: ({ row }) => (
-                <span className="text-xs text-muted-foreground font-mono">
-                    {row.original.referenceNumber || '—'}
-                </span>
-            ),
         },
         {
             accessorKey: 'createdAt',

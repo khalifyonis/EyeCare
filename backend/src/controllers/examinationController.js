@@ -504,6 +504,8 @@ export const createClinicalExamination = async (req, res, next) => {
             axisLeft,
             diagnosis,
             managementPlan,
+            nextReviewDate,
+            nextReviewReason,
             examinedById
         } = req.body;
 
@@ -516,6 +518,7 @@ export const createClinicalExamination = async (req, res, next) => {
         }
 
         const doctorId = await resolveExaminedByDoctorId(req, appointment, examinedById);
+        const reviewDate = nextReviewDate ? new Date(nextReviewDate) : null;
 
         const created = await prisma.clinicalExamination.create({
             data: {
@@ -528,6 +531,8 @@ export const createClinicalExamination = async (req, res, next) => {
                 axisLeft,
                 diagnosis: toNullableString(diagnosis),
                 managementPlan: toNullableString(managementPlan),
+                nextReviewDate: reviewDate,
+                nextReviewReason: toNullableString(nextReviewReason),
                 examinedById: doctorId
             },
             include: {
@@ -545,6 +550,21 @@ export const createClinicalExamination = async (req, res, next) => {
                 }
             }
         });
+
+        if (reviewDate && created.id && appointment.patient?.id && appointment.branchId) {
+            await prisma.followUp.create({
+                data: {
+                    patientId: appointment.patient.id,
+                    branchId: appointment.branchId,
+                    sourceType: 'EXAMINATION',
+                    sourceId: created.id,
+                    dueDate: reviewDate,
+                    status: 'PENDING',
+                    notes: toNullableString(nextReviewReason),
+                    clinicalExaminationId: created.id,
+                },
+            });
+        }
 
         res.status(201).json(created);
     } catch (error) {
@@ -571,12 +591,15 @@ export const updateClinicalExamination = async (req, res, next) => {
             axisLeft,
             diagnosis,
             managementPlan,
+            nextReviewDate,
+            nextReviewReason,
             examinedById
         } = req.body;
 
         const resolvedExaminedById = examinedById
             ? await resolveExaminedByDoctorId(req, existing.appointment, examinedById)
             : undefined;
+        const reviewDate = nextReviewDate ? new Date(nextReviewDate) : null;
 
         const updated = await prisma.clinicalExamination.update({
             where: { id: req.params.id },
@@ -589,6 +612,8 @@ export const updateClinicalExamination = async (req, res, next) => {
                 axisLeft,
                 diagnosis: toNullableString(diagnosis),
                 managementPlan: toNullableString(managementPlan),
+                nextReviewDate: reviewDate,
+                nextReviewReason: toNullableString(nextReviewReason),
                 examinedById: resolvedExaminedById
             },
             include: {
@@ -606,6 +631,36 @@ export const updateClinicalExamination = async (req, res, next) => {
                 }
             }
         });
+
+        const existingFollowUp = await prisma.followUp.findFirst({
+            where: { clinicalExaminationId: updated.id },
+        });
+        if (reviewDate && updated.appointment?.patient?.id && updated.appointment?.branchId) {
+            if (existingFollowUp) {
+                await prisma.followUp.update({
+                    where: { id: existingFollowUp.id },
+                    data: { dueDate: reviewDate, notes: toNullableString(nextReviewReason), status: 'PENDING' },
+                });
+            } else {
+                await prisma.followUp.create({
+                    data: {
+                        patientId: updated.appointment.patient.id,
+                        branchId: updated.appointment.branchId,
+                        sourceType: 'EXAMINATION',
+                        sourceId: updated.id,
+                        dueDate: reviewDate,
+                        status: 'PENDING',
+                        notes: toNullableString(nextReviewReason),
+                        clinicalExaminationId: updated.id,
+                    },
+                });
+            }
+        } else if (existingFollowUp) {
+            await prisma.followUp.update({
+                where: { id: existingFollowUp.id },
+                data: { status: 'CANCELLED' },
+            });
+        }
 
         res.status(200).json(updated);
     } catch (error) {

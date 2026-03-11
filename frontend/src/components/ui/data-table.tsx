@@ -10,6 +10,7 @@ import {
     flexRender,
     type ColumnDef,
     type SortingState,
+    type RowSelectionState,
 } from '@tanstack/react-table';
 import {
     Table,
@@ -21,13 +22,48 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import {
     Search,
     RefreshCcw,
     Loader2,
     ChevronLeft,
     ChevronRight,
+    ChevronsLeft,
+    ChevronsRight,
 } from 'lucide-react';
+
+const ROWS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
+
+function getPageNumbers(currentPage: number, totalPages: number): (number | 'ellipsis')[] {
+    if (totalPages <= 7) {
+        return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const pages: (number | 'ellipsis')[] = [];
+    if (currentPage <= 4) {
+        for (let i = 1; i <= 5; i++) pages.push(i);
+        pages.push('ellipsis');
+        pages.push(totalPages);
+    } else if (currentPage >= totalPages - 3) {
+        pages.push(1);
+        pages.push('ellipsis');
+        for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+    } else {
+        pages.push(1);
+        pages.push('ellipsis');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
+        pages.push('ellipsis');
+        pages.push(totalPages);
+    }
+    return pages;
+}
 
 interface DataTableProps<TData> {
     columns: ColumnDef<TData, any>[];
@@ -39,6 +75,11 @@ interface DataTableProps<TData> {
     pageSize?: number;
     itemLabel?: string;
     hideSearch?: boolean;
+    hidePagination?: boolean;
+    emptyMessage?: string;
+    emptyDescription?: string;
+    enableRowSelection?: boolean;
+    onSelectionChange?: (rows: TData[]) => void;
 }
 
 export function DataTable<TData>({
@@ -50,45 +91,91 @@ export function DataTable<TData>({
     pageSize = 10,
     itemLabel = 'rows',
     hideSearch = false,
+    hidePagination = false,
+    emptyMessage,
+    emptyDescription,
+    enableRowSelection = false,
+    onSelectionChange,
 }: DataTableProps<TData>) {
     const [globalFilter, setGlobalFilter] = useState('');
     const [sorting, setSorting] = useState<SortingState>([]);
+    const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+
+    const selectionColumn: ColumnDef<TData, any> = {
+        id: 'select',
+        header: ({ table: t }) => (
+            <Checkbox
+                checked={t.getIsAllPageRowsSelected()}
+                indeterminate={t.getIsSomePageRowsSelected()}
+                onChange={t.getToggleAllPageRowsSelectedHandler()}
+            />
+        ),
+        cell: ({ row }) => (
+            <Checkbox
+                checked={row.getIsSelected()}
+                onChange={row.getToggleSelectedHandler()}
+            />
+        ),
+        enableSorting: false,
+        enableGlobalFilter: false,
+    };
+
+    const finalColumns = enableRowSelection ? [selectionColumn, ...columns] : columns;
 
     const table = useReactTable({
         data,
-        columns,
-        state: { globalFilter, sorting },
+        columns: finalColumns,
+        state: { globalFilter, sorting, rowSelection },
         onGlobalFilterChange: setGlobalFilter,
         onSortingChange: setSorting,
+        onRowSelectionChange: (updater) => {
+            const newSelection = typeof updater === 'function' ? updater(rowSelection) : updater;
+            setRowSelection(newSelection);
+            if (onSelectionChange) {
+                const selectedIndices = Object.keys(newSelection).filter(k => newSelection[k]).map(Number);
+                onSelectionChange(selectedIndices.map(i => data[i]).filter(Boolean));
+            }
+        },
+        enableRowSelection,
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getSortedRowModel: getSortedRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
+        getPaginationRowModel: hidePagination ? undefined : getPaginationRowModel(),
         initialState: {
-            pagination: { pageSize },
+            pagination: { pageSize: hidePagination ? 9999 : pageSize },
         },
     });
 
+    const totalRows = table.getFilteredRowModel().rows.length;
+    const pageCount = table.getPageCount();
+    const { pageIndex, pageSize: currentPageSize } = table.getState().pagination;
+    const start = totalRows === 0 ? 0 : pageIndex * currentPageSize + 1;
+    const end = Math.min((pageIndex + 1) * currentPageSize, totalRows);
+    const currentPage = pageIndex + 1;
+    const pageNumbers = getPageNumbers(currentPage, pageCount || 1);
+
+    const selectedCount = Object.values(rowSelection).filter(Boolean).length;
+
     return (
-        <div className="space-y-4">
+        <div>
             {!hideSearch && (
-                <div className="flex items-center gap-4 bg-background/50 backdrop-blur pb-4 border-b">
+                <div className="flex items-center gap-4 p-4 border-b border-slate-200 dark:border-slate-700">
                     <div className="relative flex-1 max-w-sm">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                         <Input
                             placeholder={searchPlaceholder}
-                            className="pl-9 h-10 border-slate-200 dark:border-slate-800 focus-visible:ring-[#0EA5E9]"
+                            className="pl-9 h-10 rounded-lg border-slate-200 dark:border-slate-700 text-sm"
                             value={globalFilter ?? ''}
                             onChange={(e) => setGlobalFilter(e.target.value)}
                         />
                     </div>
                     {onRefresh && (
                         <Button
-                            variant="ghost"
+                            variant="outline"
                             size="icon"
                             onClick={onRefresh}
                             disabled={loading}
-                            className="hover:bg-slate-100 dark:hover:bg-slate-800"
+                            className="h-10 w-10 rounded-lg border-slate-200 dark:border-slate-700"
                         >
                             <RefreshCcw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                         </Button>
@@ -96,13 +183,18 @@ export function DataTable<TData>({
                 </div>
             )}
 
-            <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-card shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
                 <Table>
-                    <TableHeader className="bg-slate-50/50 dark:bg-slate-900/50">
+                    <TableHeader className="bg-slate-50 dark:bg-slate-800/60 [&_tr]:border-slate-200 dark:[&_tr]:border-slate-700 [&_tr]:hover:bg-transparent">
                         {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id} className="hover:bg-transparent px-2">
+                            <TableRow key={headerGroup.id} className="border-slate-200 dark:border-slate-700 hover:bg-transparent">
                                 {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id} className="text-slate-500 font-bold uppercase text-[11px] tracking-wider py-4">
+                                    <TableHead
+                                        key={header.id}
+                                        className={`text-slate-600 dark:text-slate-300 font-semibold text-[13px] tracking-normal py-3 ${
+                                            header.id === 'select' ? 'w-[50px] px-4' : ''
+                                        }`}
+                                    >
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(header.column.columnDef.header, header.getContext())}
@@ -113,25 +205,40 @@ export function DataTable<TData>({
                     </TableHeader>
                     <TableBody>
                         {loading ? (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-32 text-center text-muted-foreground">
-                                    <div className="flex items-center justify-center gap-2">
+                            <TableRow className="hover:bg-transparent">
+                                <TableCell colSpan={finalColumns.length} className="h-32 text-center">
+                                    <div className="flex items-center justify-center gap-2 text-slate-500">
                                         <Loader2 className="w-5 h-5 animate-spin text-[#0EA5E9]" />
-                                        <span>Loading data...</span>
+                                        <span className="text-sm">Loading data...</span>
                                     </div>
                                 </TableCell>
                             </TableRow>
                         ) : table.getRowModel().rows.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-32 text-center text-muted-foreground font-medium">
-                                    No results found.
+                            <TableRow className="hover:bg-transparent">
+                                <TableCell colSpan={finalColumns.length} className="h-40 text-center">
+                                    <div className="flex flex-col items-center gap-1.5">
+                                        <span className="text-slate-500 text-sm">
+                                            {emptyMessage || `No ${itemLabel} found.`}
+                                        </span>
+                                        {emptyDescription && (
+                                            <span className="text-xs text-slate-400 max-w-xs">
+                                                {emptyDescription}
+                                            </span>
+                                        )}
+                                    </div>
                                 </TableCell>
                             </TableRow>
                         ) : (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-900/40 transition-colors border-slate-100 dark:border-slate-800/50">
+                                <TableRow
+                                    key={row.id}
+                                    data-state={row.getIsSelected() ? 'selected' : undefined}
+                                >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="py-3 px-4">
+                                        <TableCell
+                                            key={cell.id}
+                                            className={cell.column.id === 'select' ? 'w-[50px] px-4' : undefined}
+                                        >
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}
@@ -140,37 +247,78 @@ export function DataTable<TData>({
                         )}
                     </TableBody>
                 </Table>
-
-                {!loading && table.getRowModel().rows.length > 0 && (
-                    <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/20">
-                        <p className="text-xs text-slate-500 font-medium tracking-tight">
-                            Showing <span className="text-slate-900 dark:text-white font-bold">{table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}</span>–<span className="text-slate-900 dark:text-white font-bold">{Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize, table.getFilteredRowModel().rows.length)}</span> of <span className="text-[#0EA5E9] font-black">{table.getFilteredRowModel().rows.length}</span> {itemLabel}
-                        </p>
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => table.previousPage()}
-                                disabled={!table.getCanPreviousPage()}
-                                className="h-8 px-3 text-[11px] font-bold uppercase tracking-wider border-slate-200 dark:border-slate-800 hover:bg-[#0EA5E9]/5 hover:text-[#0EA5E9] hover:border-[#0EA5E9]/20 transition-all"
-                            >
-                                <ChevronLeft className="w-3.5 h-3.5 mr-1" />
-                                Previous
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => table.nextPage()}
-                                disabled={!table.getCanNextPage()}
-                                className="h-8 px-3 text-[11px] font-bold uppercase tracking-wider border-slate-200 dark:border-slate-800 hover:bg-[#0EA5E9]/5 hover:text-[#0EA5E9] hover:border-[#0EA5E9]/20 transition-all"
-                            >
-                                Next
-                                <ChevronRight className="w-3.5 h-3.5 ml-1" />
-                            </Button>
-                        </div>
-                    </div>
-                )}
             </div>
+
+            {!loading && !hidePagination && totalRows > 0 && (
+                <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-transparent bg-slate-50 dark:bg-slate-900/40">
+                    <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
+                        {enableRowSelection && selectedCount > 0 && (
+                            <span className="font-medium text-[#0EA5E9]">
+                                {selectedCount} selected
+                            </span>
+                        )}
+                        <span className="flex items-center gap-2">
+                            Rows per page
+                            <Select
+                                value={String(currentPageSize)}
+                                onValueChange={(v) => table.setPageSize(Number(v))}
+                            >
+                                <SelectTrigger className="h-8 w-[68px] border-slate-200 dark:border-slate-700 text-sm font-medium">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {ROWS_PER_PAGE_OPTIONS.map((n) => (
+                                        <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </span>
+                        {/* Left side intentionally only rows-per-page, no total text to match sample footer */}
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 rounded-md border-slate-200 dark:border-slate-700"
+                            onClick={() => table.setPageIndex(0)}
+                            disabled={!table.getCanPreviousPage()}
+                        >
+                            <ChevronsLeft className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 rounded-md border-slate-200 dark:border-slate-700"
+                            onClick={() => table.previousPage()}
+                            disabled={!table.getCanPreviousPage()}
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <span className="px-3 text-sm text-slate-600 dark:text-slate-400">
+                            Page <span className="font-semibold text-slate-900 dark:text-white">{currentPage}</span> of{' '}
+                            <span className="font-semibold text-slate-900 dark:text-white">{pageCount || 1}</span>
+                        </span>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 rounded-md border-slate-200 dark:border-slate-700"
+                            onClick={() => table.nextPage()}
+                            disabled={!table.getCanNextPage()}
+                        >
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 rounded-md border-slate-200 dark:border-slate-700"
+                            onClick={() => table.setPageIndex(pageCount - 1)}
+                            disabled={!table.getCanNextPage()}
+                        >
+                            <ChevronsRight className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

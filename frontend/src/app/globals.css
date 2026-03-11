@@ -95,15 +95,15 @@
   --input: 214.3 31.8% 91.4%;
   --ring: 222.2 84% 4.9%;
   --radius: 0.5rem;
-  /* ─── Sidebar: Light (White) Theme ─── */
-  --sidebar-background: 0 0% 100%;
-  --sidebar-foreground: 222.2 47.4% 11.2%;
-  --sidebar-primary: 222.2 47.4% 11.2%;
-  --sidebar-primary-foreground: 210 40% 98%;
-  --sidebar-accent: 210 40% 96.1%;
-  --sidebar-accent-foreground: 222.2 47.4% 11.2%;
-  --sidebar-border: 220 13% 91%;
-  --sidebar-ring: 222.2 84% 4.9%;
+  /* ─── Sidebar: Dark Navy (original) ─── */
+  --sidebar-background: 220 40% 13%;
+  --sidebar-foreground: 210 40% 92%;
+  --sidebar-primary: 199 89% 56%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 220 35% 18%;
+  --sidebar-accent-foreground: 210 40% 95%;
+  --sidebar-border: 220 30% 18%;
+  --sidebar-ring: 199 89% 56%;
 }
 
 .dark {
@@ -126,7 +126,7 @@
   --border: 217.2 32.6% 17.5%;
   --input: 217.2 32.6% 17.5%;
   --ring: 212.7 26.8% 83.9%;
-  /* ─── Sidebar: Dark Theme ─── */
+  /* ─── Sidebar: Dark Theme (original) ─── */
   --sidebar-background: 222.2 47% 9%;
   --sidebar-foreground: 210 40% 98%;
   --sidebar-primary: 199 89% 56%;
@@ -146,6 +146,35 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+  }
+
+  /* Scrollbars: hidden by default, visible on hover (like modern SaaS) */
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 999px;
+  }
+
+  *:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(148, 163, 184, 0.7);
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+
+  *:hover {
+    scrollbar-color: rgb(148 163 184 / 0.7) transparent;
   }
 
   /* ─── Premium UI Utilities ─── */
@@ -182,5 +211,13 @@
       radial-gradient(at 100% 0%, hsla(205, 75%, 18%, 0.2) 0, transparent 50%),
       radial-gradient(at 0% 100%, hsla(199, 89%, 48%, 0.2) 0, transparent 50%),
       radial-gradient(at 100% 100%, hsla(190, 80%, 40%, 0.15) 0, transparent 50%);
+  }
+
+  /* Sidebar: use theme variables (original behaviour) */
+  [data-sidebar="sidebar"] {
+    background-color: hsl(var(--sidebar-background));
+  }
+  .dark [data-sidebar="sidebar"] {
+    background-color: hsl(var(--sidebar-background));
   }
 }

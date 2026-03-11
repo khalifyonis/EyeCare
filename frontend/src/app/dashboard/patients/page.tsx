@@ -27,7 +27,7 @@ export default function PatientsPage() {
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
-    const pageSize = 20;
+    const [pageSize, setPageSize] = useState(20);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedPatient, setSelectedPatient] = useState<PatientRow | null>(null);
     const [user, setUser] = useState<unknown>(null);
@@ -143,9 +143,8 @@ export default function PatientsPage() {
     });
 
     return (
-        <div className="w-full min-w-0 p-4 sm:p-5 md:p-6 lg:p-8 space-y-6 animate-in fade-in duration-300">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="w-full min-w-0 p-4 sm:p-5 md:p-6 lg:p-8 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Patients</h1>
                     <PageBreadcrumb current="Patients" />
@@ -153,7 +152,7 @@ export default function PatientsPage() {
                 {canManage && (
                     <Button
                         onClick={() => { setSelectedPatient(null); setDialogOpen(true); }}
-                        className="bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold shadow-lg shadow-blue-500/20 px-6 rounded-xl transition-all active:scale-[0.98]"
+                        className="h-10 rounded-lg bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-semibold px-4"
                     >
                         <UserPlus className="w-4 h-4 mr-2" />
                         New Patient
@@ -161,7 +160,6 @@ export default function PatientsPage() {
                 )}
             </div>
 
-            {/* Stats cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 w-full min-w-0">
                 <StatsCard title="Total Patients" value={stats.total.toLocaleString()} icon={Users} color="blue" trend={{ text: 'Growth', isUp: true }} />
                 <StatsCard title="New Today" value={stats.today.toLocaleString()} icon={CalendarDays} color="emerald" trend={{ text: 'Growth', isUp: true }} />
@@ -169,51 +167,40 @@ export default function PatientsPage() {
                 <StatsCard title="New This Month" value={stats.month.toLocaleString()} icon={UserCheck} color="purple" trend={{ text: 'Growth', isUp: true }} />
             </div>
 
-            {/* Filter row: Search | Status | Sort By */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                    <label className="text-xs font-medium text-slate-500 mb-1 block">Search Patients</label>
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <Input
-                            placeholder="Search by name, email, or phone..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="pl-9 h-10 rounded-lg border-slate-200 dark:border-slate-800 text-sm"
-                        />
-                    </div>
+            <div className="flex flex-col md:flex-row md:items-center gap-3 sm:gap-4">
+                <div className="relative w-full md:w-[260px]">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                    <Input
+                        placeholder="Search patients..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="pl-9 h-9 w-full rounded-md border border-slate-200 bg-white text-sm shadow-sm focus-visible:ring-1 focus-visible:ring-slate-300 dark:border-slate-700 dark:bg-slate-900"
+                    />
                 </div>
-                <div>
-                    <label className="text-xs font-medium text-slate-500 mb-1 block">Status</label>
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="h-10 rounded-lg border-slate-200 dark:border-slate-800 text-sm">
-                            <SelectValue placeholder="All Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Status</SelectItem>
-                            <SelectItem value="active">Active</SelectItem>
-                            <SelectItem value="inactive">Inactive</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div>
-                    <label className="text-xs font-medium text-slate-500 mb-1 block">Sort By</label>
-                    <Select value={sortBy} onValueChange={setSortBy}>
-                        <SelectTrigger className="h-10 rounded-lg border-slate-200 dark:border-slate-800 text-sm">
-                            <SelectValue placeholder="Newest First" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="newest">Newest First</SelectItem>
-                            <SelectItem value="oldest">Oldest First</SelectItem>
-                            <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-                            <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="h-10 w-full md:w-[150px] rounded-md border border-slate-200 bg-white text-sm shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                        <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="h-10 w-full md:w-[150px] rounded-md border border-slate-200 bg-white text-sm shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                        <SelectValue placeholder="Sort" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="newest">Newest First</SelectItem>
+                        <SelectItem value="oldest">Oldest First</SelectItem>
+                        <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                        <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                    </SelectContent>
+                </Select>
             </div>
 
-            {/* Table */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-x-auto min-w-0">
+            <div className="min-w-0">
                 <DataTable
                     columns={columns}
                     data={filtered}
@@ -221,6 +208,10 @@ export default function PatientsPage() {
                     onRefresh={() => { fetchPatients(search, page); fetchStats(); }}
                     itemLabel="patients"
                     hideSearch
+                    hidePagination
+                    enableRowSelection
+                    emptyMessage="No patients registered yet"
+                    emptyDescription="Click 'New Patient' to register a patient."
                 />
                 <ServerPagination
                     page={page}
@@ -228,7 +219,9 @@ export default function PatientsPage() {
                     total={total}
                     totalPages={totalPages}
                     onPageChange={setPage}
+                    onLimitChange={(limit) => { setPageSize(limit); setPage(1); }}
                     disabled={loading}
+                    itemLabel="patients"
                 />
             </div>
 

@@ -176,7 +176,7 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px] rounded-2xl">
+            <DialogContent className="sm:max-w-[500px] rounded-2xl max-h-[90vh] flex flex-col overflow-hidden">
                 <DialogHeader>
                     <DialogTitle className="text-xl font-black">{user ? 'Edit User' : 'Register New User'}</DialogTitle>
                     <DialogDescription className="font-medium">
@@ -184,7 +184,7 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="grid gap-4 py-4">
+                <div className="grid gap-4 py-4 overflow-y-auto flex-1 min-h-0">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
                             <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Full Name</label>
@@ -309,9 +309,9 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
                     </div>
                 </div>
 
-                <DialogFooter className="pt-2">
+                <DialogFooter className="pt-4 pb-2 shrink-0 border-t border-slate-100 dark:border-slate-800 mt-2">
                     <Button variant="ghost" onClick={() => onOpenChange(false)} className="rounded-xl font-bold text-slate-500">Cancel</Button>
-                    <Button onClick={handleSave} disabled={saving} className="bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold px-8 rounded-xl shadow-lg shadow-blue-500/20">
+                    <Button onClick={handleSave} disabled={saving} className="h-11 min-h-[44px] bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold px-8 rounded-xl shadow-lg shadow-blue-500/20">
                         {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                         {user ? 'Update User' : 'Create User'}
                     </Button>

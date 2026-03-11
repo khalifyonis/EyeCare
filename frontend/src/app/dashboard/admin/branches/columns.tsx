@@ -47,7 +47,7 @@ export const getBranchColumns = ({ onEdit, onDelete }: BranchColumnsProps): Colu
     },
     {
         id: 'actions',
-        header: () => <span className="flex justify-end pr-2 uppercase text-[11px] font-bold text-slate-500 tracking-wider">Actions</span>,
+        header: 'Actions',
         cell: ({ row }) => (
             <div className="flex items-center justify-end gap-1 pr-1">
                 <Button

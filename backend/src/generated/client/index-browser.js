@@ -217,6 +217,8 @@ exports.Prisma.ClinicalExaminationScalarFieldEnum = {
   axisLeft: 'axisLeft',
   diagnosis: 'diagnosis',
   managementPlan: 'managementPlan',
+  nextReviewDate: 'nextReviewDate',
+  nextReviewReason: 'nextReviewReason',
   examinedById: 'examinedById',
   examinedAt: 'examinedAt'
 };
@@ -231,6 +233,7 @@ exports.Prisma.SurgeryScalarFieldEnum = {
   cost: 'cost',
   status: 'status',
   notes: 'notes',
+  nextFollowUpDate: 'nextFollowUpDate',
   surgeonId: 'surgeonId',
   createdAt: 'createdAt'
 };
@@ -244,6 +247,7 @@ exports.Prisma.PrescriptionScalarFieldEnum = {
   itemId: 'itemId',
   quantity: 'quantity',
   instructions: 'instructions',
+  reviewAfterDays: 'reviewAfterDays',
   createdAt: 'createdAt'
 };
 
@@ -262,7 +266,8 @@ exports.Prisma.PharmacyItemScalarFieldEnum = {
   sellingPrice: 'sellingPrice',
   expiryDate: 'expiryDate',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  isActive: 'isActive'
 };
 
 exports.Prisma.PharmacyStockTransactionScalarFieldEnum = {
@@ -290,7 +295,8 @@ exports.Prisma.OpticalItemScalarFieldEnum = {
   purchasePrice: 'purchasePrice',
   sellingPrice: 'sellingPrice',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  isActive: 'isActive'
 };
 
 exports.Prisma.OpticalStockTransactionScalarFieldEnum = {
@@ -320,6 +326,23 @@ exports.Prisma.BillingScalarFieldEnum = {
   referenceNumber: 'referenceNumber',
   status: 'status',
   createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FollowUpScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  branchId: 'branchId',
+  sourceType: 'sourceType',
+  sourceId: 'sourceId',
+  dueDate: 'dueDate',
+  status: 'status',
+  notes: 'notes',
+  completedAppointmentId: 'completedAppointmentId',
+  clinicalExaminationId: 'clinicalExaminationId',
+  surgeryId: 'surgeryId',
+  prescriptionId: 'prescriptionId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -365,6 +388,20 @@ exports.BillingStatus = exports.$Enums.BillingStatus = {
   PARTIAL: 'PARTIAL'
 };
 
+exports.FollowUpSourceType = exports.$Enums.FollowUpSourceType = {
+  EXAMINATION: 'EXAMINATION',
+  PRESCRIPTION: 'PRESCRIPTION',
+  SURGERY: 'SURGERY',
+  OPTICAL: 'OPTICAL'
+};
+
+exports.FollowUpStatus = exports.$Enums.FollowUpStatus = {
+  PENDING: 'PENDING',
+  DONE: 'DONE',
+  CANCELLED: 'CANCELLED',
+  OVERDUE: 'OVERDUE'
+};
+
 exports.Prisma.ModelName = {
   Role: 'Role',
   Branch: 'Branch',
@@ -381,6 +418,7 @@ exports.Prisma.ModelName = {
   OpticalItem: 'OpticalItem',
   OpticalStockTransaction: 'OpticalStockTransaction',
   Billing: 'Billing',
+  FollowUp: 'FollowUp',
   StaffAssignment: 'StaffAssignment'
 };
 

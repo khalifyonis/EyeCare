@@ -89,6 +89,11 @@ export type OpticalStockTransaction = $Result.DefaultSelection<Prisma.$OpticalSt
  */
 export type Billing = $Result.DefaultSelection<Prisma.$BillingPayload>
 /**
+ * Model FollowUp
+ * 
+ */
+export type FollowUp = $Result.DefaultSelection<Prisma.$FollowUpPayload>
+/**
  * Model StaffAssignment
  * 
  */
@@ -125,6 +130,26 @@ export const BillingStatus: {
 
 export type BillingStatus = (typeof BillingStatus)[keyof typeof BillingStatus]
 
+
+export const FollowUpSourceType: {
+  EXAMINATION: 'EXAMINATION',
+  PRESCRIPTION: 'PRESCRIPTION',
+  SURGERY: 'SURGERY',
+  OPTICAL: 'OPTICAL'
+};
+
+export type FollowUpSourceType = (typeof FollowUpSourceType)[keyof typeof FollowUpSourceType]
+
+
+export const FollowUpStatus: {
+  PENDING: 'PENDING',
+  DONE: 'DONE',
+  CANCELLED: 'CANCELLED',
+  OVERDUE: 'OVERDUE'
+};
+
+export type FollowUpStatus = (typeof FollowUpStatus)[keyof typeof FollowUpStatus]
+
 }
 
 export type AppointmentStatus = $Enums.AppointmentStatus
@@ -138,6 +163,14 @@ export const ServiceType: typeof $Enums.ServiceType
 export type BillingStatus = $Enums.BillingStatus
 
 export const BillingStatus: typeof $Enums.BillingStatus
+
+export type FollowUpSourceType = $Enums.FollowUpSourceType
+
+export const FollowUpSourceType: typeof $Enums.FollowUpSourceType
+
+export type FollowUpStatus = $Enums.FollowUpStatus
+
+export const FollowUpStatus: typeof $Enums.FollowUpStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -406,6 +439,16 @@ export class PrismaClient<
     * ```
     */
   get billing(): Prisma.BillingDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.followUp`: Exposes CRUD operations for the **FollowUp** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FollowUps
+    * const followUps = await prisma.followUp.findMany()
+    * ```
+    */
+  get followUp(): Prisma.FollowUpDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.staffAssignment`: Exposes CRUD operations for the **StaffAssignment** model.
@@ -872,6 +915,7 @@ export namespace Prisma {
     OpticalItem: 'OpticalItem',
     OpticalStockTransaction: 'OpticalStockTransaction',
     Billing: 'Billing',
+    FollowUp: 'FollowUp',
     StaffAssignment: 'StaffAssignment'
   };
 
@@ -891,7 +935,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "role" | "branch" | "user" | "doctor" | "patient" | "appointment" | "eRExamination" | "clinicalExamination" | "surgery" | "prescription" | "pharmacyItem" | "pharmacyStockTransaction" | "opticalItem" | "opticalStockTransaction" | "billing" | "staffAssignment"
+      modelProps: "role" | "branch" | "user" | "doctor" | "patient" | "appointment" | "eRExamination" | "clinicalExamination" | "surgery" | "prescription" | "pharmacyItem" | "pharmacyStockTransaction" | "opticalItem" | "opticalStockTransaction" | "billing" | "followUp" | "staffAssignment"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2005,6 +2049,80 @@ export namespace Prisma {
           }
         }
       }
+      FollowUp: {
+        payload: Prisma.$FollowUpPayload<ExtArgs>
+        fields: Prisma.FollowUpFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FollowUpFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FollowUpPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FollowUpFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FollowUpPayload>
+          }
+          findFirst: {
+            args: Prisma.FollowUpFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FollowUpPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FollowUpFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FollowUpPayload>
+          }
+          findMany: {
+            args: Prisma.FollowUpFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FollowUpPayload>[]
+          }
+          create: {
+            args: Prisma.FollowUpCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FollowUpPayload>
+          }
+          createMany: {
+            args: Prisma.FollowUpCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FollowUpCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FollowUpPayload>[]
+          }
+          delete: {
+            args: Prisma.FollowUpDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FollowUpPayload>
+          }
+          update: {
+            args: Prisma.FollowUpUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FollowUpPayload>
+          }
+          deleteMany: {
+            args: Prisma.FollowUpDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FollowUpUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FollowUpUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FollowUpPayload>[]
+          }
+          upsert: {
+            args: Prisma.FollowUpUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FollowUpPayload>
+          }
+          aggregate: {
+            args: Prisma.FollowUpAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFollowUp>
+          }
+          groupBy: {
+            args: Prisma.FollowUpGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FollowUpGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FollowUpCountArgs<ExtArgs>
+            result: $Utils.Optional<FollowUpCountAggregateOutputType> | number
+          }
+        }
+      }
       StaffAssignment: {
         payload: Prisma.$StaffAssignmentPayload<ExtArgs>
         fields: Prisma.StaffAssignmentFieldRefs
@@ -2190,6 +2308,7 @@ export namespace Prisma {
     opticalItem?: OpticalItemOmit
     opticalStockTransaction?: OpticalStockTransactionOmit
     billing?: BillingOmit
+    followUp?: FollowUpOmit
     staffAssignment?: StaffAssignmentOmit
   }
 
@@ -2314,6 +2433,7 @@ export namespace Prisma {
     opticalItems: number
     opticalTransactions: number
     billings: number
+    followUps: number
   }
 
   export type BranchCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2329,6 +2449,7 @@ export namespace Prisma {
     opticalItems?: boolean | BranchCountOutputTypeCountOpticalItemsArgs
     opticalTransactions?: boolean | BranchCountOutputTypeCountOpticalTransactionsArgs
     billings?: boolean | BranchCountOutputTypeCountBillingsArgs
+    followUps?: boolean | BranchCountOutputTypeCountFollowUpsArgs
   }
 
   // Custom InputTypes
@@ -2424,6 +2545,13 @@ export namespace Prisma {
    */
   export type BranchCountOutputTypeCountBillingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: BillingWhereInput
+  }
+
+  /**
+   * BranchCountOutputType without action
+   */
+  export type BranchCountOutputTypeCountFollowUpsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FollowUpWhereInput
   }
 
 
@@ -2559,11 +2687,13 @@ export namespace Prisma {
   export type PatientCountOutputType = {
     appointments: number
     billings: number
+    followUps: number
   }
 
   export type PatientCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     appointments?: boolean | PatientCountOutputTypeCountAppointmentsArgs
     billings?: boolean | PatientCountOutputTypeCountBillingsArgs
+    followUps?: boolean | PatientCountOutputTypeCountFollowUpsArgs
   }
 
   // Custom InputTypes
@@ -2591,6 +2721,13 @@ export namespace Prisma {
     where?: BillingWhereInput
   }
 
+  /**
+   * PatientCountOutputType without action
+   */
+  export type PatientCountOutputTypeCountFollowUpsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FollowUpWhereInput
+  }
+
 
   /**
    * Count Type AppointmentCountOutputType
@@ -2599,11 +2736,13 @@ export namespace Prisma {
   export type AppointmentCountOutputType = {
     prescriptions: number
     billings: number
+    completedFollowUps: number
   }
 
   export type AppointmentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     prescriptions?: boolean | AppointmentCountOutputTypeCountPrescriptionsArgs
     billings?: boolean | AppointmentCountOutputTypeCountBillingsArgs
+    completedFollowUps?: boolean | AppointmentCountOutputTypeCountCompletedFollowUpsArgs
   }
 
   // Custom InputTypes
@@ -2631,6 +2770,13 @@ export namespace Prisma {
     where?: BillingWhereInput
   }
 
+  /**
+   * AppointmentCountOutputType without action
+   */
+  export type AppointmentCountOutputTypeCountCompletedFollowUpsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FollowUpWhereInput
+  }
+
 
   /**
    * Count Type ClinicalExaminationCountOutputType
@@ -2638,10 +2784,12 @@ export namespace Prisma {
 
   export type ClinicalExaminationCountOutputType = {
     prescriptions: number
+    followUps: number
   }
 
   export type ClinicalExaminationCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     prescriptions?: boolean | ClinicalExaminationCountOutputTypeCountPrescriptionsArgs
+    followUps?: boolean | ClinicalExaminationCountOutputTypeCountFollowUpsArgs
   }
 
   // Custom InputTypes
@@ -2662,6 +2810,13 @@ export namespace Prisma {
     where?: PrescriptionWhereInput
   }
 
+  /**
+   * ClinicalExaminationCountOutputType without action
+   */
+  export type ClinicalExaminationCountOutputTypeCountFollowUpsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FollowUpWhereInput
+  }
+
 
   /**
    * Count Type SurgeryCountOutputType
@@ -2669,10 +2824,12 @@ export namespace Prisma {
 
   export type SurgeryCountOutputType = {
     billings: number
+    followUps: number
   }
 
   export type SurgeryCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     billings?: boolean | SurgeryCountOutputTypeCountBillingsArgs
+    followUps?: boolean | SurgeryCountOutputTypeCountFollowUpsArgs
   }
 
   // Custom InputTypes
@@ -2693,6 +2850,13 @@ export namespace Prisma {
     where?: BillingWhereInput
   }
 
+  /**
+   * SurgeryCountOutputType without action
+   */
+  export type SurgeryCountOutputTypeCountFollowUpsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FollowUpWhereInput
+  }
+
 
   /**
    * Count Type PrescriptionCountOutputType
@@ -2700,10 +2864,12 @@ export namespace Prisma {
 
   export type PrescriptionCountOutputType = {
     billings: number
+    followUps: number
   }
 
   export type PrescriptionCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     billings?: boolean | PrescriptionCountOutputTypeCountBillingsArgs
+    followUps?: boolean | PrescriptionCountOutputTypeCountFollowUpsArgs
   }
 
   // Custom InputTypes
@@ -2722,6 +2888,13 @@ export namespace Prisma {
    */
   export type PrescriptionCountOutputTypeCountBillingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: BillingWhereInput
+  }
+
+  /**
+   * PrescriptionCountOutputType without action
+   */
+  export type PrescriptionCountOutputTypeCountFollowUpsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FollowUpWhereInput
   }
 
 
@@ -4067,6 +4240,7 @@ export namespace Prisma {
     opticalItems?: boolean | Branch$opticalItemsArgs<ExtArgs>
     opticalTransactions?: boolean | Branch$opticalTransactionsArgs<ExtArgs>
     billings?: boolean | Branch$billingsArgs<ExtArgs>
+    followUps?: boolean | Branch$followUpsArgs<ExtArgs>
     _count?: boolean | BranchCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["branch"]>
 
@@ -4114,6 +4288,7 @@ export namespace Prisma {
     opticalItems?: boolean | Branch$opticalItemsArgs<ExtArgs>
     opticalTransactions?: boolean | Branch$opticalTransactionsArgs<ExtArgs>
     billings?: boolean | Branch$billingsArgs<ExtArgs>
+    followUps?: boolean | Branch$followUpsArgs<ExtArgs>
     _count?: boolean | BranchCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type BranchIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -4134,6 +4309,7 @@ export namespace Prisma {
       opticalItems: Prisma.$OpticalItemPayload<ExtArgs>[]
       opticalTransactions: Prisma.$OpticalStockTransactionPayload<ExtArgs>[]
       billings: Prisma.$BillingPayload<ExtArgs>[]
+      followUps: Prisma.$FollowUpPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4549,6 +4725,7 @@ export namespace Prisma {
     opticalItems<T extends Branch$opticalItemsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$opticalItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpticalItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     opticalTransactions<T extends Branch$opticalTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$opticalTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpticalStockTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     billings<T extends Branch$billingsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$billingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    followUps<T extends Branch$followUpsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$followUpsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5258,6 +5435,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: BillingScalarFieldEnum | BillingScalarFieldEnum[]
+  }
+
+  /**
+   * Branch.followUps
+   */
+  export type Branch$followUpsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FollowUp
+     */
+    select?: FollowUpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FollowUp
+     */
+    omit?: FollowUpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FollowUpInclude<ExtArgs> | null
+    where?: FollowUpWhereInput
+    orderBy?: FollowUpOrderByWithRelationInput | FollowUpOrderByWithRelationInput[]
+    cursor?: FollowUpWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FollowUpScalarFieldEnum | FollowUpScalarFieldEnum[]
   }
 
   /**
@@ -8053,6 +8254,7 @@ export namespace Prisma {
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     appointments?: boolean | Patient$appointmentsArgs<ExtArgs>
     billings?: boolean | Patient$billingsArgs<ExtArgs>
+    followUps?: boolean | Patient$followUpsArgs<ExtArgs>
     _count?: boolean | PatientCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["patient"]>
 
@@ -8102,6 +8304,7 @@ export namespace Prisma {
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     appointments?: boolean | Patient$appointmentsArgs<ExtArgs>
     billings?: boolean | Patient$billingsArgs<ExtArgs>
+    followUps?: boolean | Patient$followUpsArgs<ExtArgs>
     _count?: boolean | PatientCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type PatientIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -8117,6 +8320,7 @@ export namespace Prisma {
       branch: Prisma.$BranchPayload<ExtArgs>
       appointments: Prisma.$AppointmentPayload<ExtArgs>[]
       billings: Prisma.$BillingPayload<ExtArgs>[]
+      followUps: Prisma.$FollowUpPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -8526,6 +8730,7 @@ export namespace Prisma {
     branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     appointments<T extends Patient$appointmentsArgs<ExtArgs> = {}>(args?: Subset<T, Patient$appointmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     billings<T extends Patient$billingsArgs<ExtArgs> = {}>(args?: Subset<T, Patient$billingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    followUps<T extends Patient$followUpsArgs<ExtArgs> = {}>(args?: Subset<T, Patient$followUpsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9009,6 +9214,30 @@ export namespace Prisma {
   }
 
   /**
+   * Patient.followUps
+   */
+  export type Patient$followUpsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FollowUp
+     */
+    select?: FollowUpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FollowUp
+     */
+    omit?: FollowUpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FollowUpInclude<ExtArgs> | null
+    where?: FollowUpWhereInput
+    orderBy?: FollowUpOrderByWithRelationInput | FollowUpOrderByWithRelationInput[]
+    cursor?: FollowUpWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FollowUpScalarFieldEnum | FollowUpScalarFieldEnum[]
+  }
+
+  /**
    * Patient without action
    */
   export type PatientDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9281,6 +9510,7 @@ export namespace Prisma {
     clinicalExamination?: boolean | Appointment$clinicalExaminationArgs<ExtArgs>
     prescriptions?: boolean | Appointment$prescriptionsArgs<ExtArgs>
     billings?: boolean | Appointment$billingsArgs<ExtArgs>
+    completedFollowUps?: boolean | Appointment$completedFollowUpsArgs<ExtArgs>
     _count?: boolean | AppointmentCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["appointment"]>
 
@@ -9344,6 +9574,7 @@ export namespace Prisma {
     clinicalExamination?: boolean | Appointment$clinicalExaminationArgs<ExtArgs>
     prescriptions?: boolean | Appointment$prescriptionsArgs<ExtArgs>
     billings?: boolean | Appointment$billingsArgs<ExtArgs>
+    completedFollowUps?: boolean | Appointment$completedFollowUpsArgs<ExtArgs>
     _count?: boolean | AppointmentCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type AppointmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9370,6 +9601,7 @@ export namespace Prisma {
       clinicalExamination: Prisma.$ClinicalExaminationPayload<ExtArgs> | null
       prescriptions: Prisma.$PrescriptionPayload<ExtArgs>[]
       billings: Prisma.$BillingPayload<ExtArgs>[]
+      completedFollowUps: Prisma.$FollowUpPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -9785,6 +10017,7 @@ export namespace Prisma {
     clinicalExamination<T extends Appointment$clinicalExaminationArgs<ExtArgs> = {}>(args?: Subset<T, Appointment$clinicalExaminationArgs<ExtArgs>>): Prisma__ClinicalExaminationClient<$Result.GetResult<Prisma.$ClinicalExaminationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     prescriptions<T extends Appointment$prescriptionsArgs<ExtArgs> = {}>(args?: Subset<T, Appointment$prescriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PrescriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     billings<T extends Appointment$billingsArgs<ExtArgs> = {}>(args?: Subset<T, Appointment$billingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    completedFollowUps<T extends Appointment$completedFollowUpsArgs<ExtArgs> = {}>(args?: Subset<T, Appointment$completedFollowUpsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10304,6 +10537,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: BillingScalarFieldEnum | BillingScalarFieldEnum[]
+  }
+
+  /**
+   * Appointment.completedFollowUps
+   */
+  export type Appointment$completedFollowUpsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FollowUp
+     */
+    select?: FollowUpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FollowUp
+     */
+    omit?: FollowUpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FollowUpInclude<ExtArgs> | null
+    where?: FollowUpWhereInput
+    orderBy?: FollowUpOrderByWithRelationInput | FollowUpOrderByWithRelationInput[]
+    cursor?: FollowUpWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FollowUpScalarFieldEnum | FollowUpScalarFieldEnum[]
   }
 
   /**
@@ -11548,6 +11805,8 @@ export namespace Prisma {
     axisLeft: number | null
     diagnosis: string | null
     managementPlan: string | null
+    nextReviewDate: Date | null
+    nextReviewReason: string | null
     examinedById: string | null
     examinedAt: Date | null
   }
@@ -11563,6 +11822,8 @@ export namespace Prisma {
     axisLeft: number | null
     diagnosis: string | null
     managementPlan: string | null
+    nextReviewDate: Date | null
+    nextReviewReason: string | null
     examinedById: string | null
     examinedAt: Date | null
   }
@@ -11578,6 +11839,8 @@ export namespace Prisma {
     axisLeft: number
     diagnosis: number
     managementPlan: number
+    nextReviewDate: number
+    nextReviewReason: number
     examinedById: number
     examinedAt: number
     _all: number
@@ -11613,6 +11876,8 @@ export namespace Prisma {
     axisLeft?: true
     diagnosis?: true
     managementPlan?: true
+    nextReviewDate?: true
+    nextReviewReason?: true
     examinedById?: true
     examinedAt?: true
   }
@@ -11628,6 +11893,8 @@ export namespace Prisma {
     axisLeft?: true
     diagnosis?: true
     managementPlan?: true
+    nextReviewDate?: true
+    nextReviewReason?: true
     examinedById?: true
     examinedAt?: true
   }
@@ -11643,6 +11910,8 @@ export namespace Prisma {
     axisLeft?: true
     diagnosis?: true
     managementPlan?: true
+    nextReviewDate?: true
+    nextReviewReason?: true
     examinedById?: true
     examinedAt?: true
     _all?: true
@@ -11745,6 +12014,8 @@ export namespace Prisma {
     axisLeft: number | null
     diagnosis: string | null
     managementPlan: string | null
+    nextReviewDate: Date | null
+    nextReviewReason: string | null
     examinedById: string
     examinedAt: Date
     _count: ClinicalExaminationCountAggregateOutputType | null
@@ -11779,12 +12050,15 @@ export namespace Prisma {
     axisLeft?: boolean
     diagnosis?: boolean
     managementPlan?: boolean
+    nextReviewDate?: boolean
+    nextReviewReason?: boolean
     examinedById?: boolean
     examinedAt?: boolean
     appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
     examinedBy?: boolean | DoctorDefaultArgs<ExtArgs>
     surgery?: boolean | ClinicalExamination$surgeryArgs<ExtArgs>
     prescriptions?: boolean | ClinicalExamination$prescriptionsArgs<ExtArgs>
+    followUps?: boolean | ClinicalExamination$followUpsArgs<ExtArgs>
     _count?: boolean | ClinicalExaminationCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["clinicalExamination"]>
 
@@ -11799,6 +12073,8 @@ export namespace Prisma {
     axisLeft?: boolean
     diagnosis?: boolean
     managementPlan?: boolean
+    nextReviewDate?: boolean
+    nextReviewReason?: boolean
     examinedById?: boolean
     examinedAt?: boolean
     appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
@@ -11816,6 +12092,8 @@ export namespace Prisma {
     axisLeft?: boolean
     diagnosis?: boolean
     managementPlan?: boolean
+    nextReviewDate?: boolean
+    nextReviewReason?: boolean
     examinedById?: boolean
     examinedAt?: boolean
     appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
@@ -11833,16 +12111,19 @@ export namespace Prisma {
     axisLeft?: boolean
     diagnosis?: boolean
     managementPlan?: boolean
+    nextReviewDate?: boolean
+    nextReviewReason?: boolean
     examinedById?: boolean
     examinedAt?: boolean
   }
 
-  export type ClinicalExaminationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "appointmentId" | "sphRight" | "cylRight" | "axisRight" | "sphLeft" | "cylLeft" | "axisLeft" | "diagnosis" | "managementPlan" | "examinedById" | "examinedAt", ExtArgs["result"]["clinicalExamination"]>
+  export type ClinicalExaminationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "appointmentId" | "sphRight" | "cylRight" | "axisRight" | "sphLeft" | "cylLeft" | "axisLeft" | "diagnosis" | "managementPlan" | "nextReviewDate" | "nextReviewReason" | "examinedById" | "examinedAt", ExtArgs["result"]["clinicalExamination"]>
   export type ClinicalExaminationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
     examinedBy?: boolean | DoctorDefaultArgs<ExtArgs>
     surgery?: boolean | ClinicalExamination$surgeryArgs<ExtArgs>
     prescriptions?: boolean | ClinicalExamination$prescriptionsArgs<ExtArgs>
+    followUps?: boolean | ClinicalExamination$followUpsArgs<ExtArgs>
     _count?: boolean | ClinicalExaminationCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ClinicalExaminationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -11861,6 +12142,7 @@ export namespace Prisma {
       examinedBy: Prisma.$DoctorPayload<ExtArgs>
       surgery: Prisma.$SurgeryPayload<ExtArgs> | null
       prescriptions: Prisma.$PrescriptionPayload<ExtArgs>[]
+      followUps: Prisma.$FollowUpPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -11873,6 +12155,8 @@ export namespace Prisma {
       axisLeft: number | null
       diagnosis: string | null
       managementPlan: string | null
+      nextReviewDate: Date | null
+      nextReviewReason: string | null
       examinedById: string
       examinedAt: Date
     }, ExtArgs["result"]["clinicalExamination"]>
@@ -12273,6 +12557,7 @@ export namespace Prisma {
     examinedBy<T extends DoctorDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DoctorDefaultArgs<ExtArgs>>): Prisma__DoctorClient<$Result.GetResult<Prisma.$DoctorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     surgery<T extends ClinicalExamination$surgeryArgs<ExtArgs> = {}>(args?: Subset<T, ClinicalExamination$surgeryArgs<ExtArgs>>): Prisma__SurgeryClient<$Result.GetResult<Prisma.$SurgeryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     prescriptions<T extends ClinicalExamination$prescriptionsArgs<ExtArgs> = {}>(args?: Subset<T, ClinicalExamination$prescriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PrescriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    followUps<T extends ClinicalExamination$followUpsArgs<ExtArgs> = {}>(args?: Subset<T, ClinicalExamination$followUpsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -12312,6 +12597,8 @@ export namespace Prisma {
     readonly axisLeft: FieldRef<"ClinicalExamination", 'Int'>
     readonly diagnosis: FieldRef<"ClinicalExamination", 'String'>
     readonly managementPlan: FieldRef<"ClinicalExamination", 'String'>
+    readonly nextReviewDate: FieldRef<"ClinicalExamination", 'DateTime'>
+    readonly nextReviewReason: FieldRef<"ClinicalExamination", 'String'>
     readonly examinedById: FieldRef<"ClinicalExamination", 'String'>
     readonly examinedAt: FieldRef<"ClinicalExamination", 'DateTime'>
   }
@@ -12753,6 +13040,30 @@ export namespace Prisma {
   }
 
   /**
+   * ClinicalExamination.followUps
+   */
+  export type ClinicalExamination$followUpsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FollowUp
+     */
+    select?: FollowUpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FollowUp
+     */
+    omit?: FollowUpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FollowUpInclude<ExtArgs> | null
+    where?: FollowUpWhereInput
+    orderBy?: FollowUpOrderByWithRelationInput | FollowUpOrderByWithRelationInput[]
+    cursor?: FollowUpWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FollowUpScalarFieldEnum | FollowUpScalarFieldEnum[]
+  }
+
+  /**
    * ClinicalExamination without action
    */
   export type ClinicalExaminationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -12801,6 +13112,7 @@ export namespace Prisma {
     cost: Decimal | null
     status: string | null
     notes: string | null
+    nextFollowUpDate: Date | null
     surgeonId: string | null
     createdAt: Date | null
   }
@@ -12815,6 +13127,7 @@ export namespace Prisma {
     cost: Decimal | null
     status: string | null
     notes: string | null
+    nextFollowUpDate: Date | null
     surgeonId: string | null
     createdAt: Date | null
   }
@@ -12829,6 +13142,7 @@ export namespace Prisma {
     cost: number
     status: number
     notes: number
+    nextFollowUpDate: number
     surgeonId: number
     createdAt: number
     _all: number
@@ -12853,6 +13167,7 @@ export namespace Prisma {
     cost?: true
     status?: true
     notes?: true
+    nextFollowUpDate?: true
     surgeonId?: true
     createdAt?: true
   }
@@ -12867,6 +13182,7 @@ export namespace Prisma {
     cost?: true
     status?: true
     notes?: true
+    nextFollowUpDate?: true
     surgeonId?: true
     createdAt?: true
   }
@@ -12881,6 +13197,7 @@ export namespace Prisma {
     cost?: true
     status?: true
     notes?: true
+    nextFollowUpDate?: true
     surgeonId?: true
     createdAt?: true
     _all?: true
@@ -12982,6 +13299,7 @@ export namespace Prisma {
     cost: Decimal
     status: string
     notes: string | null
+    nextFollowUpDate: Date | null
     surgeonId: string
     createdAt: Date
     _count: SurgeryCountAggregateOutputType | null
@@ -13015,12 +13333,14 @@ export namespace Prisma {
     cost?: boolean
     status?: boolean
     notes?: boolean
+    nextFollowUpDate?: boolean
     surgeonId?: boolean
     createdAt?: boolean
     clinicalExam?: boolean | ClinicalExaminationDefaultArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     surgeon?: boolean | DoctorDefaultArgs<ExtArgs>
     billings?: boolean | Surgery$billingsArgs<ExtArgs>
+    followUps?: boolean | Surgery$followUpsArgs<ExtArgs>
     _count?: boolean | SurgeryCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["surgery"]>
 
@@ -13034,6 +13354,7 @@ export namespace Prisma {
     cost?: boolean
     status?: boolean
     notes?: boolean
+    nextFollowUpDate?: boolean
     surgeonId?: boolean
     createdAt?: boolean
     clinicalExam?: boolean | ClinicalExaminationDefaultArgs<ExtArgs>
@@ -13051,6 +13372,7 @@ export namespace Prisma {
     cost?: boolean
     status?: boolean
     notes?: boolean
+    nextFollowUpDate?: boolean
     surgeonId?: boolean
     createdAt?: boolean
     clinicalExam?: boolean | ClinicalExaminationDefaultArgs<ExtArgs>
@@ -13068,16 +13390,18 @@ export namespace Prisma {
     cost?: boolean
     status?: boolean
     notes?: boolean
+    nextFollowUpDate?: boolean
     surgeonId?: boolean
     createdAt?: boolean
   }
 
-  export type SurgeryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "examId" | "branchId" | "eyeSide" | "surgeryType" | "surgeryDate" | "cost" | "status" | "notes" | "surgeonId" | "createdAt", ExtArgs["result"]["surgery"]>
+  export type SurgeryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "examId" | "branchId" | "eyeSide" | "surgeryType" | "surgeryDate" | "cost" | "status" | "notes" | "nextFollowUpDate" | "surgeonId" | "createdAt", ExtArgs["result"]["surgery"]>
   export type SurgeryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     clinicalExam?: boolean | ClinicalExaminationDefaultArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     surgeon?: boolean | DoctorDefaultArgs<ExtArgs>
     billings?: boolean | Surgery$billingsArgs<ExtArgs>
+    followUps?: boolean | Surgery$followUpsArgs<ExtArgs>
     _count?: boolean | SurgeryCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SurgeryIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -13098,6 +13422,7 @@ export namespace Prisma {
       branch: Prisma.$BranchPayload<ExtArgs>
       surgeon: Prisma.$DoctorPayload<ExtArgs>
       billings: Prisma.$BillingPayload<ExtArgs>[]
+      followUps: Prisma.$FollowUpPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -13109,6 +13434,7 @@ export namespace Prisma {
       cost: Prisma.Decimal
       status: string
       notes: string | null
+      nextFollowUpDate: Date | null
       surgeonId: string
       createdAt: Date
     }, ExtArgs["result"]["surgery"]>
@@ -13509,6 +13835,7 @@ export namespace Prisma {
     branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     surgeon<T extends DoctorDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DoctorDefaultArgs<ExtArgs>>): Prisma__DoctorClient<$Result.GetResult<Prisma.$DoctorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     billings<T extends Surgery$billingsArgs<ExtArgs> = {}>(args?: Subset<T, Surgery$billingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    followUps<T extends Surgery$followUpsArgs<ExtArgs> = {}>(args?: Subset<T, Surgery$followUpsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -13547,6 +13874,7 @@ export namespace Prisma {
     readonly cost: FieldRef<"Surgery", 'Decimal'>
     readonly status: FieldRef<"Surgery", 'String'>
     readonly notes: FieldRef<"Surgery", 'String'>
+    readonly nextFollowUpDate: FieldRef<"Surgery", 'DateTime'>
     readonly surgeonId: FieldRef<"Surgery", 'String'>
     readonly createdAt: FieldRef<"Surgery", 'DateTime'>
   }
@@ -13969,6 +14297,30 @@ export namespace Prisma {
   }
 
   /**
+   * Surgery.followUps
+   */
+  export type Surgery$followUpsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FollowUp
+     */
+    select?: FollowUpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FollowUp
+     */
+    omit?: FollowUpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FollowUpInclude<ExtArgs> | null
+    where?: FollowUpWhereInput
+    orderBy?: FollowUpOrderByWithRelationInput | FollowUpOrderByWithRelationInput[]
+    cursor?: FollowUpWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FollowUpScalarFieldEnum | FollowUpScalarFieldEnum[]
+  }
+
+  /**
    * Surgery without action
    */
   export type SurgeryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -14001,10 +14353,12 @@ export namespace Prisma {
 
   export type PrescriptionAvgAggregateOutputType = {
     quantity: number | null
+    reviewAfterDays: number | null
   }
 
   export type PrescriptionSumAggregateOutputType = {
     quantity: number | null
+    reviewAfterDays: number | null
   }
 
   export type PrescriptionMinAggregateOutputType = {
@@ -14016,6 +14370,7 @@ export namespace Prisma {
     itemId: string | null
     quantity: number | null
     instructions: string | null
+    reviewAfterDays: number | null
     createdAt: Date | null
   }
 
@@ -14028,6 +14383,7 @@ export namespace Prisma {
     itemId: string | null
     quantity: number | null
     instructions: string | null
+    reviewAfterDays: number | null
     createdAt: Date | null
   }
 
@@ -14040,6 +14396,7 @@ export namespace Prisma {
     itemId: number
     quantity: number
     instructions: number
+    reviewAfterDays: number
     createdAt: number
     _all: number
   }
@@ -14047,10 +14404,12 @@ export namespace Prisma {
 
   export type PrescriptionAvgAggregateInputType = {
     quantity?: true
+    reviewAfterDays?: true
   }
 
   export type PrescriptionSumAggregateInputType = {
     quantity?: true
+    reviewAfterDays?: true
   }
 
   export type PrescriptionMinAggregateInputType = {
@@ -14062,6 +14421,7 @@ export namespace Prisma {
     itemId?: true
     quantity?: true
     instructions?: true
+    reviewAfterDays?: true
     createdAt?: true
   }
 
@@ -14074,6 +14434,7 @@ export namespace Prisma {
     itemId?: true
     quantity?: true
     instructions?: true
+    reviewAfterDays?: true
     createdAt?: true
   }
 
@@ -14086,6 +14447,7 @@ export namespace Prisma {
     itemId?: true
     quantity?: true
     instructions?: true
+    reviewAfterDays?: true
     createdAt?: true
     _all?: true
   }
@@ -14185,6 +14547,7 @@ export namespace Prisma {
     itemId: string | null
     quantity: number
     instructions: string | null
+    reviewAfterDays: number | null
     createdAt: Date
     _count: PrescriptionCountAggregateOutputType | null
     _avg: PrescriptionAvgAggregateOutputType | null
@@ -14216,11 +14579,13 @@ export namespace Prisma {
     itemId?: boolean
     quantity?: boolean
     instructions?: boolean
+    reviewAfterDays?: boolean
     createdAt?: boolean
     appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
     clinicalExam?: boolean | ClinicalExaminationDefaultArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     billings?: boolean | Prescription$billingsArgs<ExtArgs>
+    followUps?: boolean | Prescription$followUpsArgs<ExtArgs>
     _count?: boolean | PrescriptionCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["prescription"]>
 
@@ -14233,6 +14598,7 @@ export namespace Prisma {
     itemId?: boolean
     quantity?: boolean
     instructions?: boolean
+    reviewAfterDays?: boolean
     createdAt?: boolean
     appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
     clinicalExam?: boolean | ClinicalExaminationDefaultArgs<ExtArgs>
@@ -14248,6 +14614,7 @@ export namespace Prisma {
     itemId?: boolean
     quantity?: boolean
     instructions?: boolean
+    reviewAfterDays?: boolean
     createdAt?: boolean
     appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
     clinicalExam?: boolean | ClinicalExaminationDefaultArgs<ExtArgs>
@@ -14263,15 +14630,17 @@ export namespace Prisma {
     itemId?: boolean
     quantity?: boolean
     instructions?: boolean
+    reviewAfterDays?: boolean
     createdAt?: boolean
   }
 
-  export type PrescriptionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "appointmentId" | "examId" | "branchId" | "itemType" | "itemId" | "quantity" | "instructions" | "createdAt", ExtArgs["result"]["prescription"]>
+  export type PrescriptionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "appointmentId" | "examId" | "branchId" | "itemType" | "itemId" | "quantity" | "instructions" | "reviewAfterDays" | "createdAt", ExtArgs["result"]["prescription"]>
   export type PrescriptionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     appointment?: boolean | AppointmentDefaultArgs<ExtArgs>
     clinicalExam?: boolean | ClinicalExaminationDefaultArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     billings?: boolean | Prescription$billingsArgs<ExtArgs>
+    followUps?: boolean | Prescription$followUpsArgs<ExtArgs>
     _count?: boolean | PrescriptionCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type PrescriptionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -14292,6 +14661,7 @@ export namespace Prisma {
       clinicalExam: Prisma.$ClinicalExaminationPayload<ExtArgs>
       branch: Prisma.$BranchPayload<ExtArgs>
       billings: Prisma.$BillingPayload<ExtArgs>[]
+      followUps: Prisma.$FollowUpPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -14302,6 +14672,7 @@ export namespace Prisma {
       itemId: string | null
       quantity: number
       instructions: string | null
+      reviewAfterDays: number | null
       createdAt: Date
     }, ExtArgs["result"]["prescription"]>
     composites: {}
@@ -14701,6 +15072,7 @@ export namespace Prisma {
     clinicalExam<T extends ClinicalExaminationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ClinicalExaminationDefaultArgs<ExtArgs>>): Prisma__ClinicalExaminationClient<$Result.GetResult<Prisma.$ClinicalExaminationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     billings<T extends Prescription$billingsArgs<ExtArgs> = {}>(args?: Subset<T, Prescription$billingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    followUps<T extends Prescription$followUpsArgs<ExtArgs> = {}>(args?: Subset<T, Prescription$followUpsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -14738,6 +15110,7 @@ export namespace Prisma {
     readonly itemId: FieldRef<"Prescription", 'String'>
     readonly quantity: FieldRef<"Prescription", 'Int'>
     readonly instructions: FieldRef<"Prescription", 'String'>
+    readonly reviewAfterDays: FieldRef<"Prescription", 'Int'>
     readonly createdAt: FieldRef<"Prescription", 'DateTime'>
   }
     
@@ -15159,6 +15532,30 @@ export namespace Prisma {
   }
 
   /**
+   * Prescription.followUps
+   */
+  export type Prescription$followUpsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FollowUp
+     */
+    select?: FollowUpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FollowUp
+     */
+    omit?: FollowUpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FollowUpInclude<ExtArgs> | null
+    where?: FollowUpWhereInput
+    orderBy?: FollowUpOrderByWithRelationInput | FollowUpOrderByWithRelationInput[]
+    cursor?: FollowUpWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FollowUpScalarFieldEnum | FollowUpScalarFieldEnum[]
+  }
+
+  /**
    * Prescription without action
    */
   export type PrescriptionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -15219,6 +15616,7 @@ export namespace Prisma {
     expiryDate: Date | null
     createdAt: Date | null
     updatedAt: Date | null
+    isActive: boolean | null
   }
 
   export type PharmacyItemMaxAggregateOutputType = {
@@ -15237,6 +15635,7 @@ export namespace Prisma {
     expiryDate: Date | null
     createdAt: Date | null
     updatedAt: Date | null
+    isActive: boolean | null
   }
 
   export type PharmacyItemCountAggregateOutputType = {
@@ -15255,6 +15654,7 @@ export namespace Prisma {
     expiryDate: number
     createdAt: number
     updatedAt: number
+    isActive: number
     _all: number
   }
 
@@ -15289,6 +15689,7 @@ export namespace Prisma {
     expiryDate?: true
     createdAt?: true
     updatedAt?: true
+    isActive?: true
   }
 
   export type PharmacyItemMaxAggregateInputType = {
@@ -15307,6 +15708,7 @@ export namespace Prisma {
     expiryDate?: true
     createdAt?: true
     updatedAt?: true
+    isActive?: true
   }
 
   export type PharmacyItemCountAggregateInputType = {
@@ -15325,6 +15727,7 @@ export namespace Prisma {
     expiryDate?: true
     createdAt?: true
     updatedAt?: true
+    isActive?: true
     _all?: true
   }
 
@@ -15430,6 +15833,7 @@ export namespace Prisma {
     expiryDate: Date | null
     createdAt: Date
     updatedAt: Date
+    isActive: boolean
     _count: PharmacyItemCountAggregateOutputType | null
     _avg: PharmacyItemAvgAggregateOutputType | null
     _sum: PharmacyItemSumAggregateOutputType | null
@@ -15467,6 +15871,7 @@ export namespace Prisma {
     expiryDate?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    isActive?: boolean
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     transactions?: boolean | PharmacyItem$transactionsArgs<ExtArgs>
     _count?: boolean | PharmacyItemCountOutputTypeDefaultArgs<ExtArgs>
@@ -15488,6 +15893,7 @@ export namespace Prisma {
     expiryDate?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    isActive?: boolean
     branch?: boolean | BranchDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["pharmacyItem"]>
 
@@ -15507,6 +15913,7 @@ export namespace Prisma {
     expiryDate?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    isActive?: boolean
     branch?: boolean | BranchDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["pharmacyItem"]>
 
@@ -15526,9 +15933,10 @@ export namespace Prisma {
     expiryDate?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    isActive?: boolean
   }
 
-  export type PharmacyItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "branchId" | "itemName" | "itemType" | "category" | "manufacturer" | "supplierName" | "batchNumber" | "stockQuantity" | "reorderLevel" | "purchasePrice" | "sellingPrice" | "expiryDate" | "createdAt" | "updatedAt", ExtArgs["result"]["pharmacyItem"]>
+  export type PharmacyItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "branchId" | "itemName" | "itemType" | "category" | "manufacturer" | "supplierName" | "batchNumber" | "stockQuantity" | "reorderLevel" | "purchasePrice" | "sellingPrice" | "expiryDate" | "createdAt" | "updatedAt" | "isActive", ExtArgs["result"]["pharmacyItem"]>
   export type PharmacyItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     transactions?: boolean | PharmacyItem$transactionsArgs<ExtArgs>
@@ -15563,6 +15971,7 @@ export namespace Prisma {
       expiryDate: Date | null
       createdAt: Date
       updatedAt: Date
+      isActive: boolean
     }, ExtArgs["result"]["pharmacyItem"]>
     composites: {}
   }
@@ -16003,6 +16412,7 @@ export namespace Prisma {
     readonly expiryDate: FieldRef<"PharmacyItem", 'DateTime'>
     readonly createdAt: FieldRef<"PharmacyItem", 'DateTime'>
     readonly updatedAt: FieldRef<"PharmacyItem", 'DateTime'>
+    readonly isActive: FieldRef<"PharmacyItem", 'Boolean'>
   }
     
 
@@ -17672,6 +18082,7 @@ export namespace Prisma {
     sellingPrice: Decimal | null
     createdAt: Date | null
     updatedAt: Date | null
+    isActive: boolean | null
   }
 
   export type OpticalItemMaxAggregateOutputType = {
@@ -17688,6 +18099,7 @@ export namespace Prisma {
     sellingPrice: Decimal | null
     createdAt: Date | null
     updatedAt: Date | null
+    isActive: boolean | null
   }
 
   export type OpticalItemCountAggregateOutputType = {
@@ -17704,6 +18116,7 @@ export namespace Prisma {
     sellingPrice: number
     createdAt: number
     updatedAt: number
+    isActive: number
     _all: number
   }
 
@@ -17736,6 +18149,7 @@ export namespace Prisma {
     sellingPrice?: true
     createdAt?: true
     updatedAt?: true
+    isActive?: true
   }
 
   export type OpticalItemMaxAggregateInputType = {
@@ -17752,6 +18166,7 @@ export namespace Prisma {
     sellingPrice?: true
     createdAt?: true
     updatedAt?: true
+    isActive?: true
   }
 
   export type OpticalItemCountAggregateInputType = {
@@ -17768,6 +18183,7 @@ export namespace Prisma {
     sellingPrice?: true
     createdAt?: true
     updatedAt?: true
+    isActive?: true
     _all?: true
   }
 
@@ -17871,6 +18287,7 @@ export namespace Prisma {
     sellingPrice: Decimal
     createdAt: Date
     updatedAt: Date
+    isActive: boolean
     _count: OpticalItemCountAggregateOutputType | null
     _avg: OpticalItemAvgAggregateOutputType | null
     _sum: OpticalItemSumAggregateOutputType | null
@@ -17906,6 +18323,7 @@ export namespace Prisma {
     sellingPrice?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    isActive?: boolean
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     transactions?: boolean | OpticalItem$transactionsArgs<ExtArgs>
     _count?: boolean | OpticalItemCountOutputTypeDefaultArgs<ExtArgs>
@@ -17925,6 +18343,7 @@ export namespace Prisma {
     sellingPrice?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    isActive?: boolean
     branch?: boolean | BranchDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["opticalItem"]>
 
@@ -17942,6 +18361,7 @@ export namespace Prisma {
     sellingPrice?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    isActive?: boolean
     branch?: boolean | BranchDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["opticalItem"]>
 
@@ -17959,9 +18379,10 @@ export namespace Prisma {
     sellingPrice?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    isActive?: boolean
   }
 
-  export type OpticalItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "branchId" | "itemName" | "itemType" | "brand" | "manufacturer" | "supplierName" | "stockQuantity" | "reorderLevel" | "purchasePrice" | "sellingPrice" | "createdAt" | "updatedAt", ExtArgs["result"]["opticalItem"]>
+  export type OpticalItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "branchId" | "itemName" | "itemType" | "brand" | "manufacturer" | "supplierName" | "stockQuantity" | "reorderLevel" | "purchasePrice" | "sellingPrice" | "createdAt" | "updatedAt" | "isActive", ExtArgs["result"]["opticalItem"]>
   export type OpticalItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     transactions?: boolean | OpticalItem$transactionsArgs<ExtArgs>
@@ -17994,6 +18415,7 @@ export namespace Prisma {
       sellingPrice: Prisma.Decimal
       createdAt: Date
       updatedAt: Date
+      isActive: boolean
     }, ExtArgs["result"]["opticalItem"]>
     composites: {}
   }
@@ -18432,6 +18854,7 @@ export namespace Prisma {
     readonly sellingPrice: FieldRef<"OpticalItem", 'Decimal'>
     readonly createdAt: FieldRef<"OpticalItem", 'DateTime'>
     readonly updatedAt: FieldRef<"OpticalItem", 'DateTime'>
+    readonly isActive: FieldRef<"OpticalItem", 'Boolean'>
   }
     
 
@@ -21460,6 +21883,1297 @@ export namespace Prisma {
 
 
   /**
+   * Model FollowUp
+   */
+
+  export type AggregateFollowUp = {
+    _count: FollowUpCountAggregateOutputType | null
+    _min: FollowUpMinAggregateOutputType | null
+    _max: FollowUpMaxAggregateOutputType | null
+  }
+
+  export type FollowUpMinAggregateOutputType = {
+    id: string | null
+    patientId: string | null
+    branchId: string | null
+    sourceType: $Enums.FollowUpSourceType | null
+    sourceId: string | null
+    dueDate: Date | null
+    status: $Enums.FollowUpStatus | null
+    notes: string | null
+    completedAppointmentId: string | null
+    clinicalExaminationId: string | null
+    surgeryId: string | null
+    prescriptionId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FollowUpMaxAggregateOutputType = {
+    id: string | null
+    patientId: string | null
+    branchId: string | null
+    sourceType: $Enums.FollowUpSourceType | null
+    sourceId: string | null
+    dueDate: Date | null
+    status: $Enums.FollowUpStatus | null
+    notes: string | null
+    completedAppointmentId: string | null
+    clinicalExaminationId: string | null
+    surgeryId: string | null
+    prescriptionId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FollowUpCountAggregateOutputType = {
+    id: number
+    patientId: number
+    branchId: number
+    sourceType: number
+    sourceId: number
+    dueDate: number
+    status: number
+    notes: number
+    completedAppointmentId: number
+    clinicalExaminationId: number
+    surgeryId: number
+    prescriptionId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type FollowUpMinAggregateInputType = {
+    id?: true
+    patientId?: true
+    branchId?: true
+    sourceType?: true
+    sourceId?: true
+    dueDate?: true
+    status?: true
+    notes?: true
+    completedAppointmentId?: true
+    clinicalExaminationId?: true
+    surgeryId?: true
+    prescriptionId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FollowUpMaxAggregateInputType = {
+    id?: true
+    patientId?: true
+    branchId?: true
+    sourceType?: true
+    sourceId?: true
+    dueDate?: true
+    status?: true
+    notes?: true
+    completedAppointmentId?: true
+    clinicalExaminationId?: true
+    surgeryId?: true
+    prescriptionId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FollowUpCountAggregateInputType = {
+    id?: true
+    patientId?: true
+    branchId?: true
+    sourceType?: true
+    sourceId?: true
+    dueDate?: true
+    status?: true
+    notes?: true
+    completedAppointmentId?: true
+    clinicalExaminationId?: true
+    surgeryId?: true
+    prescriptionId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type FollowUpAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FollowUp to aggregate.
+     */
+    where?: FollowUpWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FollowUps to fetch.
+     */
+    orderBy?: FollowUpOrderByWithRelationInput | FollowUpOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FollowUpWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FollowUps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FollowUps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FollowUps
+    **/
+    _count?: true | FollowUpCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FollowUpMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FollowUpMaxAggregateInputType
+  }
+
+  export type GetFollowUpAggregateType<T extends FollowUpAggregateArgs> = {
+        [P in keyof T & keyof AggregateFollowUp]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFollowUp[P]>
+      : GetScalarType<T[P], AggregateFollowUp[P]>
+  }
+
+
+
+
+  export type FollowUpGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FollowUpWhereInput
+    orderBy?: FollowUpOrderByWithAggregationInput | FollowUpOrderByWithAggregationInput[]
+    by: FollowUpScalarFieldEnum[] | FollowUpScalarFieldEnum
+    having?: FollowUpScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FollowUpCountAggregateInputType | true
+    _min?: FollowUpMinAggregateInputType
+    _max?: FollowUpMaxAggregateInputType
+  }
+
+  export type FollowUpGroupByOutputType = {
+    id: string
+    patientId: string
+    branchId: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date
+    status: $Enums.FollowUpStatus
+    notes: string | null
+    completedAppointmentId: string | null
+    clinicalExaminationId: string | null
+    surgeryId: string | null
+    prescriptionId: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: FollowUpCountAggregateOutputType | null
+    _min: FollowUpMinAggregateOutputType | null
+    _max: FollowUpMaxAggregateOutputType | null
+  }
+
+  type GetFollowUpGroupByPayload<T extends FollowUpGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FollowUpGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FollowUpGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FollowUpGroupByOutputType[P]>
+            : GetScalarType<T[P], FollowUpGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FollowUpSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    branchId?: boolean
+    sourceType?: boolean
+    sourceId?: boolean
+    dueDate?: boolean
+    status?: boolean
+    notes?: boolean
+    completedAppointmentId?: boolean
+    clinicalExaminationId?: boolean
+    surgeryId?: boolean
+    prescriptionId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    completedAppointment?: boolean | FollowUp$completedAppointmentArgs<ExtArgs>
+    clinicalExamination?: boolean | FollowUp$clinicalExaminationArgs<ExtArgs>
+    surgery?: boolean | FollowUp$surgeryArgs<ExtArgs>
+    prescription?: boolean | FollowUp$prescriptionArgs<ExtArgs>
+  }, ExtArgs["result"]["followUp"]>
+
+  export type FollowUpSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    branchId?: boolean
+    sourceType?: boolean
+    sourceId?: boolean
+    dueDate?: boolean
+    status?: boolean
+    notes?: boolean
+    completedAppointmentId?: boolean
+    clinicalExaminationId?: boolean
+    surgeryId?: boolean
+    prescriptionId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    completedAppointment?: boolean | FollowUp$completedAppointmentArgs<ExtArgs>
+    clinicalExamination?: boolean | FollowUp$clinicalExaminationArgs<ExtArgs>
+    surgery?: boolean | FollowUp$surgeryArgs<ExtArgs>
+    prescription?: boolean | FollowUp$prescriptionArgs<ExtArgs>
+  }, ExtArgs["result"]["followUp"]>
+
+  export type FollowUpSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    patientId?: boolean
+    branchId?: boolean
+    sourceType?: boolean
+    sourceId?: boolean
+    dueDate?: boolean
+    status?: boolean
+    notes?: boolean
+    completedAppointmentId?: boolean
+    clinicalExaminationId?: boolean
+    surgeryId?: boolean
+    prescriptionId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    completedAppointment?: boolean | FollowUp$completedAppointmentArgs<ExtArgs>
+    clinicalExamination?: boolean | FollowUp$clinicalExaminationArgs<ExtArgs>
+    surgery?: boolean | FollowUp$surgeryArgs<ExtArgs>
+    prescription?: boolean | FollowUp$prescriptionArgs<ExtArgs>
+  }, ExtArgs["result"]["followUp"]>
+
+  export type FollowUpSelectScalar = {
+    id?: boolean
+    patientId?: boolean
+    branchId?: boolean
+    sourceType?: boolean
+    sourceId?: boolean
+    dueDate?: boolean
+    status?: boolean
+    notes?: boolean
+    completedAppointmentId?: boolean
+    clinicalExaminationId?: boolean
+    surgeryId?: boolean
+    prescriptionId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type FollowUpOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientId" | "branchId" | "sourceType" | "sourceId" | "dueDate" | "status" | "notes" | "completedAppointmentId" | "clinicalExaminationId" | "surgeryId" | "prescriptionId" | "createdAt" | "updatedAt", ExtArgs["result"]["followUp"]>
+  export type FollowUpInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    completedAppointment?: boolean | FollowUp$completedAppointmentArgs<ExtArgs>
+    clinicalExamination?: boolean | FollowUp$clinicalExaminationArgs<ExtArgs>
+    surgery?: boolean | FollowUp$surgeryArgs<ExtArgs>
+    prescription?: boolean | FollowUp$prescriptionArgs<ExtArgs>
+  }
+  export type FollowUpIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    completedAppointment?: boolean | FollowUp$completedAppointmentArgs<ExtArgs>
+    clinicalExamination?: boolean | FollowUp$clinicalExaminationArgs<ExtArgs>
+    surgery?: boolean | FollowUp$surgeryArgs<ExtArgs>
+    prescription?: boolean | FollowUp$prescriptionArgs<ExtArgs>
+  }
+  export type FollowUpIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    completedAppointment?: boolean | FollowUp$completedAppointmentArgs<ExtArgs>
+    clinicalExamination?: boolean | FollowUp$clinicalExaminationArgs<ExtArgs>
+    surgery?: boolean | FollowUp$surgeryArgs<ExtArgs>
+    prescription?: boolean | FollowUp$prescriptionArgs<ExtArgs>
+  }
+
+  export type $FollowUpPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FollowUp"
+    objects: {
+      patient: Prisma.$PatientPayload<ExtArgs>
+      branch: Prisma.$BranchPayload<ExtArgs>
+      completedAppointment: Prisma.$AppointmentPayload<ExtArgs> | null
+      clinicalExamination: Prisma.$ClinicalExaminationPayload<ExtArgs> | null
+      surgery: Prisma.$SurgeryPayload<ExtArgs> | null
+      prescription: Prisma.$PrescriptionPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      patientId: string
+      branchId: string
+      sourceType: $Enums.FollowUpSourceType
+      sourceId: string
+      dueDate: Date
+      status: $Enums.FollowUpStatus
+      notes: string | null
+      completedAppointmentId: string | null
+      clinicalExaminationId: string | null
+      surgeryId: string | null
+      prescriptionId: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["followUp"]>
+    composites: {}
+  }
+
+  type FollowUpGetPayload<S extends boolean | null | undefined | FollowUpDefaultArgs> = $Result.GetResult<Prisma.$FollowUpPayload, S>
+
+  type FollowUpCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FollowUpFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FollowUpCountAggregateInputType | true
+    }
+
+  export interface FollowUpDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FollowUp'], meta: { name: 'FollowUp' } }
+    /**
+     * Find zero or one FollowUp that matches the filter.
+     * @param {FollowUpFindUniqueArgs} args - Arguments to find a FollowUp
+     * @example
+     * // Get one FollowUp
+     * const followUp = await prisma.followUp.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FollowUpFindUniqueArgs>(args: SelectSubset<T, FollowUpFindUniqueArgs<ExtArgs>>): Prisma__FollowUpClient<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one FollowUp that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FollowUpFindUniqueOrThrowArgs} args - Arguments to find a FollowUp
+     * @example
+     * // Get one FollowUp
+     * const followUp = await prisma.followUp.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FollowUpFindUniqueOrThrowArgs>(args: SelectSubset<T, FollowUpFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FollowUpClient<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FollowUp that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FollowUpFindFirstArgs} args - Arguments to find a FollowUp
+     * @example
+     * // Get one FollowUp
+     * const followUp = await prisma.followUp.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FollowUpFindFirstArgs>(args?: SelectSubset<T, FollowUpFindFirstArgs<ExtArgs>>): Prisma__FollowUpClient<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FollowUp that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FollowUpFindFirstOrThrowArgs} args - Arguments to find a FollowUp
+     * @example
+     * // Get one FollowUp
+     * const followUp = await prisma.followUp.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FollowUpFindFirstOrThrowArgs>(args?: SelectSubset<T, FollowUpFindFirstOrThrowArgs<ExtArgs>>): Prisma__FollowUpClient<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more FollowUps that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FollowUpFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FollowUps
+     * const followUps = await prisma.followUp.findMany()
+     * 
+     * // Get first 10 FollowUps
+     * const followUps = await prisma.followUp.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const followUpWithIdOnly = await prisma.followUp.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FollowUpFindManyArgs>(args?: SelectSubset<T, FollowUpFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a FollowUp.
+     * @param {FollowUpCreateArgs} args - Arguments to create a FollowUp.
+     * @example
+     * // Create one FollowUp
+     * const FollowUp = await prisma.followUp.create({
+     *   data: {
+     *     // ... data to create a FollowUp
+     *   }
+     * })
+     * 
+     */
+    create<T extends FollowUpCreateArgs>(args: SelectSubset<T, FollowUpCreateArgs<ExtArgs>>): Prisma__FollowUpClient<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many FollowUps.
+     * @param {FollowUpCreateManyArgs} args - Arguments to create many FollowUps.
+     * @example
+     * // Create many FollowUps
+     * const followUp = await prisma.followUp.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FollowUpCreateManyArgs>(args?: SelectSubset<T, FollowUpCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FollowUps and returns the data saved in the database.
+     * @param {FollowUpCreateManyAndReturnArgs} args - Arguments to create many FollowUps.
+     * @example
+     * // Create many FollowUps
+     * const followUp = await prisma.followUp.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FollowUps and only return the `id`
+     * const followUpWithIdOnly = await prisma.followUp.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FollowUpCreateManyAndReturnArgs>(args?: SelectSubset<T, FollowUpCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a FollowUp.
+     * @param {FollowUpDeleteArgs} args - Arguments to delete one FollowUp.
+     * @example
+     * // Delete one FollowUp
+     * const FollowUp = await prisma.followUp.delete({
+     *   where: {
+     *     // ... filter to delete one FollowUp
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FollowUpDeleteArgs>(args: SelectSubset<T, FollowUpDeleteArgs<ExtArgs>>): Prisma__FollowUpClient<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one FollowUp.
+     * @param {FollowUpUpdateArgs} args - Arguments to update one FollowUp.
+     * @example
+     * // Update one FollowUp
+     * const followUp = await prisma.followUp.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FollowUpUpdateArgs>(args: SelectSubset<T, FollowUpUpdateArgs<ExtArgs>>): Prisma__FollowUpClient<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more FollowUps.
+     * @param {FollowUpDeleteManyArgs} args - Arguments to filter FollowUps to delete.
+     * @example
+     * // Delete a few FollowUps
+     * const { count } = await prisma.followUp.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FollowUpDeleteManyArgs>(args?: SelectSubset<T, FollowUpDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FollowUps.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FollowUpUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FollowUps
+     * const followUp = await prisma.followUp.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FollowUpUpdateManyArgs>(args: SelectSubset<T, FollowUpUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FollowUps and returns the data updated in the database.
+     * @param {FollowUpUpdateManyAndReturnArgs} args - Arguments to update many FollowUps.
+     * @example
+     * // Update many FollowUps
+     * const followUp = await prisma.followUp.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more FollowUps and only return the `id`
+     * const followUpWithIdOnly = await prisma.followUp.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FollowUpUpdateManyAndReturnArgs>(args: SelectSubset<T, FollowUpUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one FollowUp.
+     * @param {FollowUpUpsertArgs} args - Arguments to update or create a FollowUp.
+     * @example
+     * // Update or create a FollowUp
+     * const followUp = await prisma.followUp.upsert({
+     *   create: {
+     *     // ... data to create a FollowUp
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FollowUp we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FollowUpUpsertArgs>(args: SelectSubset<T, FollowUpUpsertArgs<ExtArgs>>): Prisma__FollowUpClient<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of FollowUps.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FollowUpCountArgs} args - Arguments to filter FollowUps to count.
+     * @example
+     * // Count the number of FollowUps
+     * const count = await prisma.followUp.count({
+     *   where: {
+     *     // ... the filter for the FollowUps we want to count
+     *   }
+     * })
+    **/
+    count<T extends FollowUpCountArgs>(
+      args?: Subset<T, FollowUpCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FollowUpCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FollowUp.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FollowUpAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FollowUpAggregateArgs>(args: Subset<T, FollowUpAggregateArgs>): Prisma.PrismaPromise<GetFollowUpAggregateType<T>>
+
+    /**
+     * Group by FollowUp.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FollowUpGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FollowUpGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FollowUpGroupByArgs['orderBy'] }
+        : { orderBy?: FollowUpGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FollowUpGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFollowUpGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FollowUp model
+   */
+  readonly fields: FollowUpFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FollowUp.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FollowUpClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    patient<T extends PatientDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PatientDefaultArgs<ExtArgs>>): Prisma__PatientClient<$Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    completedAppointment<T extends FollowUp$completedAppointmentArgs<ExtArgs> = {}>(args?: Subset<T, FollowUp$completedAppointmentArgs<ExtArgs>>): Prisma__AppointmentClient<$Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    clinicalExamination<T extends FollowUp$clinicalExaminationArgs<ExtArgs> = {}>(args?: Subset<T, FollowUp$clinicalExaminationArgs<ExtArgs>>): Prisma__ClinicalExaminationClient<$Result.GetResult<Prisma.$ClinicalExaminationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    surgery<T extends FollowUp$surgeryArgs<ExtArgs> = {}>(args?: Subset<T, FollowUp$surgeryArgs<ExtArgs>>): Prisma__SurgeryClient<$Result.GetResult<Prisma.$SurgeryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    prescription<T extends FollowUp$prescriptionArgs<ExtArgs> = {}>(args?: Subset<T, FollowUp$prescriptionArgs<ExtArgs>>): Prisma__PrescriptionClient<$Result.GetResult<Prisma.$PrescriptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FollowUp model
+   */
+  interface FollowUpFieldRefs {
+    readonly id: FieldRef<"FollowUp", 'String'>
+    readonly patientId: FieldRef<"FollowUp", 'String'>
+    readonly branchId: FieldRef<"FollowUp", 'String'>
+    readonly sourceType: FieldRef<"FollowUp", 'FollowUpSourceType'>
+    readonly sourceId: FieldRef<"FollowUp", 'String'>
+    readonly dueDate: FieldRef<"FollowUp", 'DateTime'>
+    readonly status: FieldRef<"FollowUp", 'FollowUpStatus'>
+    readonly notes: FieldRef<"FollowUp", 'String'>
+    readonly completedAppointmentId: FieldRef<"FollowUp", 'String'>
+    readonly clinicalExaminationId: FieldRef<"FollowUp", 'String'>
+    readonly surgeryId: FieldRef<"FollowUp", 'String'>
+    readonly prescriptionId: FieldRef<"FollowUp", 'String'>
+    readonly createdAt: FieldRef<"FollowUp", 'DateTime'>
+    readonly updatedAt: FieldRef<"FollowUp", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FollowUp findUnique
+   */
+  export type FollowUpFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FollowUp
+     */
+    select?: FollowUpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FollowUp
+     */
+    omit?: FollowUpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FollowUpInclude<ExtArgs> | null
+    /**
+     * Filter, which FollowUp to fetch.
+     */
+    where: FollowUpWhereUniqueInput
+  }
+
+  /**
+   * FollowUp findUniqueOrThrow
+   */
+  export type FollowUpFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FollowUp
+     */
+    select?: FollowUpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FollowUp
+     */
+    omit?: FollowUpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FollowUpInclude<ExtArgs> | null
+    /**
+     * Filter, which FollowUp to fetch.
+     */
+    where: FollowUpWhereUniqueInput
+  }
+
+  /**
+   * FollowUp findFirst
+   */
+  export type FollowUpFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FollowUp
+     */
+    select?: FollowUpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FollowUp
+     */
+    omit?: FollowUpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FollowUpInclude<ExtArgs> | null
+    /**
+     * Filter, which FollowUp to fetch.
+     */
+    where?: FollowUpWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FollowUps to fetch.
+     */
+    orderBy?: FollowUpOrderByWithRelationInput | FollowUpOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FollowUps.
+     */
+    cursor?: FollowUpWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FollowUps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FollowUps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FollowUps.
+     */
+    distinct?: FollowUpScalarFieldEnum | FollowUpScalarFieldEnum[]
+  }
+
+  /**
+   * FollowUp findFirstOrThrow
+   */
+  export type FollowUpFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FollowUp
+     */
+    select?: FollowUpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FollowUp
+     */
+    omit?: FollowUpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FollowUpInclude<ExtArgs> | null
+    /**
+     * Filter, which FollowUp to fetch.
+     */
+    where?: FollowUpWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FollowUps to fetch.
+     */
+    orderBy?: FollowUpOrderByWithRelationInput | FollowUpOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FollowUps.
+     */
+    cursor?: FollowUpWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FollowUps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FollowUps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FollowUps.
+     */
+    distinct?: FollowUpScalarFieldEnum | FollowUpScalarFieldEnum[]
+  }
+
+  /**
+   * FollowUp findMany
+   */
+  export type FollowUpFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FollowUp
+     */
+    select?: FollowUpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FollowUp
+     */
+    omit?: FollowUpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FollowUpInclude<ExtArgs> | null
+    /**
+     * Filter, which FollowUps to fetch.
+     */
+    where?: FollowUpWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FollowUps to fetch.
+     */
+    orderBy?: FollowUpOrderByWithRelationInput | FollowUpOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FollowUps.
+     */
+    cursor?: FollowUpWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FollowUps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FollowUps.
+     */
+    skip?: number
+    distinct?: FollowUpScalarFieldEnum | FollowUpScalarFieldEnum[]
+  }
+
+  /**
+   * FollowUp create
+   */
+  export type FollowUpCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FollowUp
+     */
+    select?: FollowUpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FollowUp
+     */
+    omit?: FollowUpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FollowUpInclude<ExtArgs> | null
+    /**
+     * The data needed to create a FollowUp.
+     */
+    data: XOR<FollowUpCreateInput, FollowUpUncheckedCreateInput>
+  }
+
+  /**
+   * FollowUp createMany
+   */
+  export type FollowUpCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FollowUps.
+     */
+    data: FollowUpCreateManyInput | FollowUpCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FollowUp createManyAndReturn
+   */
+  export type FollowUpCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FollowUp
+     */
+    select?: FollowUpSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FollowUp
+     */
+    omit?: FollowUpOmit<ExtArgs> | null
+    /**
+     * The data used to create many FollowUps.
+     */
+    data: FollowUpCreateManyInput | FollowUpCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FollowUpIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FollowUp update
+   */
+  export type FollowUpUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FollowUp
+     */
+    select?: FollowUpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FollowUp
+     */
+    omit?: FollowUpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FollowUpInclude<ExtArgs> | null
+    /**
+     * The data needed to update a FollowUp.
+     */
+    data: XOR<FollowUpUpdateInput, FollowUpUncheckedUpdateInput>
+    /**
+     * Choose, which FollowUp to update.
+     */
+    where: FollowUpWhereUniqueInput
+  }
+
+  /**
+   * FollowUp updateMany
+   */
+  export type FollowUpUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FollowUps.
+     */
+    data: XOR<FollowUpUpdateManyMutationInput, FollowUpUncheckedUpdateManyInput>
+    /**
+     * Filter which FollowUps to update
+     */
+    where?: FollowUpWhereInput
+    /**
+     * Limit how many FollowUps to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FollowUp updateManyAndReturn
+   */
+  export type FollowUpUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FollowUp
+     */
+    select?: FollowUpSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FollowUp
+     */
+    omit?: FollowUpOmit<ExtArgs> | null
+    /**
+     * The data used to update FollowUps.
+     */
+    data: XOR<FollowUpUpdateManyMutationInput, FollowUpUncheckedUpdateManyInput>
+    /**
+     * Filter which FollowUps to update
+     */
+    where?: FollowUpWhereInput
+    /**
+     * Limit how many FollowUps to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FollowUpIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FollowUp upsert
+   */
+  export type FollowUpUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FollowUp
+     */
+    select?: FollowUpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FollowUp
+     */
+    omit?: FollowUpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FollowUpInclude<ExtArgs> | null
+    /**
+     * The filter to search for the FollowUp to update in case it exists.
+     */
+    where: FollowUpWhereUniqueInput
+    /**
+     * In case the FollowUp found by the `where` argument doesn't exist, create a new FollowUp with this data.
+     */
+    create: XOR<FollowUpCreateInput, FollowUpUncheckedCreateInput>
+    /**
+     * In case the FollowUp was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FollowUpUpdateInput, FollowUpUncheckedUpdateInput>
+  }
+
+  /**
+   * FollowUp delete
+   */
+  export type FollowUpDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FollowUp
+     */
+    select?: FollowUpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FollowUp
+     */
+    omit?: FollowUpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FollowUpInclude<ExtArgs> | null
+    /**
+     * Filter which FollowUp to delete.
+     */
+    where: FollowUpWhereUniqueInput
+  }
+
+  /**
+   * FollowUp deleteMany
+   */
+  export type FollowUpDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FollowUps to delete
+     */
+    where?: FollowUpWhereInput
+    /**
+     * Limit how many FollowUps to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * FollowUp.completedAppointment
+   */
+  export type FollowUp$completedAppointmentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Appointment
+     */
+    select?: AppointmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Appointment
+     */
+    omit?: AppointmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppointmentInclude<ExtArgs> | null
+    where?: AppointmentWhereInput
+  }
+
+  /**
+   * FollowUp.clinicalExamination
+   */
+  export type FollowUp$clinicalExaminationArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClinicalExamination
+     */
+    select?: ClinicalExaminationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClinicalExamination
+     */
+    omit?: ClinicalExaminationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClinicalExaminationInclude<ExtArgs> | null
+    where?: ClinicalExaminationWhereInput
+  }
+
+  /**
+   * FollowUp.surgery
+   */
+  export type FollowUp$surgeryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Surgery
+     */
+    select?: SurgerySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Surgery
+     */
+    omit?: SurgeryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SurgeryInclude<ExtArgs> | null
+    where?: SurgeryWhereInput
+  }
+
+  /**
+   * FollowUp.prescription
+   */
+  export type FollowUp$prescriptionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Prescription
+     */
+    select?: PrescriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Prescription
+     */
+    omit?: PrescriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PrescriptionInclude<ExtArgs> | null
+    where?: PrescriptionWhereInput
+  }
+
+  /**
+   * FollowUp without action
+   */
+  export type FollowUpDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FollowUp
+     */
+    select?: FollowUpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FollowUp
+     */
+    omit?: FollowUpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FollowUpInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model StaffAssignment
    */
 
@@ -22656,6 +24370,8 @@ export namespace Prisma {
     axisLeft: 'axisLeft',
     diagnosis: 'diagnosis',
     managementPlan: 'managementPlan',
+    nextReviewDate: 'nextReviewDate',
+    nextReviewReason: 'nextReviewReason',
     examinedById: 'examinedById',
     examinedAt: 'examinedAt'
   };
@@ -22673,6 +24389,7 @@ export namespace Prisma {
     cost: 'cost',
     status: 'status',
     notes: 'notes',
+    nextFollowUpDate: 'nextFollowUpDate',
     surgeonId: 'surgeonId',
     createdAt: 'createdAt'
   };
@@ -22689,6 +24406,7 @@ export namespace Prisma {
     itemId: 'itemId',
     quantity: 'quantity',
     instructions: 'instructions',
+    reviewAfterDays: 'reviewAfterDays',
     createdAt: 'createdAt'
   };
 
@@ -22710,7 +24428,8 @@ export namespace Prisma {
     sellingPrice: 'sellingPrice',
     expiryDate: 'expiryDate',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    isActive: 'isActive'
   };
 
   export type PharmacyItemScalarFieldEnum = (typeof PharmacyItemScalarFieldEnum)[keyof typeof PharmacyItemScalarFieldEnum]
@@ -22744,7 +24463,8 @@ export namespace Prisma {
     purchasePrice: 'purchasePrice',
     sellingPrice: 'sellingPrice',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    isActive: 'isActive'
   };
 
   export type OpticalItemScalarFieldEnum = (typeof OpticalItemScalarFieldEnum)[keyof typeof OpticalItemScalarFieldEnum]
@@ -22785,6 +24505,26 @@ export namespace Prisma {
   };
 
   export type BillingScalarFieldEnum = (typeof BillingScalarFieldEnum)[keyof typeof BillingScalarFieldEnum]
+
+
+  export const FollowUpScalarFieldEnum: {
+    id: 'id',
+    patientId: 'patientId',
+    branchId: 'branchId',
+    sourceType: 'sourceType',
+    sourceId: 'sourceId',
+    dueDate: 'dueDate',
+    status: 'status',
+    notes: 'notes',
+    completedAppointmentId: 'completedAppointmentId',
+    clinicalExaminationId: 'clinicalExaminationId',
+    surgeryId: 'surgeryId',
+    prescriptionId: 'prescriptionId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type FollowUpScalarFieldEnum = (typeof FollowUpScalarFieldEnum)[keyof typeof FollowUpScalarFieldEnum]
 
 
   export const StaffAssignmentScalarFieldEnum: {
@@ -22933,6 +24673,34 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'FollowUpSourceType'
+   */
+  export type EnumFollowUpSourceTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FollowUpSourceType'>
+    
+
+
+  /**
+   * Reference to a field of type 'FollowUpSourceType[]'
+   */
+  export type ListEnumFollowUpSourceTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FollowUpSourceType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'FollowUpStatus'
+   */
+  export type EnumFollowUpStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FollowUpStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'FollowUpStatus[]'
+   */
+  export type ListEnumFollowUpStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FollowUpStatus[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -23017,6 +24785,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemListRelationFilter
     opticalTransactions?: OpticalStockTransactionListRelationFilter
     billings?: BillingListRelationFilter
+    followUps?: FollowUpListRelationFilter
   }
 
   export type BranchOrderByWithRelationInput = {
@@ -23039,6 +24808,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemOrderByRelationAggregateInput
     opticalTransactions?: OpticalStockTransactionOrderByRelationAggregateInput
     billings?: BillingOrderByRelationAggregateInput
+    followUps?: FollowUpOrderByRelationAggregateInput
   }
 
   export type BranchWhereUniqueInput = Prisma.AtLeast<{
@@ -23064,6 +24834,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemListRelationFilter
     opticalTransactions?: OpticalStockTransactionListRelationFilter
     billings?: BillingListRelationFilter
+    followUps?: FollowUpListRelationFilter
   }, "id">
 
   export type BranchOrderByWithAggregationInput = {
@@ -23315,6 +25086,7 @@ export namespace Prisma {
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     appointments?: AppointmentListRelationFilter
     billings?: BillingListRelationFilter
+    followUps?: FollowUpListRelationFilter
   }
 
   export type PatientOrderByWithRelationInput = {
@@ -23331,6 +25103,7 @@ export namespace Prisma {
     branch?: BranchOrderByWithRelationInput
     appointments?: AppointmentOrderByRelationAggregateInput
     billings?: BillingOrderByRelationAggregateInput
+    followUps?: FollowUpOrderByRelationAggregateInput
   }
 
   export type PatientWhereUniqueInput = Prisma.AtLeast<{
@@ -23350,6 +25123,7 @@ export namespace Prisma {
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     appointments?: AppointmentListRelationFilter
     billings?: BillingListRelationFilter
+    followUps?: FollowUpListRelationFilter
   }, "id" | "phone">
 
   export type PatientOrderByWithAggregationInput = {
@@ -23407,6 +25181,7 @@ export namespace Prisma {
     clinicalExamination?: XOR<ClinicalExaminationNullableScalarRelationFilter, ClinicalExaminationWhereInput> | null
     prescriptions?: PrescriptionListRelationFilter
     billings?: BillingListRelationFilter
+    completedFollowUps?: FollowUpListRelationFilter
   }
 
   export type AppointmentOrderByWithRelationInput = {
@@ -23429,6 +25204,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationOrderByWithRelationInput
     prescriptions?: PrescriptionOrderByRelationAggregateInput
     billings?: BillingOrderByRelationAggregateInput
+    completedFollowUps?: FollowUpOrderByRelationAggregateInput
   }
 
   export type AppointmentWhereUniqueInput = Prisma.AtLeast<{
@@ -23454,6 +25230,7 @@ export namespace Prisma {
     clinicalExamination?: XOR<ClinicalExaminationNullableScalarRelationFilter, ClinicalExaminationWhereInput> | null
     prescriptions?: PrescriptionListRelationFilter
     billings?: BillingListRelationFilter
+    completedFollowUps?: FollowUpListRelationFilter
   }, "id" | "bookingNumber">
 
   export type AppointmentOrderByWithAggregationInput = {
@@ -23596,12 +25373,15 @@ export namespace Prisma {
     axisLeft?: IntNullableFilter<"ClinicalExamination"> | number | null
     diagnosis?: StringNullableFilter<"ClinicalExamination"> | string | null
     managementPlan?: StringNullableFilter<"ClinicalExamination"> | string | null
+    nextReviewDate?: DateTimeNullableFilter<"ClinicalExamination"> | Date | string | null
+    nextReviewReason?: StringNullableFilter<"ClinicalExamination"> | string | null
     examinedById?: StringFilter<"ClinicalExamination"> | string
     examinedAt?: DateTimeFilter<"ClinicalExamination"> | Date | string
     appointment?: XOR<AppointmentScalarRelationFilter, AppointmentWhereInput>
     examinedBy?: XOR<DoctorScalarRelationFilter, DoctorWhereInput>
     surgery?: XOR<SurgeryNullableScalarRelationFilter, SurgeryWhereInput> | null
     prescriptions?: PrescriptionListRelationFilter
+    followUps?: FollowUpListRelationFilter
   }
 
   export type ClinicalExaminationOrderByWithRelationInput = {
@@ -23615,12 +25395,15 @@ export namespace Prisma {
     axisLeft?: SortOrderInput | SortOrder
     diagnosis?: SortOrderInput | SortOrder
     managementPlan?: SortOrderInput | SortOrder
+    nextReviewDate?: SortOrderInput | SortOrder
+    nextReviewReason?: SortOrderInput | SortOrder
     examinedById?: SortOrder
     examinedAt?: SortOrder
     appointment?: AppointmentOrderByWithRelationInput
     examinedBy?: DoctorOrderByWithRelationInput
     surgery?: SurgeryOrderByWithRelationInput
     prescriptions?: PrescriptionOrderByRelationAggregateInput
+    followUps?: FollowUpOrderByRelationAggregateInput
   }
 
   export type ClinicalExaminationWhereUniqueInput = Prisma.AtLeast<{
@@ -23637,12 +25420,15 @@ export namespace Prisma {
     axisLeft?: IntNullableFilter<"ClinicalExamination"> | number | null
     diagnosis?: StringNullableFilter<"ClinicalExamination"> | string | null
     managementPlan?: StringNullableFilter<"ClinicalExamination"> | string | null
+    nextReviewDate?: DateTimeNullableFilter<"ClinicalExamination"> | Date | string | null
+    nextReviewReason?: StringNullableFilter<"ClinicalExamination"> | string | null
     examinedById?: StringFilter<"ClinicalExamination"> | string
     examinedAt?: DateTimeFilter<"ClinicalExamination"> | Date | string
     appointment?: XOR<AppointmentScalarRelationFilter, AppointmentWhereInput>
     examinedBy?: XOR<DoctorScalarRelationFilter, DoctorWhereInput>
     surgery?: XOR<SurgeryNullableScalarRelationFilter, SurgeryWhereInput> | null
     prescriptions?: PrescriptionListRelationFilter
+    followUps?: FollowUpListRelationFilter
   }, "id" | "appointmentId">
 
   export type ClinicalExaminationOrderByWithAggregationInput = {
@@ -23656,6 +25442,8 @@ export namespace Prisma {
     axisLeft?: SortOrderInput | SortOrder
     diagnosis?: SortOrderInput | SortOrder
     managementPlan?: SortOrderInput | SortOrder
+    nextReviewDate?: SortOrderInput | SortOrder
+    nextReviewReason?: SortOrderInput | SortOrder
     examinedById?: SortOrder
     examinedAt?: SortOrder
     _count?: ClinicalExaminationCountOrderByAggregateInput
@@ -23679,6 +25467,8 @@ export namespace Prisma {
     axisLeft?: IntNullableWithAggregatesFilter<"ClinicalExamination"> | number | null
     diagnosis?: StringNullableWithAggregatesFilter<"ClinicalExamination"> | string | null
     managementPlan?: StringNullableWithAggregatesFilter<"ClinicalExamination"> | string | null
+    nextReviewDate?: DateTimeNullableWithAggregatesFilter<"ClinicalExamination"> | Date | string | null
+    nextReviewReason?: StringNullableWithAggregatesFilter<"ClinicalExamination"> | string | null
     examinedById?: StringWithAggregatesFilter<"ClinicalExamination"> | string
     examinedAt?: DateTimeWithAggregatesFilter<"ClinicalExamination"> | Date | string
   }
@@ -23696,12 +25486,14 @@ export namespace Prisma {
     cost?: DecimalFilter<"Surgery"> | Decimal | DecimalJsLike | number | string
     status?: StringFilter<"Surgery"> | string
     notes?: StringNullableFilter<"Surgery"> | string | null
+    nextFollowUpDate?: DateTimeNullableFilter<"Surgery"> | Date | string | null
     surgeonId?: StringFilter<"Surgery"> | string
     createdAt?: DateTimeFilter<"Surgery"> | Date | string
     clinicalExam?: XOR<ClinicalExaminationScalarRelationFilter, ClinicalExaminationWhereInput>
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     surgeon?: XOR<DoctorScalarRelationFilter, DoctorWhereInput>
     billings?: BillingListRelationFilter
+    followUps?: FollowUpListRelationFilter
   }
 
   export type SurgeryOrderByWithRelationInput = {
@@ -23714,12 +25506,14 @@ export namespace Prisma {
     cost?: SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
+    nextFollowUpDate?: SortOrderInput | SortOrder
     surgeonId?: SortOrder
     createdAt?: SortOrder
     clinicalExam?: ClinicalExaminationOrderByWithRelationInput
     branch?: BranchOrderByWithRelationInput
     surgeon?: DoctorOrderByWithRelationInput
     billings?: BillingOrderByRelationAggregateInput
+    followUps?: FollowUpOrderByRelationAggregateInput
   }
 
   export type SurgeryWhereUniqueInput = Prisma.AtLeast<{
@@ -23735,12 +25529,14 @@ export namespace Prisma {
     cost?: DecimalFilter<"Surgery"> | Decimal | DecimalJsLike | number | string
     status?: StringFilter<"Surgery"> | string
     notes?: StringNullableFilter<"Surgery"> | string | null
+    nextFollowUpDate?: DateTimeNullableFilter<"Surgery"> | Date | string | null
     surgeonId?: StringFilter<"Surgery"> | string
     createdAt?: DateTimeFilter<"Surgery"> | Date | string
     clinicalExam?: XOR<ClinicalExaminationScalarRelationFilter, ClinicalExaminationWhereInput>
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     surgeon?: XOR<DoctorScalarRelationFilter, DoctorWhereInput>
     billings?: BillingListRelationFilter
+    followUps?: FollowUpListRelationFilter
   }, "id" | "examId">
 
   export type SurgeryOrderByWithAggregationInput = {
@@ -23753,6 +25549,7 @@ export namespace Prisma {
     cost?: SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
+    nextFollowUpDate?: SortOrderInput | SortOrder
     surgeonId?: SortOrder
     createdAt?: SortOrder
     _count?: SurgeryCountOrderByAggregateInput
@@ -23775,6 +25572,7 @@ export namespace Prisma {
     cost?: DecimalWithAggregatesFilter<"Surgery"> | Decimal | DecimalJsLike | number | string
     status?: StringWithAggregatesFilter<"Surgery"> | string
     notes?: StringNullableWithAggregatesFilter<"Surgery"> | string | null
+    nextFollowUpDate?: DateTimeNullableWithAggregatesFilter<"Surgery"> | Date | string | null
     surgeonId?: StringWithAggregatesFilter<"Surgery"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Surgery"> | Date | string
   }
@@ -23791,11 +25589,13 @@ export namespace Prisma {
     itemId?: StringNullableFilter<"Prescription"> | string | null
     quantity?: IntFilter<"Prescription"> | number
     instructions?: StringNullableFilter<"Prescription"> | string | null
+    reviewAfterDays?: IntNullableFilter<"Prescription"> | number | null
     createdAt?: DateTimeFilter<"Prescription"> | Date | string
     appointment?: XOR<AppointmentScalarRelationFilter, AppointmentWhereInput>
     clinicalExam?: XOR<ClinicalExaminationScalarRelationFilter, ClinicalExaminationWhereInput>
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     billings?: BillingListRelationFilter
+    followUps?: FollowUpListRelationFilter
   }
 
   export type PrescriptionOrderByWithRelationInput = {
@@ -23807,11 +25607,13 @@ export namespace Prisma {
     itemId?: SortOrderInput | SortOrder
     quantity?: SortOrder
     instructions?: SortOrderInput | SortOrder
+    reviewAfterDays?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     appointment?: AppointmentOrderByWithRelationInput
     clinicalExam?: ClinicalExaminationOrderByWithRelationInput
     branch?: BranchOrderByWithRelationInput
     billings?: BillingOrderByRelationAggregateInput
+    followUps?: FollowUpOrderByRelationAggregateInput
   }
 
   export type PrescriptionWhereUniqueInput = Prisma.AtLeast<{
@@ -23826,11 +25628,13 @@ export namespace Prisma {
     itemId?: StringNullableFilter<"Prescription"> | string | null
     quantity?: IntFilter<"Prescription"> | number
     instructions?: StringNullableFilter<"Prescription"> | string | null
+    reviewAfterDays?: IntNullableFilter<"Prescription"> | number | null
     createdAt?: DateTimeFilter<"Prescription"> | Date | string
     appointment?: XOR<AppointmentScalarRelationFilter, AppointmentWhereInput>
     clinicalExam?: XOR<ClinicalExaminationScalarRelationFilter, ClinicalExaminationWhereInput>
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     billings?: BillingListRelationFilter
+    followUps?: FollowUpListRelationFilter
   }, "id">
 
   export type PrescriptionOrderByWithAggregationInput = {
@@ -23842,6 +25646,7 @@ export namespace Prisma {
     itemId?: SortOrderInput | SortOrder
     quantity?: SortOrder
     instructions?: SortOrderInput | SortOrder
+    reviewAfterDays?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: PrescriptionCountOrderByAggregateInput
     _avg?: PrescriptionAvgOrderByAggregateInput
@@ -23862,6 +25667,7 @@ export namespace Prisma {
     itemId?: StringNullableWithAggregatesFilter<"Prescription"> | string | null
     quantity?: IntWithAggregatesFilter<"Prescription"> | number
     instructions?: StringNullableWithAggregatesFilter<"Prescription"> | string | null
+    reviewAfterDays?: IntNullableWithAggregatesFilter<"Prescription"> | number | null
     createdAt?: DateTimeWithAggregatesFilter<"Prescription"> | Date | string
   }
 
@@ -23884,6 +25690,7 @@ export namespace Prisma {
     expiryDate?: DateTimeNullableFilter<"PharmacyItem"> | Date | string | null
     createdAt?: DateTimeFilter<"PharmacyItem"> | Date | string
     updatedAt?: DateTimeFilter<"PharmacyItem"> | Date | string
+    isActive?: BoolFilter<"PharmacyItem"> | boolean
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     transactions?: PharmacyStockTransactionListRelationFilter
   }
@@ -23904,12 +25711,14 @@ export namespace Prisma {
     expiryDate?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    isActive?: SortOrder
     branch?: BranchOrderByWithRelationInput
     transactions?: PharmacyStockTransactionOrderByRelationAggregateInput
   }
 
   export type PharmacyItemWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    branchId_itemName_batchNumber?: PharmacyItemBranchIdItemNameBatchNumberCompoundUniqueInput
     AND?: PharmacyItemWhereInput | PharmacyItemWhereInput[]
     OR?: PharmacyItemWhereInput[]
     NOT?: PharmacyItemWhereInput | PharmacyItemWhereInput[]
@@ -23927,9 +25736,10 @@ export namespace Prisma {
     expiryDate?: DateTimeNullableFilter<"PharmacyItem"> | Date | string | null
     createdAt?: DateTimeFilter<"PharmacyItem"> | Date | string
     updatedAt?: DateTimeFilter<"PharmacyItem"> | Date | string
+    isActive?: BoolFilter<"PharmacyItem"> | boolean
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     transactions?: PharmacyStockTransactionListRelationFilter
-  }, "id">
+  }, "id" | "branchId_itemName_batchNumber">
 
   export type PharmacyItemOrderByWithAggregationInput = {
     id?: SortOrder
@@ -23947,6 +25757,7 @@ export namespace Prisma {
     expiryDate?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    isActive?: SortOrder
     _count?: PharmacyItemCountOrderByAggregateInput
     _avg?: PharmacyItemAvgOrderByAggregateInput
     _max?: PharmacyItemMaxOrderByAggregateInput
@@ -23973,6 +25784,7 @@ export namespace Prisma {
     expiryDate?: DateTimeNullableWithAggregatesFilter<"PharmacyItem"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"PharmacyItem"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"PharmacyItem"> | Date | string
+    isActive?: BoolWithAggregatesFilter<"PharmacyItem"> | boolean
   }
 
   export type PharmacyStockTransactionWhereInput = {
@@ -24078,6 +25890,7 @@ export namespace Prisma {
     sellingPrice?: DecimalFilter<"OpticalItem"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFilter<"OpticalItem"> | Date | string
     updatedAt?: DateTimeFilter<"OpticalItem"> | Date | string
+    isActive?: BoolFilter<"OpticalItem"> | boolean
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     transactions?: OpticalStockTransactionListRelationFilter
   }
@@ -24096,12 +25909,14 @@ export namespace Prisma {
     sellingPrice?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    isActive?: SortOrder
     branch?: BranchOrderByWithRelationInput
     transactions?: OpticalStockTransactionOrderByRelationAggregateInput
   }
 
   export type OpticalItemWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    branchId_itemName_brand?: OpticalItemBranchIdItemNameBrandCompoundUniqueInput
     AND?: OpticalItemWhereInput | OpticalItemWhereInput[]
     OR?: OpticalItemWhereInput[]
     NOT?: OpticalItemWhereInput | OpticalItemWhereInput[]
@@ -24117,9 +25932,10 @@ export namespace Prisma {
     sellingPrice?: DecimalFilter<"OpticalItem"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFilter<"OpticalItem"> | Date | string
     updatedAt?: DateTimeFilter<"OpticalItem"> | Date | string
+    isActive?: BoolFilter<"OpticalItem"> | boolean
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     transactions?: OpticalStockTransactionListRelationFilter
-  }, "id">
+  }, "id" | "branchId_itemName_brand">
 
   export type OpticalItemOrderByWithAggregationInput = {
     id?: SortOrder
@@ -24135,6 +25951,7 @@ export namespace Prisma {
     sellingPrice?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    isActive?: SortOrder
     _count?: OpticalItemCountOrderByAggregateInput
     _avg?: OpticalItemAvgOrderByAggregateInput
     _max?: OpticalItemMaxOrderByAggregateInput
@@ -24159,6 +25976,7 @@ export namespace Prisma {
     sellingPrice?: DecimalWithAggregatesFilter<"OpticalItem"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeWithAggregatesFilter<"OpticalItem"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"OpticalItem"> | Date | string
+    isActive?: BoolWithAggregatesFilter<"OpticalItem"> | boolean
   }
 
   export type OpticalStockTransactionWhereInput = {
@@ -24380,6 +26198,121 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"Billing"> | Date | string
   }
 
+  export type FollowUpWhereInput = {
+    AND?: FollowUpWhereInput | FollowUpWhereInput[]
+    OR?: FollowUpWhereInput[]
+    NOT?: FollowUpWhereInput | FollowUpWhereInput[]
+    id?: StringFilter<"FollowUp"> | string
+    patientId?: StringFilter<"FollowUp"> | string
+    branchId?: StringFilter<"FollowUp"> | string
+    sourceType?: EnumFollowUpSourceTypeFilter<"FollowUp"> | $Enums.FollowUpSourceType
+    sourceId?: StringFilter<"FollowUp"> | string
+    dueDate?: DateTimeFilter<"FollowUp"> | Date | string
+    status?: EnumFollowUpStatusFilter<"FollowUp"> | $Enums.FollowUpStatus
+    notes?: StringNullableFilter<"FollowUp"> | string | null
+    completedAppointmentId?: StringNullableFilter<"FollowUp"> | string | null
+    clinicalExaminationId?: StringNullableFilter<"FollowUp"> | string | null
+    surgeryId?: StringNullableFilter<"FollowUp"> | string | null
+    prescriptionId?: StringNullableFilter<"FollowUp"> | string | null
+    createdAt?: DateTimeFilter<"FollowUp"> | Date | string
+    updatedAt?: DateTimeFilter<"FollowUp"> | Date | string
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
+    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    completedAppointment?: XOR<AppointmentNullableScalarRelationFilter, AppointmentWhereInput> | null
+    clinicalExamination?: XOR<ClinicalExaminationNullableScalarRelationFilter, ClinicalExaminationWhereInput> | null
+    surgery?: XOR<SurgeryNullableScalarRelationFilter, SurgeryWhereInput> | null
+    prescription?: XOR<PrescriptionNullableScalarRelationFilter, PrescriptionWhereInput> | null
+  }
+
+  export type FollowUpOrderByWithRelationInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    branchId?: SortOrder
+    sourceType?: SortOrder
+    sourceId?: SortOrder
+    dueDate?: SortOrder
+    status?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    completedAppointmentId?: SortOrderInput | SortOrder
+    clinicalExaminationId?: SortOrderInput | SortOrder
+    surgeryId?: SortOrderInput | SortOrder
+    prescriptionId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    patient?: PatientOrderByWithRelationInput
+    branch?: BranchOrderByWithRelationInput
+    completedAppointment?: AppointmentOrderByWithRelationInput
+    clinicalExamination?: ClinicalExaminationOrderByWithRelationInput
+    surgery?: SurgeryOrderByWithRelationInput
+    prescription?: PrescriptionOrderByWithRelationInput
+  }
+
+  export type FollowUpWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: FollowUpWhereInput | FollowUpWhereInput[]
+    OR?: FollowUpWhereInput[]
+    NOT?: FollowUpWhereInput | FollowUpWhereInput[]
+    patientId?: StringFilter<"FollowUp"> | string
+    branchId?: StringFilter<"FollowUp"> | string
+    sourceType?: EnumFollowUpSourceTypeFilter<"FollowUp"> | $Enums.FollowUpSourceType
+    sourceId?: StringFilter<"FollowUp"> | string
+    dueDate?: DateTimeFilter<"FollowUp"> | Date | string
+    status?: EnumFollowUpStatusFilter<"FollowUp"> | $Enums.FollowUpStatus
+    notes?: StringNullableFilter<"FollowUp"> | string | null
+    completedAppointmentId?: StringNullableFilter<"FollowUp"> | string | null
+    clinicalExaminationId?: StringNullableFilter<"FollowUp"> | string | null
+    surgeryId?: StringNullableFilter<"FollowUp"> | string | null
+    prescriptionId?: StringNullableFilter<"FollowUp"> | string | null
+    createdAt?: DateTimeFilter<"FollowUp"> | Date | string
+    updatedAt?: DateTimeFilter<"FollowUp"> | Date | string
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
+    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    completedAppointment?: XOR<AppointmentNullableScalarRelationFilter, AppointmentWhereInput> | null
+    clinicalExamination?: XOR<ClinicalExaminationNullableScalarRelationFilter, ClinicalExaminationWhereInput> | null
+    surgery?: XOR<SurgeryNullableScalarRelationFilter, SurgeryWhereInput> | null
+    prescription?: XOR<PrescriptionNullableScalarRelationFilter, PrescriptionWhereInput> | null
+  }, "id">
+
+  export type FollowUpOrderByWithAggregationInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    branchId?: SortOrder
+    sourceType?: SortOrder
+    sourceId?: SortOrder
+    dueDate?: SortOrder
+    status?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    completedAppointmentId?: SortOrderInput | SortOrder
+    clinicalExaminationId?: SortOrderInput | SortOrder
+    surgeryId?: SortOrderInput | SortOrder
+    prescriptionId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: FollowUpCountOrderByAggregateInput
+    _max?: FollowUpMaxOrderByAggregateInput
+    _min?: FollowUpMinOrderByAggregateInput
+  }
+
+  export type FollowUpScalarWhereWithAggregatesInput = {
+    AND?: FollowUpScalarWhereWithAggregatesInput | FollowUpScalarWhereWithAggregatesInput[]
+    OR?: FollowUpScalarWhereWithAggregatesInput[]
+    NOT?: FollowUpScalarWhereWithAggregatesInput | FollowUpScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FollowUp"> | string
+    patientId?: StringWithAggregatesFilter<"FollowUp"> | string
+    branchId?: StringWithAggregatesFilter<"FollowUp"> | string
+    sourceType?: EnumFollowUpSourceTypeWithAggregatesFilter<"FollowUp"> | $Enums.FollowUpSourceType
+    sourceId?: StringWithAggregatesFilter<"FollowUp"> | string
+    dueDate?: DateTimeWithAggregatesFilter<"FollowUp"> | Date | string
+    status?: EnumFollowUpStatusWithAggregatesFilter<"FollowUp"> | $Enums.FollowUpStatus
+    notes?: StringNullableWithAggregatesFilter<"FollowUp"> | string | null
+    completedAppointmentId?: StringNullableWithAggregatesFilter<"FollowUp"> | string | null
+    clinicalExaminationId?: StringNullableWithAggregatesFilter<"FollowUp"> | string | null
+    surgeryId?: StringNullableWithAggregatesFilter<"FollowUp"> | string | null
+    prescriptionId?: StringNullableWithAggregatesFilter<"FollowUp"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"FollowUp"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"FollowUp"> | Date | string
+  }
+
   export type StaffAssignmentWhereInput = {
     AND?: StaffAssignmentWhereInput | StaffAssignmentWhereInput[]
     OR?: StaffAssignmentWhereInput[]
@@ -24505,6 +26438,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateInput = {
@@ -24527,6 +26461,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUpdateInput = {
@@ -24549,6 +26484,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateInput = {
@@ -24571,6 +26507,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchCreateManyInput = {
@@ -24848,6 +26785,7 @@ export namespace Prisma {
     branch: BranchCreateNestedOneWithoutPatientsInput
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
     billings?: BillingCreateNestedManyWithoutPatientInput
+    followUps?: FollowUpCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateInput = {
@@ -24863,6 +26801,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
     billings?: BillingUncheckedCreateNestedManyWithoutPatientInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUpdateInput = {
@@ -24878,6 +26817,7 @@ export namespace Prisma {
     branch?: BranchUpdateOneRequiredWithoutPatientsNestedInput
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
     billings?: BillingUpdateManyWithoutPatientNestedInput
+    followUps?: FollowUpUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateInput = {
@@ -24893,6 +26833,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
     billings?: BillingUncheckedUpdateManyWithoutPatientNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientCreateManyInput = {
@@ -24949,6 +26890,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationCreateNestedOneWithoutAppointmentInput
     prescriptions?: PrescriptionCreateNestedManyWithoutAppointmentInput
     billings?: BillingCreateNestedManyWithoutAppointmentInput
+    completedFollowUps?: FollowUpCreateNestedManyWithoutCompletedAppointmentInput
   }
 
   export type AppointmentUncheckedCreateInput = {
@@ -24967,6 +26909,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationUncheckedCreateNestedOneWithoutAppointmentInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutAppointmentInput
     billings?: BillingUncheckedCreateNestedManyWithoutAppointmentInput
+    completedFollowUps?: FollowUpUncheckedCreateNestedManyWithoutCompletedAppointmentInput
   }
 
   export type AppointmentUpdateInput = {
@@ -24985,6 +26928,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationUpdateOneWithoutAppointmentNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutAppointmentNestedInput
     billings?: BillingUpdateManyWithoutAppointmentNestedInput
+    completedFollowUps?: FollowUpUpdateManyWithoutCompletedAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateInput = {
@@ -25003,6 +26947,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationUncheckedUpdateOneWithoutAppointmentNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutAppointmentNestedInput
     billings?: BillingUncheckedUpdateManyWithoutAppointmentNestedInput
+    completedFollowUps?: FollowUpUncheckedUpdateManyWithoutCompletedAppointmentNestedInput
   }
 
   export type AppointmentCreateManyInput = {
@@ -25149,11 +27094,14 @@ export namespace Prisma {
     axisLeft?: number | null
     diagnosis?: string | null
     managementPlan?: string | null
+    nextReviewDate?: Date | string | null
+    nextReviewReason?: string | null
     examinedAt?: Date | string
     appointment: AppointmentCreateNestedOneWithoutClinicalExaminationInput
     examinedBy: DoctorCreateNestedOneWithoutExaminedClinicalExamsInput
     surgery?: SurgeryCreateNestedOneWithoutClinicalExamInput
     prescriptions?: PrescriptionCreateNestedManyWithoutClinicalExamInput
+    followUps?: FollowUpCreateNestedManyWithoutClinicalExaminationInput
   }
 
   export type ClinicalExaminationUncheckedCreateInput = {
@@ -25167,10 +27115,13 @@ export namespace Prisma {
     axisLeft?: number | null
     diagnosis?: string | null
     managementPlan?: string | null
+    nextReviewDate?: Date | string | null
+    nextReviewReason?: string | null
     examinedById: string
     examinedAt?: Date | string
     surgery?: SurgeryUncheckedCreateNestedOneWithoutClinicalExamInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutClinicalExamInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutClinicalExaminationInput
   }
 
   export type ClinicalExaminationUpdateInput = {
@@ -25183,11 +27134,14 @@ export namespace Prisma {
     axisLeft?: NullableIntFieldUpdateOperationsInput | number | null
     diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     managementPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    nextReviewDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextReviewReason?: NullableStringFieldUpdateOperationsInput | string | null
     examinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointment?: AppointmentUpdateOneRequiredWithoutClinicalExaminationNestedInput
     examinedBy?: DoctorUpdateOneRequiredWithoutExaminedClinicalExamsNestedInput
     surgery?: SurgeryUpdateOneWithoutClinicalExamNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutClinicalExamNestedInput
+    followUps?: FollowUpUpdateManyWithoutClinicalExaminationNestedInput
   }
 
   export type ClinicalExaminationUncheckedUpdateInput = {
@@ -25201,10 +27155,13 @@ export namespace Prisma {
     axisLeft?: NullableIntFieldUpdateOperationsInput | number | null
     diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     managementPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    nextReviewDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextReviewReason?: NullableStringFieldUpdateOperationsInput | string | null
     examinedById?: StringFieldUpdateOperationsInput | string
     examinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     surgery?: SurgeryUncheckedUpdateOneWithoutClinicalExamNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutClinicalExamNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutClinicalExaminationNestedInput
   }
 
   export type ClinicalExaminationCreateManyInput = {
@@ -25218,6 +27175,8 @@ export namespace Prisma {
     axisLeft?: number | null
     diagnosis?: string | null
     managementPlan?: string | null
+    nextReviewDate?: Date | string | null
+    nextReviewReason?: string | null
     examinedById: string
     examinedAt?: Date | string
   }
@@ -25232,6 +27191,8 @@ export namespace Prisma {
     axisLeft?: NullableIntFieldUpdateOperationsInput | number | null
     diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     managementPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    nextReviewDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextReviewReason?: NullableStringFieldUpdateOperationsInput | string | null
     examinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -25246,6 +27207,8 @@ export namespace Prisma {
     axisLeft?: NullableIntFieldUpdateOperationsInput | number | null
     diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     managementPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    nextReviewDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextReviewReason?: NullableStringFieldUpdateOperationsInput | string | null
     examinedById?: StringFieldUpdateOperationsInput | string
     examinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -25258,11 +27221,13 @@ export namespace Prisma {
     cost: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
+    nextFollowUpDate?: Date | string | null
     createdAt?: Date | string
     clinicalExam: ClinicalExaminationCreateNestedOneWithoutSurgeryInput
     branch: BranchCreateNestedOneWithoutSurgeriesInput
     surgeon: DoctorCreateNestedOneWithoutSurgeriesInput
     billings?: BillingCreateNestedManyWithoutSurgeryInput
+    followUps?: FollowUpCreateNestedManyWithoutSurgeryInput
   }
 
   export type SurgeryUncheckedCreateInput = {
@@ -25275,9 +27240,11 @@ export namespace Prisma {
     cost: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
+    nextFollowUpDate?: Date | string | null
     surgeonId: string
     createdAt?: Date | string
     billings?: BillingUncheckedCreateNestedManyWithoutSurgeryInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutSurgeryInput
   }
 
   export type SurgeryUpdateInput = {
@@ -25288,11 +27255,13 @@ export namespace Prisma {
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinicalExam?: ClinicalExaminationUpdateOneRequiredWithoutSurgeryNestedInput
     branch?: BranchUpdateOneRequiredWithoutSurgeriesNestedInput
     surgeon?: DoctorUpdateOneRequiredWithoutSurgeriesNestedInput
     billings?: BillingUpdateManyWithoutSurgeryNestedInput
+    followUps?: FollowUpUpdateManyWithoutSurgeryNestedInput
   }
 
   export type SurgeryUncheckedUpdateInput = {
@@ -25305,9 +27274,11 @@ export namespace Prisma {
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     surgeonId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     billings?: BillingUncheckedUpdateManyWithoutSurgeryNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutSurgeryNestedInput
   }
 
   export type SurgeryCreateManyInput = {
@@ -25320,6 +27291,7 @@ export namespace Prisma {
     cost: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
+    nextFollowUpDate?: Date | string | null
     surgeonId: string
     createdAt?: Date | string
   }
@@ -25332,6 +27304,7 @@ export namespace Prisma {
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -25345,6 +27318,7 @@ export namespace Prisma {
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     surgeonId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -25355,11 +27329,13 @@ export namespace Prisma {
     itemId?: string | null
     quantity: number
     instructions?: string | null
+    reviewAfterDays?: number | null
     createdAt?: Date | string
     appointment: AppointmentCreateNestedOneWithoutPrescriptionsInput
     clinicalExam: ClinicalExaminationCreateNestedOneWithoutPrescriptionsInput
     branch: BranchCreateNestedOneWithoutPrescriptionsInput
     billings?: BillingCreateNestedManyWithoutPrescriptionInput
+    followUps?: FollowUpCreateNestedManyWithoutPrescriptionInput
   }
 
   export type PrescriptionUncheckedCreateInput = {
@@ -25371,8 +27347,10 @@ export namespace Prisma {
     itemId?: string | null
     quantity: number
     instructions?: string | null
+    reviewAfterDays?: number | null
     createdAt?: Date | string
     billings?: BillingUncheckedCreateNestedManyWithoutPrescriptionInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutPrescriptionInput
   }
 
   export type PrescriptionUpdateInput = {
@@ -25381,11 +27359,13 @@ export namespace Prisma {
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewAfterDays?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointment?: AppointmentUpdateOneRequiredWithoutPrescriptionsNestedInput
     clinicalExam?: ClinicalExaminationUpdateOneRequiredWithoutPrescriptionsNestedInput
     branch?: BranchUpdateOneRequiredWithoutPrescriptionsNestedInput
     billings?: BillingUpdateManyWithoutPrescriptionNestedInput
+    followUps?: FollowUpUpdateManyWithoutPrescriptionNestedInput
   }
 
   export type PrescriptionUncheckedUpdateInput = {
@@ -25397,8 +27377,10 @@ export namespace Prisma {
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewAfterDays?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     billings?: BillingUncheckedUpdateManyWithoutPrescriptionNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutPrescriptionNestedInput
   }
 
   export type PrescriptionCreateManyInput = {
@@ -25410,6 +27392,7 @@ export namespace Prisma {
     itemId?: string | null
     quantity: number
     instructions?: string | null
+    reviewAfterDays?: number | null
     createdAt?: Date | string
   }
 
@@ -25419,6 +27402,7 @@ export namespace Prisma {
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewAfterDays?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -25431,6 +27415,7 @@ export namespace Prisma {
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewAfterDays?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -25449,6 +27434,7 @@ export namespace Prisma {
     expiryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    isActive?: boolean
     branch: BranchCreateNestedOneWithoutPharmacyItemsInput
     transactions?: PharmacyStockTransactionCreateNestedManyWithoutPharmacyItemInput
   }
@@ -25469,6 +27455,7 @@ export namespace Prisma {
     expiryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    isActive?: boolean
     transactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutPharmacyItemInput
   }
 
@@ -25487,6 +27474,7 @@ export namespace Prisma {
     expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     branch?: BranchUpdateOneRequiredWithoutPharmacyItemsNestedInput
     transactions?: PharmacyStockTransactionUpdateManyWithoutPharmacyItemNestedInput
   }
@@ -25507,6 +27495,7 @@ export namespace Prisma {
     expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     transactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutPharmacyItemNestedInput
   }
 
@@ -25526,6 +27515,7 @@ export namespace Prisma {
     expiryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    isActive?: boolean
   }
 
   export type PharmacyItemUpdateManyMutationInput = {
@@ -25543,6 +27533,7 @@ export namespace Prisma {
     expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type PharmacyItemUncheckedUpdateManyInput = {
@@ -25561,6 +27552,7 @@ export namespace Prisma {
     expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type PharmacyStockTransactionCreateInput = {
@@ -25656,6 +27648,7 @@ export namespace Prisma {
     sellingPrice: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
+    isActive?: boolean
     branch: BranchCreateNestedOneWithoutOpticalItemsInput
     transactions?: OpticalStockTransactionCreateNestedManyWithoutOpticalItemInput
   }
@@ -25674,6 +27667,7 @@ export namespace Prisma {
     sellingPrice: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
+    isActive?: boolean
     transactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutOpticalItemInput
   }
 
@@ -25690,6 +27684,7 @@ export namespace Prisma {
     sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     branch?: BranchUpdateOneRequiredWithoutOpticalItemsNestedInput
     transactions?: OpticalStockTransactionUpdateManyWithoutOpticalItemNestedInput
   }
@@ -25708,6 +27703,7 @@ export namespace Prisma {
     sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     transactions?: OpticalStockTransactionUncheckedUpdateManyWithoutOpticalItemNestedInput
   }
 
@@ -25725,6 +27721,7 @@ export namespace Prisma {
     sellingPrice: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
+    isActive?: boolean
   }
 
   export type OpticalItemUpdateManyMutationInput = {
@@ -25740,6 +27737,7 @@ export namespace Prisma {
     sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type OpticalItemUncheckedUpdateManyInput = {
@@ -25756,6 +27754,7 @@ export namespace Prisma {
     sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type OpticalStockTransactionCreateInput = {
@@ -25969,6 +27968,119 @@ export namespace Prisma {
     referenceNumber?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBillingStatusFieldUpdateOperationsInput | $Enums.BillingStatus
     createdById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FollowUpCreateInput = {
+    id?: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutFollowUpsInput
+    branch: BranchCreateNestedOneWithoutFollowUpsInput
+    completedAppointment?: AppointmentCreateNestedOneWithoutCompletedFollowUpsInput
+    clinicalExamination?: ClinicalExaminationCreateNestedOneWithoutFollowUpsInput
+    surgery?: SurgeryCreateNestedOneWithoutFollowUpsInput
+    prescription?: PrescriptionCreateNestedOneWithoutFollowUpsInput
+  }
+
+  export type FollowUpUncheckedCreateInput = {
+    id?: string
+    patientId: string
+    branchId: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    completedAppointmentId?: string | null
+    clinicalExaminationId?: string | null
+    surgeryId?: string | null
+    prescriptionId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FollowUpUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutFollowUpsNestedInput
+    branch?: BranchUpdateOneRequiredWithoutFollowUpsNestedInput
+    completedAppointment?: AppointmentUpdateOneWithoutCompletedFollowUpsNestedInput
+    clinicalExamination?: ClinicalExaminationUpdateOneWithoutFollowUpsNestedInput
+    surgery?: SurgeryUpdateOneWithoutFollowUpsNestedInput
+    prescription?: PrescriptionUpdateOneWithoutFollowUpsNestedInput
+  }
+
+  export type FollowUpUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAppointmentId?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalExaminationId?: NullableStringFieldUpdateOperationsInput | string | null
+    surgeryId?: NullableStringFieldUpdateOperationsInput | string | null
+    prescriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FollowUpCreateManyInput = {
+    id?: string
+    patientId: string
+    branchId: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    completedAppointmentId?: string | null
+    clinicalExaminationId?: string | null
+    surgeryId?: string | null
+    prescriptionId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FollowUpUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FollowUpUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAppointmentId?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalExaminationId?: NullableStringFieldUpdateOperationsInput | string | null
+    surgeryId?: NullableStringFieldUpdateOperationsInput | string | null
+    prescriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26208,6 +28320,12 @@ export namespace Prisma {
     none?: BillingWhereInput
   }
 
+  export type FollowUpListRelationFilter = {
+    every?: FollowUpWhereInput
+    some?: FollowUpWhereInput
+    none?: FollowUpWhereInput
+  }
+
   export type StaffAssignmentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -26249,6 +28367,10 @@ export namespace Prisma {
   }
 
   export type BillingOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FollowUpOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -26717,6 +28839,8 @@ export namespace Prisma {
     axisLeft?: SortOrder
     diagnosis?: SortOrder
     managementPlan?: SortOrder
+    nextReviewDate?: SortOrder
+    nextReviewReason?: SortOrder
     examinedById?: SortOrder
     examinedAt?: SortOrder
   }
@@ -26741,6 +28865,8 @@ export namespace Prisma {
     axisLeft?: SortOrder
     diagnosis?: SortOrder
     managementPlan?: SortOrder
+    nextReviewDate?: SortOrder
+    nextReviewReason?: SortOrder
     examinedById?: SortOrder
     examinedAt?: SortOrder
   }
@@ -26756,6 +28882,8 @@ export namespace Prisma {
     axisLeft?: SortOrder
     diagnosis?: SortOrder
     managementPlan?: SortOrder
+    nextReviewDate?: SortOrder
+    nextReviewReason?: SortOrder
     examinedById?: SortOrder
     examinedAt?: SortOrder
   }
@@ -26800,6 +28928,7 @@ export namespace Prisma {
     cost?: SortOrder
     status?: SortOrder
     notes?: SortOrder
+    nextFollowUpDate?: SortOrder
     surgeonId?: SortOrder
     createdAt?: SortOrder
   }
@@ -26818,6 +28947,7 @@ export namespace Prisma {
     cost?: SortOrder
     status?: SortOrder
     notes?: SortOrder
+    nextFollowUpDate?: SortOrder
     surgeonId?: SortOrder
     createdAt?: SortOrder
   }
@@ -26832,6 +28962,7 @@ export namespace Prisma {
     cost?: SortOrder
     status?: SortOrder
     notes?: SortOrder
+    nextFollowUpDate?: SortOrder
     surgeonId?: SortOrder
     createdAt?: SortOrder
   }
@@ -26860,11 +28991,13 @@ export namespace Prisma {
     itemId?: SortOrder
     quantity?: SortOrder
     instructions?: SortOrder
+    reviewAfterDays?: SortOrder
     createdAt?: SortOrder
   }
 
   export type PrescriptionAvgOrderByAggregateInput = {
     quantity?: SortOrder
+    reviewAfterDays?: SortOrder
   }
 
   export type PrescriptionMaxOrderByAggregateInput = {
@@ -26876,6 +29009,7 @@ export namespace Prisma {
     itemId?: SortOrder
     quantity?: SortOrder
     instructions?: SortOrder
+    reviewAfterDays?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -26888,11 +29022,13 @@ export namespace Prisma {
     itemId?: SortOrder
     quantity?: SortOrder
     instructions?: SortOrder
+    reviewAfterDays?: SortOrder
     createdAt?: SortOrder
   }
 
   export type PrescriptionSumOrderByAggregateInput = {
     quantity?: SortOrder
+    reviewAfterDays?: SortOrder
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -26911,6 +29047,12 @@ export namespace Prisma {
     _max?: NestedIntFilter<$PrismaModel>
   }
 
+  export type PharmacyItemBranchIdItemNameBatchNumberCompoundUniqueInput = {
+    branchId: string
+    itemName: string
+    batchNumber: string
+  }
+
   export type PharmacyItemCountOrderByAggregateInput = {
     id?: SortOrder
     branchId?: SortOrder
@@ -26927,6 +29069,7 @@ export namespace Prisma {
     expiryDate?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    isActive?: SortOrder
   }
 
   export type PharmacyItemAvgOrderByAggregateInput = {
@@ -26952,6 +29095,7 @@ export namespace Prisma {
     expiryDate?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    isActive?: SortOrder
   }
 
   export type PharmacyItemMinOrderByAggregateInput = {
@@ -26970,6 +29114,7 @@ export namespace Prisma {
     expiryDate?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    isActive?: SortOrder
   }
 
   export type PharmacyItemSumOrderByAggregateInput = {
@@ -27035,6 +29180,12 @@ export namespace Prisma {
     unitPrice?: SortOrder
   }
 
+  export type OpticalItemBranchIdItemNameBrandCompoundUniqueInput = {
+    branchId: string
+    itemName: string
+    brand: string
+  }
+
   export type OpticalItemCountOrderByAggregateInput = {
     id?: SortOrder
     branchId?: SortOrder
@@ -27049,6 +29200,7 @@ export namespace Prisma {
     sellingPrice?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    isActive?: SortOrder
   }
 
   export type OpticalItemAvgOrderByAggregateInput = {
@@ -27072,6 +29224,7 @@ export namespace Prisma {
     sellingPrice?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    isActive?: SortOrder
   }
 
   export type OpticalItemMinOrderByAggregateInput = {
@@ -27088,6 +29241,7 @@ export namespace Prisma {
     sellingPrice?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    isActive?: SortOrder
   }
 
   export type OpticalItemSumOrderByAggregateInput = {
@@ -27259,6 +29413,91 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumBillingStatusFilter<$PrismaModel>
     _max?: NestedEnumBillingStatusFilter<$PrismaModel>
+  }
+
+  export type EnumFollowUpSourceTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.FollowUpSourceType | EnumFollowUpSourceTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.FollowUpSourceType[] | ListEnumFollowUpSourceTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FollowUpSourceType[] | ListEnumFollowUpSourceTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumFollowUpSourceTypeFilter<$PrismaModel> | $Enums.FollowUpSourceType
+  }
+
+  export type EnumFollowUpStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.FollowUpStatus | EnumFollowUpStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FollowUpStatus[] | ListEnumFollowUpStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FollowUpStatus[] | ListEnumFollowUpStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFollowUpStatusFilter<$PrismaModel> | $Enums.FollowUpStatus
+  }
+
+  export type FollowUpCountOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    branchId?: SortOrder
+    sourceType?: SortOrder
+    sourceId?: SortOrder
+    dueDate?: SortOrder
+    status?: SortOrder
+    notes?: SortOrder
+    completedAppointmentId?: SortOrder
+    clinicalExaminationId?: SortOrder
+    surgeryId?: SortOrder
+    prescriptionId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FollowUpMaxOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    branchId?: SortOrder
+    sourceType?: SortOrder
+    sourceId?: SortOrder
+    dueDate?: SortOrder
+    status?: SortOrder
+    notes?: SortOrder
+    completedAppointmentId?: SortOrder
+    clinicalExaminationId?: SortOrder
+    surgeryId?: SortOrder
+    prescriptionId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FollowUpMinOrderByAggregateInput = {
+    id?: SortOrder
+    patientId?: SortOrder
+    branchId?: SortOrder
+    sourceType?: SortOrder
+    sourceId?: SortOrder
+    dueDate?: SortOrder
+    status?: SortOrder
+    notes?: SortOrder
+    completedAppointmentId?: SortOrder
+    clinicalExaminationId?: SortOrder
+    surgeryId?: SortOrder
+    prescriptionId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumFollowUpSourceTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FollowUpSourceType | EnumFollowUpSourceTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.FollowUpSourceType[] | ListEnumFollowUpSourceTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FollowUpSourceType[] | ListEnumFollowUpSourceTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumFollowUpSourceTypeWithAggregatesFilter<$PrismaModel> | $Enums.FollowUpSourceType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFollowUpSourceTypeFilter<$PrismaModel>
+    _max?: NestedEnumFollowUpSourceTypeFilter<$PrismaModel>
+  }
+
+  export type EnumFollowUpStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FollowUpStatus | EnumFollowUpStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FollowUpStatus[] | ListEnumFollowUpStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FollowUpStatus[] | ListEnumFollowUpStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFollowUpStatusWithAggregatesFilter<$PrismaModel> | $Enums.FollowUpStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFollowUpStatusFilter<$PrismaModel>
+    _max?: NestedEnumFollowUpStatusFilter<$PrismaModel>
   }
 
   export type BoolNullableFilter<$PrismaModel = never> = {
@@ -27437,6 +29676,13 @@ export namespace Prisma {
     connect?: BillingWhereUniqueInput | BillingWhereUniqueInput[]
   }
 
+  export type FollowUpCreateNestedManyWithoutBranchInput = {
+    create?: XOR<FollowUpCreateWithoutBranchInput, FollowUpUncheckedCreateWithoutBranchInput> | FollowUpCreateWithoutBranchInput[] | FollowUpUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutBranchInput | FollowUpCreateOrConnectWithoutBranchInput[]
+    createMany?: FollowUpCreateManyBranchInputEnvelope
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+  }
+
   export type UserUncheckedCreateNestedManyWithoutBranchInput = {
     create?: XOR<UserCreateWithoutBranchInput, UserUncheckedCreateWithoutBranchInput> | UserCreateWithoutBranchInput[] | UserUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: UserCreateOrConnectWithoutBranchInput | UserCreateOrConnectWithoutBranchInput[]
@@ -27519,6 +29765,13 @@ export namespace Prisma {
     connectOrCreate?: BillingCreateOrConnectWithoutBranchInput | BillingCreateOrConnectWithoutBranchInput[]
     createMany?: BillingCreateManyBranchInputEnvelope
     connect?: BillingWhereUniqueInput | BillingWhereUniqueInput[]
+  }
+
+  export type FollowUpUncheckedCreateNestedManyWithoutBranchInput = {
+    create?: XOR<FollowUpCreateWithoutBranchInput, FollowUpUncheckedCreateWithoutBranchInput> | FollowUpCreateWithoutBranchInput[] | FollowUpUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutBranchInput | FollowUpCreateOrConnectWithoutBranchInput[]
+    createMany?: FollowUpCreateManyBranchInputEnvelope
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -27697,6 +29950,20 @@ export namespace Prisma {
     deleteMany?: BillingScalarWhereInput | BillingScalarWhereInput[]
   }
 
+  export type FollowUpUpdateManyWithoutBranchNestedInput = {
+    create?: XOR<FollowUpCreateWithoutBranchInput, FollowUpUncheckedCreateWithoutBranchInput> | FollowUpCreateWithoutBranchInput[] | FollowUpUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutBranchInput | FollowUpCreateOrConnectWithoutBranchInput[]
+    upsert?: FollowUpUpsertWithWhereUniqueWithoutBranchInput | FollowUpUpsertWithWhereUniqueWithoutBranchInput[]
+    createMany?: FollowUpCreateManyBranchInputEnvelope
+    set?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    disconnect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    delete?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    update?: FollowUpUpdateWithWhereUniqueWithoutBranchInput | FollowUpUpdateWithWhereUniqueWithoutBranchInput[]
+    updateMany?: FollowUpUpdateManyWithWhereWithoutBranchInput | FollowUpUpdateManyWithWhereWithoutBranchInput[]
+    deleteMany?: FollowUpScalarWhereInput | FollowUpScalarWhereInput[]
+  }
+
   export type UserUncheckedUpdateManyWithoutBranchNestedInput = {
     create?: XOR<UserCreateWithoutBranchInput, UserUncheckedCreateWithoutBranchInput> | UserCreateWithoutBranchInput[] | UserUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: UserCreateOrConnectWithoutBranchInput | UserCreateOrConnectWithoutBranchInput[]
@@ -27863,6 +30130,20 @@ export namespace Prisma {
     update?: BillingUpdateWithWhereUniqueWithoutBranchInput | BillingUpdateWithWhereUniqueWithoutBranchInput[]
     updateMany?: BillingUpdateManyWithWhereWithoutBranchInput | BillingUpdateManyWithWhereWithoutBranchInput[]
     deleteMany?: BillingScalarWhereInput | BillingScalarWhereInput[]
+  }
+
+  export type FollowUpUncheckedUpdateManyWithoutBranchNestedInput = {
+    create?: XOR<FollowUpCreateWithoutBranchInput, FollowUpUncheckedCreateWithoutBranchInput> | FollowUpCreateWithoutBranchInput[] | FollowUpUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutBranchInput | FollowUpCreateOrConnectWithoutBranchInput[]
+    upsert?: FollowUpUpsertWithWhereUniqueWithoutBranchInput | FollowUpUpsertWithWhereUniqueWithoutBranchInput[]
+    createMany?: FollowUpCreateManyBranchInputEnvelope
+    set?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    disconnect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    delete?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    update?: FollowUpUpdateWithWhereUniqueWithoutBranchInput | FollowUpUpdateWithWhereUniqueWithoutBranchInput[]
+    updateMany?: FollowUpUpdateManyWithWhereWithoutBranchInput | FollowUpUpdateManyWithWhereWithoutBranchInput[]
+    deleteMany?: FollowUpScalarWhereInput | FollowUpScalarWhereInput[]
   }
 
   export type RoleCreateNestedOneWithoutUsersInput = {
@@ -28355,6 +30636,13 @@ export namespace Prisma {
     connect?: BillingWhereUniqueInput | BillingWhereUniqueInput[]
   }
 
+  export type FollowUpCreateNestedManyWithoutPatientInput = {
+    create?: XOR<FollowUpCreateWithoutPatientInput, FollowUpUncheckedCreateWithoutPatientInput> | FollowUpCreateWithoutPatientInput[] | FollowUpUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutPatientInput | FollowUpCreateOrConnectWithoutPatientInput[]
+    createMany?: FollowUpCreateManyPatientInputEnvelope
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+  }
+
   export type AppointmentUncheckedCreateNestedManyWithoutPatientInput = {
     create?: XOR<AppointmentCreateWithoutPatientInput, AppointmentUncheckedCreateWithoutPatientInput> | AppointmentCreateWithoutPatientInput[] | AppointmentUncheckedCreateWithoutPatientInput[]
     connectOrCreate?: AppointmentCreateOrConnectWithoutPatientInput | AppointmentCreateOrConnectWithoutPatientInput[]
@@ -28367,6 +30655,13 @@ export namespace Prisma {
     connectOrCreate?: BillingCreateOrConnectWithoutPatientInput | BillingCreateOrConnectWithoutPatientInput[]
     createMany?: BillingCreateManyPatientInputEnvelope
     connect?: BillingWhereUniqueInput | BillingWhereUniqueInput[]
+  }
+
+  export type FollowUpUncheckedCreateNestedManyWithoutPatientInput = {
+    create?: XOR<FollowUpCreateWithoutPatientInput, FollowUpUncheckedCreateWithoutPatientInput> | FollowUpCreateWithoutPatientInput[] | FollowUpUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutPatientInput | FollowUpCreateOrConnectWithoutPatientInput[]
+    createMany?: FollowUpCreateManyPatientInputEnvelope
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
   }
 
   export type BranchUpdateOneRequiredWithoutPatientsNestedInput = {
@@ -28405,6 +30700,20 @@ export namespace Prisma {
     deleteMany?: BillingScalarWhereInput | BillingScalarWhereInput[]
   }
 
+  export type FollowUpUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<FollowUpCreateWithoutPatientInput, FollowUpUncheckedCreateWithoutPatientInput> | FollowUpCreateWithoutPatientInput[] | FollowUpUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutPatientInput | FollowUpCreateOrConnectWithoutPatientInput[]
+    upsert?: FollowUpUpsertWithWhereUniqueWithoutPatientInput | FollowUpUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: FollowUpCreateManyPatientInputEnvelope
+    set?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    disconnect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    delete?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    update?: FollowUpUpdateWithWhereUniqueWithoutPatientInput | FollowUpUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: FollowUpUpdateManyWithWhereWithoutPatientInput | FollowUpUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: FollowUpScalarWhereInput | FollowUpScalarWhereInput[]
+  }
+
   export type AppointmentUncheckedUpdateManyWithoutPatientNestedInput = {
     create?: XOR<AppointmentCreateWithoutPatientInput, AppointmentUncheckedCreateWithoutPatientInput> | AppointmentCreateWithoutPatientInput[] | AppointmentUncheckedCreateWithoutPatientInput[]
     connectOrCreate?: AppointmentCreateOrConnectWithoutPatientInput | AppointmentCreateOrConnectWithoutPatientInput[]
@@ -28431,6 +30740,20 @@ export namespace Prisma {
     update?: BillingUpdateWithWhereUniqueWithoutPatientInput | BillingUpdateWithWhereUniqueWithoutPatientInput[]
     updateMany?: BillingUpdateManyWithWhereWithoutPatientInput | BillingUpdateManyWithWhereWithoutPatientInput[]
     deleteMany?: BillingScalarWhereInput | BillingScalarWhereInput[]
+  }
+
+  export type FollowUpUncheckedUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<FollowUpCreateWithoutPatientInput, FollowUpUncheckedCreateWithoutPatientInput> | FollowUpCreateWithoutPatientInput[] | FollowUpUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutPatientInput | FollowUpCreateOrConnectWithoutPatientInput[]
+    upsert?: FollowUpUpsertWithWhereUniqueWithoutPatientInput | FollowUpUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: FollowUpCreateManyPatientInputEnvelope
+    set?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    disconnect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    delete?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    update?: FollowUpUpdateWithWhereUniqueWithoutPatientInput | FollowUpUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: FollowUpUpdateManyWithWhereWithoutPatientInput | FollowUpUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: FollowUpScalarWhereInput | FollowUpScalarWhereInput[]
   }
 
   export type BranchCreateNestedOneWithoutAppointmentsInput = {
@@ -28483,6 +30806,13 @@ export namespace Prisma {
     connect?: BillingWhereUniqueInput | BillingWhereUniqueInput[]
   }
 
+  export type FollowUpCreateNestedManyWithoutCompletedAppointmentInput = {
+    create?: XOR<FollowUpCreateWithoutCompletedAppointmentInput, FollowUpUncheckedCreateWithoutCompletedAppointmentInput> | FollowUpCreateWithoutCompletedAppointmentInput[] | FollowUpUncheckedCreateWithoutCompletedAppointmentInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutCompletedAppointmentInput | FollowUpCreateOrConnectWithoutCompletedAppointmentInput[]
+    createMany?: FollowUpCreateManyCompletedAppointmentInputEnvelope
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+  }
+
   export type ERExaminationUncheckedCreateNestedOneWithoutAppointmentInput = {
     create?: XOR<ERExaminationCreateWithoutAppointmentInput, ERExaminationUncheckedCreateWithoutAppointmentInput>
     connectOrCreate?: ERExaminationCreateOrConnectWithoutAppointmentInput
@@ -28507,6 +30837,13 @@ export namespace Prisma {
     connectOrCreate?: BillingCreateOrConnectWithoutAppointmentInput | BillingCreateOrConnectWithoutAppointmentInput[]
     createMany?: BillingCreateManyAppointmentInputEnvelope
     connect?: BillingWhereUniqueInput | BillingWhereUniqueInput[]
+  }
+
+  export type FollowUpUncheckedCreateNestedManyWithoutCompletedAppointmentInput = {
+    create?: XOR<FollowUpCreateWithoutCompletedAppointmentInput, FollowUpUncheckedCreateWithoutCompletedAppointmentInput> | FollowUpCreateWithoutCompletedAppointmentInput[] | FollowUpUncheckedCreateWithoutCompletedAppointmentInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutCompletedAppointmentInput | FollowUpCreateOrConnectWithoutCompletedAppointmentInput[]
+    createMany?: FollowUpCreateManyCompletedAppointmentInputEnvelope
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
   }
 
   export type EnumAppointmentStatusFieldUpdateOperationsInput = {
@@ -28601,6 +30938,20 @@ export namespace Prisma {
     deleteMany?: BillingScalarWhereInput | BillingScalarWhereInput[]
   }
 
+  export type FollowUpUpdateManyWithoutCompletedAppointmentNestedInput = {
+    create?: XOR<FollowUpCreateWithoutCompletedAppointmentInput, FollowUpUncheckedCreateWithoutCompletedAppointmentInput> | FollowUpCreateWithoutCompletedAppointmentInput[] | FollowUpUncheckedCreateWithoutCompletedAppointmentInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutCompletedAppointmentInput | FollowUpCreateOrConnectWithoutCompletedAppointmentInput[]
+    upsert?: FollowUpUpsertWithWhereUniqueWithoutCompletedAppointmentInput | FollowUpUpsertWithWhereUniqueWithoutCompletedAppointmentInput[]
+    createMany?: FollowUpCreateManyCompletedAppointmentInputEnvelope
+    set?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    disconnect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    delete?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    update?: FollowUpUpdateWithWhereUniqueWithoutCompletedAppointmentInput | FollowUpUpdateWithWhereUniqueWithoutCompletedAppointmentInput[]
+    updateMany?: FollowUpUpdateManyWithWhereWithoutCompletedAppointmentInput | FollowUpUpdateManyWithWhereWithoutCompletedAppointmentInput[]
+    deleteMany?: FollowUpScalarWhereInput | FollowUpScalarWhereInput[]
+  }
+
   export type ERExaminationUncheckedUpdateOneWithoutAppointmentNestedInput = {
     create?: XOR<ERExaminationCreateWithoutAppointmentInput, ERExaminationUncheckedCreateWithoutAppointmentInput>
     connectOrCreate?: ERExaminationCreateOrConnectWithoutAppointmentInput
@@ -28647,6 +30998,20 @@ export namespace Prisma {
     update?: BillingUpdateWithWhereUniqueWithoutAppointmentInput | BillingUpdateWithWhereUniqueWithoutAppointmentInput[]
     updateMany?: BillingUpdateManyWithWhereWithoutAppointmentInput | BillingUpdateManyWithWhereWithoutAppointmentInput[]
     deleteMany?: BillingScalarWhereInput | BillingScalarWhereInput[]
+  }
+
+  export type FollowUpUncheckedUpdateManyWithoutCompletedAppointmentNestedInput = {
+    create?: XOR<FollowUpCreateWithoutCompletedAppointmentInput, FollowUpUncheckedCreateWithoutCompletedAppointmentInput> | FollowUpCreateWithoutCompletedAppointmentInput[] | FollowUpUncheckedCreateWithoutCompletedAppointmentInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutCompletedAppointmentInput | FollowUpCreateOrConnectWithoutCompletedAppointmentInput[]
+    upsert?: FollowUpUpsertWithWhereUniqueWithoutCompletedAppointmentInput | FollowUpUpsertWithWhereUniqueWithoutCompletedAppointmentInput[]
+    createMany?: FollowUpCreateManyCompletedAppointmentInputEnvelope
+    set?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    disconnect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    delete?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    update?: FollowUpUpdateWithWhereUniqueWithoutCompletedAppointmentInput | FollowUpUpdateWithWhereUniqueWithoutCompletedAppointmentInput[]
+    updateMany?: FollowUpUpdateManyWithWhereWithoutCompletedAppointmentInput | FollowUpUpdateManyWithWhereWithoutCompletedAppointmentInput[]
+    deleteMany?: FollowUpScalarWhereInput | FollowUpScalarWhereInput[]
   }
 
   export type AppointmentCreateNestedOneWithoutErExaminationInput = {
@@ -28710,6 +31075,13 @@ export namespace Prisma {
     connect?: PrescriptionWhereUniqueInput | PrescriptionWhereUniqueInput[]
   }
 
+  export type FollowUpCreateNestedManyWithoutClinicalExaminationInput = {
+    create?: XOR<FollowUpCreateWithoutClinicalExaminationInput, FollowUpUncheckedCreateWithoutClinicalExaminationInput> | FollowUpCreateWithoutClinicalExaminationInput[] | FollowUpUncheckedCreateWithoutClinicalExaminationInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutClinicalExaminationInput | FollowUpCreateOrConnectWithoutClinicalExaminationInput[]
+    createMany?: FollowUpCreateManyClinicalExaminationInputEnvelope
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+  }
+
   export type SurgeryUncheckedCreateNestedOneWithoutClinicalExamInput = {
     create?: XOR<SurgeryCreateWithoutClinicalExamInput, SurgeryUncheckedCreateWithoutClinicalExamInput>
     connectOrCreate?: SurgeryCreateOrConnectWithoutClinicalExamInput
@@ -28721,6 +31093,13 @@ export namespace Prisma {
     connectOrCreate?: PrescriptionCreateOrConnectWithoutClinicalExamInput | PrescriptionCreateOrConnectWithoutClinicalExamInput[]
     createMany?: PrescriptionCreateManyClinicalExamInputEnvelope
     connect?: PrescriptionWhereUniqueInput | PrescriptionWhereUniqueInput[]
+  }
+
+  export type FollowUpUncheckedCreateNestedManyWithoutClinicalExaminationInput = {
+    create?: XOR<FollowUpCreateWithoutClinicalExaminationInput, FollowUpUncheckedCreateWithoutClinicalExaminationInput> | FollowUpCreateWithoutClinicalExaminationInput[] | FollowUpUncheckedCreateWithoutClinicalExaminationInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutClinicalExaminationInput | FollowUpCreateOrConnectWithoutClinicalExaminationInput[]
+    createMany?: FollowUpCreateManyClinicalExaminationInputEnvelope
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
   }
 
   export type NullableIntFieldUpdateOperationsInput = {
@@ -28771,6 +31150,20 @@ export namespace Prisma {
     deleteMany?: PrescriptionScalarWhereInput | PrescriptionScalarWhereInput[]
   }
 
+  export type FollowUpUpdateManyWithoutClinicalExaminationNestedInput = {
+    create?: XOR<FollowUpCreateWithoutClinicalExaminationInput, FollowUpUncheckedCreateWithoutClinicalExaminationInput> | FollowUpCreateWithoutClinicalExaminationInput[] | FollowUpUncheckedCreateWithoutClinicalExaminationInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutClinicalExaminationInput | FollowUpCreateOrConnectWithoutClinicalExaminationInput[]
+    upsert?: FollowUpUpsertWithWhereUniqueWithoutClinicalExaminationInput | FollowUpUpsertWithWhereUniqueWithoutClinicalExaminationInput[]
+    createMany?: FollowUpCreateManyClinicalExaminationInputEnvelope
+    set?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    disconnect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    delete?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    update?: FollowUpUpdateWithWhereUniqueWithoutClinicalExaminationInput | FollowUpUpdateWithWhereUniqueWithoutClinicalExaminationInput[]
+    updateMany?: FollowUpUpdateManyWithWhereWithoutClinicalExaminationInput | FollowUpUpdateManyWithWhereWithoutClinicalExaminationInput[]
+    deleteMany?: FollowUpScalarWhereInput | FollowUpScalarWhereInput[]
+  }
+
   export type SurgeryUncheckedUpdateOneWithoutClinicalExamNestedInput = {
     create?: XOR<SurgeryCreateWithoutClinicalExamInput, SurgeryUncheckedCreateWithoutClinicalExamInput>
     connectOrCreate?: SurgeryCreateOrConnectWithoutClinicalExamInput
@@ -28793,6 +31186,20 @@ export namespace Prisma {
     update?: PrescriptionUpdateWithWhereUniqueWithoutClinicalExamInput | PrescriptionUpdateWithWhereUniqueWithoutClinicalExamInput[]
     updateMany?: PrescriptionUpdateManyWithWhereWithoutClinicalExamInput | PrescriptionUpdateManyWithWhereWithoutClinicalExamInput[]
     deleteMany?: PrescriptionScalarWhereInput | PrescriptionScalarWhereInput[]
+  }
+
+  export type FollowUpUncheckedUpdateManyWithoutClinicalExaminationNestedInput = {
+    create?: XOR<FollowUpCreateWithoutClinicalExaminationInput, FollowUpUncheckedCreateWithoutClinicalExaminationInput> | FollowUpCreateWithoutClinicalExaminationInput[] | FollowUpUncheckedCreateWithoutClinicalExaminationInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutClinicalExaminationInput | FollowUpCreateOrConnectWithoutClinicalExaminationInput[]
+    upsert?: FollowUpUpsertWithWhereUniqueWithoutClinicalExaminationInput | FollowUpUpsertWithWhereUniqueWithoutClinicalExaminationInput[]
+    createMany?: FollowUpCreateManyClinicalExaminationInputEnvelope
+    set?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    disconnect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    delete?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    update?: FollowUpUpdateWithWhereUniqueWithoutClinicalExaminationInput | FollowUpUpdateWithWhereUniqueWithoutClinicalExaminationInput[]
+    updateMany?: FollowUpUpdateManyWithWhereWithoutClinicalExaminationInput | FollowUpUpdateManyWithWhereWithoutClinicalExaminationInput[]
+    deleteMany?: FollowUpScalarWhereInput | FollowUpScalarWhereInput[]
   }
 
   export type ClinicalExaminationCreateNestedOneWithoutSurgeryInput = {
@@ -28820,11 +31227,25 @@ export namespace Prisma {
     connect?: BillingWhereUniqueInput | BillingWhereUniqueInput[]
   }
 
+  export type FollowUpCreateNestedManyWithoutSurgeryInput = {
+    create?: XOR<FollowUpCreateWithoutSurgeryInput, FollowUpUncheckedCreateWithoutSurgeryInput> | FollowUpCreateWithoutSurgeryInput[] | FollowUpUncheckedCreateWithoutSurgeryInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutSurgeryInput | FollowUpCreateOrConnectWithoutSurgeryInput[]
+    createMany?: FollowUpCreateManySurgeryInputEnvelope
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+  }
+
   export type BillingUncheckedCreateNestedManyWithoutSurgeryInput = {
     create?: XOR<BillingCreateWithoutSurgeryInput, BillingUncheckedCreateWithoutSurgeryInput> | BillingCreateWithoutSurgeryInput[] | BillingUncheckedCreateWithoutSurgeryInput[]
     connectOrCreate?: BillingCreateOrConnectWithoutSurgeryInput | BillingCreateOrConnectWithoutSurgeryInput[]
     createMany?: BillingCreateManySurgeryInputEnvelope
     connect?: BillingWhereUniqueInput | BillingWhereUniqueInput[]
+  }
+
+  export type FollowUpUncheckedCreateNestedManyWithoutSurgeryInput = {
+    create?: XOR<FollowUpCreateWithoutSurgeryInput, FollowUpUncheckedCreateWithoutSurgeryInput> | FollowUpCreateWithoutSurgeryInput[] | FollowUpUncheckedCreateWithoutSurgeryInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutSurgeryInput | FollowUpCreateOrConnectWithoutSurgeryInput[]
+    createMany?: FollowUpCreateManySurgeryInputEnvelope
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
   }
 
   export type ClinicalExaminationUpdateOneRequiredWithoutSurgeryNestedInput = {
@@ -28865,6 +31286,20 @@ export namespace Prisma {
     deleteMany?: BillingScalarWhereInput | BillingScalarWhereInput[]
   }
 
+  export type FollowUpUpdateManyWithoutSurgeryNestedInput = {
+    create?: XOR<FollowUpCreateWithoutSurgeryInput, FollowUpUncheckedCreateWithoutSurgeryInput> | FollowUpCreateWithoutSurgeryInput[] | FollowUpUncheckedCreateWithoutSurgeryInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutSurgeryInput | FollowUpCreateOrConnectWithoutSurgeryInput[]
+    upsert?: FollowUpUpsertWithWhereUniqueWithoutSurgeryInput | FollowUpUpsertWithWhereUniqueWithoutSurgeryInput[]
+    createMany?: FollowUpCreateManySurgeryInputEnvelope
+    set?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    disconnect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    delete?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    update?: FollowUpUpdateWithWhereUniqueWithoutSurgeryInput | FollowUpUpdateWithWhereUniqueWithoutSurgeryInput[]
+    updateMany?: FollowUpUpdateManyWithWhereWithoutSurgeryInput | FollowUpUpdateManyWithWhereWithoutSurgeryInput[]
+    deleteMany?: FollowUpScalarWhereInput | FollowUpScalarWhereInput[]
+  }
+
   export type BillingUncheckedUpdateManyWithoutSurgeryNestedInput = {
     create?: XOR<BillingCreateWithoutSurgeryInput, BillingUncheckedCreateWithoutSurgeryInput> | BillingCreateWithoutSurgeryInput[] | BillingUncheckedCreateWithoutSurgeryInput[]
     connectOrCreate?: BillingCreateOrConnectWithoutSurgeryInput | BillingCreateOrConnectWithoutSurgeryInput[]
@@ -28877,6 +31312,20 @@ export namespace Prisma {
     update?: BillingUpdateWithWhereUniqueWithoutSurgeryInput | BillingUpdateWithWhereUniqueWithoutSurgeryInput[]
     updateMany?: BillingUpdateManyWithWhereWithoutSurgeryInput | BillingUpdateManyWithWhereWithoutSurgeryInput[]
     deleteMany?: BillingScalarWhereInput | BillingScalarWhereInput[]
+  }
+
+  export type FollowUpUncheckedUpdateManyWithoutSurgeryNestedInput = {
+    create?: XOR<FollowUpCreateWithoutSurgeryInput, FollowUpUncheckedCreateWithoutSurgeryInput> | FollowUpCreateWithoutSurgeryInput[] | FollowUpUncheckedCreateWithoutSurgeryInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutSurgeryInput | FollowUpCreateOrConnectWithoutSurgeryInput[]
+    upsert?: FollowUpUpsertWithWhereUniqueWithoutSurgeryInput | FollowUpUpsertWithWhereUniqueWithoutSurgeryInput[]
+    createMany?: FollowUpCreateManySurgeryInputEnvelope
+    set?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    disconnect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    delete?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    update?: FollowUpUpdateWithWhereUniqueWithoutSurgeryInput | FollowUpUpdateWithWhereUniqueWithoutSurgeryInput[]
+    updateMany?: FollowUpUpdateManyWithWhereWithoutSurgeryInput | FollowUpUpdateManyWithWhereWithoutSurgeryInput[]
+    deleteMany?: FollowUpScalarWhereInput | FollowUpScalarWhereInput[]
   }
 
   export type AppointmentCreateNestedOneWithoutPrescriptionsInput = {
@@ -28904,11 +31353,25 @@ export namespace Prisma {
     connect?: BillingWhereUniqueInput | BillingWhereUniqueInput[]
   }
 
+  export type FollowUpCreateNestedManyWithoutPrescriptionInput = {
+    create?: XOR<FollowUpCreateWithoutPrescriptionInput, FollowUpUncheckedCreateWithoutPrescriptionInput> | FollowUpCreateWithoutPrescriptionInput[] | FollowUpUncheckedCreateWithoutPrescriptionInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutPrescriptionInput | FollowUpCreateOrConnectWithoutPrescriptionInput[]
+    createMany?: FollowUpCreateManyPrescriptionInputEnvelope
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+  }
+
   export type BillingUncheckedCreateNestedManyWithoutPrescriptionInput = {
     create?: XOR<BillingCreateWithoutPrescriptionInput, BillingUncheckedCreateWithoutPrescriptionInput> | BillingCreateWithoutPrescriptionInput[] | BillingUncheckedCreateWithoutPrescriptionInput[]
     connectOrCreate?: BillingCreateOrConnectWithoutPrescriptionInput | BillingCreateOrConnectWithoutPrescriptionInput[]
     createMany?: BillingCreateManyPrescriptionInputEnvelope
     connect?: BillingWhereUniqueInput | BillingWhereUniqueInput[]
+  }
+
+  export type FollowUpUncheckedCreateNestedManyWithoutPrescriptionInput = {
+    create?: XOR<FollowUpCreateWithoutPrescriptionInput, FollowUpUncheckedCreateWithoutPrescriptionInput> | FollowUpCreateWithoutPrescriptionInput[] | FollowUpUncheckedCreateWithoutPrescriptionInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutPrescriptionInput | FollowUpCreateOrConnectWithoutPrescriptionInput[]
+    createMany?: FollowUpCreateManyPrescriptionInputEnvelope
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -28957,6 +31420,20 @@ export namespace Prisma {
     deleteMany?: BillingScalarWhereInput | BillingScalarWhereInput[]
   }
 
+  export type FollowUpUpdateManyWithoutPrescriptionNestedInput = {
+    create?: XOR<FollowUpCreateWithoutPrescriptionInput, FollowUpUncheckedCreateWithoutPrescriptionInput> | FollowUpCreateWithoutPrescriptionInput[] | FollowUpUncheckedCreateWithoutPrescriptionInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutPrescriptionInput | FollowUpCreateOrConnectWithoutPrescriptionInput[]
+    upsert?: FollowUpUpsertWithWhereUniqueWithoutPrescriptionInput | FollowUpUpsertWithWhereUniqueWithoutPrescriptionInput[]
+    createMany?: FollowUpCreateManyPrescriptionInputEnvelope
+    set?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    disconnect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    delete?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    update?: FollowUpUpdateWithWhereUniqueWithoutPrescriptionInput | FollowUpUpdateWithWhereUniqueWithoutPrescriptionInput[]
+    updateMany?: FollowUpUpdateManyWithWhereWithoutPrescriptionInput | FollowUpUpdateManyWithWhereWithoutPrescriptionInput[]
+    deleteMany?: FollowUpScalarWhereInput | FollowUpScalarWhereInput[]
+  }
+
   export type BillingUncheckedUpdateManyWithoutPrescriptionNestedInput = {
     create?: XOR<BillingCreateWithoutPrescriptionInput, BillingUncheckedCreateWithoutPrescriptionInput> | BillingCreateWithoutPrescriptionInput[] | BillingUncheckedCreateWithoutPrescriptionInput[]
     connectOrCreate?: BillingCreateOrConnectWithoutPrescriptionInput | BillingCreateOrConnectWithoutPrescriptionInput[]
@@ -28969,6 +31446,20 @@ export namespace Prisma {
     update?: BillingUpdateWithWhereUniqueWithoutPrescriptionInput | BillingUpdateWithWhereUniqueWithoutPrescriptionInput[]
     updateMany?: BillingUpdateManyWithWhereWithoutPrescriptionInput | BillingUpdateManyWithWhereWithoutPrescriptionInput[]
     deleteMany?: BillingScalarWhereInput | BillingScalarWhereInput[]
+  }
+
+  export type FollowUpUncheckedUpdateManyWithoutPrescriptionNestedInput = {
+    create?: XOR<FollowUpCreateWithoutPrescriptionInput, FollowUpUncheckedCreateWithoutPrescriptionInput> | FollowUpCreateWithoutPrescriptionInput[] | FollowUpUncheckedCreateWithoutPrescriptionInput[]
+    connectOrCreate?: FollowUpCreateOrConnectWithoutPrescriptionInput | FollowUpCreateOrConnectWithoutPrescriptionInput[]
+    upsert?: FollowUpUpsertWithWhereUniqueWithoutPrescriptionInput | FollowUpUpsertWithWhereUniqueWithoutPrescriptionInput[]
+    createMany?: FollowUpCreateManyPrescriptionInputEnvelope
+    set?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    disconnect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    delete?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+    update?: FollowUpUpdateWithWhereUniqueWithoutPrescriptionInput | FollowUpUpdateWithWhereUniqueWithoutPrescriptionInput[]
+    updateMany?: FollowUpUpdateManyWithWhereWithoutPrescriptionInput | FollowUpUpdateManyWithWhereWithoutPrescriptionInput[]
+    deleteMany?: FollowUpScalarWhereInput | FollowUpScalarWhereInput[]
   }
 
   export type BranchCreateNestedOneWithoutPharmacyItemsInput = {
@@ -29381,6 +31872,106 @@ export namespace Prisma {
     deleteMany?: OpticalStockTransactionScalarWhereInput | OpticalStockTransactionScalarWhereInput[]
   }
 
+  export type PatientCreateNestedOneWithoutFollowUpsInput = {
+    create?: XOR<PatientCreateWithoutFollowUpsInput, PatientUncheckedCreateWithoutFollowUpsInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutFollowUpsInput
+    connect?: PatientWhereUniqueInput
+  }
+
+  export type BranchCreateNestedOneWithoutFollowUpsInput = {
+    create?: XOR<BranchCreateWithoutFollowUpsInput, BranchUncheckedCreateWithoutFollowUpsInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutFollowUpsInput
+    connect?: BranchWhereUniqueInput
+  }
+
+  export type AppointmentCreateNestedOneWithoutCompletedFollowUpsInput = {
+    create?: XOR<AppointmentCreateWithoutCompletedFollowUpsInput, AppointmentUncheckedCreateWithoutCompletedFollowUpsInput>
+    connectOrCreate?: AppointmentCreateOrConnectWithoutCompletedFollowUpsInput
+    connect?: AppointmentWhereUniqueInput
+  }
+
+  export type ClinicalExaminationCreateNestedOneWithoutFollowUpsInput = {
+    create?: XOR<ClinicalExaminationCreateWithoutFollowUpsInput, ClinicalExaminationUncheckedCreateWithoutFollowUpsInput>
+    connectOrCreate?: ClinicalExaminationCreateOrConnectWithoutFollowUpsInput
+    connect?: ClinicalExaminationWhereUniqueInput
+  }
+
+  export type SurgeryCreateNestedOneWithoutFollowUpsInput = {
+    create?: XOR<SurgeryCreateWithoutFollowUpsInput, SurgeryUncheckedCreateWithoutFollowUpsInput>
+    connectOrCreate?: SurgeryCreateOrConnectWithoutFollowUpsInput
+    connect?: SurgeryWhereUniqueInput
+  }
+
+  export type PrescriptionCreateNestedOneWithoutFollowUpsInput = {
+    create?: XOR<PrescriptionCreateWithoutFollowUpsInput, PrescriptionUncheckedCreateWithoutFollowUpsInput>
+    connectOrCreate?: PrescriptionCreateOrConnectWithoutFollowUpsInput
+    connect?: PrescriptionWhereUniqueInput
+  }
+
+  export type EnumFollowUpSourceTypeFieldUpdateOperationsInput = {
+    set?: $Enums.FollowUpSourceType
+  }
+
+  export type EnumFollowUpStatusFieldUpdateOperationsInput = {
+    set?: $Enums.FollowUpStatus
+  }
+
+  export type PatientUpdateOneRequiredWithoutFollowUpsNestedInput = {
+    create?: XOR<PatientCreateWithoutFollowUpsInput, PatientUncheckedCreateWithoutFollowUpsInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutFollowUpsInput
+    upsert?: PatientUpsertWithoutFollowUpsInput
+    connect?: PatientWhereUniqueInput
+    update?: XOR<XOR<PatientUpdateToOneWithWhereWithoutFollowUpsInput, PatientUpdateWithoutFollowUpsInput>, PatientUncheckedUpdateWithoutFollowUpsInput>
+  }
+
+  export type BranchUpdateOneRequiredWithoutFollowUpsNestedInput = {
+    create?: XOR<BranchCreateWithoutFollowUpsInput, BranchUncheckedCreateWithoutFollowUpsInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutFollowUpsInput
+    upsert?: BranchUpsertWithoutFollowUpsInput
+    connect?: BranchWhereUniqueInput
+    update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutFollowUpsInput, BranchUpdateWithoutFollowUpsInput>, BranchUncheckedUpdateWithoutFollowUpsInput>
+  }
+
+  export type AppointmentUpdateOneWithoutCompletedFollowUpsNestedInput = {
+    create?: XOR<AppointmentCreateWithoutCompletedFollowUpsInput, AppointmentUncheckedCreateWithoutCompletedFollowUpsInput>
+    connectOrCreate?: AppointmentCreateOrConnectWithoutCompletedFollowUpsInput
+    upsert?: AppointmentUpsertWithoutCompletedFollowUpsInput
+    disconnect?: AppointmentWhereInput | boolean
+    delete?: AppointmentWhereInput | boolean
+    connect?: AppointmentWhereUniqueInput
+    update?: XOR<XOR<AppointmentUpdateToOneWithWhereWithoutCompletedFollowUpsInput, AppointmentUpdateWithoutCompletedFollowUpsInput>, AppointmentUncheckedUpdateWithoutCompletedFollowUpsInput>
+  }
+
+  export type ClinicalExaminationUpdateOneWithoutFollowUpsNestedInput = {
+    create?: XOR<ClinicalExaminationCreateWithoutFollowUpsInput, ClinicalExaminationUncheckedCreateWithoutFollowUpsInput>
+    connectOrCreate?: ClinicalExaminationCreateOrConnectWithoutFollowUpsInput
+    upsert?: ClinicalExaminationUpsertWithoutFollowUpsInput
+    disconnect?: ClinicalExaminationWhereInput | boolean
+    delete?: ClinicalExaminationWhereInput | boolean
+    connect?: ClinicalExaminationWhereUniqueInput
+    update?: XOR<XOR<ClinicalExaminationUpdateToOneWithWhereWithoutFollowUpsInput, ClinicalExaminationUpdateWithoutFollowUpsInput>, ClinicalExaminationUncheckedUpdateWithoutFollowUpsInput>
+  }
+
+  export type SurgeryUpdateOneWithoutFollowUpsNestedInput = {
+    create?: XOR<SurgeryCreateWithoutFollowUpsInput, SurgeryUncheckedCreateWithoutFollowUpsInput>
+    connectOrCreate?: SurgeryCreateOrConnectWithoutFollowUpsInput
+    upsert?: SurgeryUpsertWithoutFollowUpsInput
+    disconnect?: SurgeryWhereInput | boolean
+    delete?: SurgeryWhereInput | boolean
+    connect?: SurgeryWhereUniqueInput
+    update?: XOR<XOR<SurgeryUpdateToOneWithWhereWithoutFollowUpsInput, SurgeryUpdateWithoutFollowUpsInput>, SurgeryUncheckedUpdateWithoutFollowUpsInput>
+  }
+
+  export type PrescriptionUpdateOneWithoutFollowUpsNestedInput = {
+    create?: XOR<PrescriptionCreateWithoutFollowUpsInput, PrescriptionUncheckedCreateWithoutFollowUpsInput>
+    connectOrCreate?: PrescriptionCreateOrConnectWithoutFollowUpsInput
+    upsert?: PrescriptionUpsertWithoutFollowUpsInput
+    disconnect?: PrescriptionWhereInput | boolean
+    delete?: PrescriptionWhereInput | boolean
+    connect?: PrescriptionWhereUniqueInput
+    update?: XOR<XOR<PrescriptionUpdateToOneWithWhereWithoutFollowUpsInput, PrescriptionUpdateWithoutFollowUpsInput>, PrescriptionUncheckedUpdateWithoutFollowUpsInput>
+  }
+
   export type UserCreateNestedOneWithoutStaffAssignmentsInput = {
     create?: XOR<UserCreateWithoutStaffAssignmentsInput, UserUncheckedCreateWithoutStaffAssignmentsInput>
     connectOrCreate?: UserCreateOrConnectWithoutStaffAssignmentsInput
@@ -29719,6 +32310,40 @@ export namespace Prisma {
     _max?: NestedEnumBillingStatusFilter<$PrismaModel>
   }
 
+  export type NestedEnumFollowUpSourceTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.FollowUpSourceType | EnumFollowUpSourceTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.FollowUpSourceType[] | ListEnumFollowUpSourceTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FollowUpSourceType[] | ListEnumFollowUpSourceTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumFollowUpSourceTypeFilter<$PrismaModel> | $Enums.FollowUpSourceType
+  }
+
+  export type NestedEnumFollowUpStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.FollowUpStatus | EnumFollowUpStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FollowUpStatus[] | ListEnumFollowUpStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FollowUpStatus[] | ListEnumFollowUpStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFollowUpStatusFilter<$PrismaModel> | $Enums.FollowUpStatus
+  }
+
+  export type NestedEnumFollowUpSourceTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FollowUpSourceType | EnumFollowUpSourceTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.FollowUpSourceType[] | ListEnumFollowUpSourceTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FollowUpSourceType[] | ListEnumFollowUpSourceTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumFollowUpSourceTypeWithAggregatesFilter<$PrismaModel> | $Enums.FollowUpSourceType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFollowUpSourceTypeFilter<$PrismaModel>
+    _max?: NestedEnumFollowUpSourceTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumFollowUpStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FollowUpStatus | EnumFollowUpStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FollowUpStatus[] | ListEnumFollowUpStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FollowUpStatus[] | ListEnumFollowUpStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFollowUpStatusWithAggregatesFilter<$PrismaModel> | $Enums.FollowUpStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFollowUpStatusFilter<$PrismaModel>
+    _max?: NestedEnumFollowUpStatusFilter<$PrismaModel>
+  }
+
   export type NestedBoolNullableFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
     not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
@@ -29952,6 +32577,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
     billings?: BillingCreateNestedManyWithoutPatientInput
+    followUps?: FollowUpCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutBranchInput = {
@@ -29966,6 +32592,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
     billings?: BillingUncheckedCreateNestedManyWithoutPatientInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutBranchInput = {
@@ -29993,6 +32620,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationCreateNestedOneWithoutAppointmentInput
     prescriptions?: PrescriptionCreateNestedManyWithoutAppointmentInput
     billings?: BillingCreateNestedManyWithoutAppointmentInput
+    completedFollowUps?: FollowUpCreateNestedManyWithoutCompletedAppointmentInput
   }
 
   export type AppointmentUncheckedCreateWithoutBranchInput = {
@@ -30010,6 +32638,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationUncheckedCreateNestedOneWithoutAppointmentInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutAppointmentInput
     billings?: BillingUncheckedCreateNestedManyWithoutAppointmentInput
+    completedFollowUps?: FollowUpUncheckedCreateNestedManyWithoutCompletedAppointmentInput
   }
 
   export type AppointmentCreateOrConnectWithoutBranchInput = {
@@ -30030,10 +32659,12 @@ export namespace Prisma {
     cost: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
+    nextFollowUpDate?: Date | string | null
     createdAt?: Date | string
     clinicalExam: ClinicalExaminationCreateNestedOneWithoutSurgeryInput
     surgeon: DoctorCreateNestedOneWithoutSurgeriesInput
     billings?: BillingCreateNestedManyWithoutSurgeryInput
+    followUps?: FollowUpCreateNestedManyWithoutSurgeryInput
   }
 
   export type SurgeryUncheckedCreateWithoutBranchInput = {
@@ -30045,9 +32676,11 @@ export namespace Prisma {
     cost: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
+    nextFollowUpDate?: Date | string | null
     surgeonId: string
     createdAt?: Date | string
     billings?: BillingUncheckedCreateNestedManyWithoutSurgeryInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutSurgeryInput
   }
 
   export type SurgeryCreateOrConnectWithoutBranchInput = {
@@ -30066,10 +32699,12 @@ export namespace Prisma {
     itemId?: string | null
     quantity: number
     instructions?: string | null
+    reviewAfterDays?: number | null
     createdAt?: Date | string
     appointment: AppointmentCreateNestedOneWithoutPrescriptionsInput
     clinicalExam: ClinicalExaminationCreateNestedOneWithoutPrescriptionsInput
     billings?: BillingCreateNestedManyWithoutPrescriptionInput
+    followUps?: FollowUpCreateNestedManyWithoutPrescriptionInput
   }
 
   export type PrescriptionUncheckedCreateWithoutBranchInput = {
@@ -30080,8 +32715,10 @@ export namespace Prisma {
     itemId?: string | null
     quantity: number
     instructions?: string | null
+    reviewAfterDays?: number | null
     createdAt?: Date | string
     billings?: BillingUncheckedCreateNestedManyWithoutPrescriptionInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutPrescriptionInput
   }
 
   export type PrescriptionCreateOrConnectWithoutBranchInput = {
@@ -30109,6 +32746,7 @@ export namespace Prisma {
     expiryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    isActive?: boolean
     transactions?: PharmacyStockTransactionCreateNestedManyWithoutPharmacyItemInput
   }
 
@@ -30127,6 +32765,7 @@ export namespace Prisma {
     expiryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    isActive?: boolean
     transactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutPharmacyItemInput
   }
 
@@ -30185,6 +32824,7 @@ export namespace Prisma {
     sellingPrice: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
+    isActive?: boolean
     transactions?: OpticalStockTransactionCreateNestedManyWithoutOpticalItemInput
   }
 
@@ -30201,6 +32841,7 @@ export namespace Prisma {
     sellingPrice: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
+    isActive?: boolean
     transactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutOpticalItemInput
   }
 
@@ -30293,6 +32934,48 @@ export namespace Prisma {
 
   export type BillingCreateManyBranchInputEnvelope = {
     data: BillingCreateManyBranchInput | BillingCreateManyBranchInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FollowUpCreateWithoutBranchInput = {
+    id?: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutFollowUpsInput
+    completedAppointment?: AppointmentCreateNestedOneWithoutCompletedFollowUpsInput
+    clinicalExamination?: ClinicalExaminationCreateNestedOneWithoutFollowUpsInput
+    surgery?: SurgeryCreateNestedOneWithoutFollowUpsInput
+    prescription?: PrescriptionCreateNestedOneWithoutFollowUpsInput
+  }
+
+  export type FollowUpUncheckedCreateWithoutBranchInput = {
+    id?: string
+    patientId: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    completedAppointmentId?: string | null
+    clinicalExaminationId?: string | null
+    surgeryId?: string | null
+    prescriptionId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FollowUpCreateOrConnectWithoutBranchInput = {
+    where: FollowUpWhereUniqueInput
+    create: XOR<FollowUpCreateWithoutBranchInput, FollowUpUncheckedCreateWithoutBranchInput>
+  }
+
+  export type FollowUpCreateManyBranchInputEnvelope = {
+    data: FollowUpCreateManyBranchInput | FollowUpCreateManyBranchInput[]
     skipDuplicates?: boolean
   }
 
@@ -30463,6 +33146,7 @@ export namespace Prisma {
     cost?: DecimalFilter<"Surgery"> | Decimal | DecimalJsLike | number | string
     status?: StringFilter<"Surgery"> | string
     notes?: StringNullableFilter<"Surgery"> | string | null
+    nextFollowUpDate?: DateTimeNullableFilter<"Surgery"> | Date | string | null
     surgeonId?: StringFilter<"Surgery"> | string
     createdAt?: DateTimeFilter<"Surgery"> | Date | string
   }
@@ -30495,6 +33179,7 @@ export namespace Prisma {
     itemId?: StringNullableFilter<"Prescription"> | string | null
     quantity?: IntFilter<"Prescription"> | number
     instructions?: StringNullableFilter<"Prescription"> | string | null
+    reviewAfterDays?: IntNullableFilter<"Prescription"> | number | null
     createdAt?: DateTimeFilter<"Prescription"> | Date | string
   }
 
@@ -30533,6 +33218,7 @@ export namespace Prisma {
     expiryDate?: DateTimeNullableFilter<"PharmacyItem"> | Date | string | null
     createdAt?: DateTimeFilter<"PharmacyItem"> | Date | string
     updatedAt?: DateTimeFilter<"PharmacyItem"> | Date | string
+    isActive?: BoolFilter<"PharmacyItem"> | boolean
   }
 
   export type PharmacyStockTransactionUpsertWithWhereUniqueWithoutBranchInput = {
@@ -30599,6 +33285,7 @@ export namespace Prisma {
     sellingPrice?: DecimalFilter<"OpticalItem"> | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFilter<"OpticalItem"> | Date | string
     updatedAt?: DateTimeFilter<"OpticalItem"> | Date | string
+    isActive?: BoolFilter<"OpticalItem"> | boolean
   }
 
   export type OpticalStockTransactionUpsertWithWhereUniqueWithoutBranchInput = {
@@ -30670,6 +33357,42 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Billing"> | Date | string
   }
 
+  export type FollowUpUpsertWithWhereUniqueWithoutBranchInput = {
+    where: FollowUpWhereUniqueInput
+    update: XOR<FollowUpUpdateWithoutBranchInput, FollowUpUncheckedUpdateWithoutBranchInput>
+    create: XOR<FollowUpCreateWithoutBranchInput, FollowUpUncheckedCreateWithoutBranchInput>
+  }
+
+  export type FollowUpUpdateWithWhereUniqueWithoutBranchInput = {
+    where: FollowUpWhereUniqueInput
+    data: XOR<FollowUpUpdateWithoutBranchInput, FollowUpUncheckedUpdateWithoutBranchInput>
+  }
+
+  export type FollowUpUpdateManyWithWhereWithoutBranchInput = {
+    where: FollowUpScalarWhereInput
+    data: XOR<FollowUpUpdateManyMutationInput, FollowUpUncheckedUpdateManyWithoutBranchInput>
+  }
+
+  export type FollowUpScalarWhereInput = {
+    AND?: FollowUpScalarWhereInput | FollowUpScalarWhereInput[]
+    OR?: FollowUpScalarWhereInput[]
+    NOT?: FollowUpScalarWhereInput | FollowUpScalarWhereInput[]
+    id?: StringFilter<"FollowUp"> | string
+    patientId?: StringFilter<"FollowUp"> | string
+    branchId?: StringFilter<"FollowUp"> | string
+    sourceType?: EnumFollowUpSourceTypeFilter<"FollowUp"> | $Enums.FollowUpSourceType
+    sourceId?: StringFilter<"FollowUp"> | string
+    dueDate?: DateTimeFilter<"FollowUp"> | Date | string
+    status?: EnumFollowUpStatusFilter<"FollowUp"> | $Enums.FollowUpStatus
+    notes?: StringNullableFilter<"FollowUp"> | string | null
+    completedAppointmentId?: StringNullableFilter<"FollowUp"> | string | null
+    clinicalExaminationId?: StringNullableFilter<"FollowUp"> | string | null
+    surgeryId?: StringNullableFilter<"FollowUp"> | string | null
+    prescriptionId?: StringNullableFilter<"FollowUp"> | string | null
+    createdAt?: DateTimeFilter<"FollowUp"> | Date | string
+    updatedAt?: DateTimeFilter<"FollowUp"> | Date | string
+  }
+
   export type RoleCreateWithoutUsersInput = {
     id?: string
     name: string
@@ -30706,6 +33429,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutUsersInput = {
@@ -30727,6 +33451,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutUsersInput = {
@@ -30780,6 +33505,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationCreateNestedOneWithoutAppointmentInput
     prescriptions?: PrescriptionCreateNestedManyWithoutAppointmentInput
     billings?: BillingCreateNestedManyWithoutAppointmentInput
+    completedFollowUps?: FollowUpCreateNestedManyWithoutCompletedAppointmentInput
   }
 
   export type AppointmentUncheckedCreateWithoutCreatedByInput = {
@@ -30797,6 +33523,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationUncheckedCreateNestedOneWithoutAppointmentInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutAppointmentInput
     billings?: BillingUncheckedCreateNestedManyWithoutAppointmentInput
+    completedFollowUps?: FollowUpUncheckedCreateNestedManyWithoutCompletedAppointmentInput
   }
 
   export type AppointmentCreateOrConnectWithoutCreatedByInput = {
@@ -31036,6 +33763,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutUsersInput = {
@@ -31057,6 +33785,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type DoctorUpsertWithoutUserInput = {
@@ -31279,6 +34008,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutDoctorsInput = {
@@ -31300,6 +34030,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutDoctorsInput = {
@@ -31322,6 +34053,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationCreateNestedOneWithoutAppointmentInput
     prescriptions?: PrescriptionCreateNestedManyWithoutAppointmentInput
     billings?: BillingCreateNestedManyWithoutAppointmentInput
+    completedFollowUps?: FollowUpCreateNestedManyWithoutCompletedAppointmentInput
   }
 
   export type AppointmentUncheckedCreateWithoutDoctorInput = {
@@ -31339,6 +34071,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationUncheckedCreateNestedOneWithoutAppointmentInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutAppointmentInput
     billings?: BillingUncheckedCreateNestedManyWithoutAppointmentInput
+    completedFollowUps?: FollowUpUncheckedCreateNestedManyWithoutCompletedAppointmentInput
   }
 
   export type AppointmentCreateOrConnectWithoutDoctorInput = {
@@ -31361,10 +34094,13 @@ export namespace Prisma {
     axisLeft?: number | null
     diagnosis?: string | null
     managementPlan?: string | null
+    nextReviewDate?: Date | string | null
+    nextReviewReason?: string | null
     examinedAt?: Date | string
     appointment: AppointmentCreateNestedOneWithoutClinicalExaminationInput
     surgery?: SurgeryCreateNestedOneWithoutClinicalExamInput
     prescriptions?: PrescriptionCreateNestedManyWithoutClinicalExamInput
+    followUps?: FollowUpCreateNestedManyWithoutClinicalExaminationInput
   }
 
   export type ClinicalExaminationUncheckedCreateWithoutExaminedByInput = {
@@ -31378,9 +34114,12 @@ export namespace Prisma {
     axisLeft?: number | null
     diagnosis?: string | null
     managementPlan?: string | null
+    nextReviewDate?: Date | string | null
+    nextReviewReason?: string | null
     examinedAt?: Date | string
     surgery?: SurgeryUncheckedCreateNestedOneWithoutClinicalExamInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutClinicalExamInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutClinicalExaminationInput
   }
 
   export type ClinicalExaminationCreateOrConnectWithoutExaminedByInput = {
@@ -31401,10 +34140,12 @@ export namespace Prisma {
     cost: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
+    nextFollowUpDate?: Date | string | null
     createdAt?: Date | string
     clinicalExam: ClinicalExaminationCreateNestedOneWithoutSurgeryInput
     branch: BranchCreateNestedOneWithoutSurgeriesInput
     billings?: BillingCreateNestedManyWithoutSurgeryInput
+    followUps?: FollowUpCreateNestedManyWithoutSurgeryInput
   }
 
   export type SurgeryUncheckedCreateWithoutSurgeonInput = {
@@ -31417,8 +34158,10 @@ export namespace Prisma {
     cost: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
+    nextFollowUpDate?: Date | string | null
     createdAt?: Date | string
     billings?: BillingUncheckedCreateNestedManyWithoutSurgeryInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutSurgeryInput
   }
 
   export type SurgeryCreateOrConnectWithoutSurgeonInput = {
@@ -31518,6 +34261,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutDoctorsInput = {
@@ -31539,6 +34283,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type AppointmentUpsertWithWhereUniqueWithoutDoctorInput = {
@@ -31587,6 +34332,8 @@ export namespace Prisma {
     axisLeft?: IntNullableFilter<"ClinicalExamination"> | number | null
     diagnosis?: StringNullableFilter<"ClinicalExamination"> | string | null
     managementPlan?: StringNullableFilter<"ClinicalExamination"> | string | null
+    nextReviewDate?: DateTimeNullableFilter<"ClinicalExamination"> | Date | string | null
+    nextReviewReason?: StringNullableFilter<"ClinicalExamination"> | string | null
     examinedById?: StringFilter<"ClinicalExamination"> | string
     examinedAt?: DateTimeFilter<"ClinicalExamination"> | Date | string
   }
@@ -31626,6 +34373,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutPatientsInput = {
@@ -31647,6 +34395,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutPatientsInput = {
@@ -31669,6 +34418,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationCreateNestedOneWithoutAppointmentInput
     prescriptions?: PrescriptionCreateNestedManyWithoutAppointmentInput
     billings?: BillingCreateNestedManyWithoutAppointmentInput
+    completedFollowUps?: FollowUpCreateNestedManyWithoutCompletedAppointmentInput
   }
 
   export type AppointmentUncheckedCreateWithoutPatientInput = {
@@ -31686,6 +34436,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationUncheckedCreateNestedOneWithoutAppointmentInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutAppointmentInput
     billings?: BillingUncheckedCreateNestedManyWithoutAppointmentInput
+    completedFollowUps?: FollowUpUncheckedCreateNestedManyWithoutCompletedAppointmentInput
   }
 
   export type AppointmentCreateOrConnectWithoutPatientInput = {
@@ -31748,6 +34499,48 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type FollowUpCreateWithoutPatientInput = {
+    id?: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutFollowUpsInput
+    completedAppointment?: AppointmentCreateNestedOneWithoutCompletedFollowUpsInput
+    clinicalExamination?: ClinicalExaminationCreateNestedOneWithoutFollowUpsInput
+    surgery?: SurgeryCreateNestedOneWithoutFollowUpsInput
+    prescription?: PrescriptionCreateNestedOneWithoutFollowUpsInput
+  }
+
+  export type FollowUpUncheckedCreateWithoutPatientInput = {
+    id?: string
+    branchId: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    completedAppointmentId?: string | null
+    clinicalExaminationId?: string | null
+    surgeryId?: string | null
+    prescriptionId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FollowUpCreateOrConnectWithoutPatientInput = {
+    where: FollowUpWhereUniqueInput
+    create: XOR<FollowUpCreateWithoutPatientInput, FollowUpUncheckedCreateWithoutPatientInput>
+  }
+
+  export type FollowUpCreateManyPatientInputEnvelope = {
+    data: FollowUpCreateManyPatientInput | FollowUpCreateManyPatientInput[]
+    skipDuplicates?: boolean
+  }
+
   export type BranchUpsertWithoutPatientsInput = {
     update: XOR<BranchUpdateWithoutPatientsInput, BranchUncheckedUpdateWithoutPatientsInput>
     create: XOR<BranchCreateWithoutPatientsInput, BranchUncheckedCreateWithoutPatientsInput>
@@ -31778,6 +34571,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutPatientsInput = {
@@ -31799,6 +34593,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type AppointmentUpsertWithWhereUniqueWithoutPatientInput = {
@@ -31833,6 +34628,22 @@ export namespace Prisma {
     data: XOR<BillingUpdateManyMutationInput, BillingUncheckedUpdateManyWithoutPatientInput>
   }
 
+  export type FollowUpUpsertWithWhereUniqueWithoutPatientInput = {
+    where: FollowUpWhereUniqueInput
+    update: XOR<FollowUpUpdateWithoutPatientInput, FollowUpUncheckedUpdateWithoutPatientInput>
+    create: XOR<FollowUpCreateWithoutPatientInput, FollowUpUncheckedCreateWithoutPatientInput>
+  }
+
+  export type FollowUpUpdateWithWhereUniqueWithoutPatientInput = {
+    where: FollowUpWhereUniqueInput
+    data: XOR<FollowUpUpdateWithoutPatientInput, FollowUpUncheckedUpdateWithoutPatientInput>
+  }
+
+  export type FollowUpUpdateManyWithWhereWithoutPatientInput = {
+    where: FollowUpScalarWhereInput
+    data: XOR<FollowUpUpdateManyMutationInput, FollowUpUncheckedUpdateManyWithoutPatientInput>
+  }
+
   export type BranchCreateWithoutAppointmentsInput = {
     id?: string
     branchName: string
@@ -31852,6 +34663,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutAppointmentsInput = {
@@ -31873,6 +34685,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutAppointmentsInput = {
@@ -31892,6 +34705,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     branch: BranchCreateNestedOneWithoutPatientsInput
     billings?: BillingCreateNestedManyWithoutPatientInput
+    followUps?: FollowUpCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutAppointmentsInput = {
@@ -31906,6 +34720,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     billings?: BillingUncheckedCreateNestedManyWithoutPatientInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutAppointmentsInput = {
@@ -32036,10 +34851,13 @@ export namespace Prisma {
     axisLeft?: number | null
     diagnosis?: string | null
     managementPlan?: string | null
+    nextReviewDate?: Date | string | null
+    nextReviewReason?: string | null
     examinedAt?: Date | string
     examinedBy: DoctorCreateNestedOneWithoutExaminedClinicalExamsInput
     surgery?: SurgeryCreateNestedOneWithoutClinicalExamInput
     prescriptions?: PrescriptionCreateNestedManyWithoutClinicalExamInput
+    followUps?: FollowUpCreateNestedManyWithoutClinicalExaminationInput
   }
 
   export type ClinicalExaminationUncheckedCreateWithoutAppointmentInput = {
@@ -32052,10 +34870,13 @@ export namespace Prisma {
     axisLeft?: number | null
     diagnosis?: string | null
     managementPlan?: string | null
+    nextReviewDate?: Date | string | null
+    nextReviewReason?: string | null
     examinedById: string
     examinedAt?: Date | string
     surgery?: SurgeryUncheckedCreateNestedOneWithoutClinicalExamInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutClinicalExamInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutClinicalExaminationInput
   }
 
   export type ClinicalExaminationCreateOrConnectWithoutAppointmentInput = {
@@ -32069,10 +34890,12 @@ export namespace Prisma {
     itemId?: string | null
     quantity: number
     instructions?: string | null
+    reviewAfterDays?: number | null
     createdAt?: Date | string
     clinicalExam: ClinicalExaminationCreateNestedOneWithoutPrescriptionsInput
     branch: BranchCreateNestedOneWithoutPrescriptionsInput
     billings?: BillingCreateNestedManyWithoutPrescriptionInput
+    followUps?: FollowUpCreateNestedManyWithoutPrescriptionInput
   }
 
   export type PrescriptionUncheckedCreateWithoutAppointmentInput = {
@@ -32083,8 +34906,10 @@ export namespace Prisma {
     itemId?: string | null
     quantity: number
     instructions?: string | null
+    reviewAfterDays?: number | null
     createdAt?: Date | string
     billings?: BillingUncheckedCreateNestedManyWithoutPrescriptionInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutPrescriptionInput
   }
 
   export type PrescriptionCreateOrConnectWithoutAppointmentInput = {
@@ -32147,6 +34972,48 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type FollowUpCreateWithoutCompletedAppointmentInput = {
+    id?: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutFollowUpsInput
+    branch: BranchCreateNestedOneWithoutFollowUpsInput
+    clinicalExamination?: ClinicalExaminationCreateNestedOneWithoutFollowUpsInput
+    surgery?: SurgeryCreateNestedOneWithoutFollowUpsInput
+    prescription?: PrescriptionCreateNestedOneWithoutFollowUpsInput
+  }
+
+  export type FollowUpUncheckedCreateWithoutCompletedAppointmentInput = {
+    id?: string
+    patientId: string
+    branchId: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    clinicalExaminationId?: string | null
+    surgeryId?: string | null
+    prescriptionId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FollowUpCreateOrConnectWithoutCompletedAppointmentInput = {
+    where: FollowUpWhereUniqueInput
+    create: XOR<FollowUpCreateWithoutCompletedAppointmentInput, FollowUpUncheckedCreateWithoutCompletedAppointmentInput>
+  }
+
+  export type FollowUpCreateManyCompletedAppointmentInputEnvelope = {
+    data: FollowUpCreateManyCompletedAppointmentInput | FollowUpCreateManyCompletedAppointmentInput[]
+    skipDuplicates?: boolean
+  }
+
   export type BranchUpsertWithoutAppointmentsInput = {
     update: XOR<BranchUpdateWithoutAppointmentsInput, BranchUncheckedUpdateWithoutAppointmentsInput>
     create: XOR<BranchCreateWithoutAppointmentsInput, BranchUncheckedCreateWithoutAppointmentsInput>
@@ -32177,6 +35044,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutAppointmentsInput = {
@@ -32198,6 +35066,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type PatientUpsertWithoutAppointmentsInput = {
@@ -32223,6 +35092,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     branch?: BranchUpdateOneRequiredWithoutPatientsNestedInput
     billings?: BillingUpdateManyWithoutPatientNestedInput
+    followUps?: FollowUpUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutAppointmentsInput = {
@@ -32237,6 +35107,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     billings?: BillingUncheckedUpdateManyWithoutPatientNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type DoctorUpsertWithoutAppointmentsInput = {
@@ -32391,10 +35262,13 @@ export namespace Prisma {
     axisLeft?: NullableIntFieldUpdateOperationsInput | number | null
     diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     managementPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    nextReviewDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextReviewReason?: NullableStringFieldUpdateOperationsInput | string | null
     examinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     examinedBy?: DoctorUpdateOneRequiredWithoutExaminedClinicalExamsNestedInput
     surgery?: SurgeryUpdateOneWithoutClinicalExamNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutClinicalExamNestedInput
+    followUps?: FollowUpUpdateManyWithoutClinicalExaminationNestedInput
   }
 
   export type ClinicalExaminationUncheckedUpdateWithoutAppointmentInput = {
@@ -32407,10 +35281,13 @@ export namespace Prisma {
     axisLeft?: NullableIntFieldUpdateOperationsInput | number | null
     diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     managementPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    nextReviewDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextReviewReason?: NullableStringFieldUpdateOperationsInput | string | null
     examinedById?: StringFieldUpdateOperationsInput | string
     examinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     surgery?: SurgeryUncheckedUpdateOneWithoutClinicalExamNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutClinicalExamNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutClinicalExaminationNestedInput
   }
 
   export type PrescriptionUpsertWithWhereUniqueWithoutAppointmentInput = {
@@ -32445,6 +35322,22 @@ export namespace Prisma {
     data: XOR<BillingUpdateManyMutationInput, BillingUncheckedUpdateManyWithoutAppointmentInput>
   }
 
+  export type FollowUpUpsertWithWhereUniqueWithoutCompletedAppointmentInput = {
+    where: FollowUpWhereUniqueInput
+    update: XOR<FollowUpUpdateWithoutCompletedAppointmentInput, FollowUpUncheckedUpdateWithoutCompletedAppointmentInput>
+    create: XOR<FollowUpCreateWithoutCompletedAppointmentInput, FollowUpUncheckedCreateWithoutCompletedAppointmentInput>
+  }
+
+  export type FollowUpUpdateWithWhereUniqueWithoutCompletedAppointmentInput = {
+    where: FollowUpWhereUniqueInput
+    data: XOR<FollowUpUpdateWithoutCompletedAppointmentInput, FollowUpUncheckedUpdateWithoutCompletedAppointmentInput>
+  }
+
+  export type FollowUpUpdateManyWithWhereWithoutCompletedAppointmentInput = {
+    where: FollowUpScalarWhereInput
+    data: XOR<FollowUpUpdateManyMutationInput, FollowUpUncheckedUpdateManyWithoutCompletedAppointmentInput>
+  }
+
   export type AppointmentCreateWithoutErExaminationInput = {
     id?: string
     bookingNumber?: string | null
@@ -32460,6 +35353,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationCreateNestedOneWithoutAppointmentInput
     prescriptions?: PrescriptionCreateNestedManyWithoutAppointmentInput
     billings?: BillingCreateNestedManyWithoutAppointmentInput
+    completedFollowUps?: FollowUpCreateNestedManyWithoutCompletedAppointmentInput
   }
 
   export type AppointmentUncheckedCreateWithoutErExaminationInput = {
@@ -32477,6 +35371,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationUncheckedCreateNestedOneWithoutAppointmentInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutAppointmentInput
     billings?: BillingUncheckedCreateNestedManyWithoutAppointmentInput
+    completedFollowUps?: FollowUpUncheckedCreateNestedManyWithoutCompletedAppointmentInput
   }
 
   export type AppointmentCreateOrConnectWithoutErExaminationInput = {
@@ -32561,6 +35456,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationUpdateOneWithoutAppointmentNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutAppointmentNestedInput
     billings?: BillingUpdateManyWithoutAppointmentNestedInput
+    completedFollowUps?: FollowUpUpdateManyWithoutCompletedAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateWithoutErExaminationInput = {
@@ -32578,6 +35474,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationUncheckedUpdateOneWithoutAppointmentNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutAppointmentNestedInput
     billings?: BillingUncheckedUpdateManyWithoutAppointmentNestedInput
+    completedFollowUps?: FollowUpUncheckedUpdateManyWithoutCompletedAppointmentNestedInput
   }
 
   export type UserUpsertWithoutRecordedERExamsInput = {
@@ -32652,6 +35549,7 @@ export namespace Prisma {
     erExamination?: ERExaminationCreateNestedOneWithoutAppointmentInput
     prescriptions?: PrescriptionCreateNestedManyWithoutAppointmentInput
     billings?: BillingCreateNestedManyWithoutAppointmentInput
+    completedFollowUps?: FollowUpCreateNestedManyWithoutCompletedAppointmentInput
   }
 
   export type AppointmentUncheckedCreateWithoutClinicalExaminationInput = {
@@ -32669,6 +35567,7 @@ export namespace Prisma {
     erExamination?: ERExaminationUncheckedCreateNestedOneWithoutAppointmentInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutAppointmentInput
     billings?: BillingUncheckedCreateNestedManyWithoutAppointmentInput
+    completedFollowUps?: FollowUpUncheckedCreateNestedManyWithoutCompletedAppointmentInput
   }
 
   export type AppointmentCreateOrConnectWithoutClinicalExaminationInput = {
@@ -32715,10 +35614,12 @@ export namespace Prisma {
     cost: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
+    nextFollowUpDate?: Date | string | null
     createdAt?: Date | string
     branch: BranchCreateNestedOneWithoutSurgeriesInput
     surgeon: DoctorCreateNestedOneWithoutSurgeriesInput
     billings?: BillingCreateNestedManyWithoutSurgeryInput
+    followUps?: FollowUpCreateNestedManyWithoutSurgeryInput
   }
 
   export type SurgeryUncheckedCreateWithoutClinicalExamInput = {
@@ -32730,9 +35631,11 @@ export namespace Prisma {
     cost: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
+    nextFollowUpDate?: Date | string | null
     surgeonId: string
     createdAt?: Date | string
     billings?: BillingUncheckedCreateNestedManyWithoutSurgeryInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutSurgeryInput
   }
 
   export type SurgeryCreateOrConnectWithoutClinicalExamInput = {
@@ -32746,10 +35649,12 @@ export namespace Prisma {
     itemId?: string | null
     quantity: number
     instructions?: string | null
+    reviewAfterDays?: number | null
     createdAt?: Date | string
     appointment: AppointmentCreateNestedOneWithoutPrescriptionsInput
     branch: BranchCreateNestedOneWithoutPrescriptionsInput
     billings?: BillingCreateNestedManyWithoutPrescriptionInput
+    followUps?: FollowUpCreateNestedManyWithoutPrescriptionInput
   }
 
   export type PrescriptionUncheckedCreateWithoutClinicalExamInput = {
@@ -32760,8 +35665,10 @@ export namespace Prisma {
     itemId?: string | null
     quantity: number
     instructions?: string | null
+    reviewAfterDays?: number | null
     createdAt?: Date | string
     billings?: BillingUncheckedCreateNestedManyWithoutPrescriptionInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutPrescriptionInput
   }
 
   export type PrescriptionCreateOrConnectWithoutClinicalExamInput = {
@@ -32771,6 +35678,48 @@ export namespace Prisma {
 
   export type PrescriptionCreateManyClinicalExamInputEnvelope = {
     data: PrescriptionCreateManyClinicalExamInput | PrescriptionCreateManyClinicalExamInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FollowUpCreateWithoutClinicalExaminationInput = {
+    id?: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutFollowUpsInput
+    branch: BranchCreateNestedOneWithoutFollowUpsInput
+    completedAppointment?: AppointmentCreateNestedOneWithoutCompletedFollowUpsInput
+    surgery?: SurgeryCreateNestedOneWithoutFollowUpsInput
+    prescription?: PrescriptionCreateNestedOneWithoutFollowUpsInput
+  }
+
+  export type FollowUpUncheckedCreateWithoutClinicalExaminationInput = {
+    id?: string
+    patientId: string
+    branchId: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    completedAppointmentId?: string | null
+    surgeryId?: string | null
+    prescriptionId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FollowUpCreateOrConnectWithoutClinicalExaminationInput = {
+    where: FollowUpWhereUniqueInput
+    create: XOR<FollowUpCreateWithoutClinicalExaminationInput, FollowUpUncheckedCreateWithoutClinicalExaminationInput>
+  }
+
+  export type FollowUpCreateManyClinicalExaminationInputEnvelope = {
+    data: FollowUpCreateManyClinicalExaminationInput | FollowUpCreateManyClinicalExaminationInput[]
     skipDuplicates?: boolean
   }
 
@@ -32800,6 +35749,7 @@ export namespace Prisma {
     erExamination?: ERExaminationUpdateOneWithoutAppointmentNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutAppointmentNestedInput
     billings?: BillingUpdateManyWithoutAppointmentNestedInput
+    completedFollowUps?: FollowUpUpdateManyWithoutCompletedAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateWithoutClinicalExaminationInput = {
@@ -32817,6 +35767,7 @@ export namespace Prisma {
     erExamination?: ERExaminationUncheckedUpdateOneWithoutAppointmentNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutAppointmentNestedInput
     billings?: BillingUncheckedUpdateManyWithoutAppointmentNestedInput
+    completedFollowUps?: FollowUpUncheckedUpdateManyWithoutCompletedAppointmentNestedInput
   }
 
   export type DoctorUpsertWithoutExaminedClinicalExamsInput = {
@@ -32875,10 +35826,12 @@ export namespace Prisma {
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     branch?: BranchUpdateOneRequiredWithoutSurgeriesNestedInput
     surgeon?: DoctorUpdateOneRequiredWithoutSurgeriesNestedInput
     billings?: BillingUpdateManyWithoutSurgeryNestedInput
+    followUps?: FollowUpUpdateManyWithoutSurgeryNestedInput
   }
 
   export type SurgeryUncheckedUpdateWithoutClinicalExamInput = {
@@ -32890,9 +35843,11 @@ export namespace Prisma {
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     surgeonId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     billings?: BillingUncheckedUpdateManyWithoutSurgeryNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutSurgeryNestedInput
   }
 
   export type PrescriptionUpsertWithWhereUniqueWithoutClinicalExamInput = {
@@ -32911,6 +35866,22 @@ export namespace Prisma {
     data: XOR<PrescriptionUpdateManyMutationInput, PrescriptionUncheckedUpdateManyWithoutClinicalExamInput>
   }
 
+  export type FollowUpUpsertWithWhereUniqueWithoutClinicalExaminationInput = {
+    where: FollowUpWhereUniqueInput
+    update: XOR<FollowUpUpdateWithoutClinicalExaminationInput, FollowUpUncheckedUpdateWithoutClinicalExaminationInput>
+    create: XOR<FollowUpCreateWithoutClinicalExaminationInput, FollowUpUncheckedCreateWithoutClinicalExaminationInput>
+  }
+
+  export type FollowUpUpdateWithWhereUniqueWithoutClinicalExaminationInput = {
+    where: FollowUpWhereUniqueInput
+    data: XOR<FollowUpUpdateWithoutClinicalExaminationInput, FollowUpUncheckedUpdateWithoutClinicalExaminationInput>
+  }
+
+  export type FollowUpUpdateManyWithWhereWithoutClinicalExaminationInput = {
+    where: FollowUpScalarWhereInput
+    data: XOR<FollowUpUpdateManyMutationInput, FollowUpUncheckedUpdateManyWithoutClinicalExaminationInput>
+  }
+
   export type ClinicalExaminationCreateWithoutSurgeryInput = {
     id?: string
     sphRight?: Decimal | DecimalJsLike | number | string | null
@@ -32921,10 +35892,13 @@ export namespace Prisma {
     axisLeft?: number | null
     diagnosis?: string | null
     managementPlan?: string | null
+    nextReviewDate?: Date | string | null
+    nextReviewReason?: string | null
     examinedAt?: Date | string
     appointment: AppointmentCreateNestedOneWithoutClinicalExaminationInput
     examinedBy: DoctorCreateNestedOneWithoutExaminedClinicalExamsInput
     prescriptions?: PrescriptionCreateNestedManyWithoutClinicalExamInput
+    followUps?: FollowUpCreateNestedManyWithoutClinicalExaminationInput
   }
 
   export type ClinicalExaminationUncheckedCreateWithoutSurgeryInput = {
@@ -32938,9 +35912,12 @@ export namespace Prisma {
     axisLeft?: number | null
     diagnosis?: string | null
     managementPlan?: string | null
+    nextReviewDate?: Date | string | null
+    nextReviewReason?: string | null
     examinedById: string
     examinedAt?: Date | string
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutClinicalExamInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutClinicalExaminationInput
   }
 
   export type ClinicalExaminationCreateOrConnectWithoutSurgeryInput = {
@@ -32967,6 +35944,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutSurgeriesInput = {
@@ -32988,6 +35966,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutSurgeriesInput = {
@@ -33076,6 +36055,48 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type FollowUpCreateWithoutSurgeryInput = {
+    id?: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutFollowUpsInput
+    branch: BranchCreateNestedOneWithoutFollowUpsInput
+    completedAppointment?: AppointmentCreateNestedOneWithoutCompletedFollowUpsInput
+    clinicalExamination?: ClinicalExaminationCreateNestedOneWithoutFollowUpsInput
+    prescription?: PrescriptionCreateNestedOneWithoutFollowUpsInput
+  }
+
+  export type FollowUpUncheckedCreateWithoutSurgeryInput = {
+    id?: string
+    patientId: string
+    branchId: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    completedAppointmentId?: string | null
+    clinicalExaminationId?: string | null
+    prescriptionId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FollowUpCreateOrConnectWithoutSurgeryInput = {
+    where: FollowUpWhereUniqueInput
+    create: XOR<FollowUpCreateWithoutSurgeryInput, FollowUpUncheckedCreateWithoutSurgeryInput>
+  }
+
+  export type FollowUpCreateManySurgeryInputEnvelope = {
+    data: FollowUpCreateManySurgeryInput | FollowUpCreateManySurgeryInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ClinicalExaminationUpsertWithoutSurgeryInput = {
     update: XOR<ClinicalExaminationUpdateWithoutSurgeryInput, ClinicalExaminationUncheckedUpdateWithoutSurgeryInput>
     create: XOR<ClinicalExaminationCreateWithoutSurgeryInput, ClinicalExaminationUncheckedCreateWithoutSurgeryInput>
@@ -33097,10 +36118,13 @@ export namespace Prisma {
     axisLeft?: NullableIntFieldUpdateOperationsInput | number | null
     diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     managementPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    nextReviewDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextReviewReason?: NullableStringFieldUpdateOperationsInput | string | null
     examinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointment?: AppointmentUpdateOneRequiredWithoutClinicalExaminationNestedInput
     examinedBy?: DoctorUpdateOneRequiredWithoutExaminedClinicalExamsNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutClinicalExamNestedInput
+    followUps?: FollowUpUpdateManyWithoutClinicalExaminationNestedInput
   }
 
   export type ClinicalExaminationUncheckedUpdateWithoutSurgeryInput = {
@@ -33114,9 +36138,12 @@ export namespace Prisma {
     axisLeft?: NullableIntFieldUpdateOperationsInput | number | null
     diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     managementPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    nextReviewDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextReviewReason?: NullableStringFieldUpdateOperationsInput | string | null
     examinedById?: StringFieldUpdateOperationsInput | string
     examinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutClinicalExamNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutClinicalExaminationNestedInput
   }
 
   export type BranchUpsertWithoutSurgeriesInput = {
@@ -33149,6 +36176,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutSurgeriesInput = {
@@ -33170,6 +36198,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type DoctorUpsertWithoutSurgeriesInput = {
@@ -33225,6 +36254,22 @@ export namespace Prisma {
     data: XOR<BillingUpdateManyMutationInput, BillingUncheckedUpdateManyWithoutSurgeryInput>
   }
 
+  export type FollowUpUpsertWithWhereUniqueWithoutSurgeryInput = {
+    where: FollowUpWhereUniqueInput
+    update: XOR<FollowUpUpdateWithoutSurgeryInput, FollowUpUncheckedUpdateWithoutSurgeryInput>
+    create: XOR<FollowUpCreateWithoutSurgeryInput, FollowUpUncheckedCreateWithoutSurgeryInput>
+  }
+
+  export type FollowUpUpdateWithWhereUniqueWithoutSurgeryInput = {
+    where: FollowUpWhereUniqueInput
+    data: XOR<FollowUpUpdateWithoutSurgeryInput, FollowUpUncheckedUpdateWithoutSurgeryInput>
+  }
+
+  export type FollowUpUpdateManyWithWhereWithoutSurgeryInput = {
+    where: FollowUpScalarWhereInput
+    data: XOR<FollowUpUpdateManyMutationInput, FollowUpUncheckedUpdateManyWithoutSurgeryInput>
+  }
+
   export type AppointmentCreateWithoutPrescriptionsInput = {
     id?: string
     bookingNumber?: string | null
@@ -33240,6 +36285,7 @@ export namespace Prisma {
     erExamination?: ERExaminationCreateNestedOneWithoutAppointmentInput
     clinicalExamination?: ClinicalExaminationCreateNestedOneWithoutAppointmentInput
     billings?: BillingCreateNestedManyWithoutAppointmentInput
+    completedFollowUps?: FollowUpCreateNestedManyWithoutCompletedAppointmentInput
   }
 
   export type AppointmentUncheckedCreateWithoutPrescriptionsInput = {
@@ -33257,6 +36303,7 @@ export namespace Prisma {
     erExamination?: ERExaminationUncheckedCreateNestedOneWithoutAppointmentInput
     clinicalExamination?: ClinicalExaminationUncheckedCreateNestedOneWithoutAppointmentInput
     billings?: BillingUncheckedCreateNestedManyWithoutAppointmentInput
+    completedFollowUps?: FollowUpUncheckedCreateNestedManyWithoutCompletedAppointmentInput
   }
 
   export type AppointmentCreateOrConnectWithoutPrescriptionsInput = {
@@ -33274,10 +36321,13 @@ export namespace Prisma {
     axisLeft?: number | null
     diagnosis?: string | null
     managementPlan?: string | null
+    nextReviewDate?: Date | string | null
+    nextReviewReason?: string | null
     examinedAt?: Date | string
     appointment: AppointmentCreateNestedOneWithoutClinicalExaminationInput
     examinedBy: DoctorCreateNestedOneWithoutExaminedClinicalExamsInput
     surgery?: SurgeryCreateNestedOneWithoutClinicalExamInput
+    followUps?: FollowUpCreateNestedManyWithoutClinicalExaminationInput
   }
 
   export type ClinicalExaminationUncheckedCreateWithoutPrescriptionsInput = {
@@ -33291,9 +36341,12 @@ export namespace Prisma {
     axisLeft?: number | null
     diagnosis?: string | null
     managementPlan?: string | null
+    nextReviewDate?: Date | string | null
+    nextReviewReason?: string | null
     examinedById: string
     examinedAt?: Date | string
     surgery?: SurgeryUncheckedCreateNestedOneWithoutClinicalExamInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutClinicalExaminationInput
   }
 
   export type ClinicalExaminationCreateOrConnectWithoutPrescriptionsInput = {
@@ -33320,6 +36373,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutPrescriptionsInput = {
@@ -33341,6 +36395,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutPrescriptionsInput = {
@@ -33398,6 +36453,48 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type FollowUpCreateWithoutPrescriptionInput = {
+    id?: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutFollowUpsInput
+    branch: BranchCreateNestedOneWithoutFollowUpsInput
+    completedAppointment?: AppointmentCreateNestedOneWithoutCompletedFollowUpsInput
+    clinicalExamination?: ClinicalExaminationCreateNestedOneWithoutFollowUpsInput
+    surgery?: SurgeryCreateNestedOneWithoutFollowUpsInput
+  }
+
+  export type FollowUpUncheckedCreateWithoutPrescriptionInput = {
+    id?: string
+    patientId: string
+    branchId: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    completedAppointmentId?: string | null
+    clinicalExaminationId?: string | null
+    surgeryId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FollowUpCreateOrConnectWithoutPrescriptionInput = {
+    where: FollowUpWhereUniqueInput
+    create: XOR<FollowUpCreateWithoutPrescriptionInput, FollowUpUncheckedCreateWithoutPrescriptionInput>
+  }
+
+  export type FollowUpCreateManyPrescriptionInputEnvelope = {
+    data: FollowUpCreateManyPrescriptionInput | FollowUpCreateManyPrescriptionInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AppointmentUpsertWithoutPrescriptionsInput = {
     update: XOR<AppointmentUpdateWithoutPrescriptionsInput, AppointmentUncheckedUpdateWithoutPrescriptionsInput>
     create: XOR<AppointmentCreateWithoutPrescriptionsInput, AppointmentUncheckedCreateWithoutPrescriptionsInput>
@@ -33424,6 +36521,7 @@ export namespace Prisma {
     erExamination?: ERExaminationUpdateOneWithoutAppointmentNestedInput
     clinicalExamination?: ClinicalExaminationUpdateOneWithoutAppointmentNestedInput
     billings?: BillingUpdateManyWithoutAppointmentNestedInput
+    completedFollowUps?: FollowUpUpdateManyWithoutCompletedAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateWithoutPrescriptionsInput = {
@@ -33441,6 +36539,7 @@ export namespace Prisma {
     erExamination?: ERExaminationUncheckedUpdateOneWithoutAppointmentNestedInput
     clinicalExamination?: ClinicalExaminationUncheckedUpdateOneWithoutAppointmentNestedInput
     billings?: BillingUncheckedUpdateManyWithoutAppointmentNestedInput
+    completedFollowUps?: FollowUpUncheckedUpdateManyWithoutCompletedAppointmentNestedInput
   }
 
   export type ClinicalExaminationUpsertWithoutPrescriptionsInput = {
@@ -33464,10 +36563,13 @@ export namespace Prisma {
     axisLeft?: NullableIntFieldUpdateOperationsInput | number | null
     diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     managementPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    nextReviewDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextReviewReason?: NullableStringFieldUpdateOperationsInput | string | null
     examinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointment?: AppointmentUpdateOneRequiredWithoutClinicalExaminationNestedInput
     examinedBy?: DoctorUpdateOneRequiredWithoutExaminedClinicalExamsNestedInput
     surgery?: SurgeryUpdateOneWithoutClinicalExamNestedInput
+    followUps?: FollowUpUpdateManyWithoutClinicalExaminationNestedInput
   }
 
   export type ClinicalExaminationUncheckedUpdateWithoutPrescriptionsInput = {
@@ -33481,9 +36583,12 @@ export namespace Prisma {
     axisLeft?: NullableIntFieldUpdateOperationsInput | number | null
     diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     managementPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    nextReviewDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextReviewReason?: NullableStringFieldUpdateOperationsInput | string | null
     examinedById?: StringFieldUpdateOperationsInput | string
     examinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     surgery?: SurgeryUncheckedUpdateOneWithoutClinicalExamNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutClinicalExaminationNestedInput
   }
 
   export type BranchUpsertWithoutPrescriptionsInput = {
@@ -33516,6 +36621,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutPrescriptionsInput = {
@@ -33537,6 +36643,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type BillingUpsertWithWhereUniqueWithoutPrescriptionInput = {
@@ -33553,6 +36660,22 @@ export namespace Prisma {
   export type BillingUpdateManyWithWhereWithoutPrescriptionInput = {
     where: BillingScalarWhereInput
     data: XOR<BillingUpdateManyMutationInput, BillingUncheckedUpdateManyWithoutPrescriptionInput>
+  }
+
+  export type FollowUpUpsertWithWhereUniqueWithoutPrescriptionInput = {
+    where: FollowUpWhereUniqueInput
+    update: XOR<FollowUpUpdateWithoutPrescriptionInput, FollowUpUncheckedUpdateWithoutPrescriptionInput>
+    create: XOR<FollowUpCreateWithoutPrescriptionInput, FollowUpUncheckedCreateWithoutPrescriptionInput>
+  }
+
+  export type FollowUpUpdateWithWhereUniqueWithoutPrescriptionInput = {
+    where: FollowUpWhereUniqueInput
+    data: XOR<FollowUpUpdateWithoutPrescriptionInput, FollowUpUncheckedUpdateWithoutPrescriptionInput>
+  }
+
+  export type FollowUpUpdateManyWithWhereWithoutPrescriptionInput = {
+    where: FollowUpScalarWhereInput
+    data: XOR<FollowUpUpdateManyMutationInput, FollowUpUncheckedUpdateManyWithoutPrescriptionInput>
   }
 
   export type BranchCreateWithoutPharmacyItemsInput = {
@@ -33574,6 +36697,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutPharmacyItemsInput = {
@@ -33595,6 +36719,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutPharmacyItemsInput = {
@@ -33664,6 +36789,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutPharmacyItemsInput = {
@@ -33685,6 +36811,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type PharmacyStockTransactionUpsertWithWhereUniqueWithoutPharmacyItemInput = {
@@ -33718,6 +36845,7 @@ export namespace Prisma {
     expiryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    isActive?: boolean
     branch: BranchCreateNestedOneWithoutPharmacyItemsInput
   }
 
@@ -33737,6 +36865,7 @@ export namespace Prisma {
     expiryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    isActive?: boolean
   }
 
   export type PharmacyItemCreateOrConnectWithoutTransactionsInput = {
@@ -33763,6 +36892,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutPharmacyTransactionsInput = {
@@ -33784,6 +36914,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutPharmacyTransactionsInput = {
@@ -33913,6 +37044,7 @@ export namespace Prisma {
     expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     branch?: BranchUpdateOneRequiredWithoutPharmacyItemsNestedInput
   }
 
@@ -33932,6 +37064,7 @@ export namespace Prisma {
     expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type BranchUpsertWithoutPharmacyTransactionsInput = {
@@ -33964,6 +37097,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutPharmacyTransactionsInput = {
@@ -33985,6 +37119,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type BillingUpsertWithoutPharmacyTransactionsInput = {
@@ -34114,6 +37249,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutOpticalItemsInput = {
@@ -34135,6 +37271,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutOpticalItemsInput = {
@@ -34204,6 +37341,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutOpticalItemsInput = {
@@ -34225,6 +37363,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type OpticalStockTransactionUpsertWithWhereUniqueWithoutOpticalItemInput = {
@@ -34256,6 +37395,7 @@ export namespace Prisma {
     sellingPrice: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
+    isActive?: boolean
     branch: BranchCreateNestedOneWithoutOpticalItemsInput
   }
 
@@ -34273,6 +37413,7 @@ export namespace Prisma {
     sellingPrice: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
+    isActive?: boolean
   }
 
   export type OpticalItemCreateOrConnectWithoutTransactionsInput = {
@@ -34299,6 +37440,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutOpticalTransactionsInput = {
@@ -34320,6 +37462,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutOpticalTransactionsInput = {
@@ -34447,6 +37590,7 @@ export namespace Prisma {
     sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     branch?: BranchUpdateOneRequiredWithoutOpticalItemsNestedInput
   }
 
@@ -34464,6 +37608,7 @@ export namespace Prisma {
     sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type BranchUpsertWithoutOpticalTransactionsInput = {
@@ -34496,6 +37641,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutOpticalTransactionsInput = {
@@ -34517,6 +37663,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type BillingUpsertWithoutOpticalTransactionsInput = {
@@ -34639,6 +37786,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     branch: BranchCreateNestedOneWithoutPatientsInput
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
+    followUps?: FollowUpCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutBillingsInput = {
@@ -34653,6 +37801,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientCreateOrConnectWithoutBillingsInput = {
@@ -34679,6 +37828,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutBillingsInput = {
@@ -34700,6 +37850,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutBillingsInput = {
@@ -34722,6 +37873,7 @@ export namespace Prisma {
     erExamination?: ERExaminationCreateNestedOneWithoutAppointmentInput
     clinicalExamination?: ClinicalExaminationCreateNestedOneWithoutAppointmentInput
     prescriptions?: PrescriptionCreateNestedManyWithoutAppointmentInput
+    completedFollowUps?: FollowUpCreateNestedManyWithoutCompletedAppointmentInput
   }
 
   export type AppointmentUncheckedCreateWithoutBillingsInput = {
@@ -34739,6 +37891,7 @@ export namespace Prisma {
     erExamination?: ERExaminationUncheckedCreateNestedOneWithoutAppointmentInput
     clinicalExamination?: ClinicalExaminationUncheckedCreateNestedOneWithoutAppointmentInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutAppointmentInput
+    completedFollowUps?: FollowUpUncheckedCreateNestedManyWithoutCompletedAppointmentInput
   }
 
   export type AppointmentCreateOrConnectWithoutBillingsInput = {
@@ -34754,10 +37907,12 @@ export namespace Prisma {
     cost: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
+    nextFollowUpDate?: Date | string | null
     createdAt?: Date | string
     clinicalExam: ClinicalExaminationCreateNestedOneWithoutSurgeryInput
     branch: BranchCreateNestedOneWithoutSurgeriesInput
     surgeon: DoctorCreateNestedOneWithoutSurgeriesInput
+    followUps?: FollowUpCreateNestedManyWithoutSurgeryInput
   }
 
   export type SurgeryUncheckedCreateWithoutBillingsInput = {
@@ -34770,8 +37925,10 @@ export namespace Prisma {
     cost: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
+    nextFollowUpDate?: Date | string | null
     surgeonId: string
     createdAt?: Date | string
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutSurgeryInput
   }
 
   export type SurgeryCreateOrConnectWithoutBillingsInput = {
@@ -34785,10 +37942,12 @@ export namespace Prisma {
     itemId?: string | null
     quantity: number
     instructions?: string | null
+    reviewAfterDays?: number | null
     createdAt?: Date | string
     appointment: AppointmentCreateNestedOneWithoutPrescriptionsInput
     clinicalExam: ClinicalExaminationCreateNestedOneWithoutPrescriptionsInput
     branch: BranchCreateNestedOneWithoutPrescriptionsInput
+    followUps?: FollowUpCreateNestedManyWithoutPrescriptionInput
   }
 
   export type PrescriptionUncheckedCreateWithoutBillingsInput = {
@@ -34800,7 +37959,9 @@ export namespace Prisma {
     itemId?: string | null
     quantity: number
     instructions?: string | null
+    reviewAfterDays?: number | null
     createdAt?: Date | string
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutPrescriptionInput
   }
 
   export type PrescriptionCreateOrConnectWithoutBillingsInput = {
@@ -34946,6 +38107,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     branch?: BranchUpdateOneRequiredWithoutPatientsNestedInput
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
+    followUps?: FollowUpUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutBillingsInput = {
@@ -34960,6 +38122,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type BranchUpsertWithoutBillingsInput = {
@@ -34992,6 +38155,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutBillingsInput = {
@@ -35013,6 +38177,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type AppointmentUpsertWithoutBillingsInput = {
@@ -35041,6 +38206,7 @@ export namespace Prisma {
     erExamination?: ERExaminationUpdateOneWithoutAppointmentNestedInput
     clinicalExamination?: ClinicalExaminationUpdateOneWithoutAppointmentNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutAppointmentNestedInput
+    completedFollowUps?: FollowUpUpdateManyWithoutCompletedAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateWithoutBillingsInput = {
@@ -35058,6 +38224,7 @@ export namespace Prisma {
     erExamination?: ERExaminationUncheckedUpdateOneWithoutAppointmentNestedInput
     clinicalExamination?: ClinicalExaminationUncheckedUpdateOneWithoutAppointmentNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutAppointmentNestedInput
+    completedFollowUps?: FollowUpUncheckedUpdateManyWithoutCompletedAppointmentNestedInput
   }
 
   export type SurgeryUpsertWithoutBillingsInput = {
@@ -35079,10 +38246,12 @@ export namespace Prisma {
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinicalExam?: ClinicalExaminationUpdateOneRequiredWithoutSurgeryNestedInput
     branch?: BranchUpdateOneRequiredWithoutSurgeriesNestedInput
     surgeon?: DoctorUpdateOneRequiredWithoutSurgeriesNestedInput
+    followUps?: FollowUpUpdateManyWithoutSurgeryNestedInput
   }
 
   export type SurgeryUncheckedUpdateWithoutBillingsInput = {
@@ -35095,8 +38264,10 @@ export namespace Prisma {
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     surgeonId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    followUps?: FollowUpUncheckedUpdateManyWithoutSurgeryNestedInput
   }
 
   export type PrescriptionUpsertWithoutBillingsInput = {
@@ -35116,10 +38287,12 @@ export namespace Prisma {
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewAfterDays?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointment?: AppointmentUpdateOneRequiredWithoutPrescriptionsNestedInput
     clinicalExam?: ClinicalExaminationUpdateOneRequiredWithoutPrescriptionsNestedInput
     branch?: BranchUpdateOneRequiredWithoutPrescriptionsNestedInput
+    followUps?: FollowUpUpdateManyWithoutPrescriptionNestedInput
   }
 
   export type PrescriptionUncheckedUpdateWithoutBillingsInput = {
@@ -35131,7 +38304,9 @@ export namespace Prisma {
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewAfterDays?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    followUps?: FollowUpUncheckedUpdateManyWithoutPrescriptionNestedInput
   }
 
   export type UserUpsertWithoutCreatedBillingsInput = {
@@ -35223,6 +38398,518 @@ export namespace Prisma {
     data: XOR<OpticalStockTransactionUpdateManyMutationInput, OpticalStockTransactionUncheckedUpdateManyWithoutBillingInput>
   }
 
+  export type PatientCreateWithoutFollowUpsInput = {
+    id?: string
+    fullName: string
+    gender?: string | null
+    dateOfBirth: Date | string
+    phone: string
+    email?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutPatientsInput
+    appointments?: AppointmentCreateNestedManyWithoutPatientInput
+    billings?: BillingCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientUncheckedCreateWithoutFollowUpsInput = {
+    id?: string
+    fullName: string
+    gender?: string | null
+    dateOfBirth: Date | string
+    phone: string
+    email?: string | null
+    address?: string | null
+    branchId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
+    billings?: BillingUncheckedCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientCreateOrConnectWithoutFollowUpsInput = {
+    where: PatientWhereUniqueInput
+    create: XOR<PatientCreateWithoutFollowUpsInput, PatientUncheckedCreateWithoutFollowUpsInput>
+  }
+
+  export type BranchCreateWithoutFollowUpsInput = {
+    id?: string
+    branchName: string
+    address: string
+    phone: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserCreateNestedManyWithoutBranchInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutBranchInput
+    doctors?: DoctorCreateNestedManyWithoutBranchInput
+    patients?: PatientCreateNestedManyWithoutBranchInput
+    appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    surgeries?: SurgeryCreateNestedManyWithoutBranchInput
+    prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
+    pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
+    opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
+    opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
+    billings?: BillingCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchUncheckedCreateWithoutFollowUpsInput = {
+    id?: string
+    branchName: string
+    address: string
+    phone: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserUncheckedCreateNestedManyWithoutBranchInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutBranchInput
+    doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
+    patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
+    prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
+    pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
+    opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
+    opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
+    billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchCreateOrConnectWithoutFollowUpsInput = {
+    where: BranchWhereUniqueInput
+    create: XOR<BranchCreateWithoutFollowUpsInput, BranchUncheckedCreateWithoutFollowUpsInput>
+  }
+
+  export type AppointmentCreateWithoutCompletedFollowUpsInput = {
+    id?: string
+    bookingNumber?: string | null
+    appointmentDate: Date | string
+    status?: $Enums.AppointmentStatus
+    amount?: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutAppointmentsInput
+    patient: PatientCreateNestedOneWithoutAppointmentsInput
+    doctor: DoctorCreateNestedOneWithoutAppointmentsInput
+    createdBy: UserCreateNestedOneWithoutCreatedAppointmentsInput
+    erExamination?: ERExaminationCreateNestedOneWithoutAppointmentInput
+    clinicalExamination?: ClinicalExaminationCreateNestedOneWithoutAppointmentInput
+    prescriptions?: PrescriptionCreateNestedManyWithoutAppointmentInput
+    billings?: BillingCreateNestedManyWithoutAppointmentInput
+  }
+
+  export type AppointmentUncheckedCreateWithoutCompletedFollowUpsInput = {
+    id?: string
+    bookingNumber?: string | null
+    appointmentDate: Date | string
+    status?: $Enums.AppointmentStatus
+    amount?: Decimal | DecimalJsLike | number | string
+    branchId: string
+    patientId: string
+    doctorId: string
+    createdById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    erExamination?: ERExaminationUncheckedCreateNestedOneWithoutAppointmentInput
+    clinicalExamination?: ClinicalExaminationUncheckedCreateNestedOneWithoutAppointmentInput
+    prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutAppointmentInput
+    billings?: BillingUncheckedCreateNestedManyWithoutAppointmentInput
+  }
+
+  export type AppointmentCreateOrConnectWithoutCompletedFollowUpsInput = {
+    where: AppointmentWhereUniqueInput
+    create: XOR<AppointmentCreateWithoutCompletedFollowUpsInput, AppointmentUncheckedCreateWithoutCompletedFollowUpsInput>
+  }
+
+  export type ClinicalExaminationCreateWithoutFollowUpsInput = {
+    id?: string
+    sphRight?: Decimal | DecimalJsLike | number | string | null
+    cylRight?: Decimal | DecimalJsLike | number | string | null
+    axisRight?: number | null
+    sphLeft?: Decimal | DecimalJsLike | number | string | null
+    cylLeft?: Decimal | DecimalJsLike | number | string | null
+    axisLeft?: number | null
+    diagnosis?: string | null
+    managementPlan?: string | null
+    nextReviewDate?: Date | string | null
+    nextReviewReason?: string | null
+    examinedAt?: Date | string
+    appointment: AppointmentCreateNestedOneWithoutClinicalExaminationInput
+    examinedBy: DoctorCreateNestedOneWithoutExaminedClinicalExamsInput
+    surgery?: SurgeryCreateNestedOneWithoutClinicalExamInput
+    prescriptions?: PrescriptionCreateNestedManyWithoutClinicalExamInput
+  }
+
+  export type ClinicalExaminationUncheckedCreateWithoutFollowUpsInput = {
+    id?: string
+    appointmentId: string
+    sphRight?: Decimal | DecimalJsLike | number | string | null
+    cylRight?: Decimal | DecimalJsLike | number | string | null
+    axisRight?: number | null
+    sphLeft?: Decimal | DecimalJsLike | number | string | null
+    cylLeft?: Decimal | DecimalJsLike | number | string | null
+    axisLeft?: number | null
+    diagnosis?: string | null
+    managementPlan?: string | null
+    nextReviewDate?: Date | string | null
+    nextReviewReason?: string | null
+    examinedById: string
+    examinedAt?: Date | string
+    surgery?: SurgeryUncheckedCreateNestedOneWithoutClinicalExamInput
+    prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutClinicalExamInput
+  }
+
+  export type ClinicalExaminationCreateOrConnectWithoutFollowUpsInput = {
+    where: ClinicalExaminationWhereUniqueInput
+    create: XOR<ClinicalExaminationCreateWithoutFollowUpsInput, ClinicalExaminationUncheckedCreateWithoutFollowUpsInput>
+  }
+
+  export type SurgeryCreateWithoutFollowUpsInput = {
+    id?: string
+    eyeSide: string
+    surgeryType: string
+    surgeryDate: Date | string
+    cost: Decimal | DecimalJsLike | number | string
+    status?: string
+    notes?: string | null
+    nextFollowUpDate?: Date | string | null
+    createdAt?: Date | string
+    clinicalExam: ClinicalExaminationCreateNestedOneWithoutSurgeryInput
+    branch: BranchCreateNestedOneWithoutSurgeriesInput
+    surgeon: DoctorCreateNestedOneWithoutSurgeriesInput
+    billings?: BillingCreateNestedManyWithoutSurgeryInput
+  }
+
+  export type SurgeryUncheckedCreateWithoutFollowUpsInput = {
+    id?: string
+    examId: string
+    branchId: string
+    eyeSide: string
+    surgeryType: string
+    surgeryDate: Date | string
+    cost: Decimal | DecimalJsLike | number | string
+    status?: string
+    notes?: string | null
+    nextFollowUpDate?: Date | string | null
+    surgeonId: string
+    createdAt?: Date | string
+    billings?: BillingUncheckedCreateNestedManyWithoutSurgeryInput
+  }
+
+  export type SurgeryCreateOrConnectWithoutFollowUpsInput = {
+    where: SurgeryWhereUniqueInput
+    create: XOR<SurgeryCreateWithoutFollowUpsInput, SurgeryUncheckedCreateWithoutFollowUpsInput>
+  }
+
+  export type PrescriptionCreateWithoutFollowUpsInput = {
+    id?: string
+    itemType: string
+    itemId?: string | null
+    quantity: number
+    instructions?: string | null
+    reviewAfterDays?: number | null
+    createdAt?: Date | string
+    appointment: AppointmentCreateNestedOneWithoutPrescriptionsInput
+    clinicalExam: ClinicalExaminationCreateNestedOneWithoutPrescriptionsInput
+    branch: BranchCreateNestedOneWithoutPrescriptionsInput
+    billings?: BillingCreateNestedManyWithoutPrescriptionInput
+  }
+
+  export type PrescriptionUncheckedCreateWithoutFollowUpsInput = {
+    id?: string
+    appointmentId: string
+    examId: string
+    branchId: string
+    itemType: string
+    itemId?: string | null
+    quantity: number
+    instructions?: string | null
+    reviewAfterDays?: number | null
+    createdAt?: Date | string
+    billings?: BillingUncheckedCreateNestedManyWithoutPrescriptionInput
+  }
+
+  export type PrescriptionCreateOrConnectWithoutFollowUpsInput = {
+    where: PrescriptionWhereUniqueInput
+    create: XOR<PrescriptionCreateWithoutFollowUpsInput, PrescriptionUncheckedCreateWithoutFollowUpsInput>
+  }
+
+  export type PatientUpsertWithoutFollowUpsInput = {
+    update: XOR<PatientUpdateWithoutFollowUpsInput, PatientUncheckedUpdateWithoutFollowUpsInput>
+    create: XOR<PatientCreateWithoutFollowUpsInput, PatientUncheckedCreateWithoutFollowUpsInput>
+    where?: PatientWhereInput
+  }
+
+  export type PatientUpdateToOneWithWhereWithoutFollowUpsInput = {
+    where?: PatientWhereInput
+    data: XOR<PatientUpdateWithoutFollowUpsInput, PatientUncheckedUpdateWithoutFollowUpsInput>
+  }
+
+  export type PatientUpdateWithoutFollowUpsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutPatientsNestedInput
+    appointments?: AppointmentUpdateManyWithoutPatientNestedInput
+    billings?: BillingUpdateManyWithoutPatientNestedInput
+  }
+
+  export type PatientUncheckedUpdateWithoutFollowUpsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    branchId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+    billings?: BillingUncheckedUpdateManyWithoutPatientNestedInput
+  }
+
+  export type BranchUpsertWithoutFollowUpsInput = {
+    update: XOR<BranchUpdateWithoutFollowUpsInput, BranchUncheckedUpdateWithoutFollowUpsInput>
+    create: XOR<BranchCreateWithoutFollowUpsInput, BranchUncheckedCreateWithoutFollowUpsInput>
+    where?: BranchWhereInput
+  }
+
+  export type BranchUpdateToOneWithWhereWithoutFollowUpsInput = {
+    where?: BranchWhereInput
+    data: XOR<BranchUpdateWithoutFollowUpsInput, BranchUncheckedUpdateWithoutFollowUpsInput>
+  }
+
+  export type BranchUpdateWithoutFollowUpsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchName?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUpdateManyWithoutBranchNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutBranchNestedInput
+    doctors?: DoctorUpdateManyWithoutBranchNestedInput
+    patients?: PatientUpdateManyWithoutBranchNestedInput
+    appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
+    prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
+    pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
+    opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
+    opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
+    billings?: BillingUpdateManyWithoutBranchNestedInput
+  }
+
+  export type BranchUncheckedUpdateWithoutFollowUpsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchName?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUncheckedUpdateManyWithoutBranchNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutBranchNestedInput
+    doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
+    patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
+    appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
+    prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
+    pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
+    opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
+    billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+  }
+
+  export type AppointmentUpsertWithoutCompletedFollowUpsInput = {
+    update: XOR<AppointmentUpdateWithoutCompletedFollowUpsInput, AppointmentUncheckedUpdateWithoutCompletedFollowUpsInput>
+    create: XOR<AppointmentCreateWithoutCompletedFollowUpsInput, AppointmentUncheckedCreateWithoutCompletedFollowUpsInput>
+    where?: AppointmentWhereInput
+  }
+
+  export type AppointmentUpdateToOneWithWhereWithoutCompletedFollowUpsInput = {
+    where?: AppointmentWhereInput
+    data: XOR<AppointmentUpdateWithoutCompletedFollowUpsInput, AppointmentUncheckedUpdateWithoutCompletedFollowUpsInput>
+  }
+
+  export type AppointmentUpdateWithoutCompletedFollowUpsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutAppointmentsNestedInput
+    patient?: PatientUpdateOneRequiredWithoutAppointmentsNestedInput
+    doctor?: DoctorUpdateOneRequiredWithoutAppointmentsNestedInput
+    createdBy?: UserUpdateOneRequiredWithoutCreatedAppointmentsNestedInput
+    erExamination?: ERExaminationUpdateOneWithoutAppointmentNestedInput
+    clinicalExamination?: ClinicalExaminationUpdateOneWithoutAppointmentNestedInput
+    prescriptions?: PrescriptionUpdateManyWithoutAppointmentNestedInput
+    billings?: BillingUpdateManyWithoutAppointmentNestedInput
+  }
+
+  export type AppointmentUncheckedUpdateWithoutCompletedFollowUpsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    doctorId?: StringFieldUpdateOperationsInput | string
+    createdById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    erExamination?: ERExaminationUncheckedUpdateOneWithoutAppointmentNestedInput
+    clinicalExamination?: ClinicalExaminationUncheckedUpdateOneWithoutAppointmentNestedInput
+    prescriptions?: PrescriptionUncheckedUpdateManyWithoutAppointmentNestedInput
+    billings?: BillingUncheckedUpdateManyWithoutAppointmentNestedInput
+  }
+
+  export type ClinicalExaminationUpsertWithoutFollowUpsInput = {
+    update: XOR<ClinicalExaminationUpdateWithoutFollowUpsInput, ClinicalExaminationUncheckedUpdateWithoutFollowUpsInput>
+    create: XOR<ClinicalExaminationCreateWithoutFollowUpsInput, ClinicalExaminationUncheckedCreateWithoutFollowUpsInput>
+    where?: ClinicalExaminationWhereInput
+  }
+
+  export type ClinicalExaminationUpdateToOneWithWhereWithoutFollowUpsInput = {
+    where?: ClinicalExaminationWhereInput
+    data: XOR<ClinicalExaminationUpdateWithoutFollowUpsInput, ClinicalExaminationUncheckedUpdateWithoutFollowUpsInput>
+  }
+
+  export type ClinicalExaminationUpdateWithoutFollowUpsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sphRight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    cylRight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    axisRight?: NullableIntFieldUpdateOperationsInput | number | null
+    sphLeft?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    cylLeft?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    axisLeft?: NullableIntFieldUpdateOperationsInput | number | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    managementPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    nextReviewDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextReviewReason?: NullableStringFieldUpdateOperationsInput | string | null
+    examinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointment?: AppointmentUpdateOneRequiredWithoutClinicalExaminationNestedInput
+    examinedBy?: DoctorUpdateOneRequiredWithoutExaminedClinicalExamsNestedInput
+    surgery?: SurgeryUpdateOneWithoutClinicalExamNestedInput
+    prescriptions?: PrescriptionUpdateManyWithoutClinicalExamNestedInput
+  }
+
+  export type ClinicalExaminationUncheckedUpdateWithoutFollowUpsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    sphRight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    cylRight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    axisRight?: NullableIntFieldUpdateOperationsInput | number | null
+    sphLeft?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    cylLeft?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    axisLeft?: NullableIntFieldUpdateOperationsInput | number | null
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    managementPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    nextReviewDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextReviewReason?: NullableStringFieldUpdateOperationsInput | string | null
+    examinedById?: StringFieldUpdateOperationsInput | string
+    examinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    surgery?: SurgeryUncheckedUpdateOneWithoutClinicalExamNestedInput
+    prescriptions?: PrescriptionUncheckedUpdateManyWithoutClinicalExamNestedInput
+  }
+
+  export type SurgeryUpsertWithoutFollowUpsInput = {
+    update: XOR<SurgeryUpdateWithoutFollowUpsInput, SurgeryUncheckedUpdateWithoutFollowUpsInput>
+    create: XOR<SurgeryCreateWithoutFollowUpsInput, SurgeryUncheckedCreateWithoutFollowUpsInput>
+    where?: SurgeryWhereInput
+  }
+
+  export type SurgeryUpdateToOneWithWhereWithoutFollowUpsInput = {
+    where?: SurgeryWhereInput
+    data: XOR<SurgeryUpdateWithoutFollowUpsInput, SurgeryUncheckedUpdateWithoutFollowUpsInput>
+  }
+
+  export type SurgeryUpdateWithoutFollowUpsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    eyeSide?: StringFieldUpdateOperationsInput | string
+    surgeryType?: StringFieldUpdateOperationsInput | string
+    surgeryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clinicalExam?: ClinicalExaminationUpdateOneRequiredWithoutSurgeryNestedInput
+    branch?: BranchUpdateOneRequiredWithoutSurgeriesNestedInput
+    surgeon?: DoctorUpdateOneRequiredWithoutSurgeriesNestedInput
+    billings?: BillingUpdateManyWithoutSurgeryNestedInput
+  }
+
+  export type SurgeryUncheckedUpdateWithoutFollowUpsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    examId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    eyeSide?: StringFieldUpdateOperationsInput | string
+    surgeryType?: StringFieldUpdateOperationsInput | string
+    surgeryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    surgeonId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    billings?: BillingUncheckedUpdateManyWithoutSurgeryNestedInput
+  }
+
+  export type PrescriptionUpsertWithoutFollowUpsInput = {
+    update: XOR<PrescriptionUpdateWithoutFollowUpsInput, PrescriptionUncheckedUpdateWithoutFollowUpsInput>
+    create: XOR<PrescriptionCreateWithoutFollowUpsInput, PrescriptionUncheckedCreateWithoutFollowUpsInput>
+    where?: PrescriptionWhereInput
+  }
+
+  export type PrescriptionUpdateToOneWithWhereWithoutFollowUpsInput = {
+    where?: PrescriptionWhereInput
+    data: XOR<PrescriptionUpdateWithoutFollowUpsInput, PrescriptionUncheckedUpdateWithoutFollowUpsInput>
+  }
+
+  export type PrescriptionUpdateWithoutFollowUpsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    itemType?: StringFieldUpdateOperationsInput | string
+    itemId?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: IntFieldUpdateOperationsInput | number
+    instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewAfterDays?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointment?: AppointmentUpdateOneRequiredWithoutPrescriptionsNestedInput
+    clinicalExam?: ClinicalExaminationUpdateOneRequiredWithoutPrescriptionsNestedInput
+    branch?: BranchUpdateOneRequiredWithoutPrescriptionsNestedInput
+    billings?: BillingUpdateManyWithoutPrescriptionNestedInput
+  }
+
+  export type PrescriptionUncheckedUpdateWithoutFollowUpsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    appointmentId?: StringFieldUpdateOperationsInput | string
+    examId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    itemType?: StringFieldUpdateOperationsInput | string
+    itemId?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: IntFieldUpdateOperationsInput | number
+    instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewAfterDays?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    billings?: BillingUncheckedUpdateManyWithoutPrescriptionNestedInput
+  }
+
   export type UserCreateWithoutStaffAssignmentsInput = {
     id?: string
     fullName: string
@@ -35293,6 +38980,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutStaffAssignmentsInput = {
@@ -35314,6 +39002,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutStaffAssignmentsInput = {
@@ -35408,6 +39097,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutStaffAssignmentsInput = {
@@ -35429,6 +39119,7 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type UserCreateManyRoleInput = {
@@ -35576,6 +39267,7 @@ export namespace Prisma {
     cost: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
+    nextFollowUpDate?: Date | string | null
     surgeonId: string
     createdAt?: Date | string
   }
@@ -35588,6 +39280,7 @@ export namespace Prisma {
     itemId?: string | null
     quantity: number
     instructions?: string | null
+    reviewAfterDays?: number | null
     createdAt?: Date | string
   }
 
@@ -35606,6 +39299,7 @@ export namespace Prisma {
     expiryDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    isActive?: boolean
   }
 
   export type PharmacyStockTransactionCreateManyBranchInput = {
@@ -35632,6 +39326,7 @@ export namespace Prisma {
     sellingPrice: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
+    isActive?: boolean
   }
 
   export type OpticalStockTransactionCreateManyBranchInput = {
@@ -35659,6 +39354,22 @@ export namespace Prisma {
     referenceNumber?: string | null
     status?: $Enums.BillingStatus
     createdById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FollowUpCreateManyBranchInput = {
+    id?: string
+    patientId: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    completedAppointmentId?: string | null
+    clinicalExaminationId?: string | null
+    surgeryId?: string | null
+    prescriptionId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -35794,6 +39505,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
     billings?: BillingUpdateManyWithoutPatientNestedInput
+    followUps?: FollowUpUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutBranchInput = {
@@ -35808,6 +39520,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
     billings?: BillingUncheckedUpdateManyWithoutPatientNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateManyWithoutBranchInput = {
@@ -35837,6 +39550,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationUpdateOneWithoutAppointmentNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutAppointmentNestedInput
     billings?: BillingUpdateManyWithoutAppointmentNestedInput
+    completedFollowUps?: FollowUpUpdateManyWithoutCompletedAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateWithoutBranchInput = {
@@ -35854,6 +39568,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationUncheckedUpdateOneWithoutAppointmentNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutAppointmentNestedInput
     billings?: BillingUncheckedUpdateManyWithoutAppointmentNestedInput
+    completedFollowUps?: FollowUpUncheckedUpdateManyWithoutCompletedAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateManyWithoutBranchInput = {
@@ -35877,10 +39592,12 @@ export namespace Prisma {
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinicalExam?: ClinicalExaminationUpdateOneRequiredWithoutSurgeryNestedInput
     surgeon?: DoctorUpdateOneRequiredWithoutSurgeriesNestedInput
     billings?: BillingUpdateManyWithoutSurgeryNestedInput
+    followUps?: FollowUpUpdateManyWithoutSurgeryNestedInput
   }
 
   export type SurgeryUncheckedUpdateWithoutBranchInput = {
@@ -35892,9 +39609,11 @@ export namespace Prisma {
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     surgeonId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     billings?: BillingUncheckedUpdateManyWithoutSurgeryNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutSurgeryNestedInput
   }
 
   export type SurgeryUncheckedUpdateManyWithoutBranchInput = {
@@ -35906,6 +39625,7 @@ export namespace Prisma {
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     surgeonId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -35916,10 +39636,12 @@ export namespace Prisma {
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewAfterDays?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointment?: AppointmentUpdateOneRequiredWithoutPrescriptionsNestedInput
     clinicalExam?: ClinicalExaminationUpdateOneRequiredWithoutPrescriptionsNestedInput
     billings?: BillingUpdateManyWithoutPrescriptionNestedInput
+    followUps?: FollowUpUpdateManyWithoutPrescriptionNestedInput
   }
 
   export type PrescriptionUncheckedUpdateWithoutBranchInput = {
@@ -35930,8 +39652,10 @@ export namespace Prisma {
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewAfterDays?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     billings?: BillingUncheckedUpdateManyWithoutPrescriptionNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutPrescriptionNestedInput
   }
 
   export type PrescriptionUncheckedUpdateManyWithoutBranchInput = {
@@ -35942,6 +39666,7 @@ export namespace Prisma {
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewAfterDays?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -35960,6 +39685,7 @@ export namespace Prisma {
     expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     transactions?: PharmacyStockTransactionUpdateManyWithoutPharmacyItemNestedInput
   }
 
@@ -35978,6 +39704,7 @@ export namespace Prisma {
     expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     transactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutPharmacyItemNestedInput
   }
 
@@ -35996,6 +39723,7 @@ export namespace Prisma {
     expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type PharmacyStockTransactionUpdateWithoutBranchInput = {
@@ -36044,6 +39772,7 @@ export namespace Prisma {
     sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     transactions?: OpticalStockTransactionUpdateManyWithoutOpticalItemNestedInput
   }
 
@@ -36060,6 +39789,7 @@ export namespace Prisma {
     sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     transactions?: OpticalStockTransactionUncheckedUpdateManyWithoutOpticalItemNestedInput
   }
 
@@ -36076,6 +39806,7 @@ export namespace Prisma {
     sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type OpticalStockTransactionUpdateWithoutBranchInput = {
@@ -36169,6 +39900,54 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type FollowUpUpdateWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutFollowUpsNestedInput
+    completedAppointment?: AppointmentUpdateOneWithoutCompletedFollowUpsNestedInput
+    clinicalExamination?: ClinicalExaminationUpdateOneWithoutFollowUpsNestedInput
+    surgery?: SurgeryUpdateOneWithoutFollowUpsNestedInput
+    prescription?: PrescriptionUpdateOneWithoutFollowUpsNestedInput
+  }
+
+  export type FollowUpUncheckedUpdateWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAppointmentId?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalExaminationId?: NullableStringFieldUpdateOperationsInput | string | null
+    surgeryId?: NullableStringFieldUpdateOperationsInput | string | null
+    prescriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FollowUpUncheckedUpdateManyWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAppointmentId?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalExaminationId?: NullableStringFieldUpdateOperationsInput | string | null
+    surgeryId?: NullableStringFieldUpdateOperationsInput | string | null
+    prescriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type AppointmentCreateManyCreatedByInput = {
     id?: string
     bookingNumber?: string | null
@@ -36257,6 +40036,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationUpdateOneWithoutAppointmentNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutAppointmentNestedInput
     billings?: BillingUpdateManyWithoutAppointmentNestedInput
+    completedFollowUps?: FollowUpUpdateManyWithoutCompletedAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateWithoutCreatedByInput = {
@@ -36274,6 +40054,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationUncheckedUpdateOneWithoutAppointmentNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutAppointmentNestedInput
     billings?: BillingUncheckedUpdateManyWithoutAppointmentNestedInput
+    completedFollowUps?: FollowUpUncheckedUpdateManyWithoutCompletedAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateManyWithoutCreatedByInput = {
@@ -36497,6 +40278,8 @@ export namespace Prisma {
     axisLeft?: number | null
     diagnosis?: string | null
     managementPlan?: string | null
+    nextReviewDate?: Date | string | null
+    nextReviewReason?: string | null
     examinedAt?: Date | string
   }
 
@@ -36510,6 +40293,7 @@ export namespace Prisma {
     cost: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
+    nextFollowUpDate?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -36528,6 +40312,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationUpdateOneWithoutAppointmentNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutAppointmentNestedInput
     billings?: BillingUpdateManyWithoutAppointmentNestedInput
+    completedFollowUps?: FollowUpUpdateManyWithoutCompletedAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateWithoutDoctorInput = {
@@ -36545,6 +40330,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationUncheckedUpdateOneWithoutAppointmentNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutAppointmentNestedInput
     billings?: BillingUncheckedUpdateManyWithoutAppointmentNestedInput
+    completedFollowUps?: FollowUpUncheckedUpdateManyWithoutCompletedAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateManyWithoutDoctorInput = {
@@ -36570,10 +40356,13 @@ export namespace Prisma {
     axisLeft?: NullableIntFieldUpdateOperationsInput | number | null
     diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     managementPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    nextReviewDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextReviewReason?: NullableStringFieldUpdateOperationsInput | string | null
     examinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointment?: AppointmentUpdateOneRequiredWithoutClinicalExaminationNestedInput
     surgery?: SurgeryUpdateOneWithoutClinicalExamNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutClinicalExamNestedInput
+    followUps?: FollowUpUpdateManyWithoutClinicalExaminationNestedInput
   }
 
   export type ClinicalExaminationUncheckedUpdateWithoutExaminedByInput = {
@@ -36587,9 +40376,12 @@ export namespace Prisma {
     axisLeft?: NullableIntFieldUpdateOperationsInput | number | null
     diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     managementPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    nextReviewDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextReviewReason?: NullableStringFieldUpdateOperationsInput | string | null
     examinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     surgery?: SurgeryUncheckedUpdateOneWithoutClinicalExamNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutClinicalExamNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutClinicalExaminationNestedInput
   }
 
   export type ClinicalExaminationUncheckedUpdateManyWithoutExaminedByInput = {
@@ -36603,6 +40395,8 @@ export namespace Prisma {
     axisLeft?: NullableIntFieldUpdateOperationsInput | number | null
     diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
     managementPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    nextReviewDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextReviewReason?: NullableStringFieldUpdateOperationsInput | string | null
     examinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -36614,10 +40408,12 @@ export namespace Prisma {
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinicalExam?: ClinicalExaminationUpdateOneRequiredWithoutSurgeryNestedInput
     branch?: BranchUpdateOneRequiredWithoutSurgeriesNestedInput
     billings?: BillingUpdateManyWithoutSurgeryNestedInput
+    followUps?: FollowUpUpdateManyWithoutSurgeryNestedInput
   }
 
   export type SurgeryUncheckedUpdateWithoutSurgeonInput = {
@@ -36630,8 +40426,10 @@ export namespace Prisma {
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     billings?: BillingUncheckedUpdateManyWithoutSurgeryNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutSurgeryNestedInput
   }
 
   export type SurgeryUncheckedUpdateManyWithoutSurgeonInput = {
@@ -36644,6 +40442,7 @@ export namespace Prisma {
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -36678,6 +40477,22 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type FollowUpCreateManyPatientInput = {
+    id?: string
+    branchId: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    completedAppointmentId?: string | null
+    clinicalExaminationId?: string | null
+    surgeryId?: string | null
+    prescriptionId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type AppointmentUpdateWithoutPatientInput = {
     id?: StringFieldUpdateOperationsInput | string
     bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36693,6 +40508,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationUpdateOneWithoutAppointmentNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutAppointmentNestedInput
     billings?: BillingUpdateManyWithoutAppointmentNestedInput
+    completedFollowUps?: FollowUpUpdateManyWithoutCompletedAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateWithoutPatientInput = {
@@ -36710,6 +40526,7 @@ export namespace Prisma {
     clinicalExamination?: ClinicalExaminationUncheckedUpdateOneWithoutAppointmentNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutAppointmentNestedInput
     billings?: BillingUncheckedUpdateManyWithoutAppointmentNestedInput
+    completedFollowUps?: FollowUpUncheckedUpdateManyWithoutCompletedAppointmentNestedInput
   }
 
   export type AppointmentUncheckedUpdateManyWithoutPatientInput = {
@@ -36783,6 +40600,54 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type FollowUpUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutFollowUpsNestedInput
+    completedAppointment?: AppointmentUpdateOneWithoutCompletedFollowUpsNestedInput
+    clinicalExamination?: ClinicalExaminationUpdateOneWithoutFollowUpsNestedInput
+    surgery?: SurgeryUpdateOneWithoutFollowUpsNestedInput
+    prescription?: PrescriptionUpdateOneWithoutFollowUpsNestedInput
+  }
+
+  export type FollowUpUncheckedUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAppointmentId?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalExaminationId?: NullableStringFieldUpdateOperationsInput | string | null
+    surgeryId?: NullableStringFieldUpdateOperationsInput | string | null
+    prescriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FollowUpUncheckedUpdateManyWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAppointmentId?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalExaminationId?: NullableStringFieldUpdateOperationsInput | string | null
+    surgeryId?: NullableStringFieldUpdateOperationsInput | string | null
+    prescriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type PrescriptionCreateManyAppointmentInput = {
     id?: string
     examId: string
@@ -36791,6 +40656,7 @@ export namespace Prisma {
     itemId?: string | null
     quantity: number
     instructions?: string | null
+    reviewAfterDays?: number | null
     createdAt?: Date | string
   }
 
@@ -36812,16 +40678,34 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type FollowUpCreateManyCompletedAppointmentInput = {
+    id?: string
+    patientId: string
+    branchId: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    clinicalExaminationId?: string | null
+    surgeryId?: string | null
+    prescriptionId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type PrescriptionUpdateWithoutAppointmentInput = {
     id?: StringFieldUpdateOperationsInput | string
     itemType?: StringFieldUpdateOperationsInput | string
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewAfterDays?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clinicalExam?: ClinicalExaminationUpdateOneRequiredWithoutPrescriptionsNestedInput
     branch?: BranchUpdateOneRequiredWithoutPrescriptionsNestedInput
     billings?: BillingUpdateManyWithoutPrescriptionNestedInput
+    followUps?: FollowUpUpdateManyWithoutPrescriptionNestedInput
   }
 
   export type PrescriptionUncheckedUpdateWithoutAppointmentInput = {
@@ -36832,8 +40716,10 @@ export namespace Prisma {
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewAfterDays?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     billings?: BillingUncheckedUpdateManyWithoutPrescriptionNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutPrescriptionNestedInput
   }
 
   export type PrescriptionUncheckedUpdateManyWithoutAppointmentInput = {
@@ -36844,6 +40730,7 @@ export namespace Prisma {
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewAfterDays?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -36905,6 +40792,54 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type FollowUpUpdateWithoutCompletedAppointmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutFollowUpsNestedInput
+    branch?: BranchUpdateOneRequiredWithoutFollowUpsNestedInput
+    clinicalExamination?: ClinicalExaminationUpdateOneWithoutFollowUpsNestedInput
+    surgery?: SurgeryUpdateOneWithoutFollowUpsNestedInput
+    prescription?: PrescriptionUpdateOneWithoutFollowUpsNestedInput
+  }
+
+  export type FollowUpUncheckedUpdateWithoutCompletedAppointmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalExaminationId?: NullableStringFieldUpdateOperationsInput | string | null
+    surgeryId?: NullableStringFieldUpdateOperationsInput | string | null
+    prescriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FollowUpUncheckedUpdateManyWithoutCompletedAppointmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalExaminationId?: NullableStringFieldUpdateOperationsInput | string | null
+    surgeryId?: NullableStringFieldUpdateOperationsInput | string | null
+    prescriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type PrescriptionCreateManyClinicalExamInput = {
     id?: string
     appointmentId: string
@@ -36913,7 +40848,24 @@ export namespace Prisma {
     itemId?: string | null
     quantity: number
     instructions?: string | null
+    reviewAfterDays?: number | null
     createdAt?: Date | string
+  }
+
+  export type FollowUpCreateManyClinicalExaminationInput = {
+    id?: string
+    patientId: string
+    branchId: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    completedAppointmentId?: string | null
+    surgeryId?: string | null
+    prescriptionId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type PrescriptionUpdateWithoutClinicalExamInput = {
@@ -36922,10 +40874,12 @@ export namespace Prisma {
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewAfterDays?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointment?: AppointmentUpdateOneRequiredWithoutPrescriptionsNestedInput
     branch?: BranchUpdateOneRequiredWithoutPrescriptionsNestedInput
     billings?: BillingUpdateManyWithoutPrescriptionNestedInput
+    followUps?: FollowUpUpdateManyWithoutPrescriptionNestedInput
   }
 
   export type PrescriptionUncheckedUpdateWithoutClinicalExamInput = {
@@ -36936,8 +40890,10 @@ export namespace Prisma {
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewAfterDays?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     billings?: BillingUncheckedUpdateManyWithoutPrescriptionNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutPrescriptionNestedInput
   }
 
   export type PrescriptionUncheckedUpdateManyWithoutClinicalExamInput = {
@@ -36948,7 +40904,56 @@ export namespace Prisma {
     itemId?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewAfterDays?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FollowUpUpdateWithoutClinicalExaminationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutFollowUpsNestedInput
+    branch?: BranchUpdateOneRequiredWithoutFollowUpsNestedInput
+    completedAppointment?: AppointmentUpdateOneWithoutCompletedFollowUpsNestedInput
+    surgery?: SurgeryUpdateOneWithoutFollowUpsNestedInput
+    prescription?: PrescriptionUpdateOneWithoutFollowUpsNestedInput
+  }
+
+  export type FollowUpUncheckedUpdateWithoutClinicalExaminationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAppointmentId?: NullableStringFieldUpdateOperationsInput | string | null
+    surgeryId?: NullableStringFieldUpdateOperationsInput | string | null
+    prescriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FollowUpUncheckedUpdateManyWithoutClinicalExaminationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAppointmentId?: NullableStringFieldUpdateOperationsInput | string | null
+    surgeryId?: NullableStringFieldUpdateOperationsInput | string | null
+    prescriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type BillingCreateManySurgeryInput = {
@@ -36965,6 +40970,22 @@ export namespace Prisma {
     referenceNumber?: string | null
     status?: $Enums.BillingStatus
     createdById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FollowUpCreateManySurgeryInput = {
+    id?: string
+    patientId: string
+    branchId: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    completedAppointmentId?: string | null
+    clinicalExaminationId?: string | null
+    prescriptionId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -37027,6 +41048,54 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type FollowUpUpdateWithoutSurgeryInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutFollowUpsNestedInput
+    branch?: BranchUpdateOneRequiredWithoutFollowUpsNestedInput
+    completedAppointment?: AppointmentUpdateOneWithoutCompletedFollowUpsNestedInput
+    clinicalExamination?: ClinicalExaminationUpdateOneWithoutFollowUpsNestedInput
+    prescription?: PrescriptionUpdateOneWithoutFollowUpsNestedInput
+  }
+
+  export type FollowUpUncheckedUpdateWithoutSurgeryInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAppointmentId?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalExaminationId?: NullableStringFieldUpdateOperationsInput | string | null
+    prescriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FollowUpUncheckedUpdateManyWithoutSurgeryInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAppointmentId?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalExaminationId?: NullableStringFieldUpdateOperationsInput | string | null
+    prescriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type BillingCreateManyPrescriptionInput = {
     id?: string
     patientId: string
@@ -37041,6 +41110,22 @@ export namespace Prisma {
     referenceNumber?: string | null
     status?: $Enums.BillingStatus
     createdById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FollowUpCreateManyPrescriptionInput = {
+    id?: string
+    patientId: string
+    branchId: string
+    sourceType: $Enums.FollowUpSourceType
+    sourceId: string
+    dueDate: Date | string
+    status?: $Enums.FollowUpStatus
+    notes?: string | null
+    completedAppointmentId?: string | null
+    clinicalExaminationId?: string | null
+    surgeryId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -37099,6 +41184,54 @@ export namespace Prisma {
     referenceNumber?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBillingStatusFieldUpdateOperationsInput | $Enums.BillingStatus
     createdById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FollowUpUpdateWithoutPrescriptionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutFollowUpsNestedInput
+    branch?: BranchUpdateOneRequiredWithoutFollowUpsNestedInput
+    completedAppointment?: AppointmentUpdateOneWithoutCompletedFollowUpsNestedInput
+    clinicalExamination?: ClinicalExaminationUpdateOneWithoutFollowUpsNestedInput
+    surgery?: SurgeryUpdateOneWithoutFollowUpsNestedInput
+  }
+
+  export type FollowUpUncheckedUpdateWithoutPrescriptionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAppointmentId?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalExaminationId?: NullableStringFieldUpdateOperationsInput | string | null
+    surgeryId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FollowUpUncheckedUpdateManyWithoutPrescriptionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    sourceType?: EnumFollowUpSourceTypeFieldUpdateOperationsInput | $Enums.FollowUpSourceType
+    sourceId?: StringFieldUpdateOperationsInput | string
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumFollowUpStatusFieldUpdateOperationsInput | $Enums.FollowUpStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAppointmentId?: NullableStringFieldUpdateOperationsInput | string | null
+    clinicalExaminationId?: NullableStringFieldUpdateOperationsInput | string | null
+    surgeryId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

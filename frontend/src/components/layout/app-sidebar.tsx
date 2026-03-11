@@ -5,7 +5,6 @@ import {
     Eye,
     Users,
     Calendar,
-    Package,
     FileText,
     Settings,
     LayoutDashboard,
@@ -147,9 +146,15 @@ const roleNavigation: Record<string, NavSection[]> = {
             section: 'PHARMACY',
             items: [
                 { title: 'Prescriptions', icon: FileText, url: '/dashboard/prescriptions' },
-                { title: 'Medications', icon: Pill, url: '#' },
-                { title: 'Pharmacy Inventory', icon: Package, url: '/dashboard/inventory/pharmacy' },
-                { title: 'Orders', icon: Receipt, url: '#' },
+                { title: 'Pharmacy Inventory', icon: Pill, url: '/dashboard/inventory/pharmacy' },
+                { title: 'Patients', icon: Users, url: '/dashboard/patients' },
+                { title: 'Billing', icon: Receipt, url: '/dashboard/billing' },
+            ],
+        },
+        {
+            section: 'REPORTS',
+            items: [
+                { title: 'Reports', icon: BarChart3, url: '/dashboard/reports' },
             ],
         },
     ],
@@ -163,10 +168,16 @@ const roleNavigation: Record<string, NavSection[]> = {
         {
             section: 'OPTICAL',
             items: [
-                { title: 'Orders', icon: Receipt, url: '#' },
-                { title: 'Eyewear', icon: Glasses, url: '#' },
-                { title: 'Optical Inventory', icon: Package, url: '/dashboard/inventory/optical' },
-                { title: 'Fittings', icon: Calendar, url: '#' },
+                { title: 'Prescriptions', icon: FileText, url: '/dashboard/prescriptions' },
+                { title: 'Optical Inventory', icon: Glasses, url: '/dashboard/inventory/optical' },
+                { title: 'Patients', icon: Users, url: '/dashboard/patients' },
+                { title: 'Billing', icon: Receipt, url: '/dashboard/billing' },
+            ],
+        },
+        {
+            section: 'REPORTS',
+            items: [
+                { title: 'Reports', icon: BarChart3, url: '/dashboard/reports' },
             ],
         },
     ],
@@ -174,22 +185,22 @@ const roleNavigation: Record<string, NavSection[]> = {
         {
             section: 'OVERVIEW',
             items: [
-                {
-                    title: 'Dashboard',
-                    icon: LayoutDashboard,
-                    url: '/dashboard/receptionist',
-                },
-                { title: 'Patients', icon: UserPlus, url: '/dashboard/patients' },
-                { title: 'Appointments', icon: Calendar, url: '/dashboard/appointments' },
-                { title: 'ER Examinations', icon: Eye, url: '/dashboard/examinations/er' },
+                { title: 'Dashboard', icon: LayoutDashboard, url: '/dashboard/receptionist' },
             ],
         },
         {
-            section: 'OPERATIONS',
+            section: 'FRONT DESK',
             items: [
-                { title: 'Messages', icon: MessageSquare, url: '#' },
+                { title: 'Patients', icon: UserPlus, url: '/dashboard/patients' },
+                { title: 'Appointments', icon: Calendar, url: '/dashboard/appointments' },
+                { title: 'ER Examinations', icon: Eye, url: '/dashboard/examinations/er' },
                 { title: 'Billing', icon: Receipt, url: '/dashboard/billing' },
-                { title: 'Queue', icon: Activity, url: '#' },
+            ],
+        },
+        {
+            section: 'REPORTS',
+            items: [
+                { title: 'Reports', icon: BarChart3, url: '/dashboard/reports' },
             ],
         },
     ],

@@ -9,20 +9,31 @@ const getBranchFilter = (req) => {
 
 export const listBillings = async (req, res, next) => {
     try {
-        const { search, status = 'all', serviceType = 'all', date } = req.query;
+        const { search, status = 'all', serviceType = 'all', date, from, to } = req.query;
         const { skip, take, page, limit } = getPaginationParams(req.query);
         const branchFilter = getBranchFilter(req);
+
+        let dateFilter = {};
+        if (from && to) {
+            const fromStart = new Date(from);
+            fromStart.setHours(0, 0, 0, 0);
+            const toEnd = new Date(to);
+            toEnd.setHours(23, 59, 59, 999);
+            dateFilter = { createdAt: { gte: fromStart, lte: toEnd } };
+        } else if (date) {
+            dateFilter = {
+                createdAt: {
+                    gte: new Date(new Date(date).setHours(0, 0, 0, 0)),
+                    lte: new Date(new Date(date).setHours(23, 59, 59, 999)),
+                },
+            };
+        }
 
         const whereClause = {
             ...branchFilter,
             ...(status !== 'all' ? { status } : {}),
             ...(serviceType !== 'all' ? { serviceType } : {}),
-            ...(date ? {
-                createdAt: {
-                    gte: new Date(new Date(date).setHours(0, 0, 0, 0)),
-                    lte: new Date(new Date(date).setHours(23, 59, 59, 999)),
-                },
-            } : {}),
+            ...dateFilter,
             ...(search ? {
                 OR: [
                     { referenceNumber: { contains: search, mode: 'insensitive' } },

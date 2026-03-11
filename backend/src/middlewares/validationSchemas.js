@@ -159,6 +159,8 @@ export const clinicalExaminationSchema = Joi.object({
     axisLeft: Joi.number().integer().min(0).max(180).optional(),
     diagnosis: Joi.string().allow('', null).optional(),
     managementPlan: Joi.string().allow('', null).optional(),
+    nextReviewDate: Joi.date().iso().allow('', null).optional(),
+    nextReviewReason: Joi.string().allow('', null).optional(),
     examinedById: Joi.string().uuid().allow('', null).optional()
 }).options({ stripUnknown: true });
 
@@ -181,6 +183,8 @@ export const updateClinicalExaminationSchema = Joi.object({
     axisLeft: Joi.number().integer().min(0).max(180).optional(),
     diagnosis: Joi.string().allow('', null).optional(),
     managementPlan: Joi.string().allow('', null).optional(),
+    nextReviewDate: Joi.date().iso().allow('', null).optional(),
+    nextReviewReason: Joi.string().allow('', null).optional(),
     examinedById: Joi.string().uuid().optional()
 }).min(1).options({ stripUnknown: true });
 
@@ -198,6 +202,7 @@ export const createSurgerySchema = Joi.object({
     }),
     status: Joi.string().valid('PENDING', 'COMPLETED', 'CANCELLED').optional(),
     notes: Joi.string().allow('', null).optional(),
+    nextFollowUpDate: Joi.date().iso().allow('', null).optional(),
     surgeonId: Joi.string().uuid().required(),
 }).options({ stripUnknown: true });
 
@@ -212,6 +217,7 @@ export const updateSurgerySchema = Joi.object({
     }),
     status: Joi.string().valid('PENDING', 'COMPLETED', 'CANCELLED').optional(),
     notes: Joi.string().allow('', null).optional(),
+    nextFollowUpDate: Joi.date().iso().allow('', null).optional(),
     surgeonId: Joi.string().uuid().optional(),
 }).min(1).options({ stripUnknown: true });
 

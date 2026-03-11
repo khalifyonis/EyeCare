@@ -46,6 +46,7 @@ model Branch {
   opticalItems         OpticalItem[]
   opticalTransactions  OpticalStockTransaction[]
   billings             Billing[]
+  followUps            FollowUp[]
 
   @@map("clinic_branch")
 }
@@ -81,6 +82,8 @@ model User {
   createdBillings      Billing[]                  @relation("CreatedBy")
   staffAssignments     StaffAssignment[]
 
+  @@index([branchId])
+  @@index([roleId])
   @@map("users")
 }
 
@@ -126,7 +129,11 @@ model Patient {
   // Relationships
   appointments Appointment[]
   billings     Billing[]
+  followUps    FollowUp[]
 
+  @@index([branchId])
+  @@index([fullName])
+  @@index([phone])
   @@map("patients")
 }
 
@@ -163,7 +170,13 @@ model Appointment {
   clinicalExamination ClinicalExamination?
   prescriptions       Prescription[]
   billings            Billing[]
+  completedFollowUps  FollowUp[]           @relation("FollowUpCompletedBy")
 
+  @@index([branchId])
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([appointmentDate])
+  @@index([status])
   @@map("appointments")
 }
 
@@ -200,8 +213,10 @@ model ClinicalExamination {
   cylLeft   Decimal? @map("cyl_left") @db.Decimal(10, 2)
   axisLeft  Int?     @map("axis_left")
 
-  diagnosis      String?
-  managementPlan String? @map("management_plan")
+  diagnosis        String?
+  managementPlan   String?   @map("management_plan")
+  nextReviewDate   DateTime? @map("next_review_date")
+  nextReviewReason String?   @map("next_review_reason")
 
   examinedById String @map("examined_by")
   examinedBy   Doctor @relation("ExaminedBy", fields: [examinedById], references: [id])
@@ -211,6 +226,7 @@ model ClinicalExamination {
   // Relationships
   surgery       Surgery?
   prescriptions Prescription[]
+  followUps     FollowUp[]     @relation("FollowUpFromExam")
 
   @@map("clinical_examinations")
 }
@@ -223,12 +239,13 @@ model Surgery {
   branchId String @map("branch_id")
   branch   Branch @relation(fields: [branchId], references: [id])
 
-  eyeSide     String   @map("eye_side") // RIGHT, LEFT, BOTH
-  surgeryType String   @map("surgery_type")
-  surgeryDate DateTime @map("surgery_date")
-  cost        Decimal  @db.Decimal(10, 2)
-  status      String   @default("PENDING")
-  notes       String?
+  eyeSide          String    @map("eye_side") // RIGHT, LEFT, BOTH
+  surgeryType      String    @map("surgery_type")
+  surgeryDate      DateTime  @map("surgery_date")
+  cost             Decimal   @db.Decimal(10, 2)
+  status           String    @default("PENDING")
+  notes            String?
+  nextFollowUpDate DateTime? @map("next_follow_up_date")
 
   surgeonId String @map("surgeon_id")
   surgeon   Doctor @relation("Surgeon", fields: [surgeonId], references: [id])
@@ -236,8 +253,12 @@ model Surgery {
   createdAt DateTime @default(now()) @map("created_at")
 
   // Relationships
-  billings Billing[]
+  billings  Billing[]
+  followUps FollowUp[] @relation("FollowUpFromSurgery")
 
+  @@index([branchId])
+  @@index([surgeonId])
+  @@index([status])
   @@map("surgeries")
 }
 
@@ -251,16 +272,22 @@ model Prescription {
   branchId String @map("branch_id")
   branch   Branch @relation(fields: [branchId], references: [id])
 
-  itemType     String  @map("item_type") // PHARMACY, OPTICAL
-  itemId       String? @map("item_id")
-  quantity     Int
-  instructions String?
+  itemType        String  @map("item_type") // PHARMACY, OPTICAL
+  itemId          String? @map("item_id")
+  quantity        Int
+  instructions    String?
+  reviewAfterDays Int?    @map("review_after_days")
 
   createdAt DateTime @default(now()) @map("created_at")
 
   // Relationships
-  billings Billing[]
+  billings  Billing[]
+  followUps FollowUp[] @relation("FollowUpFromPrescription")
 
+  @@index([branchId])
+  @@index([appointmentId])
+  @@index([examId])
+  @@index([itemType])
   @@map("prescriptions")
 }
 
@@ -286,9 +313,15 @@ model PharmacyItem {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  isActive Boolean @default(true) @map("is_active")
+
   // Relationships
   transactions PharmacyStockTransaction[]
 
+  @@unique([branchId, itemName, batchNumber])
+  @@index([branchId])
+  @@index([category])
+  @@index([expiryDate])
   @@map("pharmacy_items")
 }
 
@@ -311,6 +344,9 @@ model PharmacyStockTransaction {
 
   transactionDate DateTime @default(now()) @map("transaction_date")
 
+  @@index([pharmacyItemId])
+  @@index([branchId])
+  @@index([transactionDate])
   @@map("pharmacy_stock_transactions")
 }
 
@@ -332,9 +368,13 @@ model OpticalItem {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  isActive Boolean @default(true) @map("is_active")
+
   // Relationships
   transactions OpticalStockTransaction[]
 
+  @@unique([branchId, itemName, brand])
+  @@index([branchId])
   @@map("optical_items")
 }
 
@@ -357,6 +397,9 @@ model OpticalStockTransaction {
 
   transactionDate DateTime @default(now()) @map("transaction_date")
 
+  @@index([opticalItemId])
+  @@index([branchId])
+  @@index([transactionDate])
   @@map("optical_stock_transactions")
 }
 
@@ -408,7 +451,60 @@ model Billing {
   pharmacyTransactions PharmacyStockTransaction[]
   opticalTransactions  OpticalStockTransaction[]
 
+  @@index([branchId])
+  @@index([patientId])
+  @@index([status])
+  @@index([serviceType])
+  @@index([createdAt])
   @@map("billing")
+}
+
+// ── Follow-ups ──
+
+enum FollowUpSourceType {
+  EXAMINATION
+  PRESCRIPTION
+  SURGERY
+  OPTICAL
+}
+
+enum FollowUpStatus {
+  PENDING
+  DONE
+  CANCELLED
+  OVERDUE
+}
+
+model FollowUp {
+  id        String  @id @default(uuid())
+  patientId String  @map("patient_id")
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  branchId  String  @map("branch_id")
+  branch    Branch  @relation(fields: [branchId], references: [id])
+
+  sourceType             FollowUpSourceType @map("source_type")
+  sourceId               String             @map("source_id")
+  dueDate                DateTime           @map("due_date")
+  status                 FollowUpStatus     @default(PENDING)
+  notes                  String?
+  completedAppointmentId String?            @map("completed_appointment_id")
+  completedAppointment   Appointment?       @relation("FollowUpCompletedBy", fields: [completedAppointmentId], references: [id], onDelete: SetNull)
+
+  clinicalExaminationId String?              @map("clinical_examination_id")
+  clinicalExamination   ClinicalExamination? @relation("FollowUpFromExam", fields: [clinicalExaminationId], references: [id], onDelete: SetNull)
+  surgeryId             String?              @map("surgery_id")
+  surgery               Surgery?             @relation("FollowUpFromSurgery", fields: [surgeryId], references: [id], onDelete: SetNull)
+  prescriptionId        String?              @map("prescription_id")
+  prescription          Prescription?        @relation("FollowUpFromPrescription", fields: [prescriptionId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([patientId])
+  @@index([branchId])
+  @@index([dueDate])
+  @@index([status])
+  @@map("follow_ups")
 }
 
 // ── Staff Assignment (Multi-Branch) ──
