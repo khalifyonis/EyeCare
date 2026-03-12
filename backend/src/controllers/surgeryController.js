@@ -147,6 +147,7 @@ export const createSurgery = async (req, res, next) => {
             cost,
             status,
             notes,
+            nextFollowUpDate,
             surgeonId,
         } = req.body;
 
@@ -161,7 +162,7 @@ export const createSurgery = async (req, res, next) => {
                 },
             },
             include: {
-                appointment: { select: { id: true, branchId: true } },
+                appointment: { select: { id: true, branchId: true, patientId: true } },
             },
         });
 
@@ -188,6 +189,7 @@ export const createSurgery = async (req, res, next) => {
                 cost: Number(cost),
                 status: status || 'PENDING',
                 notes: typeof notes === 'string' && notes.trim() === '' ? null : notes,
+                nextFollowUpDate: nextFollowUpDate ? new Date(nextFollowUpDate) : null,
                 surgeonId,
             },
             include: {
@@ -206,6 +208,21 @@ export const createSurgery = async (req, res, next) => {
                 },
             },
         });
+
+        if (nextFollowUpDate && clinicalExam.appointment.patientId) {
+            await prisma.followUp.create({
+                data: {
+                    patientId: clinicalExam.appointment.patientId,
+                    branchId: activeBranchId,
+                    sourceType: 'SURGERY',
+                    sourceId: row.id,
+                    dueDate: new Date(nextFollowUpDate),
+                    status: 'PENDING',
+                    notes: surgeryType ? `Post-surgery follow-up: ${surgeryType}` : 'Post-surgery follow-up',
+                    surgeryId: row.id,
+                },
+            });
+        }
 
         res.status(201).json(row);
     } catch (error) {
@@ -233,6 +250,7 @@ export const updateSurgery = async (req, res, next) => {
             cost,
             status,
             notes,
+            nextFollowUpDate,
             surgeonId,
         } = req.body;
 
@@ -257,6 +275,7 @@ export const updateSurgery = async (req, res, next) => {
                 ...(cost !== undefined ? { cost: Number(cost) } : {}),
                 ...(status !== undefined ? { status } : {}),
                 ...(notes !== undefined ? { notes: typeof notes === 'string' && notes.trim() === '' ? null : notes } : {}),
+                ...(nextFollowUpDate !== undefined ? { nextFollowUpDate: nextFollowUpDate ? new Date(nextFollowUpDate) : null } : {}),
                 ...(surgeonId !== undefined ? { surgeonId } : {}),
             },
             include: {
@@ -275,6 +294,45 @@ export const updateSurgery = async (req, res, next) => {
                 },
             },
         });
+
+        const existingFollowUp = await prisma.followUp.findFirst({
+            where: { surgeryId: row.id },
+        });
+
+        if (nextFollowUpDate !== undefined) {
+            if (nextFollowUpDate && row.clinicalExam?.appointment?.patient?.id) {
+                const followUpPayload = {
+                    dueDate: new Date(nextFollowUpDate),
+                    status: 'PENDING',
+                    notes: surgeryType ? `Post-surgery follow-up: ${surgeryType}` : 'Post-surgery follow-up',
+                };
+
+                if (existingFollowUp) {
+                    await prisma.followUp.update({
+                        where: { id: existingFollowUp.id },
+                        data: followUpPayload,
+                    });
+                } else {
+                    await prisma.followUp.create({
+                        data: {
+                            patientId: row.clinicalExam.appointment.patient.id,
+                            branchId: row.branchId,
+                            sourceType: 'SURGERY',
+                            sourceId: row.id,
+                            dueDate: new Date(nextFollowUpDate),
+                            status: 'PENDING',
+                            notes: surgeryType ? `Post-surgery follow-up: ${surgeryType}` : 'Post-surgery follow-up',
+                            surgeryId: row.id,
+                        },
+                    });
+                }
+            } else if (existingFollowUp) {
+                await prisma.followUp.update({
+                    where: { id: existingFollowUp.id },
+                    data: { status: 'CANCELLED' },
+                });
+            }
+        }
 
         res.status(200).json(row);
     } catch (error) {

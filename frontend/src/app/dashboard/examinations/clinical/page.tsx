@@ -66,7 +66,8 @@ export default function ClinicalExaminationsPage() {
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
-    const pageSize = 20;
+    const [pageSize, setPageSize] = useState(20);
+    const [selectionKey, setSelectionKey] = useState(0);
 
     const [role, setRole] = useState('');
     const [open, setOpen] = useState(false);
@@ -107,7 +108,7 @@ export default function ClinicalExaminationsPage() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [pageSize]);
 
     const fetchAppointments = useCallback(async () => {
         try {
@@ -197,6 +198,78 @@ export default function ClinicalExaminationsPage() {
             toast.error(getApiErrorMessage(error) || 'Delete failed');
         }
     }, [fetchRows, search, statusFilter, dateFilter]);
+
+    const handleDeleteSelected = useCallback(
+        async (selected: ClinicalExaminationRow[]) => {
+            if (selected.length === 0) return;
+            if (!confirm(`Delete ${selected.length} selected clinical examination(s)? This cannot be undone.`)) return;
+            let done = 0;
+            let failed = 0;
+            for (const row of selected) {
+                try {
+                    await api.delete(`/examinations/clinical/${row.id}`);
+                    done++;
+                } catch {
+                    failed++;
+                }
+            }
+            if (done) {
+                toast.success(failed ? `Deleted ${done} record(s). ${failed} failed.` : `Deleted ${done} record(s).`);
+                setSelectionKey((k) => k + 1);
+                fetchRows(search, statusFilter, dateFilter, page);
+            }
+            if (failed) {
+                toast.error(`Failed to delete ${failed} record(s).`);
+            }
+        },
+        [fetchRows, search, statusFilter, dateFilter, page]
+    );
+
+    const handleExportSelected = useCallback((selected: ClinicalExaminationRow[]) => {
+        if (selected.length === 0) return;
+        const headers = [
+            'Appointment',
+            'Patient',
+            'SPH Right',
+            'CYL Right',
+            'AXIS Right',
+            'SPH Left',
+            'CYL Left',
+            'AXIS Left',
+            'Diagnosis',
+        ];
+        const escape = (v: string) => (v.includes(',') || v.includes('"') ? `"${v.replace(/"/g, '""')}"` : v);
+        const rowsCsv = selected.map((r) =>
+            [
+                escape(r.appointment?.bookingNumber || ''),
+                escape(r.appointment?.patient?.fullName || ''),
+                r.sphRight != null ? String(r.sphRight) : '',
+                r.cylRight != null ? String(r.cylRight) : '',
+                r.axisRight != null ? String(r.axisRight) : '',
+                r.sphLeft != null ? String(r.sphLeft) : '',
+                r.cylLeft != null ? String(r.cylLeft) : '',
+                r.axisLeft != null ? String(r.axisLeft) : '',
+                escape(r.diagnosis || ''),
+            ].join(',')
+        );
+        const csv = [headers.join(','), ...rowsCsv].join('\r\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `clinical-examinations-selected-${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+        toast.success(`Downloaded ${selected.length} item${selected.length === 1 ? '' : 's'}.`);
+    }, []);
+
+    const quickActions = useMemo(
+        () => [
+            { id: 'delete', label: 'Delete selected', onClick: handleDeleteSelected, variant: 'destructive' as const },
+            { id: 'download', label: 'Download selected', onClick: handleExportSelected, variant: 'default' as const },
+        ],
+        [handleDeleteSelected, handleExportSelected]
+    );
 
     const handleSave = async () => {
         if (!editing && !form.appointmentId) {
@@ -345,6 +418,8 @@ export default function ClinicalExaminationsPage() {
                     hideSearch
                     hidePagination
                     enableRowSelection
+                    quickActions={quickActions}
+                    selectionKey={selectionKey}
                     emptyMessage="No clinical examinations yet"
                     emptyDescription="Click 'New Clinical Exam' to record the first clinical examination."
                 />
@@ -354,13 +429,14 @@ export default function ClinicalExaminationsPage() {
                     total={total}
                     totalPages={totalPages}
                     onPageChange={setPage}
+                    onLimitChange={(limit) => { setPageSize(limit); setPage(1); }}
                     disabled={loading}
                 />
             </div>
 
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="sm:max-w-[680px] rounded-2xl flex flex-col p-0 overflow-hidden">
-                    <DialogHeader className="p-6 pb-4">
+                <DialogContent className="sm:max-w-[680px] rounded-2xl flex flex-col p-0 overflow-hidden bg-background">
+                    <DialogHeader className="p-6 pb-4 border-b border-slate-200 dark:border-slate-800">
                         <DialogTitle className="text-xl font-black">{editing ? 'Edit Clinical Examination' : 'New Clinical Examination'}</DialogTitle>
                         <DialogDescription className="font-medium mt-1">
                             {editing ? 'Update clinical exam details.' : 'Record a new clinical examination for an appointment.'}
@@ -369,7 +445,7 @@ export default function ClinicalExaminationsPage() {
 
                     <div className="px-6 py-2 space-y-4">
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Appointment</label>
+                            <label className="block mb-1 text-sm font-medium text-slate-800 dark:text-slate-100">Appointment</label>
                             <Select
                                 value={form.appointmentId}
                                 onValueChange={(value) => setForm((prev) => ({ ...prev, appointmentId: value }))}
@@ -394,7 +470,7 @@ export default function ClinicalExaminationsPage() {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Right Eye (SPH/CYL/AXIS)</label>
+                                <label className="block mb-1 text-sm font-medium text-slate-800 dark:text-slate-100">Right Eye (SPH/CYL/AXIS)</label>
                                 <div className="grid grid-cols-3 gap-2">
                                     <Input
                                         value={form.sphRight}
@@ -417,7 +493,7 @@ export default function ClinicalExaminationsPage() {
                                 </div>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Left Eye (SPH/CYL/AXIS)</label>
+                                <label className="block mb-1 text-sm font-medium text-slate-800 dark:text-slate-100">Left Eye (SPH/CYL/AXIS)</label>
                                 <div className="grid grid-cols-3 gap-2">
                                     <Input
                                         value={form.sphLeft}
@@ -442,7 +518,7 @@ export default function ClinicalExaminationsPage() {
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Diagnosis</label>
+                            <label className="block mb-1 text-sm font-medium text-slate-800 dark:text-slate-100">Diagnosis</label>
                             <Textarea
                                 value={form.diagnosis}
                                 onChange={(e) => setForm((p) => ({ ...p, diagnosis: e.target.value }))}
@@ -452,7 +528,7 @@ export default function ClinicalExaminationsPage() {
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Management Plan</label>
+                            <label className="block mb-1 text-sm font-medium text-slate-800 dark:text-slate-100">Management plan</label>
                             <Textarea
                                 value={form.managementPlan}
                                 onChange={(e) => setForm((p) => ({ ...p, managementPlan: e.target.value }))}
@@ -462,7 +538,7 @@ export default function ClinicalExaminationsPage() {
                         </div>
                     </div>
 
-                    <DialogFooter className="p-6 pt-4 gap-2">
+                    <DialogFooter className="p-6 pt-4 gap-2 border-t border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60">
                         <Button variant="outline" onClick={() => setOpen(false)} className="rounded-xl" disabled={saving}>
                             Cancel
                         </Button>

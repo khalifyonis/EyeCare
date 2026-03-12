@@ -149,15 +149,15 @@ export const getUserColumns = ({ onEdit, onDelete }: UserColumnsProps): ColumnDe
             const [first, ...rest] = branches;
 
             return (
-                <div className="flex items-center gap-1.5 min-w-0">
-                    <span className="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 text-xs font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                <div className="flex flex-col gap-1 min-w-0">
+                    <span className="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 text-xs font-normal text-slate-600 dark:text-slate-400 whitespace-nowrap w-fit">
                         {first.branchName}
                     </span>
                     {rest.length > 0 && (
                         <TooltipProvider delayDuration={200}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <span className="inline-flex items-center rounded-full bg-slate-200/80 dark:bg-slate-700 px-2 py-0.5 text-[11px] font-medium text-slate-500 dark:text-slate-400 cursor-default whitespace-nowrap">
+                                    <span className="inline-flex items-center rounded-full bg-slate-200/80 dark:bg-slate-700 px-2 py-0.5 text-[11px] font-normal text-slate-500 dark:text-slate-400 cursor-default whitespace-nowrap w-fit">
                                         +{rest.length} more
                                     </span>
                                 </TooltipTrigger>

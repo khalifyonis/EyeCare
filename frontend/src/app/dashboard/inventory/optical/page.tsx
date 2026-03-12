@@ -8,6 +8,7 @@ import { Glasses, Package, Search, AlertTriangle } from 'lucide-react';
 import { DataTable } from '@/components/ui/data-table';
 import { getOpticalColumns, type OpticalRow } from './columns';
 import { OpticalItemDialog } from './optical-item-dialog';
+import { ReceiveStockDialog } from '../receive-stock-dialog';
 import { toast } from 'sonner';
 import { StatsCard } from '@/components/dashboard/stats-card';
 import { PageBreadcrumb } from '@/components/dashboard/page-breadcrumb';
@@ -24,9 +25,12 @@ export default function OpticalInventoryPage() {
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
-    const pageSize = 20;
+    const [pageSize, setPageSize] = useState(20);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<OpticalRow | null>(null);
+    const [selectionKey, setSelectionKey] = useState(0);
+    const [receiveOpen, setReceiveOpen] = useState(false);
+    const [receivingItem, setReceivingItem] = useState<OpticalRow | null>(null);
 
     const fetchStats = useCallback(async () => {
         try {
@@ -63,7 +67,7 @@ export default function OpticalInventoryPage() {
                 setLoading(false);
             }
         },
-        []
+        [pageSize]
     );
 
     useEffect(() => {
@@ -84,6 +88,11 @@ export default function OpticalInventoryPage() {
         setDialogOpen(true);
     };
 
+    const handleReceive = (row: OpticalRow) => {
+        setReceivingItem(row);
+        setReceiveOpen(true);
+    };
+
     const handleDelete = useCallback(
         async (id: string) => {
             if (!confirm('Delete this optical item?')) return;
@@ -99,11 +108,65 @@ export default function OpticalInventoryPage() {
         [search, itemTypeFilter, page, fetchRows, fetchStats]
     );
 
+    const handleDeleteSelected = async (selected: OpticalRow[]) => {
+        if (selected.length === 0) return;
+        if (!confirm(`Delete ${selected.length} selected optical item(s)? This cannot be undone.`)) return;
+        let done = 0;
+        let failed = 0;
+        for (const row of selected) {
+            try {
+                await api.delete(`/inventory/optical/${row.id}`);
+                done++;
+            } catch {
+                failed++;
+            }
+        }
+        if (done) {
+            toast.success(failed ? `Deleted ${done} item(s). ${failed} failed.` : `Deleted ${done} item(s).`);
+            setSelectionKey((k) => k + 1);
+            fetchRows(search, itemTypeFilter, page);
+            fetchStats();
+        }
+        if (failed) {
+            toast.error(`Failed to delete ${failed} item(s).`);
+        }
+    };
+
+    const handleExportSelected = (selected: OpticalRow[]) => {
+        if (selected.length === 0) return;
+        const headers = ['Item name', 'Type', 'Brand', 'Stock', 'Reorder level', 'Selling price'];
+        const escape = (v: string) => (v.includes(',') || v.includes('"') ? `"${v.replace(/"/g, '""')}"` : v);
+        const rowsCsv = selected.map((r) => {
+            const selling =
+                typeof r.sellingPrice === 'number'
+                    ? r.sellingPrice.toFixed(2)
+                    : String(r.sellingPrice || '');
+            return [
+                escape(r.itemName || ''),
+                escape(r.itemType || ''),
+                escape(r.brand || ''),
+                String(r.stockQuantity ?? ''),
+                String(r.reorderLevel ?? ''),
+                escape(selling),
+            ].join(',');
+        });
+        const csv = [headers.join(','), ...rowsCsv].join('\r\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `optical-items-selected-${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+        toast.success(`Downloaded ${selected.length} item${selected.length === 1 ? '' : 's'}.`);
+    };
+
     const columns = useMemo(
         () =>
             getOpticalColumns({
                 onEdit: handleEdit,
                 onDelete: handleDelete,
+                onReceive: handleReceive,
             }),
         [handleDelete]
     );
@@ -112,6 +175,11 @@ export default function OpticalInventoryPage() {
         fetchRows(search, itemTypeFilter, page);
         fetchStats();
     };
+
+    const quickActions = [
+        { id: 'delete', label: 'Delete selected', onClick: handleDeleteSelected, variant: 'destructive' as const },
+        { id: 'download', label: 'Download selected', onClick: handleExportSelected, variant: 'default' as const },
+    ];
 
     return (
         <div className="w-full min-w-0 p-4 sm:p-5 md:p-6 lg:p-8 space-y-4">
@@ -177,6 +245,8 @@ export default function OpticalInventoryPage() {
                     hideSearch
                     hidePagination
                     enableRowSelection
+                    quickActions={quickActions}
+                    selectionKey={selectionKey}
                     emptyMessage="No optical items yet"
                     emptyDescription="Click 'Add item' to add your first eyewear or lens to the inventory."
                 />
@@ -186,6 +256,7 @@ export default function OpticalInventoryPage() {
                     total={total}
                     totalPages={totalPages}
                     onPageChange={setPage}
+                    onLimitChange={(limit) => { setPageSize(limit); setPage(1); }}
                     disabled={loading}
                 />
             </div>
@@ -194,6 +265,17 @@ export default function OpticalInventoryPage() {
                 open={dialogOpen}
                 onOpenChange={setDialogOpen}
                 item={editingItem}
+                onSuccess={refresh}
+            />
+
+            <ReceiveStockDialog
+                open={receiveOpen}
+                onOpenChange={setReceiveOpen}
+                itemId={receivingItem?.id ?? null}
+                itemName={receivingItem?.itemName ?? ''}
+                inventoryType="optical"
+                currentStock={receivingItem?.stockQuantity}
+                purchasePrice={receivingItem?.purchasePrice}
                 onSuccess={refresh}
             />
         </div>

@@ -259,7 +259,7 @@ export const getPrescriptionById = async (req, res, next) => {
 
 export const createPrescription = async (req, res, next) => {
     try {
-        const { examId, itemType, itemId, quantity, instructions } = req.body;
+        const { examId, itemType, itemId, quantity, instructions, reviewAfterDays } = req.body;
 
         const clinicalExam = await prisma.clinicalExamination.findFirst({
             where: {
@@ -267,7 +267,7 @@ export const createPrescription = async (req, res, next) => {
                 appointment: { ...getBranchFilter(req) },
             },
             include: {
-                appointment: { select: { id: true, branchId: true } }
+                appointment: { select: { id: true, branchId: true, patientId: true } }
             }
         });
 
@@ -277,10 +277,12 @@ export const createPrescription = async (req, res, next) => {
         const normalizedItemId = normalizeOptionalString(itemId);
         const branchId = clinicalExam.appointment.branchId;
         const qty = Number(quantity);
+        const reviewDays = reviewAfterDays === undefined || reviewAfterDays === null || reviewAfterDays === ''
+            ? null
+            : Number(reviewAfterDays);
 
         if (normalizedItemId) {
             await validateAndLookupItem(itemType, normalizedItemId, branchId);
-            await deductStock(itemType, normalizedItemId, branchId, qty, req.user.id);
         }
 
         const row = await prisma.prescription.create({
@@ -292,9 +294,28 @@ export const createPrescription = async (req, res, next) => {
                 itemId: normalizedItemId,
                 quantity: qty,
                 instructions: normalizeOptionalString(instructions),
+                reviewAfterDays: reviewDays,
             },
             include: prescriptionInclude,
         });
+
+        if (reviewDays && reviewDays > 0 && clinicalExam.appointment.patientId) {
+            const dueDate = new Date();
+            dueDate.setDate(dueDate.getDate() + reviewDays);
+
+            await prisma.followUp.create({
+                data: {
+                    patientId: clinicalExam.appointment.patientId,
+                    branchId,
+                    sourceType: 'PRESCRIPTION',
+                    sourceId: row.id,
+                    dueDate,
+                    status: 'PENDING',
+                    notes: 'Prescription review follow-up',
+                    prescriptionId: row.id,
+                },
+            });
+        }
 
         row._itemName = await resolveItemName(row.itemType, row.itemId);
         res.status(201).json(row);
@@ -307,19 +328,33 @@ export const updatePrescription = async (req, res, next) => {
     try {
         const existing = await prisma.prescription.findUnique({
             where: { id: req.params.id },
-            select: { id: true, branchId: true, itemType: true, itemId: true, quantity: true },
+            select: {
+                id: true,
+                branchId: true,
+                itemType: true,
+                itemId: true,
+                quantity: true,
+                reviewAfterDays: true,
+                appointment: { select: { patientId: true } },
+            },
         });
 
         if (!existing) return res.status(404).json({ message: 'Prescription not found' });
         assertBranchAccess(req, existing.branchId);
 
-        const { examId, itemType, itemId, quantity, instructions } = req.body;
+        const { examId, itemType, itemId, quantity, instructions, reviewAfterDays } = req.body;
 
         const data = {
             ...(itemType !== undefined ? { itemType } : {}),
             ...(itemId !== undefined ? { itemId: normalizeOptionalString(itemId) } : {}),
             ...(quantity !== undefined ? { quantity: Number(quantity) } : {}),
             ...(instructions !== undefined ? { instructions: normalizeOptionalString(instructions) } : {}),
+            ...(reviewAfterDays !== undefined
+                ? {
+                    reviewAfterDays:
+                        reviewAfterDays === null || reviewAfterDays === '' ? null : Number(reviewAfterDays),
+                }
+                : {}),
         };
 
         if (examId !== undefined) {
@@ -346,14 +381,8 @@ export const updatePrescription = async (req, res, next) => {
         const newQty = data.quantity || existing.quantity;
         const itemChanged = newItemId !== existing.itemId || newItemType !== existing.itemType || newQty !== existing.quantity;
 
-        if (itemChanged) {
-            if (existing.itemId) {
-                await restoreStock(existing.itemType, existing.itemId, existing.branchId, existing.quantity, req.user.id);
-            }
-            if (newItemId) {
-                await validateAndLookupItem(newItemType, newItemId, data.branchId || existing.branchId);
-                await deductStock(newItemType, newItemId, data.branchId || existing.branchId, newQty, req.user.id);
-            }
+        if (itemChanged && newItemId) {
+            await validateAndLookupItem(newItemType, newItemId, data.branchId || existing.branchId);
         }
 
         const row = await prisma.prescription.update({
@@ -361,6 +390,48 @@ export const updatePrescription = async (req, res, next) => {
             data,
             include: prescriptionInclude,
         });
+
+        const existingFollowUp = await prisma.followUp.findFirst({
+            where: { prescriptionId: row.id },
+        });
+
+        if (reviewAfterDays !== undefined) {
+            const reviewDays = reviewAfterDays === null || reviewAfterDays === '' ? null : Number(reviewAfterDays);
+
+            if (reviewDays && reviewDays > 0 && existing.appointment?.patientId) {
+                const dueDate = new Date();
+                dueDate.setDate(dueDate.getDate() + reviewDays);
+
+                if (existingFollowUp) {
+                    await prisma.followUp.update({
+                        where: { id: existingFollowUp.id },
+                        data: {
+                            dueDate,
+                            status: 'PENDING',
+                            notes: 'Prescription review follow-up',
+                        },
+                    });
+                } else {
+                    await prisma.followUp.create({
+                        data: {
+                            patientId: existing.appointment.patientId,
+                            branchId: row.branchId,
+                            sourceType: 'PRESCRIPTION',
+                            sourceId: row.id,
+                            dueDate,
+                            status: 'PENDING',
+                            notes: 'Prescription review follow-up',
+                            prescriptionId: row.id,
+                        },
+                    });
+                }
+            } else if (existingFollowUp) {
+                await prisma.followUp.update({
+                    where: { id: existingFollowUp.id },
+                    data: { status: 'CANCELLED' },
+                });
+            }
+        }
 
         row._itemName = await resolveItemName(row.itemType, row.itemId);
         res.status(200).json(row);
@@ -379,9 +450,10 @@ export const deletePrescription = async (req, res, next) => {
         if (!existing) return res.status(404).json({ message: 'Prescription not found' });
         assertBranchAccess(req, existing.branchId);
 
-        if (existing.itemId) {
-            await restoreStock(existing.itemType, existing.itemId, existing.branchId, existing.quantity, req.user.id);
-        }
+        await prisma.followUp.updateMany({
+            where: { prescriptionId: existing.id, status: 'PENDING' },
+            data: { status: 'CANCELLED' },
+        });
 
         await prisma.prescription.delete({ where: { id: req.params.id } });
         res.status(200).json({ message: 'Prescription deleted successfully' });

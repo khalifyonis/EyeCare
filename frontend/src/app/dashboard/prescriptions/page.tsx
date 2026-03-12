@@ -84,7 +84,8 @@ export default function PrescriptionsPage() {
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
-    const pageSize = 20;
+    const [pageSize, setPageSize] = useState(20);
+    const [selectionKey, setSelectionKey] = useState(0);
 
     const canManage = useMemo(() => {
         return ['ADMIN', 'SUPERADMIN', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'].includes(role);
@@ -114,7 +115,7 @@ export default function PrescriptionsPage() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [pageSize]);
 
     const fetchClinicalExams = useCallback(async () => {
         try {
@@ -199,6 +200,58 @@ export default function PrescriptionsPage() {
         }
     }, [fetchRows, search, itemTypeFilter, dateFilter, page]);
 
+    const handleDeleteSelected = async (selected: PrescriptionRow[]) => {
+        if (selected.length === 0) return;
+        if (!confirm(`Delete ${selected.length} selected prescription(s)? This cannot be undone.`)) return;
+        let done = 0;
+        let failed = 0;
+        for (const row of selected) {
+            try {
+                await api.delete(`/prescriptions/${row.id}`);
+                done++;
+            } catch {
+                failed++;
+            }
+        }
+        if (done) {
+            toast.success(failed ? `Deleted ${done} prescription(s). ${failed} failed.` : `Deleted ${done} prescription(s).`);
+            setSelectionKey((k) => k + 1);
+            fetchRows(search, itemTypeFilter, dateFilter, page);
+        }
+        if (failed) {
+            toast.error(`Failed to delete ${failed} prescription(s).`);
+        }
+    };
+
+    const handleExportSelected = (selected: PrescriptionRow[]) => {
+        if (selected.length === 0) return;
+        const headers = ['Booking #', 'Patient', 'Item type', 'Item name', 'Quantity', 'Created at'];
+        const escape = (v: string) => (v.includes(',') || v.includes('"') ? `"${v.replace(/"/g, '""')}"` : v);
+        const rowsCsv = selected.map((r) => {
+            const booking = r.appointment?.bookingNumber || '';
+            const patient = r.appointment?.patient?.fullName || '';
+            const itemName = r._itemName || '';
+            const created = r.createdAt || '';
+            return [
+                escape(booking),
+                escape(patient),
+                escape(r.itemType || ''),
+                escape(itemName),
+                String(r.quantity ?? ''),
+                escape(created),
+            ].join(',');
+        });
+        const csv = [headers.join(','), ...rowsCsv].join('\r\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `prescriptions-selected-${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+        toast.success(`Downloaded ${selected.length} item${selected.length === 1 ? '' : 's'}.`);
+    };
+
     const handleSave = async () => {
         if (!form.examId) {
             toast.error('Please select a clinical examination');
@@ -260,6 +313,11 @@ export default function PrescriptionsPage() {
         onEdit: openEdit,
         onDelete: handleDelete,
     }), [canManage, openEdit, handleDelete]);
+
+    const quickActions = [
+        { id: 'delete', label: 'Delete selected', onClick: handleDeleteSelected, variant: 'destructive' as const },
+        { id: 'download', label: 'Download selected', onClick: handleExportSelected, variant: 'default' as const },
+    ];
 
     const editingExamLabel = useMemo(() => {
         if (!editing?.appointment?.patient) return '';
@@ -340,6 +398,8 @@ export default function PrescriptionsPage() {
                     hideSearch
                     hidePagination
                     enableRowSelection
+                    quickActions={quickActions}
+                    selectionKey={selectionKey}
                     emptyMessage="No prescriptions yet"
                     emptyDescription="Click 'New Prescription' to write the first prescription from a clinical examination."
                 />
@@ -349,13 +409,14 @@ export default function PrescriptionsPage() {
                     total={total}
                     totalPages={totalPages}
                     onPageChange={setPage}
+                    onLimitChange={(limit) => { setPageSize(limit); setPage(1); }}
                     disabled={loading}
                 />
             </div>
 
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="w-[95vw] max-w-2xl rounded-2xl p-0 overflow-hidden flex flex-col max-h-[90vh]">
-                    <DialogHeader className="p-4 sm:p-5 pb-3 border-b">
+                <DialogContent className="w-[95vw] max-w-2xl rounded-2xl p-0 overflow-hidden flex flex-col max-h-[90vh] bg-background">
+                    <DialogHeader className="p-4 sm:p-5 pb-3 border-b border-slate-200 dark:border-slate-800">
                         <DialogTitle className="text-xl font-black">{editing ? 'Update Prescription' : 'Create Prescription'}</DialogTitle>
                         <DialogDescription>
                             {editing ? 'Edit prescription details.' : 'Create a prescription from a clinical examination.'}
@@ -365,7 +426,7 @@ export default function PrescriptionsPage() {
                     <div className="flex-1 overflow-y-auto p-4 sm:p-5">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                             <div className="space-y-2 sm:col-span-2">
-                                <label className="text-xs font-medium text-slate-500">Clinical Examination</label>
+                                <label className="block mb-1 text-sm font-medium text-slate-800 dark:text-slate-100">Clinical examination</label>
                                 {editing ? (
                                     <Input disabled value={editingExamLabel} />
                                 ) : (
@@ -386,7 +447,7 @@ export default function PrescriptionsPage() {
                             </div>
 
                             <div>
-                                <label className="text-xs font-medium text-slate-500 mb-1 block">Item Type</label>
+                                <label className="block mb-1 text-sm font-medium text-slate-800 dark:text-slate-100">Item type</label>
                                 <Select
                                     value={form.itemType}
                                     onValueChange={(value) => {
@@ -405,7 +466,7 @@ export default function PrescriptionsPage() {
                             </div>
 
                             <div>
-                                <label className="text-xs font-medium text-slate-500 mb-1 block">Quantity</label>
+                                <label className="block mb-1 text-sm font-medium text-slate-800 dark:text-slate-100">Quantity</label>
                                 <Input
                                     type="number"
                                     min="1"
@@ -416,7 +477,7 @@ export default function PrescriptionsPage() {
                             </div>
 
                             <div className="sm:col-span-2 space-y-2">
-                                <label className="text-xs font-medium text-slate-500 block">
+                                <label className="block mb-1 text-sm font-medium text-slate-800 dark:text-slate-100">
                                     {form.itemType === 'PHARMACY' ? 'Select Medication' : 'Select Optical Item'}
                                 </label>
                                 <div className="relative">
@@ -494,7 +555,7 @@ export default function PrescriptionsPage() {
                             </div>
 
                             <div className="sm:col-span-2">
-                                <label className="text-xs font-medium text-slate-500 mb-1 block">Instructions</label>
+                                <label className="block mb-1 text-sm font-medium text-slate-800 dark:text-slate-100">Instructions</label>
                                 <Textarea
                                     placeholder="e.g. Take 1 tablet twice daily after meals"
                                     value={form.instructions}
@@ -505,7 +566,7 @@ export default function PrescriptionsPage() {
                         </div>
                     </div>
 
-                    <DialogFooter className="p-4 sm:p-5 border-t bg-slate-50/50">
+                    <DialogFooter className="p-4 sm:p-5 border-t border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60">
                         <Button variant="ghost" onClick={() => setOpen(false)}>
                             Cancel
                         </Button>

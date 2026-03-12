@@ -232,6 +232,7 @@ export const createPrescriptionSchema = Joi.object({
         'number.min': 'Quantity must be at least 1'
     }),
     instructions: Joi.string().allow('', null).optional(),
+    reviewAfterDays: Joi.number().integer().min(0).allow('', null).optional(),
 }).options({ stripUnknown: true });
 
 export const updatePrescriptionSchema = Joi.object({
@@ -244,6 +245,7 @@ export const updatePrescriptionSchema = Joi.object({
         'number.min': 'Quantity must be at least 1'
     }),
     instructions: Joi.string().allow('', null).optional(),
+    reviewAfterDays: Joi.number().integer().min(0).allow('', null).optional(),
 }).min(1).options({ stripUnknown: true });
 
 // ── Billing Schemas ──

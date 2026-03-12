@@ -172,10 +172,10 @@ export function NewAppointmentDialog({ open, onOpenChange, onSuccess }: Props) {
 		}
 	};
 
-	return (
+return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-[520px] rounded-2xl flex flex-col p-0 overflow-hidden backdrop-blur-sm">
-				<DialogHeader className="p-6 pb-4">
+			<DialogContent className="sm:max-w-[520px] rounded-2xl flex flex-col p-0 overflow-hidden backdrop-blur-sm bg-background">
+				<DialogHeader className="p-6 pb-4 border-b border-slate-200 dark:border-slate-800">
 					<DialogTitle className="text-xl font-black flex items-center gap-2">
 						<CalendarPlus className="w-5 h-5 text-[#0EA5E9]" />
 						New Booking
@@ -187,9 +187,7 @@ export function NewAppointmentDialog({ open, onOpenChange, onSuccess }: Props) {
 
 				<div className="px-6 py-2 space-y-4">
 					<div className="space-y-2">
-						<label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 flex items-center gap-1.5">
-							<Users className="w-3 h-3 text-[#0EA5E9]" /> Patient
-						</label>
+						<label className="text-sm font-medium text-slate-800 dark:text-slate-100">Patient</label>
 						<Input
 							placeholder="Search patient by name / phone..."
 							value={patientSearch}
@@ -215,9 +213,7 @@ export function NewAppointmentDialog({ open, onOpenChange, onSuccess }: Props) {
 					</div>
 
 					<div className="space-y-1.5">
-						<label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 flex items-center gap-1.5">
-							<User className="w-3 h-3 text-[#0EA5E9]" /> Doctor
-						</label>
+						<label className="text-sm font-medium text-slate-800 dark:text-slate-100">Doctor</label>
 						<Select
 							value={formData.doctorId}
 							onValueChange={(value) => setFormData((previous) => ({ ...previous, doctorId: value }))}
@@ -238,9 +234,7 @@ export function NewAppointmentDialog({ open, onOpenChange, onSuccess }: Props) {
 
 					<div className="grid grid-cols-2 gap-4">
 						<div className="space-y-1.5">
-							<label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 flex items-center gap-1.5">
-								<CalendarPlus className="w-3 h-3 text-[#0EA5E9]" /> Date
-							</label>
+							<label className="text-sm font-medium text-slate-800 dark:text-slate-100">Date</label>
 							<Input
 								type="date"
 								min={new Date().toISOString().split('T')[0]}
@@ -250,10 +244,8 @@ export function NewAppointmentDialog({ open, onOpenChange, onSuccess }: Props) {
 							/>
 						</div>
 						<div className="space-y-1.5">
-							<label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 flex items-center gap-1.5">
-								<Clock className="w-3 h-3 text-[#0EA5E9]" /> Time
-							</label>
-							<div className="flex items-center h-11 w-full rounded-xl border border-slate-200 bg-white px-3 focus-within:ring-2 focus-within:ring-[#0EA5E9]">
+							<label className="text-sm font-medium text-slate-800 dark:text-slate-100">Time</label>
+							<div className="flex items-center h-11 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 focus-within:ring-2 focus-within:ring-[#0EA5E9]">
 								<select
 									className="appearance-none bg-transparent font-medium border-none focus:outline-none focus:ring-0 text-center text-sm w-full cursor-pointer hover:bg-slate-100 rounded px-1"
 									value={timeParts.hour}
@@ -286,9 +278,7 @@ export function NewAppointmentDialog({ open, onOpenChange, onSuccess }: Props) {
 					</div>
 
 					<div className="space-y-1.5">
-						<label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 flex items-center gap-1.5">
-							<span className="text-[#0EA5E9] font-bold text-xs">$</span> Amount
-						</label>
+						<label className="text-sm font-medium text-slate-800 dark:text-slate-100">Amount</label>
 						<Input
 							type="number"
 							min="0"
@@ -301,7 +291,7 @@ export function NewAppointmentDialog({ open, onOpenChange, onSuccess }: Props) {
 					</div>
 				</div>
 
-				<DialogFooter className="p-6 pt-4 border-t bg-slate-50/50 mt-4">
+				<DialogFooter className="p-6 pt-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 mt-4">
 					<Button
 						variant="ghost"
 						onClick={() => onOpenChange(false)}

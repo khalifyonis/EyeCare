@@ -1,9 +1,10 @@
-import express from 'express';
-import { listByPatient, listDue, markComplete, cancel } from '../controllers/followUpController.js';
+﻿import express from 'express';
+import { listAll, listByPatient, listDue, markComplete, cancel } from '../controllers/followUpController.js';
 import { authenticate, authorize } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
+router.get('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR', 'RECEPTIONIST'), listAll);
 router.get('/due', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR', 'RECEPTIONIST'), listDue);
 router.get('/patient/:patientId', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR', 'RECEPTIONIST'), listByPatient);
 router.put('/:id/complete', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR', 'RECEPTIONIST'), markComplete);

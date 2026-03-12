@@ -1,12 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { Pencil, Trash2, MoreVertical, AlertTriangle } from 'lucide-react';
+import { Pencil, Trash2, AlertTriangle, PackagePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 export interface OpticalRow {
     id: string;
@@ -24,6 +18,7 @@ export interface OpticalRow {
 export interface OpticalColumnsProps {
     onEdit: (row: OpticalRow) => void;
     onDelete: (id: string) => void;
+    onReceive: (row: OpticalRow) => void;
 }
 
 function toNum(v: number | string | null | undefined): number {
@@ -31,7 +26,7 @@ function toNum(v: number | string | null | undefined): number {
     return typeof v === 'number' ? v : parseFloat(String(v)) || 0;
 }
 
-export function getOpticalColumns({ onEdit, onDelete }: OpticalColumnsProps): ColumnDef<OpticalRow>[] {
+export function getOpticalColumns({ onEdit, onDelete, onReceive }: OpticalColumnsProps): ColumnDef<OpticalRow>[] {
     return [
         {
             accessorKey: 'itemName',
@@ -87,28 +82,37 @@ export function getOpticalColumns({ onEdit, onDelete }: OpticalColumnsProps): Co
         },
         {
             id: 'actions',
-            header: '',
+            header: 'Actions',
             cell: ({ row }: { row: { original: OpticalRow } }) => (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreVertical className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEdit(row.original)}>
-                            <Pencil className="mr-2 h-4 w-4" />
-                            Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => onDelete(row.original.id)}
-                        >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex items-center justify-end gap-1 px-1">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        title="Receive stock"
+                        className="h-8 w-8 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 transition-all active:scale-90 rounded-lg shadow-sm shadow-emerald-200/50"
+                        onClick={() => onReceive(row.original)}
+                    >
+                        <PackagePlus className="w-4 h-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        title="Edit item"
+                        className="h-8 w-8 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 transition-all active:scale-90 rounded-lg shadow-sm shadow-blue-200/50"
+                        onClick={() => onEdit(row.original)}
+                    >
+                        <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        title="Delete item"
+                        className="h-8 w-8 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition-all active:scale-90 rounded-lg shadow-sm shadow-red-200/50"
+                        onClick={() => onDelete(row.original.id)}
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </Button>
+                </div>
             ),
         },
     ];

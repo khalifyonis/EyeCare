@@ -77,8 +77,8 @@ export function RecordPaymentDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[420px]">
-                <DialogHeader>
+            <DialogContent className="sm:max-w-[420px] bg-background">
+                <DialogHeader className="border-b border-slate-200 dark:border-slate-800 pb-3">
                     <DialogTitle>Record payment</DialogTitle>
                     <DialogDescription>
                         Update payment for invoice — {billing.patient?.fullName || 'Patient'} · $
@@ -87,7 +87,7 @@ export function RecordPaymentDialog({
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                     <div className="grid gap-2">
-                        <label className="text-xs font-medium text-muted-foreground block mb-1">Status</label>
+                        <label className="block mb-1 text-sm font-medium text-slate-800 dark:text-slate-100">Status</label>
                         <Select
                             value={formData.status}
                             onValueChange={(v) => setFormData((p) => ({ ...p, status: v }))}
@@ -103,7 +103,7 @@ export function RecordPaymentDialog({
                         </Select>
                     </div>
                     <div className="grid gap-2">
-                        <label className="text-xs font-medium text-muted-foreground block mb-1">Payment method</label>
+                        <label className="block mb-1 text-sm font-medium text-slate-800 dark:text-slate-100">Payment method</label>
                         <Input
                             value={formData.paymentMethod}
                             onChange={(e) =>
@@ -113,7 +113,7 @@ export function RecordPaymentDialog({
                         />
                     </div>
                     <div className="grid gap-2">
-                        <label className="text-xs font-medium text-muted-foreground block mb-1">Reference number</label>
+                        <label className="block mb-1 text-sm font-medium text-slate-800 dark:text-slate-100">Reference number</label>
                         <Input
                             value={formData.referenceNumber}
                             onChange={(e) =>
@@ -123,7 +123,7 @@ export function RecordPaymentDialog({
                         />
                     </div>
                 </div>
-                <DialogFooter>
+                <DialogFooter className="border-t border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60">
                     <Button variant="outline" onClick={() => onOpenChange(false)}>
                         Cancel
                     </Button>

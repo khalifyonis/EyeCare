@@ -1,5 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { Pencil, Trash2, AlertTriangle } from 'lucide-react';
+import { Pencil, Trash2, AlertTriangle, PackagePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export interface PharmacyRow {
@@ -20,6 +20,7 @@ export interface PharmacyRow {
 export interface PharmacyColumnsProps {
     onEdit: (row: PharmacyRow) => void;
     onDelete: (id: string) => void;
+    onReceive: (row: PharmacyRow) => void;
 }
 
 function toNum(v: number | string | null | undefined): number {
@@ -27,7 +28,7 @@ function toNum(v: number | string | null | undefined): number {
     return typeof v === 'number' ? v : parseFloat(String(v)) || 0;
 }
 
-export function getPharmacyColumns({ onEdit, onDelete }: PharmacyColumnsProps): ColumnDef<PharmacyRow>[] {
+export function getPharmacyColumns({ onEdit, onDelete, onReceive }: PharmacyColumnsProps): ColumnDef<PharmacyRow>[] {
     return [
         {
             accessorKey: 'itemName',
@@ -94,6 +95,15 @@ export function getPharmacyColumns({ onEdit, onDelete }: PharmacyColumnsProps): 
             header: 'Actions',
             cell: ({ row }: { row: { original: PharmacyRow } }) => (
                 <div className="flex items-center justify-end gap-1 px-1">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        title="Receive stock"
+                        className="h-8 w-8 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 transition-all active:scale-90 rounded-lg shadow-sm shadow-emerald-200/50"
+                        onClick={() => onReceive(row.original)}
+                    >
+                        <PackagePlus className="w-4 h-4" />
+                    </Button>
                     <Button
                         variant="ghost"
                         size="icon"

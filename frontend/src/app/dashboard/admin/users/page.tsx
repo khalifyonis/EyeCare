@@ -22,6 +22,7 @@ export default function UsersPage() {
     const [search, setSearch] = useState('');
     const [roleFilter, setRoleFilter] = useState('all');
     const [statusFilter, setStatusFilter] = useState('all');
+    const [selectionKey, setSelectionKey] = useState(0);
 
     const fetchUsers = async () => {
         setLoading(true);
@@ -77,7 +78,59 @@ export default function UsersPage() {
         } catch (error) { toast.error('Delete failed'); }
     };
 
+    const handleDeleteSelected = async (selected: User[]) => {
+        if (selected.length === 0) return;
+        if (!confirm(`Delete ${selected.length} selected user(s)? This cannot be undone.`)) return;
+        let done = 0;
+        let failed = 0;
+        for (const u of selected) {
+            try {
+                await api.delete(`/users/${u.id}`);
+                done++;
+            } catch {
+                failed++;
+            }
+        }
+        if (done) {
+            toast.success(failed ? `Deleted ${done} user(s). ${failed} failed.` : `Deleted ${done} user(s).`);
+            setSelectionKey((k) => k + 1);
+            fetchUsers();
+        }
+        if (failed) toast.error(`Failed to delete ${failed} user(s).`);
+    };
+
+    const handleExportSelected = (selected: User[]) => {
+        if (selected.length === 0) return;
+        const headers = ['Name', 'Username', 'Email', 'Role', 'Status', 'Branches'];
+        const escape = (v: string) => (v.includes(',') || v.includes('"') ? `"${String(v).replace(/"/g, '""')}"` : v);
+        const rows = selected.map((u) => [
+            escape(u.fullName ?? ''),
+            escape(u.username ?? ''),
+            escape(u.email ?? ''),
+            escape(u.roleName ?? ''),
+            u.isActive !== false ? 'Active' : 'Inactive',
+            (u.branches ?? []).map((b) => b.branchName).filter(Boolean).join('; '),
+        ].join(','));
+        const csv = [headers.join(','), ...rows].join('\r\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `users-export-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.success(`Exported ${selected.length} user(s).`);
+    };
+
     const columns = useMemo(() => getUserColumns({ onEdit: handleEdit, onDelete: handleDelete }), []);
+
+    const quickActions = useMemo(
+        () => [
+            { id: 'delete', label: 'Delete selected', onClick: handleDeleteSelected, variant: 'destructive' as const },
+            { id: 'export', label: 'Download selected', onClick: handleExportSelected, variant: 'default' as const },
+        ],
+        []
+    );
 
     return (
         <div className="w-full min-w-0 p-4 sm:p-5 md:p-6 lg:p-8 space-y-4">
@@ -137,6 +190,8 @@ export default function UsersPage() {
                     itemLabel="users"
                     hideSearch
                     enableRowSelection
+                    quickActions={quickActions}
+                    selectionKey={selectionKey}
                 />
             </div>
 

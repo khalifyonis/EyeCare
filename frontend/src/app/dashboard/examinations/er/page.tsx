@@ -64,7 +64,8 @@ export default function ERExaminationsPage() {
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
-    const pageSize = 20;
+    const [pageSize, setPageSize] = useState(20);
+    const [selectionKey, setSelectionKey] = useState(0);
 
     const [role, setRole] = useState('');
     const [open, setOpen] = useState(false);
@@ -101,7 +102,7 @@ export default function ERExaminationsPage() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [pageSize]);
 
     const fetchAppointments = useCallback(async () => {
         try {
@@ -172,6 +173,67 @@ export default function ERExaminationsPage() {
             toast.error(getApiErrorMessage(error) || 'Delete failed');
         }
     }, [fetchRows, search, statusFilter, dateFilter, page]);
+
+    const handleDeleteSelected = useCallback(
+        async (selected: ERExaminationRow[]) => {
+            if (selected.length === 0) return;
+            if (!confirm(`Delete ${selected.length} selected ER examination(s)? This cannot be undone.`)) return;
+            let done = 0;
+            let failed = 0;
+            for (const row of selected) {
+                try {
+                    await api.delete(`/examinations/er/${row.id}`);
+                    done++;
+                } catch {
+                    failed++;
+                }
+            }
+            if (done) {
+                toast.success(failed ? `Deleted ${done} record(s). ${failed} failed.` : `Deleted ${done} record(s).`);
+                setSelectionKey((k) => k + 1);
+                fetchRows(search, statusFilter, dateFilter, page);
+            }
+            if (failed) {
+                toast.error(`Failed to delete ${failed} record(s).`);
+            }
+        },
+        [fetchRows, search, statusFilter, dateFilter, page]
+    );
+
+    const handleExportSelected = useCallback((selected: ERExaminationRow[]) => {
+        if (selected.length === 0) return;
+        const headers = ['Appointment', 'Patient', 'VA Right', 'VA Left', 'PH Right', 'PH Left', 'IOP Right', 'IOP Left'];
+        const escape = (v: string) => (v.includes(',') || v.includes('"') ? `"${v.replace(/"/g, '""')}"` : v);
+        const rowsCsv = selected.map((r) =>
+            [
+                escape(r.appointment?.bookingNumber || ''),
+                escape(r.appointment?.patient?.fullName || ''),
+                escape(r.vaRight ?? ''),
+                escape(r.vaLeft ?? ''),
+                escape(r.phRight ?? ''),
+                escape(r.phLeft ?? ''),
+                r.iopRight != null ? String(r.iopRight) : '',
+                r.iopLeft != null ? String(r.iopLeft) : '',
+            ].join(',')
+        );
+        const csv = [headers.join(','), ...rowsCsv].join('\r\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `er-examinations-selected-${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+        toast.success(`Downloaded ${selected.length} item${selected.length === 1 ? '' : 's'}.`);
+    }, []);
+
+    const quickActions = useMemo(
+        () => [
+            { id: 'delete', label: 'Delete selected', onClick: handleDeleteSelected, variant: 'destructive' as const },
+            { id: 'download', label: 'Download selected', onClick: handleExportSelected, variant: 'default' as const },
+        ],
+        [handleDeleteSelected, handleExportSelected]
+    );
 
     const handleSave = async () => {
         if (!editing && !form.appointmentId) {
@@ -313,6 +375,8 @@ export default function ERExaminationsPage() {
                     hideSearch
                     hidePagination
                     enableRowSelection
+                    quickActions={quickActions}
+                    selectionKey={selectionKey}
                     emptyMessage="No ER examinations yet"
                     emptyDescription="Click 'New ER Exam' to record the first examination."
                 />
@@ -322,13 +386,14 @@ export default function ERExaminationsPage() {
                     total={total}
                     totalPages={totalPages}
                     onPageChange={setPage}
+                    onLimitChange={(limit) => { setPageSize(limit); setPage(1); }}
                     disabled={loading}
                 />
             </div>
 
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="w-[95vw] max-w-2xl rounded-2xl p-0 overflow-hidden flex flex-col max-h-[90vh]">
-                    <DialogHeader className="p-4 sm:p-5 pb-3 border-b">
+                <DialogContent className="w-[95vw] max-w-2xl rounded-2xl p-0 overflow-hidden flex flex-col max-h-[90vh] bg-background">
+                    <DialogHeader className="p-4 sm:p-5 pb-3 border-b border-slate-200 dark:border-slate-800">
                         <DialogTitle className="text-xl font-black">{editing ? 'Update ER Examination' : 'Create ER Examination'}</DialogTitle>
                         <DialogDescription>
                             {editing ? 'Update ER findings for this appointment.' : 'Insert a new ER examination record.'}
@@ -337,7 +402,7 @@ export default function ERExaminationsPage() {
 
                     <div className="flex-1 overflow-y-auto p-4 sm:p-5">
                         <div className="space-y-3.5">
-                            <label className="text-xs font-medium text-slate-500">Appointment</label>
+                            <label className="block mb-1 text-sm font-medium text-slate-800 dark:text-slate-100">Appointment</label>
                             {editing ? (
                                 <Input
                                     disabled
@@ -407,7 +472,7 @@ export default function ERExaminationsPage() {
                         </div>
                     </div>
 
-                    <DialogFooter className="p-4 sm:p-5 border-t bg-slate-50/50">
+                    <DialogFooter className="p-4 sm:p-5 border-t border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60">
                         <Button variant="ghost" onClick={() => setOpen(false)}>
                             Cancel
                         </Button>

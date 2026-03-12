@@ -56,7 +56,8 @@ export default function AppointmentsPage() {
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
-    const pageSize = 20;
+    const [pageSize, setPageSize] = useState(20);
+    const [selectionKey, setSelectionKey] = useState(0);
 
     useEffect(() => {
         setRole(resolveRoleName(readStoredUser()));
@@ -96,7 +97,7 @@ export default function AppointmentsPage() {
         } finally {
             setLoading(false);
         }
-    }, [dateFilter, doctorFilter]);
+    }, [dateFilter, doctorFilter, pageSize]);
 
     useEffect(() => {
         setPage(1);
@@ -136,6 +137,66 @@ export default function AppointmentsPage() {
             toast.error(getApiErrorMessage(error, 'Delete failed'));
         }
     }, [fetchAppointments, fetchStats, search, statusFilter, page]);
+
+    const handleDeleteSelected = useCallback(
+        async (selected: AppointmentRow[]) => {
+            if (selected.length === 0) return;
+            if (!confirm(`Delete ${selected.length} selected appointment(s)? This cannot be undone.`)) return;
+            let done = 0;
+            let failed = 0;
+            for (const a of selected) {
+                try {
+                    await api.delete(`/appointments/${a.id}`);
+                    done++;
+                } catch {
+                    failed++;
+                }
+            }
+            if (done) {
+                toast.success(failed ? `Deleted ${done} appointment(s). ${failed} failed.` : `Deleted ${done} appointment(s).`);
+                setSelectionKey((k) => k + 1);
+                fetchAppointments(search, statusFilter, page);
+                fetchStats();
+            }
+            if (failed) {
+                toast.error(`Failed to delete ${failed} appointment(s).`);
+            }
+        },
+        [fetchAppointments, fetchStats, search, statusFilter, page]
+    );
+
+    const handleExportSelected = useCallback((selected: AppointmentRow[]) => {
+        if (selected.length === 0) return;
+        const headers = ['Booking #', 'Patient', 'Doctor', 'Date/Time', 'Status', 'Type'];
+        const escape = (v: string) => (v.includes(',') || v.includes('"') ? `"${v.replace(/"/g, '""')}"` : v);
+        const rows = selected.map((a) =>
+            [
+                escape(a.bookingNumber || ''),
+                escape(a.patient?.fullName || ''),
+                escape(a.doctor?.user?.fullName || a.doctor?.fullName || ''),
+                escape(a.appointmentDate || ''),
+                escape(a.status || ''),
+                escape(String(a.amount || '')),
+            ].join(',')
+        );
+        const csv = [headers.join(','), ...rows].join('\r\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `appointments-selected-${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+        toast.success(`Downloaded ${selected.length} item${selected.length === 1 ? '' : 's'}.`);
+    }, []);
+
+    const quickActions = useMemo(
+        () => [
+            { id: 'delete', label: 'Delete selected', onClick: handleDeleteSelected, variant: 'destructive' as const },
+            { id: 'download', label: 'Download selected', onClick: handleExportSelected, variant: 'default' as const },
+        ],
+        [handleDeleteSelected, handleExportSelected]
+    );
 
     const columns = useMemo(
         () =>
@@ -231,6 +292,8 @@ export default function AppointmentsPage() {
                     hideSearch
                     hidePagination
                     enableRowSelection
+                    quickActions={quickActions}
+                    selectionKey={selectionKey}
                     emptyMessage="No appointments found"
                     emptyDescription="Click 'New Appointment' to schedule the first appointment."
                 />
@@ -240,6 +303,7 @@ export default function AppointmentsPage() {
                     total={total}
                     totalPages={totalPages}
                     onPageChange={setPage}
+                    onLimitChange={(limit) => { setPageSize(limit); setPage(1); }}
                     disabled={loading}
                 />
             </div>

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import {
     Pill, AlertTriangle, Package, DollarSign,
-    ArrowUpRight, FileText, TrendingDown,
+    ArrowUpRight, FileText, TrendingDown, CalendarX,
 } from 'lucide-react'
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -18,6 +18,7 @@ type Stats = {
     prescriptionsToday: number; lowStockCount: number
     totalItems: number; revenueToday: number
     recentPrescriptions: any[]; stockAlerts: any[]
+    expiringItems?: any[]; expiringCount?: number
 }
 
 const AV = ['bg-sky-500','bg-violet-500','bg-emerald-500','bg-orange-500','bg-pink-500','bg-cyan-500']
@@ -161,6 +162,42 @@ export function PharmacistDashboard() {
                         </ResponsiveContainer>
                     </div>
                 </div>
+
+                {/* Expiring Items */}
+                {(data?.expiringCount ?? 0) > 0 && (
+                    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-orange-200 dark:border-orange-900/40 overflow-hidden">
+                        <div className="flex items-center justify-between px-4 py-3 border-b border-orange-100 dark:border-orange-900/30 bg-orange-50/50 dark:bg-orange-900/10">
+                            <h2 className="text-sm font-bold text-orange-700 dark:text-orange-300 flex items-center gap-1.5">
+                                <CalendarX className="h-3.5 w-3.5" /> Expiring Within 30 Days ({data?.expiringCount})
+                            </h2>
+                            <button onClick={() => router.push('/dashboard/inventory/pharmacy')}
+                                className="flex items-center gap-0.5 text-[11px] font-semibold text-sky-500 hover:text-sky-600 transition-colors">
+                                Inventory <ArrowUpRight className="h-3 w-3" />
+                            </button>
+                        </div>
+                        <div className="px-4 py-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+                                {data?.expiringItems?.map((item: any) => {
+                                    const daysLeft = Math.ceil((new Date(item.expiryDate).getTime() - Date.now()) / 86400000)
+                                    return (
+                                        <div key={item.id} className="flex items-center gap-2.5 py-2 border-b last:border-0 border-slate-50 dark:border-slate-800/50">
+                                            <div className={`h-7 w-7 rounded-lg flex items-center justify-center shrink-0 ${daysLeft <= 7 ? 'bg-red-100 dark:bg-red-900/30 text-red-500' : 'bg-orange-100 dark:bg-orange-900/30 text-orange-500'}`}>
+                                                <CalendarX className="h-3.5 w-3.5" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-[13px] font-semibold text-slate-700 dark:text-slate-200 truncate">{item.itemName}</p>
+                                                <p className="text-[10px] text-slate-400">{new Date(item.expiryDate).toLocaleDateString()} · {item.stockQuantity} left</p>
+                                            </div>
+                                            <span className={`text-[11px] font-bold tabular-nums shrink-0 ${daysLeft <= 7 ? 'text-red-500' : 'text-orange-500'}`}>
+                                                {daysLeft}d
+                                            </span>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     )

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     useReactTable,
     getCoreRowModel,
@@ -65,6 +65,13 @@ function getPageNumbers(currentPage: number, totalPages: number): (number | 'ell
     return pages;
 }
 
+export type QuickAction<TData> = {
+    id: string;
+    label: string;
+    onClick: (selected: TData[]) => void;
+    variant?: 'default' | 'destructive' | 'outline';
+};
+
 interface DataTableProps<TData> {
     columns: ColumnDef<TData, any>[];
     data: TData[];
@@ -80,6 +87,9 @@ interface DataTableProps<TData> {
     emptyDescription?: string;
     enableRowSelection?: boolean;
     onSelectionChange?: (rows: TData[]) => void;
+    quickActions?: QuickAction<TData>[];
+    /** Change this key (e.g. after bulk delete) to clear row selection */
+    selectionKey?: string | number;
 }
 
 export function DataTable<TData>({
@@ -96,10 +106,16 @@ export function DataTable<TData>({
     emptyDescription,
     enableRowSelection = false,
     onSelectionChange,
+    quickActions,
+    selectionKey,
 }: DataTableProps<TData>) {
     const [globalFilter, setGlobalFilter] = useState('');
     const [sorting, setSorting] = useState<SortingState>([]);
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+
+    useEffect(() => {
+        setRowSelection({});
+    }, [selectionKey]);
 
     const selectionColumn: ColumnDef<TData, any> = {
         id: 'select',
@@ -249,10 +265,50 @@ export function DataTable<TData>({
                 </Table>
             </div>
 
+            {enableRowSelection && selectedCount > 0 && quickActions && quickActions.length > 0 && (
+                <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/40">
+                    <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
+                        <span className="font-normal">
+                            {selectedCount} {itemLabel}
+                            {selectedCount === 1 ? '' : 's'} selected
+                        </span>
+                        {quickActions
+                            .filter((a) => a.variant === 'destructive')
+                            .map((action) => (
+                                <button
+                                    key={action.id}
+                                    type="button"
+                                    onClick={() => action.onClick(table.getSelectedRowModel().rows.map((r) => r.original))}
+                                    className="font-normal text-red-600 dark:text-red-400 hover:underline"
+                                >
+                                    {action.id === 'delete' ? 'Delete Them' : action.label}
+                                </button>
+                            ))}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        {quickActions
+                            .filter((a) => a.variant !== 'destructive')
+                            .map((action) => (
+                                <Button
+                                    key={action.id}
+                                    variant={action.variant === 'outline' ? 'outline' : 'default'}
+                                    size="sm"
+                                    className={action.variant !== 'outline' ? 'bg-[#0EA5E9] hover:bg-[#0c96d4] text-white' : ''}
+                                    onClick={() => action.onClick(table.getSelectedRowModel().rows.map((r) => r.original))}
+                                >
+                                    {action.id === 'download'
+                                        ? `Download ${selectedCount} item${selectedCount === 1 ? '' : 's'}`
+                                        : action.label}
+                                </Button>
+                            ))}
+                    </div>
+                </div>
+            )}
+
             {!loading && !hidePagination && totalRows > 0 && (
                 <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-transparent bg-slate-50 dark:bg-slate-900/40">
                     <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
-                        {enableRowSelection && selectedCount > 0 && (
+                        {enableRowSelection && selectedCount > 0 && !(quickActions && quickActions.length > 0) && (
                             <span className="font-medium text-[#0EA5E9]">
                                 {selectedCount} selected
                             </span>

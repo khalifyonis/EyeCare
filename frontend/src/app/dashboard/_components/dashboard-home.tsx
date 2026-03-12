@@ -14,8 +14,9 @@ import {
 } from '@tanstack/react-table'
 import {
     Users, Calendar, Eye,
-    TrendingUp, TrendingDown, ArrowUpRight, UserPlus,
+    TrendingUp, TrendingDown, ArrowUpRight, UserPlus, CalendarCheck, AlertTriangle, Package,
 } from 'lucide-react'
+import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
     Table,
@@ -28,11 +29,41 @@ import { toast } from 'sonner'
 import { readStoredUser, type StoredUser } from '@/lib/auth'
 import { resolveActiveBranch } from '@/lib/branches'
 
+type DueFollowUp = {
+    id: string
+    dueDate: string
+    sourceType: string
+    patient?: { id: string; fullName: string | null; phone?: string | null } | null
+    branch?: { branchName: string } | null
+}
+
+type AlertItem = {
+    id: string
+    itemName: string
+    itemType?: string | null
+    stockQuantity: number
+    reorderLevel?: number
+    expiryDate?: string | null
+    category?: 'pharmacy' | 'optical'
+}
+
+type InventoryAlerts = {
+    pharmacyLowStockCount: number
+    opticalLowStockCount: number
+    pharmacyLowStock: AlertItem[]
+    opticalLowStock: AlertItem[]
+    expiringPharmacy: AlertItem[]
+    expiringCount: number
+}
+
 type DashboardStats = {
     totalPatients: number
     appointmentsToday: number
     totalDoctors: number
     totalExams: number
+    dueFollowUps?: DueFollowUp[]
+    overdueFollowUpsCount?: number
+    inventoryAlerts?: InventoryAlerts
 }
 
 const initialStats: DashboardStats = {
@@ -40,6 +71,9 @@ const initialStats: DashboardStats = {
     appointmentsToday: 0,
     totalDoctors: 0,
     totalExams: 0,
+    dueFollowUps: [],
+    overdueFollowUpsCount: 0,
+    inventoryAlerts: undefined,
 }
 
 const revenueData = [
@@ -146,6 +180,9 @@ export function DashboardHome() {
                 appointmentsToday: Number(response.data?.appointmentsToday || 0),
                 totalDoctors: Number(response.data?.totalDoctors || 0),
                 totalExams: Number(response.data?.totalExams || 0),
+                dueFollowUps: Array.isArray(response.data?.dueFollowUps) ? response.data.dueFollowUps : [],
+                overdueFollowUpsCount: Number(response.data?.overdueFollowUpsCount ?? 0),
+                inventoryAlerts: response.data?.inventoryAlerts,
             })
             if (showToast) toast.success('Dashboard refreshed')
         } catch (error: any) {
@@ -400,6 +437,48 @@ export function DashboardHome() {
 
                         <Card className="lg:col-span-3 border-none shadow-xl bg-white dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden">
                             <CardHeader className="flex flex-row items-center justify-between py-2.5 px-4 shrink-0 border-b border-slate-100 dark:border-slate-800">
+                                <CardTitle className="text-[12px] font-black uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-2">
+                                    <CalendarCheck className="h-3.5 w-3.5 text-[#0EA5E9]" />
+                                    Due follow-ups this week
+                                </CardTitle>
+                                <Link href="/dashboard/patients" className="text-[9px] text-[#0EA5E9] font-bold hover:text-[#0c8cc7] transition-colors flex items-center gap-1 bg-blue-500/5 px-2 py-1 rounded-lg uppercase">
+                                    Patients <ArrowUpRight className="h-2.5 w-2.5" />
+                                </Link>
+                            </CardHeader>
+                            <CardContent className="px-3 pb-2.5 pt-1.5 space-y-1">
+                                {(stats.overdueFollowUpsCount ?? 0) > 0 && (
+                                    <p className="text-[10px] font-bold text-red-600 dark:text-red-400 px-2 py-1 rounded bg-red-50 dark:bg-red-950/30">
+                                        {stats.overdueFollowUpsCount} overdue
+                                    </p>
+                                )}
+                                {(stats.dueFollowUps?.length ?? 0) === 0 ? (
+                                    <p className="text-[11px] text-muted-foreground px-2 py-2">No follow-ups due this week.</p>
+                                ) : (
+                                    stats.dueFollowUps?.slice(0, 5).map((f) => (
+                                        <Link
+                                            key={f.id}
+                                            href={`/dashboard/patients/${f.patient?.id ?? '#'}`}
+                                            className="flex items-center gap-2 rounded-lg px-2.5 py-2 hover:bg-accent transition-colors duration-150 group cursor-pointer"
+                                        >
+                                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#0EA5E9]/10 text-[10px] font-bold text-[#0EA5E9]">
+                                                {f.sourceType?.slice(0, 1) ?? '?'}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-xs font-bold truncate">{f.patient?.fullName ?? 'Unknown'}</p>
+                                                <p className="text-[10px] text-muted-foreground">
+                                                    {f.dueDate ? new Date(f.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '—'} · {f.sourceType}
+                                                </p>
+                                            </div>
+                                            <ArrowUpRight className="h-3 w-3 text-muted-foreground/50 group-hover:text-[#0EA5E9] shrink-0" />
+                                        </Link>
+                                    ))
+                                )}
+                            </CardContent>
+                        </Card>
+                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
+                        <Card className="lg:col-span-4 border-none shadow-xl bg-white dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden flex flex-col">
+                            <CardHeader className="flex flex-row items-center justify-between py-2.5 px-4 shrink-0 border-b border-slate-100 dark:border-slate-800">
                                 <CardTitle className="text-[12px] font-black uppercase tracking-[0.1em] text-muted-foreground">Top Doctors</CardTitle>
                                 <button className="text-[9px] text-[#0EA5E9] font-bold hover:text-[#0c8cc7] transition-colors flex items-center gap-1 bg-blue-500/5 px-2 py-1 rounded-lg uppercase">
                                     VIEW ALL <ArrowUpRight className="h-2.5 w-2.5" />
@@ -424,6 +503,84 @@ export function DashboardHome() {
                                 ))}
                             </CardContent>
                         </Card>
+
+                        {/* Inventory Alerts – only show if there's something to flag */}
+                        {stats.inventoryAlerts && (stats.inventoryAlerts.pharmacyLowStockCount > 0 || stats.inventoryAlerts.opticalLowStockCount > 0 || stats.inventoryAlerts.expiringCount > 0) && (
+                            <Card className="lg:col-span-3 border-none shadow-xl bg-white dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden flex flex-col">
+                                <CardHeader className="flex flex-row items-center justify-between py-2.5 px-4 shrink-0 border-b border-slate-100 dark:border-slate-800">
+                                    <CardTitle className="text-[12px] font-black uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-2">
+                                        <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
+                                        Inventory Alerts
+                                    </CardTitle>
+                                    <Link href="/dashboard/inventory/pharmacy" className="text-[9px] text-[#0EA5E9] font-bold hover:text-[#0c8cc7] transition-colors flex items-center gap-1 bg-blue-500/5 px-2 py-1 rounded-lg uppercase">
+                                        Inventory <ArrowUpRight className="h-2.5 w-2.5" />
+                                    </Link>
+                                </CardHeader>
+
+                                {/* Summary badges */}
+                                <div className="flex gap-2 px-4 pt-3 pb-1 flex-wrap">
+                                    {stats.inventoryAlerts.pharmacyLowStockCount > 0 && (
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300">
+                                            {stats.inventoryAlerts.pharmacyLowStockCount} pharmacy low
+                                        </span>
+                                    )}
+                                    {stats.inventoryAlerts.opticalLowStockCount > 0 && (
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">
+                                            {stats.inventoryAlerts.opticalLowStockCount} optical low
+                                        </span>
+                                    )}
+                                    {stats.inventoryAlerts.expiringCount > 0 && (
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300">
+                                            {stats.inventoryAlerts.expiringCount} expiring ≤30d
+                                        </span>
+                                    )}
+                                </div>
+
+                                <CardContent className="px-3 pb-2.5 pt-1 space-y-0 overflow-y-auto max-h-[300px]">
+                                    {/* Low stock – pharmacy */}
+                                    {stats.inventoryAlerts.pharmacyLowStock.map((item) => (
+                                        <div key={`ph-${item.id}`} className="flex items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-accent transition-colors group">
+                                            <div className="h-7 w-7 shrink-0 rounded-lg flex items-center justify-center bg-red-100 dark:bg-red-900/30 text-red-500">
+                                                <TrendingDown className="h-3.5 w-3.5" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-xs font-bold truncate text-slate-700 dark:text-slate-200">{item.itemName}</p>
+                                                <p className="text-[10px] text-muted-foreground/70">Pharmacy · reorder at {item.reorderLevel}</p>
+                                            </div>
+                                            <span className="text-sm font-black tabular-nums text-red-500 shrink-0">{item.stockQuantity}</span>
+                                        </div>
+                                    ))}
+                                    {/* Low stock – optical */}
+                                    {stats.inventoryAlerts.opticalLowStock.map((item) => (
+                                        <div key={`op-${item.id}`} className="flex items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-accent transition-colors group">
+                                            <div className="h-7 w-7 shrink-0 rounded-lg flex items-center justify-center bg-amber-100 dark:bg-amber-900/30 text-amber-500">
+                                                <Package className="h-3.5 w-3.5" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-xs font-bold truncate text-slate-700 dark:text-slate-200">{item.itemName}</p>
+                                                <p className="text-[10px] text-muted-foreground/70">Optical · reorder at {item.reorderLevel}</p>
+                                            </div>
+                                            <span className="text-sm font-black tabular-nums text-amber-500 shrink-0">{item.stockQuantity}</span>
+                                        </div>
+                                    ))}
+                                    {/* Expiring items */}
+                                    {stats.inventoryAlerts.expiringPharmacy.map((item) => (
+                                        <div key={`ex-${item.id}`} className="flex items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-accent transition-colors group">
+                                            <div className="h-7 w-7 shrink-0 rounded-lg flex items-center justify-center bg-orange-100 dark:bg-orange-900/30 text-orange-500">
+                                                <AlertTriangle className="h-3.5 w-3.5" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-xs font-bold truncate text-slate-700 dark:text-slate-200">{item.itemName}</p>
+                                                <p className="text-[10px] text-muted-foreground/70">
+                                                    Expires {item.expiryDate ? new Date(item.expiryDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+                                                </p>
+                                            </div>
+                                            <span className="text-[10px] font-bold tabular-nums text-orange-500 shrink-0">{item.stockQuantity} left</span>
+                                        </div>
+                                    ))}
+                                </CardContent>
+                            </Card>
+                        )}
                     </div>
                 </div>
             </div>

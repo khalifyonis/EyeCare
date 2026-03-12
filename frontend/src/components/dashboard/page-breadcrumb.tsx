@@ -22,7 +22,7 @@ export function PageBreadcrumb({ current, className }: PageBreadcrumbProps) {
             >
                 Dashboard
             </Link>
-            <span className="opacity-60" aria-hidden="true">•</span>
+            <span className="opacity-60" aria-hidden="true">&gt;</span>
             <span className="font-medium text-foreground/80">{current}</span>
         </div>
     );

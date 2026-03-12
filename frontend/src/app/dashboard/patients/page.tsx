@@ -126,6 +126,8 @@ export default function PatientsPage() {
         return list;
     }, [patients, statusFilter, sortBy]);
 
+    const [selectionKey, setSelectionKey] = useState(0);
+
     const handleEdit = (patient: PatientRow) => { setSelectedPatient(patient); setDialogOpen(true); };
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to delete this patient record?')) return;
@@ -138,9 +140,68 @@ export default function PatientsPage() {
     };
     const handleBook = (patient: PatientRow) => { setBookingPatientId(patient.id); setBookingOpen(true); };
 
+    const handleDeleteSelected = async (selected: PatientRow[]) => {
+        if (selected.length === 0) return;
+        if (!confirm(`Delete ${selected.length} selected patient record(s)? This cannot be undone.`)) return;
+        let done = 0;
+        let failed = 0;
+        for (const p of selected) {
+            try {
+                await api.delete(`/patients/${p.id}`);
+                done++;
+            } catch {
+                failed++;
+            }
+        }
+        if (done) {
+            toast.success(failed ? `Deleted ${done} patient(s). ${failed} failed.` : `Deleted ${done} patient(s).`);
+        }
+        if (failed) {
+            toast.error(`Failed to delete ${failed} patient(s).`);
+        }
+        if (done) {
+            setSelectionKey((k) => k + 1);
+            fetchPatients(search, page);
+            fetchStats();
+        }
+    };
+
+    const handleExportSelected = (selected: PatientRow[]) => {
+        if (selected.length === 0) return;
+        const headers = ['Full name', 'Patient ID', 'Phone', 'Gender', 'Status', 'Branch'];
+        const escape = (v: string) => (v.includes(',') || v.includes('"') ? `"${v.replace(/"/g, '""')}"` : v);
+        const rows = selected.map((p) =>
+            [
+                escape(p.fullName || ''),
+                escape(p.id || ''),
+                escape(p.phone || ''),
+                escape(p.gender || ''),
+                p.isActive !== false ? 'Active' : 'Inactive',
+                escape(p.branch?.branchName || ''),
+            ].join(',')
+        );
+        const csv = [headers.join(','), ...rows].join('\r\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `patients-selected-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.success(`Downloaded ${selected.length} item${selected.length === 1 ? '' : 's'}.`);
+    };
+
     const columns = getPatientColumns({
         onEdit: handleEdit, onDelete: handleDelete, onBook: handleBook, canManage,
     });
+
+    const quickActions = useMemo(
+        () => [
+            { id: 'delete', label: 'Delete selected', onClick: handleDeleteSelected, variant: 'destructive' as const },
+            { id: 'download', label: 'Download selected', onClick: handleExportSelected, variant: 'default' as const },
+        ],
+        [handleDeleteSelected, handleExportSelected]
+    );
 
     return (
         <div className="w-full min-w-0 p-4 sm:p-5 md:p-6 lg:p-8 space-y-4">
@@ -210,6 +271,8 @@ export default function PatientsPage() {
                     hideSearch
                     hidePagination
                     enableRowSelection
+                    quickActions={quickActions}
+                    selectionKey={selectionKey}
                     emptyMessage="No patients registered yet"
                     emptyDescription="Click 'New Patient' to register a patient."
                 />

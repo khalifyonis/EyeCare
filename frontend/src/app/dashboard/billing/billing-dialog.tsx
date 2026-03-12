@@ -120,14 +120,14 @@ export function BillingDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[480px]">
-                <DialogHeader>
+            <DialogContent className="sm:max-w-[480px] bg-background">
+                <DialogHeader className="border-b border-slate-200 dark:border-slate-800 pb-3">
                     <DialogTitle>New Invoice</DialogTitle>
                     <DialogDescription>Create a billing record for a patient.</DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                     <div className="grid gap-2">
-                        <label className="text-xs font-medium text-muted-foreground block mb-1">Patient</label>
+                        <label className="block mb-1 text-sm font-medium text-slate-800 dark:text-slate-100">Patient</label>
                         <Select
                             value={formData.patientId}
                             onValueChange={(v) => setFormData((p) => ({ ...p, patientId: v }))}
@@ -146,7 +146,7 @@ export function BillingDialog({
                         </Select>
                     </div>
                     <div className="grid gap-2">
-                        <label className="text-xs font-medium text-muted-foreground block mb-1">Service type</label>
+                        <label className="block mb-1 text-sm font-medium text-slate-800 dark:text-slate-100">Service type</label>
                         <Select
                             value={formData.serviceType}
                             onValueChange={(v) =>
@@ -166,7 +166,7 @@ export function BillingDialog({
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="grid gap-2">
-                            <label className="text-xs font-medium text-muted-foreground block mb-1">Total amount ($)</label>
+                            <label className="block mb-1 text-sm font-medium text-slate-800 dark:text-slate-100">Total amount ($)</label>
                             <Input
                                 type="number"
                                 min={0}
@@ -179,7 +179,7 @@ export function BillingDialog({
                             />
                         </div>
                         <div className="grid gap-2">
-                            <label className="text-xs font-medium text-muted-foreground block mb-1">Discount ($)</label>
+                            <label className="block mb-1 text-sm font-medium text-slate-800 dark:text-slate-100">Discount ($)</label>
                             <Input
                                 type="number"
                                 min={0}
@@ -192,11 +192,11 @@ export function BillingDialog({
                             />
                         </div>
                     </div>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-slate-600 dark:text-slate-300">
                         Final amount: <strong>${finalAmount.toFixed(2)}</strong>
                     </p>
                 </div>
-                <DialogFooter>
+                <DialogFooter className="border-t border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60">
                     <Button variant="outline" onClick={() => onOpenChange(false)}>
                         Cancel
                     </Button>

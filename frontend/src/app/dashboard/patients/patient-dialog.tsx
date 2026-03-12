@@ -120,40 +120,34 @@ export function PatientDialog({ open, onOpenChange, patient, onSuccess }: Patien
                 <div className="flex-1 overflow-y-auto px-6 py-2 h-[calc(90vh-140px)]">
                     <div className="grid gap-4 py-2">
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Full Name</label>
+                            <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Full name</label>
                             <Input placeholder="e.g. John Doe" value={formData.fullName} onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} className="rounded-xl border-slate-200 focus-visible:ring-[#0EA5E9]" />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 flex items-center gap-1.5">
-                                    <Phone className="h-2.5 w-2.5" /> Contact Number
-                                </label>
+                                <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Contact number</label>
                                 <Input placeholder="+252..." value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="rounded-xl border-slate-200 focus-visible:ring-[#0EA5E9]" />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 flex items-center gap-1.5">
-                                    <Mail className="h-2.5 w-2.5" /> Email
-                                </label>
+                                <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Email</label>
                                 <Input type="email" placeholder="john@example.com" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="rounded-xl border-slate-200 focus-visible:ring-[#0EA5E9]" />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 flex items-center gap-1.5">
-                                    <Calendar className="h-2.5 w-2.5" /> Birth Date
-                                </label>
+                                <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Birth date</label>
                                 <Input type="date" value={formData.dateOfBirth} onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })} className="rounded-xl border-slate-200 focus-visible:ring-[#0EA5E9]" />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 text-slate-600">Gender</label>
+                                <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Gender</label>
                                 <Select
                                     value={formData.gender}
                                     onValueChange={(v) => setFormData({ ...formData, gender: v })}
                                     defaultValue="MALE"
                                 >
-                                    <SelectTrigger className="rounded-xl border-slate-200 focus:ring-[#0EA5E9] bg-white text-slate-700 font-bold">
+                                    <SelectTrigger className="rounded-xl border-slate-200 dark:border-slate-700 focus:ring-[#0EA5E9] bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-100 font-bold">
                                         <SelectValue placeholder="Select Gender" />
                                     </SelectTrigger>
                                     <SelectContent className="rounded-xl bg-white border-2 border-slate-200 shadow-2xl z-[9999]">
@@ -165,15 +159,13 @@ export function PatientDialog({ open, onOpenChange, patient, onSuccess }: Patien
                         </div>
 
                         <div className="space-y-1.5 pb-4">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 flex items-center gap-1.5">
-                                <MapPin className="h-2.5 w-2.5" /> Address
-                            </label>
+                            <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Address</label>
                             <Input placeholder="Mogadishu, Somalia" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} className="rounded-xl border-slate-200 focus-visible:ring-[#0EA5E9]" />
                         </div>
                     </div>
                 </div>
 
-                <DialogFooter className="p-6 pt-2 border-t bg-slate-50/50">
+                <DialogFooter className="p-6 pt-2 border-t bg-slate-50/70 dark:bg-slate-900/60">
                     <Button variant="ghost" onClick={() => onOpenChange(false)} className="rounded-xl font-bold text-slate-500">Cancel</Button>
                     <Button onClick={handleSave} disabled={saving} className="bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold px-8 rounded-xl shadow-lg shadow-blue-500/20">
                         {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}

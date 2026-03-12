@@ -136,6 +136,47 @@ export const deletePharmacyItem = async (req, res, next) => {
     }
 };
 
+export const receivePharmacyStock = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const branchFilter = getBranchFilter(req);
+
+        const item = await prisma.pharmacyItem.findFirst({
+            where: { id, ...branchFilter },
+        });
+        if (!item) return res.status(404).json({ message: 'Pharmacy item not found' });
+
+        const quantity = Number(req.body.quantity);
+        const unitPrice = Number(req.body.unitPrice ?? item.purchasePrice);
+
+        if (!Number.isInteger(quantity) || quantity <= 0) {
+            return res.status(400).json({ message: 'Quantity must be a positive integer' });
+        }
+
+        const [transaction, updated] = await prisma.$transaction([
+            prisma.pharmacyStockTransaction.create({
+                data: {
+                    pharmacyItemId: id,
+                    branchId: item.branchId,
+                    transactionType: 'IN',
+                    quantity,
+                    unitPrice,
+                    performedById: req.user.id,
+                },
+            }),
+            prisma.pharmacyItem.update({
+                where: { id },
+                data: { stockQuantity: { increment: quantity } },
+                include: { branch: { select: { id: true, branchName: true } } },
+            }),
+        ]);
+
+        res.status(200).json({ item: updated, transaction });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const getPharmacyStats = async (req, res, next) => {
     try {
         const branchFilter = getBranchFilter(req);

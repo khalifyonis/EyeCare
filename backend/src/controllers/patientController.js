@@ -228,3 +228,86 @@ export const deletePatient = async (req, res, next) => {
         next(error);
     }
 };
+
+export const getPatientEyeHistory = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const branchFilter = req.user.role === 'SUPERADMIN' || !req.user.branchId
+            ? {}
+            : { branchId: req.user.branchId };
+
+        const patient = await prisma.patient.findFirst({
+            where: { id, ...branchFilter },
+            select: { id: true },
+        });
+        if (!patient) return res.status(404).json({ message: 'Patient not found' });
+
+        const appointments = await prisma.appointment.findMany({
+            where: { patientId: id, ...branchFilter },
+            orderBy: { appointmentDate: 'asc' },
+            include: {
+                doctor: { include: { user: { select: { fullName: true } } } },
+                clinicalExamination: {
+                    include: {
+                        examinedBy: { include: { user: { select: { fullName: true } } } },
+                        surgery: {
+                            include: {
+                                surgeon: { include: { user: { select: { fullName: true } } } },
+                            },
+                        },
+                    },
+                },
+                erExamination: {
+                    include: { recordedBy: { select: { fullName: true } } },
+                },
+            },
+        });
+
+        const refractionHistory = [];
+        const iopHistory = [];
+        const surgeries = [];
+
+        for (const apt of appointments) {
+            if (apt.clinicalExamination) {
+                const ce = apt.clinicalExamination;
+                refractionHistory.push({
+                    date: apt.appointmentDate,
+                    doctorName: ce.examinedBy?.user?.fullName || apt.doctor?.user?.fullName || 'Unknown',
+                    sphRight: ce.sphRight,
+                    cylRight: ce.cylRight,
+                    axisRight: ce.axisRight,
+                    sphLeft: ce.sphLeft,
+                    cylLeft: ce.cylLeft,
+                    axisLeft: ce.axisLeft,
+                    diagnosis: ce.diagnosis,
+                });
+                if (ce.surgery) {
+                    const s = ce.surgery;
+                    surgeries.push({
+                        date: s.surgeryDate,
+                        eyeSide: s.eyeSide,
+                        surgeryType: s.surgeryType,
+                        status: s.status,
+                        surgeonName: s.surgeon?.user?.fullName || 'Unknown',
+                        notes: s.notes,
+                    });
+                }
+            }
+            if (apt.erExamination) {
+                const er = apt.erExamination;
+                iopHistory.push({
+                    date: apt.appointmentDate,
+                    recordedBy: er.recordedBy?.fullName || 'Unknown',
+                    vaRight: er.vaRight,
+                    vaLeft: er.vaLeft,
+                    iopRight: er.iopRight,
+                    iopLeft: er.iopLeft,
+                });
+            }
+        }
+
+        res.status(200).json({ refractionHistory, iopHistory, surgeries });
+    } catch (error) {
+        next(error);
+    }
+};

@@ -130,6 +130,100 @@ export const getBillingById = async (req, res, next) => {
     }
 };
 
+async function deductStockForBilling(itemType, itemId, branchId, quantity, userId, billingId) {
+    if (!itemId) return;
+    if (itemType === 'PHARMACY') {
+        const item = await prisma.pharmacyItem.findUnique({ where: { id: itemId } });
+        if (!item) {
+            const err = new Error('Pharmacy item not found');
+            err.statusCode = 400;
+            throw err;
+        }
+        if (item.stockQuantity < quantity) {
+            const err = new Error(`Insufficient stock: only ${item.stockQuantity} available`);
+            err.statusCode = 400;
+            throw err;
+        }
+        await prisma.pharmacyStockTransaction.create({
+            data: {
+                pharmacyItemId: itemId,
+                branchId,
+                transactionType: 'OUT',
+                quantity,
+                unitPrice: item.sellingPrice,
+                billingId,
+                performedById: userId,
+            },
+        });
+        await prisma.pharmacyItem.update({
+            where: { id: itemId },
+            data: { stockQuantity: { decrement: quantity } },
+        });
+    } else if (itemType === 'OPTICAL') {
+        const item = await prisma.opticalItem.findUnique({ where: { id: itemId } });
+        if (!item) {
+            const err = new Error('Optical item not found');
+            err.statusCode = 400;
+            throw err;
+        }
+        if (item.stockQuantity < quantity) {
+            const err = new Error(`Insufficient stock: only ${item.stockQuantity} available`);
+            err.statusCode = 400;
+            throw err;
+        }
+        await prisma.opticalStockTransaction.create({
+            data: {
+                opticalItemId: itemId,
+                branchId,
+                transactionType: 'OUT',
+                quantity,
+                unitPrice: item.sellingPrice,
+                billingId,
+                performedById: userId,
+            },
+        });
+        await prisma.opticalItem.update({
+            where: { id: itemId },
+            data: { stockQuantity: { decrement: quantity } },
+        });
+    }
+}
+
+async function restoreStockForBilling(itemType, itemId, branchId, quantity, userId) {
+    if (!itemId) return;
+    if (itemType === 'PHARMACY') {
+        await prisma.pharmacyStockTransaction.create({
+            data: {
+                pharmacyItemId: itemId,
+                branchId,
+                transactionType: 'IN',
+                quantity,
+                unitPrice: 0,
+                performedById: userId,
+            },
+        });
+        await prisma.pharmacyItem.update({
+            where: { id: itemId },
+            data: { stockQuantity: { increment: quantity } },
+        });
+    } else if (itemType === 'OPTICAL') {
+        await prisma.opticalStockTransaction.create({
+            data: {
+                opticalItemId: itemId,
+                branchId,
+                transactionType: 'IN',
+                quantity,
+                unitPrice: 0,
+                performedById: userId,
+            },
+        });
+        await prisma.opticalItem.update({
+            where: { id: itemId },
+            data: { stockQuantity: { increment: quantity } },
+        });
+    }
+}
+
 export const createBilling = async (req, res, next) => {
     try {
         const {
@@ -158,6 +252,35 @@ export const createBilling = async (req, res, next) => {
         const disc = Number(discount) || 0;
         const finalAmount = Math.max(0, total - disc);
 
+        if ((serviceType === 'PHARMACY' || serviceType === 'OPTICAL') && prescriptionId) {
+            const prescription = await prisma.prescription.findFirst({
+                where: { id: prescriptionId, branchId: activeBranchId },
+                select: { itemType: true, itemId: true, quantity: true, branchId: true },
+            });
+            if (!prescription) {
+                return res.status(404).json({ message: 'Prescription not found' });
+            }
+            if (prescription.itemId && prescription.quantity > 0) {
+                if (prescription.itemType === 'PHARMACY') {
+                    const item = await prisma.pharmacyItem.findUnique({ where: { id: prescription.itemId } });
+                    if (!item) return res.status(400).json({ message: 'Pharmacy item not found' });
+                    if (item.stockQuantity < prescription.quantity) {
+                        return res.status(400).json({
+                            message: `Insufficient stock: only ${item.stockQuantity} available`,
+                        });
+                    }
+                } else if (prescription.itemType === 'OPTICAL') {
+                    const item = await prisma.opticalItem.findUnique({ where: { id: prescription.itemId } });
+                    if (!item) return res.status(400).json({ message: 'Optical item not found' });
+                    if (item.stockQuantity < prescription.quantity) {
+                        return res.status(400).json({
+                            message: `Insufficient stock: only ${item.stockQuantity} available`,
+                        });
+                    }
+                }
+            }
+        }
+
         const billing = await prisma.billing.create({
             data: {
                 patientId,
@@ -183,6 +306,24 @@ export const createBilling = async (req, res, next) => {
                 createdBy: { select: { id: true, fullName: true } },
             },
         });
+
+        if ((serviceType === 'PHARMACY' || serviceType === 'OPTICAL') && prescriptionId && billing.prescription) {
+            const prescription = await prisma.prescription.findFirst({
+                where: { id: prescriptionId },
+                select: { itemType: true, itemId: true, quantity: true },
+            });
+            if (prescription?.itemId && prescription.quantity > 0) {
+                await deductStockForBilling(
+                    prescription.itemType,
+                    prescription.itemId,
+                    activeBranchId,
+                    prescription.quantity,
+                    req.user.id,
+                    billing.id,
+                );
+            }
+        }
+
         res.status(201).json(billing);
     } catch (error) {
         next(error);
@@ -237,11 +378,27 @@ export const updateBilling = async (req, res, next) => {
 
 export const deleteBilling = async (req, res, next) => {
     try {
-        const existing = await prisma.billing.findUnique({ where: { id: req.params.id } });
+        const existing = await prisma.billing.findUnique({
+            where: { id: req.params.id },
+            include: {
+                prescription: { select: { itemType: true, itemId: true, quantity: true, branchId: true } },
+            },
+        });
         if (!existing) return res.status(404).json({ message: 'Billing not found' });
         if (req.user.role !== 'SUPERADMIN' && existing.branchId !== req.user.branchId) {
             return res.status(403).json({ message: 'Forbidden' });
         }
+
+        if ((existing.serviceType === 'PHARMACY' || existing.serviceType === 'OPTICAL') && existing.prescription?.itemId && existing.prescription.quantity > 0) {
+            await restoreStockForBilling(
+                existing.prescription.itemType,
+                existing.prescription.itemId,
+                existing.prescription.branchId,
+                existing.prescription.quantity,
+                req.user.id,
+            );
+        }
+
         await prisma.billing.delete({ where: { id: req.params.id } });
         res.status(200).json({ message: 'Billing deleted successfully' });
     } catch (error) {

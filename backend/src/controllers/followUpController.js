@@ -1,7 +1,106 @@
-import prisma from '../lib/prisma.js';
+﻿import prisma from '../lib/prisma.js';
 
 const getBranchFilter = (req) =>
     (req.user.role === 'SUPERADMIN' || !req.user.branchId) ? {} : { branchId: req.user.branchId };
+
+export const listAll = async (req, res, next) => {
+    try {
+        const { status = 'all', from, to } = req.query;
+        const branchFilter = getBranchFilter(req);
+
+        let dateFilter = {};
+        if (from && to) {
+            const fromStart = new Date(from);
+            fromStart.setHours(0, 0, 0, 0);
+            const toEnd = new Date(to);
+            toEnd.setHours(23, 59, 59, 999);
+            dateFilter = { dueDate: { gte: fromStart, lte: toEnd } };
+        }
+
+        const where = {
+            ...branchFilter,
+            ...dateFilter,
+            ...(status !== 'all' ? { status } : {}),
+        };
+
+        const [followUps, overdueCount, doneCount, totalCount] = await Promise.all([
+            prisma.followUp.findMany({
+                where,
+                orderBy: { dueDate: 'asc' },
+                take: 500,
+                include: {
+                    patient: { select: { id: true, fullName: true, phone: true } },
+                    branch: { select: { id: true, branchName: true } },
+                },
+            }),
+            prisma.followUp.count({ where: { ...branchFilter, status: 'OVERDUE' } }),
+            prisma.followUp.count({ where: { ...branchFilter, status: 'DONE' } }),
+            prisma.followUp.count({ where: branchFilter }),
+        ]);
+
+        res.status(200).json({
+            followUps,
+            totalCount,
+            overdueCount,
+            doneCount,
+            completionRate: totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const listAll = async (req, res, next) => {
+    try {
+        const { status = 'all', from, to } = req.query;
+        const branchFilter = getBranchFilter(req);
+
+        let dateFilter = {};
+        if (from && to) {
+            const fromStart = new Date(from);
+            fromStart.setHours(0, 0, 0, 0);
+            const toEnd = new Date(to);
+            toEnd.setHours(23, 59, 59, 999);
+            dateFilter = { dueDate: { gte: fromStart, lte: toEnd } };
+        }
+
+        const where = {
+            ...branchFilter,
+            ...dateFilter,
+            ...(status !== 'all' ? { status } : {}),
+        };
+
+        const followUps = await prisma.followUp.findMany({
+            where,
+            orderBy: { dueDate: 'asc' },
+            take: 500,
+            include: {
+                patient: { select: { id: true, fullName: true, phone: true } },
+                branch: { select: { id: true, branchName: true } },
+            },
+        });
+
+        const overdueCount = await prisma.followUp.count({
+            where: { ...branchFilter, status: 'OVERDUE' },
+        });
+
+        const doneCount = await prisma.followUp.count({
+            where: { ...branchFilter, status: 'DONE' },
+        });
+
+        const totalCount = await prisma.followUp.count({ where: branchFilter });
+
+        res.status(200).json({
+            followUps,
+            totalCount,
+            overdueCount,
+            doneCount,
+            completionRate: totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
 
 export const listByPatient = async (req, res, next) => {
     try {
@@ -119,3 +218,4 @@ export const cancel = async (req, res, next) => {
         next(error);
     }
 };
+

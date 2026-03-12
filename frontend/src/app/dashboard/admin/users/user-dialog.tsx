@@ -176,46 +176,46 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px] rounded-2xl max-h-[90vh] flex flex-col overflow-hidden">
-                <DialogHeader>
+            <DialogContent className="sm:max-w-[500px] rounded-2xl max-h-[90vh] flex flex-col overflow-hidden bg-background">
+                <DialogHeader className="border-b border-slate-200 dark:border-slate-800 pb-4">
                     <DialogTitle className="text-xl font-black">{user ? 'Edit User' : 'Register New User'}</DialogTitle>
                     <DialogDescription className="font-medium">
                         {user ? 'Update account details and access roles.' : 'Create a new staff account for the platform.'}
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="grid gap-4 py-4 overflow-y-auto flex-1 min-h-0">
+                <div className="grid gap-4 py-4 px-1 overflow-y-auto flex-1 min-h-0">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Full Name</label>
-                            <Input placeholder="John Doe" value={formData.fullName} onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} className="rounded-xl border-slate-200 focus-visible:ring-[#0EA5E9]" />
+                            <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Full name</label>
+                            <Input placeholder="John Doe" value={formData.fullName} onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} className="rounded-xl border-slate-200 dark:border-slate-700 focus-visible:ring-[#0EA5E9]" />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Username</label>
-                            <Input placeholder="johndoe" value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} className="rounded-xl border-slate-200 focus-visible:ring-[#0EA5E9]" />
+                            <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Username</label>
+                            <Input placeholder="johndoe" value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} className="rounded-xl border-slate-200 dark:border-slate-700 focus-visible:ring-[#0EA5E9]" />
                         </div>
                     </div>
 
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Email Address</label>
-                        <Input type="email" placeholder="john@example.com" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="rounded-xl border-slate-200 focus-visible:ring-[#0EA5E9]" />
+                        <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Email address</label>
+                        <Input type="email" placeholder="john@example.com" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="rounded-xl border-slate-200 dark:border-slate-700 focus-visible:ring-[#0EA5E9]" />
                     </div>
 
                     {!user ? (
-                        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-start gap-3 shadow-sm shadow-emerald-500/5">
+                        <div className="rounded-xl p-4 flex items-start gap-3 border border-emerald-200 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/30 shadow-sm shadow-emerald-500/10">
                             <div className="bg-emerald-500 rounded-full p-1 mt-0.5">
                                 <ShieldCheck className="w-3 h-3 text-white" />
                             </div>
                             <div className="space-y-1">
-                                <p className="text-[10px] font-black text-emerald-900 uppercase tracking-widest">Auto-Security Active</p>
-                                <p className="text-[11px] font-medium text-emerald-700/80 leading-relaxed">
-                                    The system will automatically generate a <span className="font-bold text-emerald-800">secret password</span> and deliver it to the user's Gmail address immediately.
+                                <p className="text-[10px] font-black text-emerald-900 dark:text-emerald-100 uppercase tracking-widest">Auto-Security Active</p>
+                                <p className="text-[11px] font-medium text-emerald-700/90 dark:text-emerald-100/80 leading-relaxed">
+                                    The system will automatically generate a <span className="font-bold text-emerald-800 dark:text-emerald-50">secret password</span> and deliver it to the user's Gmail address immediately.
                                 </p>
                             </div>
                         </div>
                     ) : (
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 text-[#0EA5E9]">Change Password</label>
+                            <label className="text-sm font-medium text-[#0EA5E9]">Change password</label>
                             <div className="relative group">
                                 <Input
                                     type={showPassword ? "text" : "password"}
@@ -236,7 +236,7 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
                     )}
 
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">User Role</label>
+                        <label className="text-sm font-medium text-slate-800 dark:text-slate-100">User role</label>
                         <Select value={formData.roleName} onValueChange={(v) => setFormData({ ...formData, roleName: v })}>
                             <SelectTrigger className="rounded-xl border-slate-200 focus:ring-[#0EA5E9]">
                                 <SelectValue placeholder="Select role" />
@@ -250,7 +250,7 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
                     {isDoctorRole && (
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">License Number</label>
+                                <label className="text-sm font-medium text-slate-800 dark:text-slate-100">License number</label>
                                 <Input
                                     placeholder="DOC-12345"
                                     value={formData.licenseNumber}
@@ -259,7 +259,7 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Specialization</label>
+                                <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Specialization</label>
                                 <Input
                                     placeholder="Ophthalmology"
                                     value={formData.specialization}
@@ -270,9 +270,9 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
                         </div>
                     )}
 
-                    <div className="space-y-1.5 pt-1">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-[#0EA5E9] ml-1">Assign Branches</label>
-                        <div className="border border-slate-200 rounded-xl p-3 bg-slate-50/50 max-h-[160px] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200">
+                        <div className="space-y-1.5 pt-1">
+                        <label className="text-sm font-medium text-[#0EA5E9]">Assign branches</label>
+                        <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-3 bg-slate-50/70 dark:bg-slate-900/40 max-h-[160px] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700">
                             <div className="grid grid-cols-2 gap-2">
                                 {branches.map((b) => (
                                     <label
@@ -284,7 +284,7 @@ export function UserDialog({ open, onOpenChange, user, onSuccess }: UserDialogPr
                                     >
                                         <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all ${formData.branchIds.includes(b.id)
                                             ? 'bg-[#0EA5E9] border-[#0EA5E9] text-white'
-                                            : 'bg-white border-slate-300'
+                                            : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600'
                                             }`}>
                                             {formData.branchIds.includes(b.id) && <Check className="h-3.5 w-3.5 stroke-[3]" />}
                                         </div>

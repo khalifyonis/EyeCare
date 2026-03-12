@@ -5,7 +5,8 @@ import {
     getPatientById,
     updatePatient,
     deletePatient,
-    getPatientStats // Added getPatientStats
+    getPatientStats,
+    getPatientEyeHistory,
 } from '../controllers/patientController.js';
 import { authenticate, authorize } from '../middlewares/authMiddleware.js';
 import validate from '../middlewares/validate.js';
@@ -16,6 +17,7 @@ const router = express.Router();
 // Stats: same roles that can view the list (so the patients page loads without 403)
 router.get('/stats', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), getPatientStats);
 router.get('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), getAllPatients);
+router.get('/:id/eye-history', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), getPatientEyeHistory);
 router.get('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), getPatientById);
 
 // Only creators/managers can add or remove patients

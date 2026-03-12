@@ -5,10 +5,11 @@ import { useParams, useRouter } from 'next/navigation';
 import api from '@/lib/axios';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, ArrowLeft, CalendarPlus, Phone, Mail, MapPin, Activity, Calendar as CalendarIcon, Clock, User, Stethoscope, Scissors } from 'lucide-react';
+import { Loader2, ArrowLeft, CalendarPlus, Phone, Mail, MapPin, Activity, Calendar as CalendarIcon, Clock, User, Stethoscope, Scissors, CalendarCheck, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { AppointmentDialog } from './appointment-dialog';
 import { PageBreadcrumb } from '@/components/dashboard/page-breadcrumb';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 type SurgeryRecord = {
     id: string;
@@ -46,6 +47,51 @@ type AppointmentRecord = {
     erExamination?: ERExaminationRecord | null;
 };
 
+type FollowUpRecord = {
+    id: string;
+    dueDate: string;
+    status: string;
+    sourceType: string;
+    notes?: string | null;
+    branch?: { id: string; branchName: string } | null;
+};
+
+type RefractionRecord = {
+    date: string;
+    doctorName: string;
+    sphRight?: number | string | null;
+    cylRight?: number | string | null;
+    axisRight?: number | null;
+    sphLeft?: number | string | null;
+    cylLeft?: number | string | null;
+    axisLeft?: number | null;
+    diagnosis?: string | null;
+};
+
+type IopRecord = {
+    date: string;
+    recordedBy: string;
+    vaRight?: string | null;
+    vaLeft?: string | null;
+    iopRight?: number | string | null;
+    iopLeft?: number | string | null;
+};
+
+type SurgeryHistoryRecord = {
+    date: string;
+    eyeSide: string;
+    surgeryType: string;
+    status: string;
+    surgeonName: string;
+    notes?: string | null;
+};
+
+type EyeHistory = {
+    refractionHistory: RefractionRecord[];
+    iopHistory: IopRecord[];
+    surgeries: SurgeryHistoryRecord[];
+};
+
 type PatientDetail = {
     id: string;
     fullName?: string | null;
@@ -62,6 +108,13 @@ const money = (value?: number | string | null) => {
     return Number.isFinite(amount) ? amount.toFixed(2) : '0.00';
 };
 
+const fmtRefraction = (v?: number | string | null) => {
+    if (v === null || v === undefined || v === '') return '—';
+    const n = Number(v);
+    if (!Number.isFinite(n)) return '—';
+    return (n >= 0 ? '+' : '') + n.toFixed(2);
+};
+
 const statusClass = (status?: string | null) => {
     const value = (status || 'PENDING').toUpperCase();
     if (value === 'COMPLETED') return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400';
@@ -75,14 +128,23 @@ export default function PatientDetailPage() {
     const id = params.id as string;
 
     const [patient, setPatient] = useState<PatientDetail | null>(null);
+    const [followUps, setFollowUps] = useState<FollowUpRecord[]>([]);
+    const [eyeHistory, setEyeHistory] = useState<EyeHistory>({ refractionHistory: [], iopHistory: [], surgeries: [] });
     const [loading, setLoading] = useState(true);
     const [bookingOpen, setBookingOpen] = useState(false);
+    const [eyeTab, setEyeTab] = useState<'refraction' | 'iop' | 'surgeries' | 'chart'>('refraction');
 
     const fetchPatientDetails = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await api.get(`/patients/${id}`);
-            setPatient(res.data);
+            const [patientRes, followUpsRes, eyeHistoryRes] = await Promise.all([
+                api.get(`/patients/${id}`),
+                api.get(`/follow-ups/patient/${id}?status=all`).catch(() => ({ data: [] })),
+                api.get(`/patients/${id}/eye-history`).catch(() => ({ data: { refractionHistory: [], iopHistory: [], surgeries: [] } })),
+            ]);
+            setPatient(patientRes.data);
+            setFollowUps(Array.isArray(followUpsRes.data) ? followUpsRes.data : []);
+            setEyeHistory(eyeHistoryRes.data || { refractionHistory: [], iopHistory: [], surgeries: [] });
         } catch {
             toast.error('Failed to load patient details');
             router.push('/dashboard/patients');
@@ -304,6 +366,259 @@ export default function PatientDetailPage() {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Follow-ups */}
+            <Card className="shadow-xl border-blue-100/50 dark:border-slate-800">
+                <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-4">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                        <CalendarCheck className="w-5 h-5 text-[#0EA5E9]" />
+                        Follow-ups
+                    </CardTitle>
+                    <CardDescription>Pending and overdue follow-ups. Book an appointment to complete.</CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6">
+                    {followUps.length === 0 ? (
+                        <p className="text-sm text-slate-500 dark:text-slate-400 py-4">No follow-ups on record.</p>
+                    ) : followUps.filter((f) => f.status === 'PENDING' || f.status === 'OVERDUE').length === 0 ? (
+                        <p className="text-sm text-slate-500 dark:text-slate-400 py-4">No pending or overdue follow-ups.</p>
+                    ) : (
+                        <ul className="space-y-3">
+                            {followUps
+                                .filter((f) => f.status === 'PENDING' || f.status === 'OVERDUE')
+                                .map((f) => (
+                                    <li
+                                        key={f.id}
+                                        className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30"
+                                    >
+                                        <div className="flex flex-wrap items-center gap-3">
+                                            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                                {formatDate(f.dueDate)}
+                                            </span>
+                                            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 uppercase tracking-wider">
+                                                {f.sourceType}
+                                            </span>
+                                            {f.status === 'OVERDUE' && (
+                                                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300">
+                                                    Overdue
+                                                </span>
+                                            )}
+                                            {f.notes && (
+                                                <span className="text-xs text-slate-600 dark:text-slate-400 truncate max-w-[200px]">
+                                                    {f.notes}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <Button
+                                            size="sm"
+                                            className="bg-[#0EA5E9] hover:bg-[#0c96d4] text-white text-xs font-bold"
+                                            onClick={() => setBookingOpen(true)}
+                                        >
+                                            <CalendarPlus className="w-3.5 h-3.5 mr-1.5" />
+                                            Book appointment
+                                        </Button>
+                                    </li>
+                                ))}
+                        </ul>
+                    )}
+                </CardContent>
+            </Card>
+
+            {/* Eye History */}
+            <Card className="shadow-xl border-blue-100/50 dark:border-slate-800">
+                <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-4">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                        <Eye className="w-5 h-5 text-[#0EA5E9]" />
+                        Eye History
+                    </CardTitle>
+                    <CardDescription>Refraction, IOP / VA readings, and surgeries over time.</CardDescription>
+                </CardHeader>
+                <CardContent className="pt-4">
+                    {/* Tab bar */}
+                    <div className="flex gap-1 mb-4 flex-wrap">
+                        {([
+                            { key: 'refraction', label: `Refraction (${eyeHistory.refractionHistory.length})` },
+                            { key: 'iop', label: `IOP / VA (${eyeHistory.iopHistory.length})` },
+                            { key: 'surgeries', label: `Surgeries (${eyeHistory.surgeries.length})` },
+                            { key: 'chart', label: 'SPH Trend' },
+                        ] as const).map((t) => (
+                            <button
+                                key={t.key}
+                                onClick={() => setEyeTab(t.key)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                                    eyeTab === t.key
+                                        ? 'bg-[#0EA5E9] text-white shadow'
+                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                }`}
+                            >
+                                {t.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Refraction table */}
+                    {eyeTab === 'refraction' && (
+                        eyeHistory.refractionHistory.length === 0 ? (
+                            <p className="text-sm text-slate-500 dark:text-slate-400 py-6 text-center">No refraction records yet.</p>
+                        ) : (
+                            <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-800">
+                                <table className="w-full text-xs">
+                                    <thead>
+                                        <tr className="bg-slate-50 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                            <th className="px-3 py-2.5 text-left font-semibold">Date</th>
+                                            <th className="px-3 py-2.5 text-left font-semibold">Doctor</th>
+                                            <th className="px-3 py-2.5 text-center font-semibold" colSpan={3}>Right Eye</th>
+                                            <th className="px-3 py-2.5 text-center font-semibold" colSpan={3}>Left Eye</th>
+                                            <th className="px-3 py-2.5 text-left font-semibold">Diagnosis</th>
+                                        </tr>
+                                        <tr className="bg-slate-50/60 dark:bg-slate-900/40 text-slate-400 dark:text-slate-500 text-[10px] uppercase tracking-widest">
+                                            <th className="px-3 pb-2" />
+                                            <th className="px-3 pb-2" />
+                                            <th className="px-3 pb-2 text-center">SPH</th>
+                                            <th className="px-3 pb-2 text-center">CYL</th>
+                                            <th className="px-3 pb-2 text-center">AXIS</th>
+                                            <th className="px-3 pb-2 text-center">SPH</th>
+                                            <th className="px-3 pb-2 text-center">CYL</th>
+                                            <th className="px-3 pb-2 text-center">AXIS</th>
+                                            <th className="px-3 pb-2" />
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                                        {eyeHistory.refractionHistory.map((r, i) => (
+                                            <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-900/30 transition-colors">
+                                                <td className="px-3 py-2.5 font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">{formatDate(r.date)}</td>
+                                                <td className="px-3 py-2.5 text-slate-600 dark:text-slate-300 whitespace-nowrap">Dr. {r.doctorName}</td>
+                                                <td className="px-3 py-2.5 text-center font-mono text-slate-700 dark:text-slate-200">{fmtRefraction(r.sphRight)}</td>
+                                                <td className="px-3 py-2.5 text-center font-mono text-slate-700 dark:text-slate-200">{fmtRefraction(r.cylRight)}</td>
+                                                <td className="px-3 py-2.5 text-center text-slate-600 dark:text-slate-300">{r.axisRight ?? '—'}</td>
+                                                <td className="px-3 py-2.5 text-center font-mono text-slate-700 dark:text-slate-200">{fmtRefraction(r.sphLeft)}</td>
+                                                <td className="px-3 py-2.5 text-center font-mono text-slate-700 dark:text-slate-200">{fmtRefraction(r.cylLeft)}</td>
+                                                <td className="px-3 py-2.5 text-center text-slate-600 dark:text-slate-300">{r.axisLeft ?? '—'}</td>
+                                                <td className="px-3 py-2.5 text-slate-500 dark:text-slate-400 max-w-[180px] truncate">{r.diagnosis || '—'}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )
+                    )}
+
+                    {/* IOP / VA table */}
+                    {eyeTab === 'iop' && (
+                        eyeHistory.iopHistory.length === 0 ? (
+                            <p className="text-sm text-slate-500 dark:text-slate-400 py-6 text-center">No IOP / VA records yet.</p>
+                        ) : (
+                            <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-800">
+                                <table className="w-full text-xs">
+                                    <thead>
+                                        <tr className="bg-slate-50 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                            <th className="px-3 py-2.5 text-left font-semibold">Date</th>
+                                            <th className="px-3 py-2.5 text-left font-semibold">Recorded By</th>
+                                            <th className="px-3 py-2.5 text-center font-semibold">VA Right</th>
+                                            <th className="px-3 py-2.5 text-center font-semibold">VA Left</th>
+                                            <th className="px-3 py-2.5 text-center font-semibold">IOP Right</th>
+                                            <th className="px-3 py-2.5 text-center font-semibold">IOP Left</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                                        {eyeHistory.iopHistory.map((r, i) => (
+                                            <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-900/30 transition-colors">
+                                                <td className="px-3 py-2.5 font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">{formatDate(r.date)}</td>
+                                                <td className="px-3 py-2.5 text-slate-600 dark:text-slate-300">{r.recordedBy}</td>
+                                                <td className="px-3 py-2.5 text-center text-slate-700 dark:text-slate-200">{r.vaRight || '—'}</td>
+                                                <td className="px-3 py-2.5 text-center text-slate-700 dark:text-slate-200">{r.vaLeft || '—'}</td>
+                                                <td className="px-3 py-2.5 text-center font-mono text-slate-700 dark:text-slate-200">{r.iopRight != null ? Number(r.iopRight).toFixed(1) : '—'}</td>
+                                                <td className="px-3 py-2.5 text-center font-mono text-slate-700 dark:text-slate-200">{r.iopLeft != null ? Number(r.iopLeft).toFixed(1) : '—'}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )
+                    )}
+
+                    {/* Surgeries table */}
+                    {eyeTab === 'surgeries' && (
+                        eyeHistory.surgeries.length === 0 ? (
+                            <p className="text-sm text-slate-500 dark:text-slate-400 py-6 text-center">No surgeries on record.</p>
+                        ) : (
+                            <div className="overflow-x-auto rounded-xl border border-slate-100 dark:border-slate-800">
+                                <table className="w-full text-xs">
+                                    <thead>
+                                        <tr className="bg-slate-50 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                            <th className="px-3 py-2.5 text-left font-semibold">Date</th>
+                                            <th className="px-3 py-2.5 text-left font-semibold">Type</th>
+                                            <th className="px-3 py-2.5 text-center font-semibold">Eye</th>
+                                            <th className="px-3 py-2.5 text-center font-semibold">Status</th>
+                                            <th className="px-3 py-2.5 text-left font-semibold">Surgeon</th>
+                                            <th className="px-3 py-2.5 text-left font-semibold">Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                                        {eyeHistory.surgeries.map((s, i) => (
+                                            <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-900/30 transition-colors">
+                                                <td className="px-3 py-2.5 font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">{formatDate(s.date)}</td>
+                                                <td className="px-3 py-2.5 text-slate-700 dark:text-slate-200">{s.surgeryType}</td>
+                                                <td className="px-3 py-2.5 text-center">
+                                                    <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 font-bold uppercase text-[10px]">
+                                                        {s.eyeSide}
+                                                    </span>
+                                                </td>
+                                                <td className="px-3 py-2.5 text-center">
+                                                    <span className={`px-2 py-0.5 rounded-full font-bold uppercase text-[10px] ${
+                                                        s.status === 'COMPLETED'
+                                                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+                                                            : s.status === 'CANCELLED'
+                                                            ? 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                                                            : 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+                                                    }`}>
+                                                        {s.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-3 py-2.5 text-slate-600 dark:text-slate-300 whitespace-nowrap">Dr. {s.surgeonName}</td>
+                                                <td className="px-3 py-2.5 text-slate-500 dark:text-slate-400 max-w-[160px] truncate">{s.notes || '—'}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )
+                    )}
+
+                    {/* SPH Trend Chart */}
+                    {eyeTab === 'chart' && (
+                        eyeHistory.refractionHistory.length < 2 ? (
+                            <p className="text-sm text-slate-500 dark:text-slate-400 py-6 text-center">
+                                At least 2 refraction records are needed to display the trend chart.
+                            </p>
+                        ) : (
+                            <div className="pt-2">
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">SPH values over time (Right eye = blue, Left eye = purple)</p>
+                                <ResponsiveContainer width="100%" height={220}>
+                                    <LineChart
+                                        data={eyeHistory.refractionHistory.map((r) => ({
+                                            date: formatDate(r.date),
+                                            sphR: r.sphRight != null ? Number(r.sphRight) : null,
+                                            sphL: r.sphLeft != null ? Number(r.sphLeft) : null,
+                                        }))}
+                                        margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                                        <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+                                        <YAxis tick={{ fontSize: 10 }} />
+                                        <Tooltip
+                                            contentStyle={{ fontSize: 11, borderRadius: 8 }}
+                                            formatter={(val: unknown) => fmtRefraction(val as number)}
+                                        />
+                                        <Legend wrapperStyle={{ fontSize: 11 }} />
+                                        <Line type="monotone" dataKey="sphR" name="SPH Right" stroke="#0EA5E9" strokeWidth={2} dot={{ r: 4 }} connectNulls />
+                                        <Line type="monotone" dataKey="sphL" name="SPH Left" stroke="#8B5CF6" strokeWidth={2} dot={{ r: 4 }} connectNulls />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )
+                    )}
+                </CardContent>
+            </Card>
 
             <AppointmentDialog
                 open={bookingOpen}

@@ -15,7 +15,24 @@ export const getDashboardStats = async (req, res, next) => {
         const branchFilter = (req.user.role === 'SUPERADMIN' || !req.user.branchId) ? {} : { branchId: req.user.branchId };
         const today = todayRange();
 
-        const [totalPatients, appointmentsToday, totalDoctors, totalExams, recentPatients, recentAppointments] = await Promise.all([
+        const now = moment();
+        const startOfToday = now.clone().startOf('day').toDate();
+        const endOfWeek = now.clone().add(7, 'days').toDate();
+        const dueFollowUpsWhere = {
+            ...branchFilter,
+            status: 'PENDING',
+            dueDate: { gte: startOfToday, lte: endOfWeek },
+        };
+        const overdueFollowUpsWhere = {
+            ...branchFilter,
+            status: 'PENDING',
+            dueDate: { lt: startOfToday },
+        };
+
+        const in30Days = moment().add(30, 'days').endOf('day').toDate();
+        const expiryWindow = { gt: new Date(), lte: in30Days };
+
+        const [totalPatients, appointmentsToday, totalDoctors, totalExams, recentPatients, recentAppointments, dueFollowUps, overdueFollowUpsCount, pharmacyItems, opticalItems, expiringPharmacy] = await Promise.all([
             prisma.patient.count({ where: branchFilter }),
             prisma.appointment.count({ where: { ...branchFilter, appointmentDate: today } }),
             prisma.doctor.count({ where: branchFilter }),
@@ -25,9 +42,44 @@ export const getDashboardStats = async (req, res, next) => {
                 where: branchFilter, orderBy: { appointmentDate: 'desc' }, take: 5,
                 include: { patient: { select: { fullName: true } }, doctor: { include: { user: { select: { fullName: true } } } } },
             }),
+            prisma.followUp.findMany({
+                where: dueFollowUpsWhere,
+                orderBy: { dueDate: 'asc' },
+                take: 10,
+                include: { patient: { select: { id: true, fullName: true, phone: true } }, branch: { select: { branchName: true } } },
+            }),
+            prisma.followUp.count({ where: overdueFollowUpsWhere }),
+            prisma.pharmacyItem.findMany({ where: { ...branchFilter, isActive: true }, select: { id: true, itemName: true, itemType: true, stockQuantity: true, reorderLevel: true } }),
+            prisma.opticalItem.findMany({ where: { ...branchFilter, isActive: true }, select: { id: true, itemName: true, itemType: true, brand: true, stockQuantity: true, reorderLevel: true } }),
+            prisma.pharmacyItem.findMany({
+                where: { ...branchFilter, isActive: true, expiryDate: expiryWindow },
+                orderBy: { expiryDate: 'asc' },
+                take: 10,
+                select: { id: true, itemName: true, itemType: true, stockQuantity: true, expiryDate: true },
+            }),
         ]);
 
-        res.status(200).json({ totalPatients, appointmentsToday, totalDoctors, totalExams, recentPatients, recentAppointments });
+        const pharmacyLowStock = pharmacyItems.filter(i => i.stockQuantity <= i.reorderLevel);
+        const opticalLowStock = opticalItems.filter(i => i.stockQuantity <= i.reorderLevel);
+
+        res.status(200).json({
+            totalPatients,
+            appointmentsToday,
+            totalDoctors,
+            totalExams,
+            recentPatients,
+            recentAppointments,
+            dueFollowUps,
+            overdueFollowUpsCount,
+            inventoryAlerts: {
+                pharmacyLowStockCount: pharmacyLowStock.length,
+                opticalLowStockCount: opticalLowStock.length,
+                pharmacyLowStock: pharmacyLowStock.slice(0, 6).map(i => ({ id: i.id, itemName: i.itemName, itemType: i.itemType, stockQuantity: i.stockQuantity, reorderLevel: i.reorderLevel, category: 'pharmacy' })),
+                opticalLowStock: opticalLowStock.slice(0, 6).map(i => ({ id: i.id, itemName: i.itemName, itemType: i.itemType || i.brand, stockQuantity: i.stockQuantity, reorderLevel: i.reorderLevel, category: 'optical' })),
+                expiringPharmacy: expiringPharmacy.map(i => ({ id: i.id, itemName: i.itemName, itemType: i.itemType, stockQuantity: i.stockQuantity, expiryDate: i.expiryDate })),
+                expiringCount: expiringPharmacy.length,
+            },
+        });
     } catch (error) {
         next(error);
     }
@@ -144,11 +196,10 @@ export const getPharmacistDashboard = async (req, res, next) => {
     try {
         const branchFilter = req.user.branchId ? { branchId: req.user.branchId } : {};
         const today = todayRange();
+        const in30Days = moment().add(30, 'days').endOf('day').toDate();
 
-        const allItems = await prisma.pharmacyItem.findMany({ where: { ...branchFilter, isActive: true } });
-        const lowStockList = allItems.filter(i => i.stockQuantity <= i.reorderLevel);
-
-        const [prescriptionsToday, revenueToday, recentPrescriptions] = await Promise.all([
+        const [allItems, prescriptionsToday, revenueToday, recentPrescriptions, expiringItems] = await Promise.all([
+            prisma.pharmacyItem.findMany({ where: { ...branchFilter, isActive: true } }),
             prisma.prescription.count({ where: { ...branchFilter, itemType: 'PHARMACY', createdAt: today } }),
             prisma.billing.aggregate({
                 where: { ...branchFilter, serviceType: 'PHARMACY', createdAt: today },
@@ -160,7 +211,15 @@ export const getPharmacistDashboard = async (req, res, next) => {
                 take: 8,
                 include: { appointment: { include: { patient: { select: { fullName: true } } } } },
             }),
+            prisma.pharmacyItem.findMany({
+                where: { ...branchFilter, isActive: true, expiryDate: { gt: new Date(), lte: in30Days } },
+                orderBy: { expiryDate: 'asc' },
+                take: 8,
+                select: { id: true, itemName: true, itemType: true, stockQuantity: true, expiryDate: true },
+            }),
         ]);
+
+        const lowStockList = allItems.filter(i => i.stockQuantity <= i.reorderLevel);
 
         res.json({
             prescriptionsToday,
@@ -175,6 +234,14 @@ export const getPharmacistDashboard = async (req, res, next) => {
                 stockQuantity: i.stockQuantity,
                 reorderLevel: i.reorderLevel,
             })),
+            expiringItems: expiringItems.map(i => ({
+                id: i.id,
+                itemName: i.itemName,
+                itemType: i.itemType,
+                stockQuantity: i.stockQuantity,
+                expiryDate: i.expiryDate,
+            })),
+            expiringCount: expiringItems.length,
         });
     } catch (error) {
         next(error);

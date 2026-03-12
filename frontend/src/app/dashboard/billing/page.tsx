@@ -42,10 +42,11 @@ export default function BillingPage() {
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
-    const pageSize = 20;
+    const [pageSize, setPageSize] = useState(20);
     const [createOpen, setCreateOpen] = useState(false);
     const [paymentOpen, setPaymentOpen] = useState(false);
     const [selectedBilling, setSelectedBilling] = useState<BillingRow | null>(null);
+    const [selectionKey, setSelectionKey] = useState(0);
 
     useEffect(() => {
         setRole(resolveRoleName(readStoredUser()));
@@ -93,7 +94,7 @@ export default function BillingPage() {
                 setLoading(false);
             }
         },
-        []
+        [pageSize]
     );
 
     useEffect(() => {
@@ -133,6 +134,58 @@ export default function BillingPage() {
         [search, statusFilter, serviceTypeFilter, dateFilter, page, fetchRows, fetchStats]
     );
 
+    const handleDeleteSelected = async (selected: BillingRow[]) => {
+        if (selected.length === 0) return;
+        if (!confirm(`Delete ${selected.length} selected invoice(s)? This cannot be undone.`)) return;
+        let done = 0;
+        let failed = 0;
+        for (const row of selected) {
+            try {
+                await api.delete(`/billing/${row.id}`);
+                done++;
+            } catch {
+                failed++;
+            }
+        }
+        if (done) {
+            toast.success(failed ? `Deleted ${done} invoice(s). ${failed} failed.` : `Deleted ${done} invoice(s).`);
+            setSelectionKey((k) => k + 1);
+            fetchRows(search, statusFilter, serviceTypeFilter, dateFilter, page);
+            fetchStats();
+        }
+        if (failed) {
+            toast.error(`Failed to delete ${failed} invoice(s).`);
+        }
+    };
+
+    const handleExportSelected = (selected: BillingRow[]) => {
+        if (selected.length === 0) return;
+        const headers = ['Invoice #', 'Patient', 'Service type', 'Status', 'Total', 'Date'];
+        const escape = (v: string) => (v.includes(',') || v.includes('"') ? `"${v.replace(/"/g, '""')}"` : v);
+        const rowsCsv = selected.map((r) => {
+            const patient = r.patient?.fullName || '';
+            const date = r.createdAt || '';
+            const total = typeof r.totalAmount === 'number' ? r.totalAmount.toFixed(2) : String(r.totalAmount || '');
+            return [
+                escape(r.referenceNumber || r.id?.slice(0, 8) || ''),
+                escape(patient),
+                escape(r.serviceType || ''),
+                escape(r.status || ''),
+                escape(total),
+                escape(date),
+            ].join(',');
+        });
+        const csv = [headers.join(','), ...rowsCsv].join('\r\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `billing-selected-${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+        toast.success(`Downloaded ${selected.length} item${selected.length === 1 ? '' : 's'}.`);
+    };
+
     const columns = useMemo(
         () =>
             getBillingColumns({
@@ -147,6 +200,11 @@ export default function BillingPage() {
         fetchRows(search, statusFilter, serviceTypeFilter, dateFilter, page);
         fetchStats();
     };
+
+    const quickActions = [
+        { id: 'delete', label: 'Delete selected', onClick: handleDeleteSelected, variant: 'destructive' as const },
+        { id: 'download', label: 'Download selected', onClick: handleExportSelected, variant: 'default' as const },
+    ];
 
     return (
         <div className="w-full min-w-0 p-4 sm:p-5 md:p-6 lg:p-8 space-y-4">
@@ -246,6 +304,8 @@ export default function BillingPage() {
                     hideSearch
                     hidePagination
                     enableRowSelection
+                    quickActions={quickActions}
+                    selectionKey={selectionKey}
                     emptyMessage="No invoices yet"
                     emptyDescription="Click 'New invoice' to create your first billing record."
                 />
@@ -255,6 +315,7 @@ export default function BillingPage() {
                     total={total}
                     totalPages={totalPages}
                     onPageChange={setPage}
+                    onLimitChange={(limit) => { setPageSize(limit); setPage(1); }}
                     disabled={loading}
                 />
             </div>
