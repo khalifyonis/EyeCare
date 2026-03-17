@@ -47,8 +47,27 @@ model Branch {
   opticalTransactions    OpticalStockTransaction[]
   billings              Billing[]
   followUps             FollowUp[]
+  suppliers             Supplier[]
+  activityLogs          ActivityLog[]
 
   @@map("clinic_branch")
+}
+
+model Supplier {
+  id             String         @id @default(uuid())
+  branchId       String         @map("branch_id")
+  branch         Branch         @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  name           String
+  phone          String?
+  email          String?
+  address        String?
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  pharmacyItems  PharmacyItem[]
+  opticalItems   OpticalItem[]
+
+  @@index([branchId])
+  @@map("suppliers")
 }
 
 model User {
@@ -81,10 +100,30 @@ model User {
   opticalTransactions  OpticalStockTransaction[] @relation("PerformedBy")
   createdBillings      Billing[] @relation("CreatedBy")
   staffAssignments     StaffAssignment[]
+  activityLogs        ActivityLog[]
 
   @@index([branchId])
   @@index([roleId])
   @@map("users")
+}
+
+model ActivityLog {
+  id          String   @id @default(uuid())
+  branchId    String   @map("branch_id")
+  branch      Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action      String   // LOGIN, CREATED, UPDATED, DELETED
+  entityType  String   @map("entity_type") // Billing, Patient, User, etc.
+  entityId    String?  @map("entity_id")
+  details     String?  // optional JSON or summary
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([branchId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([entityType])
+  @@map("activity_logs")
 }
 
 model Doctor {
@@ -297,12 +336,14 @@ model PharmacyItem {
   id              String   @id @default(uuid())
   branchId        String   @map("branch_id")
   branch          Branch   @relation(fields: [branchId], references: [id])
+  supplierId      String?  @map("supplier_id")
+  supplier        Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
   
   itemName        String   @map("item_name")
   itemType        String?  @map("item_type") // Tablet, Syrup, etc.
   category        String?  // Antibiotic, Painkiller, etc.
   manufacturer    String?  // Cidda samaysay
-  supplierName    String?  @map("supplier_name") // Cidda laga soo iibiyey
+  supplierName    String?  @map("supplier_name") // denormalized for display
   batchNumber     String?  @map("batch_number")
   stockQuantity   Int      @default(0) @map("stock_quantity")
   reorderLevel    Int      @default(10) @map("reorder_level")
@@ -320,6 +361,7 @@ model PharmacyItem {
 
   @@unique([branchId, itemName, batchNumber])
   @@index([branchId])
+  @@index([supplierId])
   @@index([category])
   @@index([expiryDate])
   @@map("pharmacy_items")
@@ -354,12 +396,14 @@ model OpticalItem {
   id              String   @id @default(uuid())
   branchId        String   @map("branch_id")
   branch          Branch   @relation(fields: [branchId], references: [id])
+  supplierId      String?  @map("supplier_id")
+  supplier        Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
   
   itemName        String   @map("item_name")
   itemType        String?  @map("item_type") // Frame, Lens, Solution
   brand           String?
   manufacturer    String?  // Cidda samaysay
-  supplierName    String?  @map("supplier_name") // Cidda laga soo iibiyey
+  supplierName    String?  @map("supplier_name") // denormalized for display
   stockQuantity   Int      @default(0) @map("stock_quantity")
   reorderLevel    Int      @default(5) @map("reorder_level")
   purchasePrice   Decimal  @map("purchase_price") @db.Decimal(10, 2)
@@ -375,6 +419,7 @@ model OpticalItem {
 
   @@unique([branchId, itemName, brand])
   @@index([branchId])
+  @@index([supplierId])
   @@map("optical_items")
 }
 

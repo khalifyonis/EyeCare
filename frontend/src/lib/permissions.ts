@@ -18,6 +18,8 @@ export const ROUTE_ACCESS: AllowedRoute[] = [
     { prefix: '/dashboard/inventory/pharmacy', roles: ['ADMIN', 'SUPERADMIN', 'PHARMACIST'] },
     { prefix: '/dashboard/inventory/optical', roles: ['ADMIN', 'SUPERADMIN', 'OPTICIAN'] },
     { prefix: '/dashboard/reports', roles: ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
+    { prefix: '/dashboard/suppliers', roles: ['ADMIN', 'SUPERADMIN', 'PHARMACIST', 'OPTICIAN'] },
+    { prefix: '/dashboard/activity-log', roles: ['ADMIN', 'SUPERADMIN'] },
     { prefix: '/dashboard/profile', roles: ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
     { prefix: '/dashboard/branch-switch', roles: ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
 ]

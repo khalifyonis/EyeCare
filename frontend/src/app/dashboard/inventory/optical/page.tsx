@@ -9,6 +9,8 @@ import { DataTable } from '@/components/ui/data-table';
 import { getOpticalColumns, type OpticalRow } from './columns';
 import { OpticalItemDialog } from './optical-item-dialog';
 import { ReceiveStockDialog } from '../receive-stock-dialog';
+import { TransactionHistoryDialog } from '../transaction-history-dialog';
+import { AdjustStockDialog } from '../adjust-stock-dialog';
 import { toast } from 'sonner';
 import { StatsCard } from '@/components/dashboard/stats-card';
 import { PageBreadcrumb } from '@/components/dashboard/page-breadcrumb';
@@ -31,6 +33,10 @@ export default function OpticalInventoryPage() {
     const [selectionKey, setSelectionKey] = useState(0);
     const [receiveOpen, setReceiveOpen] = useState(false);
     const [receivingItem, setReceivingItem] = useState<OpticalRow | null>(null);
+    const [historyOpen, setHistoryOpen] = useState(false);
+    const [historyItem, setHistoryItem] = useState<OpticalRow | null>(null);
+    const [adjustOpen, setAdjustOpen] = useState(false);
+    const [adjustingItem, setAdjustingItem] = useState<OpticalRow | null>(null);
 
     const fetchStats = useCallback(async () => {
         try {
@@ -91,6 +97,16 @@ export default function OpticalInventoryPage() {
     const handleReceive = (row: OpticalRow) => {
         setReceivingItem(row);
         setReceiveOpen(true);
+    };
+
+    const handleHistory = (row: OpticalRow) => {
+        setHistoryItem(row);
+        setHistoryOpen(true);
+    };
+
+    const handleAdjust = (row: OpticalRow) => {
+        setAdjustingItem(row);
+        setAdjustOpen(true);
     };
 
     const handleDelete = useCallback(
@@ -167,6 +183,8 @@ export default function OpticalInventoryPage() {
                 onEdit: handleEdit,
                 onDelete: handleDelete,
                 onReceive: handleReceive,
+                onHistory: handleHistory,
+                onAdjust: handleAdjust,
             }),
         [handleDelete]
     );
@@ -276,6 +294,25 @@ export default function OpticalInventoryPage() {
                 inventoryType="optical"
                 currentStock={receivingItem?.stockQuantity}
                 purchasePrice={receivingItem?.purchasePrice}
+                onSuccess={refresh}
+            />
+
+            <TransactionHistoryDialog
+                open={historyOpen}
+                onOpenChange={setHistoryOpen}
+                itemId={historyItem?.id ?? null}
+                itemName={historyItem?.itemName ?? ''}
+                inventoryType="optical"
+            />
+
+            <AdjustStockDialog
+                open={adjustOpen}
+                onOpenChange={setAdjustOpen}
+                itemId={adjustingItem?.id ?? null}
+                itemName={adjustingItem?.itemName ?? ''}
+                inventoryType="optical"
+                currentStock={adjustingItem?.stockQuantity}
+                purchasePrice={adjustingItem?.purchasePrice}
                 onSuccess={refresh}
             />
         </div>

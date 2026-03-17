@@ -24,10 +24,20 @@ export type Role = $Result.DefaultSelection<Prisma.$RolePayload>
  */
 export type Branch = $Result.DefaultSelection<Prisma.$BranchPayload>
 /**
+ * Model Supplier
+ * 
+ */
+export type Supplier = $Result.DefaultSelection<Prisma.$SupplierPayload>
+/**
  * Model User
  * 
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
+/**
+ * Model ActivityLog
+ * 
+ */
+export type ActivityLog = $Result.DefaultSelection<Prisma.$ActivityLogPayload>
 /**
  * Model Doctor
  * 
@@ -311,6 +321,16 @@ export class PrismaClient<
   get branch(): Prisma.BranchDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.supplier`: Exposes CRUD operations for the **Supplier** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Suppliers
+    * const suppliers = await prisma.supplier.findMany()
+    * ```
+    */
+  get supplier(): Prisma.SupplierDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.user`: Exposes CRUD operations for the **User** model.
     * Example usage:
     * ```ts
@@ -319,6 +339,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.activityLog`: Exposes CRUD operations for the **ActivityLog** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ActivityLogs
+    * const activityLogs = await prisma.activityLog.findMany()
+    * ```
+    */
+  get activityLog(): Prisma.ActivityLogDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.doctor`: Exposes CRUD operations for the **Doctor** model.
@@ -902,7 +932,9 @@ export namespace Prisma {
   export const ModelName: {
     Role: 'Role',
     Branch: 'Branch',
+    Supplier: 'Supplier',
     User: 'User',
+    ActivityLog: 'ActivityLog',
     Doctor: 'Doctor',
     Patient: 'Patient',
     Appointment: 'Appointment',
@@ -935,7 +967,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "role" | "branch" | "user" | "doctor" | "patient" | "appointment" | "eRExamination" | "clinicalExamination" | "surgery" | "prescription" | "pharmacyItem" | "pharmacyStockTransaction" | "opticalItem" | "opticalStockTransaction" | "billing" | "followUp" | "staffAssignment"
+      modelProps: "role" | "branch" | "supplier" | "user" | "activityLog" | "doctor" | "patient" | "appointment" | "eRExamination" | "clinicalExamination" | "surgery" | "prescription" | "pharmacyItem" | "pharmacyStockTransaction" | "opticalItem" | "opticalStockTransaction" | "billing" | "followUp" | "staffAssignment"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1087,6 +1119,80 @@ export namespace Prisma {
           }
         }
       }
+      Supplier: {
+        payload: Prisma.$SupplierPayload<ExtArgs>
+        fields: Prisma.SupplierFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SupplierFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupplierPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SupplierFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupplierPayload>
+          }
+          findFirst: {
+            args: Prisma.SupplierFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupplierPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SupplierFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupplierPayload>
+          }
+          findMany: {
+            args: Prisma.SupplierFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupplierPayload>[]
+          }
+          create: {
+            args: Prisma.SupplierCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupplierPayload>
+          }
+          createMany: {
+            args: Prisma.SupplierCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SupplierCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupplierPayload>[]
+          }
+          delete: {
+            args: Prisma.SupplierDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupplierPayload>
+          }
+          update: {
+            args: Prisma.SupplierUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupplierPayload>
+          }
+          deleteMany: {
+            args: Prisma.SupplierDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SupplierUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SupplierUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupplierPayload>[]
+          }
+          upsert: {
+            args: Prisma.SupplierUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupplierPayload>
+          }
+          aggregate: {
+            args: Prisma.SupplierAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSupplier>
+          }
+          groupBy: {
+            args: Prisma.SupplierGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SupplierGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SupplierCountArgs<ExtArgs>
+            result: $Utils.Optional<SupplierCountAggregateOutputType> | number
+          }
+        }
+      }
       User: {
         payload: Prisma.$UserPayload<ExtArgs>
         fields: Prisma.UserFieldRefs
@@ -1158,6 +1264,80 @@ export namespace Prisma {
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
+          }
+        }
+      }
+      ActivityLog: {
+        payload: Prisma.$ActivityLogPayload<ExtArgs>
+        fields: Prisma.ActivityLogFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ActivityLogFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityLogPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ActivityLogFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityLogPayload>
+          }
+          findFirst: {
+            args: Prisma.ActivityLogFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityLogPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ActivityLogFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityLogPayload>
+          }
+          findMany: {
+            args: Prisma.ActivityLogFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityLogPayload>[]
+          }
+          create: {
+            args: Prisma.ActivityLogCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityLogPayload>
+          }
+          createMany: {
+            args: Prisma.ActivityLogCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ActivityLogCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityLogPayload>[]
+          }
+          delete: {
+            args: Prisma.ActivityLogDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityLogPayload>
+          }
+          update: {
+            args: Prisma.ActivityLogUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityLogPayload>
+          }
+          deleteMany: {
+            args: Prisma.ActivityLogDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ActivityLogUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ActivityLogUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityLogPayload>[]
+          }
+          upsert: {
+            args: Prisma.ActivityLogUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityLogPayload>
+          }
+          aggregate: {
+            args: Prisma.ActivityLogAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateActivityLog>
+          }
+          groupBy: {
+            args: Prisma.ActivityLogGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ActivityLogGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ActivityLogCountArgs<ExtArgs>
+            result: $Utils.Optional<ActivityLogCountAggregateOutputType> | number
           }
         }
       }
@@ -2295,7 +2475,9 @@ export namespace Prisma {
   export type GlobalOmitConfig = {
     role?: RoleOmit
     branch?: BranchOmit
+    supplier?: SupplierOmit
     user?: UserOmit
+    activityLog?: ActivityLogOmit
     doctor?: DoctorOmit
     patient?: PatientOmit
     appointment?: AppointmentOmit
@@ -2434,6 +2616,8 @@ export namespace Prisma {
     opticalTransactions: number
     billings: number
     followUps: number
+    suppliers: number
+    activityLogs: number
   }
 
   export type BranchCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2450,6 +2634,8 @@ export namespace Prisma {
     opticalTransactions?: boolean | BranchCountOutputTypeCountOpticalTransactionsArgs
     billings?: boolean | BranchCountOutputTypeCountBillingsArgs
     followUps?: boolean | BranchCountOutputTypeCountFollowUpsArgs
+    suppliers?: boolean | BranchCountOutputTypeCountSuppliersArgs
+    activityLogs?: boolean | BranchCountOutputTypeCountActivityLogsArgs
   }
 
   // Custom InputTypes
@@ -2554,6 +2740,60 @@ export namespace Prisma {
     where?: FollowUpWhereInput
   }
 
+  /**
+   * BranchCountOutputType without action
+   */
+  export type BranchCountOutputTypeCountSuppliersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SupplierWhereInput
+  }
+
+  /**
+   * BranchCountOutputType without action
+   */
+  export type BranchCountOutputTypeCountActivityLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ActivityLogWhereInput
+  }
+
+
+  /**
+   * Count Type SupplierCountOutputType
+   */
+
+  export type SupplierCountOutputType = {
+    pharmacyItems: number
+    opticalItems: number
+  }
+
+  export type SupplierCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    pharmacyItems?: boolean | SupplierCountOutputTypeCountPharmacyItemsArgs
+    opticalItems?: boolean | SupplierCountOutputTypeCountOpticalItemsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * SupplierCountOutputType without action
+   */
+  export type SupplierCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SupplierCountOutputType
+     */
+    select?: SupplierCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * SupplierCountOutputType without action
+   */
+  export type SupplierCountOutputTypeCountPharmacyItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PharmacyItemWhereInput
+  }
+
+  /**
+   * SupplierCountOutputType without action
+   */
+  export type SupplierCountOutputTypeCountOpticalItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OpticalItemWhereInput
+  }
+
 
   /**
    * Count Type UserCountOutputType
@@ -2566,6 +2806,7 @@ export namespace Prisma {
     opticalTransactions: number
     createdBillings: number
     staffAssignments: number
+    activityLogs: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2575,6 +2816,7 @@ export namespace Prisma {
     opticalTransactions?: boolean | UserCountOutputTypeCountOpticalTransactionsArgs
     createdBillings?: boolean | UserCountOutputTypeCountCreatedBillingsArgs
     staffAssignments?: boolean | UserCountOutputTypeCountStaffAssignmentsArgs
+    activityLogs?: boolean | UserCountOutputTypeCountActivityLogsArgs
   }
 
   // Custom InputTypes
@@ -2628,6 +2870,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountStaffAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: StaffAssignmentWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountActivityLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ActivityLogWhereInput
   }
 
 
@@ -4241,6 +4490,8 @@ export namespace Prisma {
     opticalTransactions?: boolean | Branch$opticalTransactionsArgs<ExtArgs>
     billings?: boolean | Branch$billingsArgs<ExtArgs>
     followUps?: boolean | Branch$followUpsArgs<ExtArgs>
+    suppliers?: boolean | Branch$suppliersArgs<ExtArgs>
+    activityLogs?: boolean | Branch$activityLogsArgs<ExtArgs>
     _count?: boolean | BranchCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["branch"]>
 
@@ -4289,6 +4540,8 @@ export namespace Prisma {
     opticalTransactions?: boolean | Branch$opticalTransactionsArgs<ExtArgs>
     billings?: boolean | Branch$billingsArgs<ExtArgs>
     followUps?: boolean | Branch$followUpsArgs<ExtArgs>
+    suppliers?: boolean | Branch$suppliersArgs<ExtArgs>
+    activityLogs?: boolean | Branch$activityLogsArgs<ExtArgs>
     _count?: boolean | BranchCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type BranchIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -4310,6 +4563,8 @@ export namespace Prisma {
       opticalTransactions: Prisma.$OpticalStockTransactionPayload<ExtArgs>[]
       billings: Prisma.$BillingPayload<ExtArgs>[]
       followUps: Prisma.$FollowUpPayload<ExtArgs>[]
+      suppliers: Prisma.$SupplierPayload<ExtArgs>[]
+      activityLogs: Prisma.$ActivityLogPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4726,6 +4981,8 @@ export namespace Prisma {
     opticalTransactions<T extends Branch$opticalTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$opticalTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpticalStockTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     billings<T extends Branch$billingsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$billingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     followUps<T extends Branch$followUpsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$followUpsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    suppliers<T extends Branch$suppliersArgs<ExtArgs> = {}>(args?: Subset<T, Branch$suppliersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    activityLogs<T extends Branch$activityLogsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$activityLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5462,6 +5719,54 @@ export namespace Prisma {
   }
 
   /**
+   * Branch.suppliers
+   */
+  export type Branch$suppliersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Supplier
+     */
+    select?: SupplierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Supplier
+     */
+    omit?: SupplierOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SupplierInclude<ExtArgs> | null
+    where?: SupplierWhereInput
+    orderBy?: SupplierOrderByWithRelationInput | SupplierOrderByWithRelationInput[]
+    cursor?: SupplierWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SupplierScalarFieldEnum | SupplierScalarFieldEnum[]
+  }
+
+  /**
+   * Branch.activityLogs
+   */
+  export type Branch$activityLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityLog
+     */
+    select?: ActivityLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityLog
+     */
+    omit?: ActivityLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityLogInclude<ExtArgs> | null
+    where?: ActivityLogWhereInput
+    orderBy?: ActivityLogOrderByWithRelationInput | ActivityLogOrderByWithRelationInput[]
+    cursor?: ActivityLogWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ActivityLogScalarFieldEnum | ActivityLogScalarFieldEnum[]
+  }
+
+  /**
    * Branch without action
    */
   export type BranchDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5477,6 +5782,1161 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: BranchInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Supplier
+   */
+
+  export type AggregateSupplier = {
+    _count: SupplierCountAggregateOutputType | null
+    _min: SupplierMinAggregateOutputType | null
+    _max: SupplierMaxAggregateOutputType | null
+  }
+
+  export type SupplierMinAggregateOutputType = {
+    id: string | null
+    branchId: string | null
+    name: string | null
+    phone: string | null
+    email: string | null
+    address: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SupplierMaxAggregateOutputType = {
+    id: string | null
+    branchId: string | null
+    name: string | null
+    phone: string | null
+    email: string | null
+    address: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SupplierCountAggregateOutputType = {
+    id: number
+    branchId: number
+    name: number
+    phone: number
+    email: number
+    address: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SupplierMinAggregateInputType = {
+    id?: true
+    branchId?: true
+    name?: true
+    phone?: true
+    email?: true
+    address?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SupplierMaxAggregateInputType = {
+    id?: true
+    branchId?: true
+    name?: true
+    phone?: true
+    email?: true
+    address?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SupplierCountAggregateInputType = {
+    id?: true
+    branchId?: true
+    name?: true
+    phone?: true
+    email?: true
+    address?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SupplierAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Supplier to aggregate.
+     */
+    where?: SupplierWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Suppliers to fetch.
+     */
+    orderBy?: SupplierOrderByWithRelationInput | SupplierOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SupplierWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Suppliers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Suppliers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Suppliers
+    **/
+    _count?: true | SupplierCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SupplierMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SupplierMaxAggregateInputType
+  }
+
+  export type GetSupplierAggregateType<T extends SupplierAggregateArgs> = {
+        [P in keyof T & keyof AggregateSupplier]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSupplier[P]>
+      : GetScalarType<T[P], AggregateSupplier[P]>
+  }
+
+
+
+
+  export type SupplierGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SupplierWhereInput
+    orderBy?: SupplierOrderByWithAggregationInput | SupplierOrderByWithAggregationInput[]
+    by: SupplierScalarFieldEnum[] | SupplierScalarFieldEnum
+    having?: SupplierScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SupplierCountAggregateInputType | true
+    _min?: SupplierMinAggregateInputType
+    _max?: SupplierMaxAggregateInputType
+  }
+
+  export type SupplierGroupByOutputType = {
+    id: string
+    branchId: string
+    name: string
+    phone: string | null
+    email: string | null
+    address: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: SupplierCountAggregateOutputType | null
+    _min: SupplierMinAggregateOutputType | null
+    _max: SupplierMaxAggregateOutputType | null
+  }
+
+  type GetSupplierGroupByPayload<T extends SupplierGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SupplierGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SupplierGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SupplierGroupByOutputType[P]>
+            : GetScalarType<T[P], SupplierGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SupplierSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    branchId?: boolean
+    name?: boolean
+    phone?: boolean
+    email?: boolean
+    address?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    pharmacyItems?: boolean | Supplier$pharmacyItemsArgs<ExtArgs>
+    opticalItems?: boolean | Supplier$opticalItemsArgs<ExtArgs>
+    _count?: boolean | SupplierCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["supplier"]>
+
+  export type SupplierSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    branchId?: boolean
+    name?: boolean
+    phone?: boolean
+    email?: boolean
+    address?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["supplier"]>
+
+  export type SupplierSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    branchId?: boolean
+    name?: boolean
+    phone?: boolean
+    email?: boolean
+    address?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["supplier"]>
+
+  export type SupplierSelectScalar = {
+    id?: boolean
+    branchId?: boolean
+    name?: boolean
+    phone?: boolean
+    email?: boolean
+    address?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SupplierOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "branchId" | "name" | "phone" | "email" | "address" | "createdAt" | "updatedAt", ExtArgs["result"]["supplier"]>
+  export type SupplierInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    pharmacyItems?: boolean | Supplier$pharmacyItemsArgs<ExtArgs>
+    opticalItems?: boolean | Supplier$opticalItemsArgs<ExtArgs>
+    _count?: boolean | SupplierCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type SupplierIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+  }
+  export type SupplierIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+  }
+
+  export type $SupplierPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Supplier"
+    objects: {
+      branch: Prisma.$BranchPayload<ExtArgs>
+      pharmacyItems: Prisma.$PharmacyItemPayload<ExtArgs>[]
+      opticalItems: Prisma.$OpticalItemPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      branchId: string
+      name: string
+      phone: string | null
+      email: string | null
+      address: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["supplier"]>
+    composites: {}
+  }
+
+  type SupplierGetPayload<S extends boolean | null | undefined | SupplierDefaultArgs> = $Result.GetResult<Prisma.$SupplierPayload, S>
+
+  type SupplierCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SupplierFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SupplierCountAggregateInputType | true
+    }
+
+  export interface SupplierDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Supplier'], meta: { name: 'Supplier' } }
+    /**
+     * Find zero or one Supplier that matches the filter.
+     * @param {SupplierFindUniqueArgs} args - Arguments to find a Supplier
+     * @example
+     * // Get one Supplier
+     * const supplier = await prisma.supplier.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SupplierFindUniqueArgs>(args: SelectSubset<T, SupplierFindUniqueArgs<ExtArgs>>): Prisma__SupplierClient<$Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Supplier that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SupplierFindUniqueOrThrowArgs} args - Arguments to find a Supplier
+     * @example
+     * // Get one Supplier
+     * const supplier = await prisma.supplier.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SupplierFindUniqueOrThrowArgs>(args: SelectSubset<T, SupplierFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SupplierClient<$Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Supplier that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SupplierFindFirstArgs} args - Arguments to find a Supplier
+     * @example
+     * // Get one Supplier
+     * const supplier = await prisma.supplier.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SupplierFindFirstArgs>(args?: SelectSubset<T, SupplierFindFirstArgs<ExtArgs>>): Prisma__SupplierClient<$Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Supplier that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SupplierFindFirstOrThrowArgs} args - Arguments to find a Supplier
+     * @example
+     * // Get one Supplier
+     * const supplier = await prisma.supplier.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SupplierFindFirstOrThrowArgs>(args?: SelectSubset<T, SupplierFindFirstOrThrowArgs<ExtArgs>>): Prisma__SupplierClient<$Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Suppliers that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SupplierFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Suppliers
+     * const suppliers = await prisma.supplier.findMany()
+     * 
+     * // Get first 10 Suppliers
+     * const suppliers = await prisma.supplier.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const supplierWithIdOnly = await prisma.supplier.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SupplierFindManyArgs>(args?: SelectSubset<T, SupplierFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Supplier.
+     * @param {SupplierCreateArgs} args - Arguments to create a Supplier.
+     * @example
+     * // Create one Supplier
+     * const Supplier = await prisma.supplier.create({
+     *   data: {
+     *     // ... data to create a Supplier
+     *   }
+     * })
+     * 
+     */
+    create<T extends SupplierCreateArgs>(args: SelectSubset<T, SupplierCreateArgs<ExtArgs>>): Prisma__SupplierClient<$Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Suppliers.
+     * @param {SupplierCreateManyArgs} args - Arguments to create many Suppliers.
+     * @example
+     * // Create many Suppliers
+     * const supplier = await prisma.supplier.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SupplierCreateManyArgs>(args?: SelectSubset<T, SupplierCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Suppliers and returns the data saved in the database.
+     * @param {SupplierCreateManyAndReturnArgs} args - Arguments to create many Suppliers.
+     * @example
+     * // Create many Suppliers
+     * const supplier = await prisma.supplier.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Suppliers and only return the `id`
+     * const supplierWithIdOnly = await prisma.supplier.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SupplierCreateManyAndReturnArgs>(args?: SelectSubset<T, SupplierCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Supplier.
+     * @param {SupplierDeleteArgs} args - Arguments to delete one Supplier.
+     * @example
+     * // Delete one Supplier
+     * const Supplier = await prisma.supplier.delete({
+     *   where: {
+     *     // ... filter to delete one Supplier
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SupplierDeleteArgs>(args: SelectSubset<T, SupplierDeleteArgs<ExtArgs>>): Prisma__SupplierClient<$Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Supplier.
+     * @param {SupplierUpdateArgs} args - Arguments to update one Supplier.
+     * @example
+     * // Update one Supplier
+     * const supplier = await prisma.supplier.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SupplierUpdateArgs>(args: SelectSubset<T, SupplierUpdateArgs<ExtArgs>>): Prisma__SupplierClient<$Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Suppliers.
+     * @param {SupplierDeleteManyArgs} args - Arguments to filter Suppliers to delete.
+     * @example
+     * // Delete a few Suppliers
+     * const { count } = await prisma.supplier.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SupplierDeleteManyArgs>(args?: SelectSubset<T, SupplierDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Suppliers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SupplierUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Suppliers
+     * const supplier = await prisma.supplier.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SupplierUpdateManyArgs>(args: SelectSubset<T, SupplierUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Suppliers and returns the data updated in the database.
+     * @param {SupplierUpdateManyAndReturnArgs} args - Arguments to update many Suppliers.
+     * @example
+     * // Update many Suppliers
+     * const supplier = await prisma.supplier.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Suppliers and only return the `id`
+     * const supplierWithIdOnly = await prisma.supplier.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SupplierUpdateManyAndReturnArgs>(args: SelectSubset<T, SupplierUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Supplier.
+     * @param {SupplierUpsertArgs} args - Arguments to update or create a Supplier.
+     * @example
+     * // Update or create a Supplier
+     * const supplier = await prisma.supplier.upsert({
+     *   create: {
+     *     // ... data to create a Supplier
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Supplier we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SupplierUpsertArgs>(args: SelectSubset<T, SupplierUpsertArgs<ExtArgs>>): Prisma__SupplierClient<$Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Suppliers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SupplierCountArgs} args - Arguments to filter Suppliers to count.
+     * @example
+     * // Count the number of Suppliers
+     * const count = await prisma.supplier.count({
+     *   where: {
+     *     // ... the filter for the Suppliers we want to count
+     *   }
+     * })
+    **/
+    count<T extends SupplierCountArgs>(
+      args?: Subset<T, SupplierCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SupplierCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Supplier.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SupplierAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SupplierAggregateArgs>(args: Subset<T, SupplierAggregateArgs>): Prisma.PrismaPromise<GetSupplierAggregateType<T>>
+
+    /**
+     * Group by Supplier.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SupplierGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SupplierGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SupplierGroupByArgs['orderBy'] }
+        : { orderBy?: SupplierGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SupplierGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSupplierGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Supplier model
+   */
+  readonly fields: SupplierFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Supplier.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SupplierClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    pharmacyItems<T extends Supplier$pharmacyItemsArgs<ExtArgs> = {}>(args?: Subset<T, Supplier$pharmacyItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PharmacyItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    opticalItems<T extends Supplier$opticalItemsArgs<ExtArgs> = {}>(args?: Subset<T, Supplier$opticalItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpticalItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Supplier model
+   */
+  interface SupplierFieldRefs {
+    readonly id: FieldRef<"Supplier", 'String'>
+    readonly branchId: FieldRef<"Supplier", 'String'>
+    readonly name: FieldRef<"Supplier", 'String'>
+    readonly phone: FieldRef<"Supplier", 'String'>
+    readonly email: FieldRef<"Supplier", 'String'>
+    readonly address: FieldRef<"Supplier", 'String'>
+    readonly createdAt: FieldRef<"Supplier", 'DateTime'>
+    readonly updatedAt: FieldRef<"Supplier", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Supplier findUnique
+   */
+  export type SupplierFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Supplier
+     */
+    select?: SupplierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Supplier
+     */
+    omit?: SupplierOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SupplierInclude<ExtArgs> | null
+    /**
+     * Filter, which Supplier to fetch.
+     */
+    where: SupplierWhereUniqueInput
+  }
+
+  /**
+   * Supplier findUniqueOrThrow
+   */
+  export type SupplierFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Supplier
+     */
+    select?: SupplierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Supplier
+     */
+    omit?: SupplierOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SupplierInclude<ExtArgs> | null
+    /**
+     * Filter, which Supplier to fetch.
+     */
+    where: SupplierWhereUniqueInput
+  }
+
+  /**
+   * Supplier findFirst
+   */
+  export type SupplierFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Supplier
+     */
+    select?: SupplierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Supplier
+     */
+    omit?: SupplierOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SupplierInclude<ExtArgs> | null
+    /**
+     * Filter, which Supplier to fetch.
+     */
+    where?: SupplierWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Suppliers to fetch.
+     */
+    orderBy?: SupplierOrderByWithRelationInput | SupplierOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Suppliers.
+     */
+    cursor?: SupplierWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Suppliers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Suppliers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Suppliers.
+     */
+    distinct?: SupplierScalarFieldEnum | SupplierScalarFieldEnum[]
+  }
+
+  /**
+   * Supplier findFirstOrThrow
+   */
+  export type SupplierFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Supplier
+     */
+    select?: SupplierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Supplier
+     */
+    omit?: SupplierOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SupplierInclude<ExtArgs> | null
+    /**
+     * Filter, which Supplier to fetch.
+     */
+    where?: SupplierWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Suppliers to fetch.
+     */
+    orderBy?: SupplierOrderByWithRelationInput | SupplierOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Suppliers.
+     */
+    cursor?: SupplierWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Suppliers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Suppliers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Suppliers.
+     */
+    distinct?: SupplierScalarFieldEnum | SupplierScalarFieldEnum[]
+  }
+
+  /**
+   * Supplier findMany
+   */
+  export type SupplierFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Supplier
+     */
+    select?: SupplierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Supplier
+     */
+    omit?: SupplierOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SupplierInclude<ExtArgs> | null
+    /**
+     * Filter, which Suppliers to fetch.
+     */
+    where?: SupplierWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Suppliers to fetch.
+     */
+    orderBy?: SupplierOrderByWithRelationInput | SupplierOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Suppliers.
+     */
+    cursor?: SupplierWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Suppliers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Suppliers.
+     */
+    skip?: number
+    distinct?: SupplierScalarFieldEnum | SupplierScalarFieldEnum[]
+  }
+
+  /**
+   * Supplier create
+   */
+  export type SupplierCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Supplier
+     */
+    select?: SupplierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Supplier
+     */
+    omit?: SupplierOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SupplierInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Supplier.
+     */
+    data: XOR<SupplierCreateInput, SupplierUncheckedCreateInput>
+  }
+
+  /**
+   * Supplier createMany
+   */
+  export type SupplierCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Suppliers.
+     */
+    data: SupplierCreateManyInput | SupplierCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Supplier createManyAndReturn
+   */
+  export type SupplierCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Supplier
+     */
+    select?: SupplierSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Supplier
+     */
+    omit?: SupplierOmit<ExtArgs> | null
+    /**
+     * The data used to create many Suppliers.
+     */
+    data: SupplierCreateManyInput | SupplierCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SupplierIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Supplier update
+   */
+  export type SupplierUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Supplier
+     */
+    select?: SupplierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Supplier
+     */
+    omit?: SupplierOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SupplierInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Supplier.
+     */
+    data: XOR<SupplierUpdateInput, SupplierUncheckedUpdateInput>
+    /**
+     * Choose, which Supplier to update.
+     */
+    where: SupplierWhereUniqueInput
+  }
+
+  /**
+   * Supplier updateMany
+   */
+  export type SupplierUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Suppliers.
+     */
+    data: XOR<SupplierUpdateManyMutationInput, SupplierUncheckedUpdateManyInput>
+    /**
+     * Filter which Suppliers to update
+     */
+    where?: SupplierWhereInput
+    /**
+     * Limit how many Suppliers to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Supplier updateManyAndReturn
+   */
+  export type SupplierUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Supplier
+     */
+    select?: SupplierSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Supplier
+     */
+    omit?: SupplierOmit<ExtArgs> | null
+    /**
+     * The data used to update Suppliers.
+     */
+    data: XOR<SupplierUpdateManyMutationInput, SupplierUncheckedUpdateManyInput>
+    /**
+     * Filter which Suppliers to update
+     */
+    where?: SupplierWhereInput
+    /**
+     * Limit how many Suppliers to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SupplierIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Supplier upsert
+   */
+  export type SupplierUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Supplier
+     */
+    select?: SupplierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Supplier
+     */
+    omit?: SupplierOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SupplierInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Supplier to update in case it exists.
+     */
+    where: SupplierWhereUniqueInput
+    /**
+     * In case the Supplier found by the `where` argument doesn't exist, create a new Supplier with this data.
+     */
+    create: XOR<SupplierCreateInput, SupplierUncheckedCreateInput>
+    /**
+     * In case the Supplier was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SupplierUpdateInput, SupplierUncheckedUpdateInput>
+  }
+
+  /**
+   * Supplier delete
+   */
+  export type SupplierDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Supplier
+     */
+    select?: SupplierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Supplier
+     */
+    omit?: SupplierOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SupplierInclude<ExtArgs> | null
+    /**
+     * Filter which Supplier to delete.
+     */
+    where: SupplierWhereUniqueInput
+  }
+
+  /**
+   * Supplier deleteMany
+   */
+  export type SupplierDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Suppliers to delete
+     */
+    where?: SupplierWhereInput
+    /**
+     * Limit how many Suppliers to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Supplier.pharmacyItems
+   */
+  export type Supplier$pharmacyItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PharmacyItem
+     */
+    select?: PharmacyItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PharmacyItem
+     */
+    omit?: PharmacyItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PharmacyItemInclude<ExtArgs> | null
+    where?: PharmacyItemWhereInput
+    orderBy?: PharmacyItemOrderByWithRelationInput | PharmacyItemOrderByWithRelationInput[]
+    cursor?: PharmacyItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PharmacyItemScalarFieldEnum | PharmacyItemScalarFieldEnum[]
+  }
+
+  /**
+   * Supplier.opticalItems
+   */
+  export type Supplier$opticalItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalItem
+     */
+    select?: OpticalItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalItem
+     */
+    omit?: OpticalItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalItemInclude<ExtArgs> | null
+    where?: OpticalItemWhereInput
+    orderBy?: OpticalItemOrderByWithRelationInput | OpticalItemOrderByWithRelationInput[]
+    cursor?: OpticalItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OpticalItemScalarFieldEnum | OpticalItemScalarFieldEnum[]
+  }
+
+  /**
+   * Supplier without action
+   */
+  export type SupplierDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Supplier
+     */
+    select?: SupplierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Supplier
+     */
+    omit?: SupplierOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SupplierInclude<ExtArgs> | null
   }
 
 
@@ -5725,6 +7185,7 @@ export namespace Prisma {
     opticalTransactions?: boolean | User$opticalTransactionsArgs<ExtArgs>
     createdBillings?: boolean | User$createdBillingsArgs<ExtArgs>
     staffAssignments?: boolean | User$staffAssignmentsArgs<ExtArgs>
+    activityLogs?: boolean | User$activityLogsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -5794,6 +7255,7 @@ export namespace Prisma {
     opticalTransactions?: boolean | User$opticalTransactionsArgs<ExtArgs>
     createdBillings?: boolean | User$createdBillingsArgs<ExtArgs>
     staffAssignments?: boolean | User$staffAssignmentsArgs<ExtArgs>
+    activityLogs?: boolean | User$activityLogsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5817,6 +7279,7 @@ export namespace Prisma {
       opticalTransactions: Prisma.$OpticalStockTransactionPayload<ExtArgs>[]
       createdBillings: Prisma.$BillingPayload<ExtArgs>[]
       staffAssignments: Prisma.$StaffAssignmentPayload<ExtArgs>[]
+      activityLogs: Prisma.$ActivityLogPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -6236,6 +7699,7 @@ export namespace Prisma {
     opticalTransactions<T extends User$opticalTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, User$opticalTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpticalStockTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     createdBillings<T extends User$createdBillingsArgs<ExtArgs> = {}>(args?: Subset<T, User$createdBillingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     staffAssignments<T extends User$staffAssignmentsArgs<ExtArgs> = {}>(args?: Subset<T, User$staffAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    activityLogs<T extends User$activityLogsArgs<ExtArgs> = {}>(args?: Subset<T, User$activityLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6838,6 +8302,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.activityLogs
+   */
+  export type User$activityLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityLog
+     */
+    select?: ActivityLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityLog
+     */
+    omit?: ActivityLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityLogInclude<ExtArgs> | null
+    where?: ActivityLogWhereInput
+    orderBy?: ActivityLogOrderByWithRelationInput | ActivityLogOrderByWithRelationInput[]
+    cursor?: ActivityLogWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ActivityLogScalarFieldEnum | ActivityLogScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6853,6 +8341,1111 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UserInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ActivityLog
+   */
+
+  export type AggregateActivityLog = {
+    _count: ActivityLogCountAggregateOutputType | null
+    _min: ActivityLogMinAggregateOutputType | null
+    _max: ActivityLogMaxAggregateOutputType | null
+  }
+
+  export type ActivityLogMinAggregateOutputType = {
+    id: string | null
+    branchId: string | null
+    userId: string | null
+    action: string | null
+    entityType: string | null
+    entityId: string | null
+    details: string | null
+    createdAt: Date | null
+  }
+
+  export type ActivityLogMaxAggregateOutputType = {
+    id: string | null
+    branchId: string | null
+    userId: string | null
+    action: string | null
+    entityType: string | null
+    entityId: string | null
+    details: string | null
+    createdAt: Date | null
+  }
+
+  export type ActivityLogCountAggregateOutputType = {
+    id: number
+    branchId: number
+    userId: number
+    action: number
+    entityType: number
+    entityId: number
+    details: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type ActivityLogMinAggregateInputType = {
+    id?: true
+    branchId?: true
+    userId?: true
+    action?: true
+    entityType?: true
+    entityId?: true
+    details?: true
+    createdAt?: true
+  }
+
+  export type ActivityLogMaxAggregateInputType = {
+    id?: true
+    branchId?: true
+    userId?: true
+    action?: true
+    entityType?: true
+    entityId?: true
+    details?: true
+    createdAt?: true
+  }
+
+  export type ActivityLogCountAggregateInputType = {
+    id?: true
+    branchId?: true
+    userId?: true
+    action?: true
+    entityType?: true
+    entityId?: true
+    details?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type ActivityLogAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ActivityLog to aggregate.
+     */
+    where?: ActivityLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ActivityLogs to fetch.
+     */
+    orderBy?: ActivityLogOrderByWithRelationInput | ActivityLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ActivityLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ActivityLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ActivityLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ActivityLogs
+    **/
+    _count?: true | ActivityLogCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ActivityLogMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ActivityLogMaxAggregateInputType
+  }
+
+  export type GetActivityLogAggregateType<T extends ActivityLogAggregateArgs> = {
+        [P in keyof T & keyof AggregateActivityLog]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateActivityLog[P]>
+      : GetScalarType<T[P], AggregateActivityLog[P]>
+  }
+
+
+
+
+  export type ActivityLogGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ActivityLogWhereInput
+    orderBy?: ActivityLogOrderByWithAggregationInput | ActivityLogOrderByWithAggregationInput[]
+    by: ActivityLogScalarFieldEnum[] | ActivityLogScalarFieldEnum
+    having?: ActivityLogScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ActivityLogCountAggregateInputType | true
+    _min?: ActivityLogMinAggregateInputType
+    _max?: ActivityLogMaxAggregateInputType
+  }
+
+  export type ActivityLogGroupByOutputType = {
+    id: string
+    branchId: string
+    userId: string
+    action: string
+    entityType: string
+    entityId: string | null
+    details: string | null
+    createdAt: Date
+    _count: ActivityLogCountAggregateOutputType | null
+    _min: ActivityLogMinAggregateOutputType | null
+    _max: ActivityLogMaxAggregateOutputType | null
+  }
+
+  type GetActivityLogGroupByPayload<T extends ActivityLogGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ActivityLogGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ActivityLogGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ActivityLogGroupByOutputType[P]>
+            : GetScalarType<T[P], ActivityLogGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ActivityLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    branchId?: boolean
+    userId?: boolean
+    action?: boolean
+    entityType?: boolean
+    entityId?: boolean
+    details?: boolean
+    createdAt?: boolean
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["activityLog"]>
+
+  export type ActivityLogSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    branchId?: boolean
+    userId?: boolean
+    action?: boolean
+    entityType?: boolean
+    entityId?: boolean
+    details?: boolean
+    createdAt?: boolean
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["activityLog"]>
+
+  export type ActivityLogSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    branchId?: boolean
+    userId?: boolean
+    action?: boolean
+    entityType?: boolean
+    entityId?: boolean
+    details?: boolean
+    createdAt?: boolean
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["activityLog"]>
+
+  export type ActivityLogSelectScalar = {
+    id?: boolean
+    branchId?: boolean
+    userId?: boolean
+    action?: boolean
+    entityType?: boolean
+    entityId?: boolean
+    details?: boolean
+    createdAt?: boolean
+  }
+
+  export type ActivityLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "branchId" | "userId" | "action" | "entityType" | "entityId" | "details" | "createdAt", ExtArgs["result"]["activityLog"]>
+  export type ActivityLogInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ActivityLogIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ActivityLogIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $ActivityLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ActivityLog"
+    objects: {
+      branch: Prisma.$BranchPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      branchId: string
+      userId: string
+      action: string
+      entityType: string
+      entityId: string | null
+      details: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["activityLog"]>
+    composites: {}
+  }
+
+  type ActivityLogGetPayload<S extends boolean | null | undefined | ActivityLogDefaultArgs> = $Result.GetResult<Prisma.$ActivityLogPayload, S>
+
+  type ActivityLogCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ActivityLogFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ActivityLogCountAggregateInputType | true
+    }
+
+  export interface ActivityLogDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ActivityLog'], meta: { name: 'ActivityLog' } }
+    /**
+     * Find zero or one ActivityLog that matches the filter.
+     * @param {ActivityLogFindUniqueArgs} args - Arguments to find a ActivityLog
+     * @example
+     * // Get one ActivityLog
+     * const activityLog = await prisma.activityLog.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ActivityLogFindUniqueArgs>(args: SelectSubset<T, ActivityLogFindUniqueArgs<ExtArgs>>): Prisma__ActivityLogClient<$Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ActivityLog that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ActivityLogFindUniqueOrThrowArgs} args - Arguments to find a ActivityLog
+     * @example
+     * // Get one ActivityLog
+     * const activityLog = await prisma.activityLog.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ActivityLogFindUniqueOrThrowArgs>(args: SelectSubset<T, ActivityLogFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ActivityLogClient<$Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ActivityLog that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityLogFindFirstArgs} args - Arguments to find a ActivityLog
+     * @example
+     * // Get one ActivityLog
+     * const activityLog = await prisma.activityLog.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ActivityLogFindFirstArgs>(args?: SelectSubset<T, ActivityLogFindFirstArgs<ExtArgs>>): Prisma__ActivityLogClient<$Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ActivityLog that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityLogFindFirstOrThrowArgs} args - Arguments to find a ActivityLog
+     * @example
+     * // Get one ActivityLog
+     * const activityLog = await prisma.activityLog.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ActivityLogFindFirstOrThrowArgs>(args?: SelectSubset<T, ActivityLogFindFirstOrThrowArgs<ExtArgs>>): Prisma__ActivityLogClient<$Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ActivityLogs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityLogFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ActivityLogs
+     * const activityLogs = await prisma.activityLog.findMany()
+     * 
+     * // Get first 10 ActivityLogs
+     * const activityLogs = await prisma.activityLog.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const activityLogWithIdOnly = await prisma.activityLog.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ActivityLogFindManyArgs>(args?: SelectSubset<T, ActivityLogFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ActivityLog.
+     * @param {ActivityLogCreateArgs} args - Arguments to create a ActivityLog.
+     * @example
+     * // Create one ActivityLog
+     * const ActivityLog = await prisma.activityLog.create({
+     *   data: {
+     *     // ... data to create a ActivityLog
+     *   }
+     * })
+     * 
+     */
+    create<T extends ActivityLogCreateArgs>(args: SelectSubset<T, ActivityLogCreateArgs<ExtArgs>>): Prisma__ActivityLogClient<$Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ActivityLogs.
+     * @param {ActivityLogCreateManyArgs} args - Arguments to create many ActivityLogs.
+     * @example
+     * // Create many ActivityLogs
+     * const activityLog = await prisma.activityLog.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ActivityLogCreateManyArgs>(args?: SelectSubset<T, ActivityLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ActivityLogs and returns the data saved in the database.
+     * @param {ActivityLogCreateManyAndReturnArgs} args - Arguments to create many ActivityLogs.
+     * @example
+     * // Create many ActivityLogs
+     * const activityLog = await prisma.activityLog.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ActivityLogs and only return the `id`
+     * const activityLogWithIdOnly = await prisma.activityLog.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ActivityLogCreateManyAndReturnArgs>(args?: SelectSubset<T, ActivityLogCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ActivityLog.
+     * @param {ActivityLogDeleteArgs} args - Arguments to delete one ActivityLog.
+     * @example
+     * // Delete one ActivityLog
+     * const ActivityLog = await prisma.activityLog.delete({
+     *   where: {
+     *     // ... filter to delete one ActivityLog
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ActivityLogDeleteArgs>(args: SelectSubset<T, ActivityLogDeleteArgs<ExtArgs>>): Prisma__ActivityLogClient<$Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ActivityLog.
+     * @param {ActivityLogUpdateArgs} args - Arguments to update one ActivityLog.
+     * @example
+     * // Update one ActivityLog
+     * const activityLog = await prisma.activityLog.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ActivityLogUpdateArgs>(args: SelectSubset<T, ActivityLogUpdateArgs<ExtArgs>>): Prisma__ActivityLogClient<$Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ActivityLogs.
+     * @param {ActivityLogDeleteManyArgs} args - Arguments to filter ActivityLogs to delete.
+     * @example
+     * // Delete a few ActivityLogs
+     * const { count } = await prisma.activityLog.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ActivityLogDeleteManyArgs>(args?: SelectSubset<T, ActivityLogDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ActivityLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityLogUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ActivityLogs
+     * const activityLog = await prisma.activityLog.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ActivityLogUpdateManyArgs>(args: SelectSubset<T, ActivityLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ActivityLogs and returns the data updated in the database.
+     * @param {ActivityLogUpdateManyAndReturnArgs} args - Arguments to update many ActivityLogs.
+     * @example
+     * // Update many ActivityLogs
+     * const activityLog = await prisma.activityLog.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ActivityLogs and only return the `id`
+     * const activityLogWithIdOnly = await prisma.activityLog.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ActivityLogUpdateManyAndReturnArgs>(args: SelectSubset<T, ActivityLogUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ActivityLog.
+     * @param {ActivityLogUpsertArgs} args - Arguments to update or create a ActivityLog.
+     * @example
+     * // Update or create a ActivityLog
+     * const activityLog = await prisma.activityLog.upsert({
+     *   create: {
+     *     // ... data to create a ActivityLog
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ActivityLog we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ActivityLogUpsertArgs>(args: SelectSubset<T, ActivityLogUpsertArgs<ExtArgs>>): Prisma__ActivityLogClient<$Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ActivityLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityLogCountArgs} args - Arguments to filter ActivityLogs to count.
+     * @example
+     * // Count the number of ActivityLogs
+     * const count = await prisma.activityLog.count({
+     *   where: {
+     *     // ... the filter for the ActivityLogs we want to count
+     *   }
+     * })
+    **/
+    count<T extends ActivityLogCountArgs>(
+      args?: Subset<T, ActivityLogCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ActivityLogCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ActivityLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityLogAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ActivityLogAggregateArgs>(args: Subset<T, ActivityLogAggregateArgs>): Prisma.PrismaPromise<GetActivityLogAggregateType<T>>
+
+    /**
+     * Group by ActivityLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityLogGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ActivityLogGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ActivityLogGroupByArgs['orderBy'] }
+        : { orderBy?: ActivityLogGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ActivityLogGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetActivityLogGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ActivityLog model
+   */
+  readonly fields: ActivityLogFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ActivityLog.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ActivityLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ActivityLog model
+   */
+  interface ActivityLogFieldRefs {
+    readonly id: FieldRef<"ActivityLog", 'String'>
+    readonly branchId: FieldRef<"ActivityLog", 'String'>
+    readonly userId: FieldRef<"ActivityLog", 'String'>
+    readonly action: FieldRef<"ActivityLog", 'String'>
+    readonly entityType: FieldRef<"ActivityLog", 'String'>
+    readonly entityId: FieldRef<"ActivityLog", 'String'>
+    readonly details: FieldRef<"ActivityLog", 'String'>
+    readonly createdAt: FieldRef<"ActivityLog", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ActivityLog findUnique
+   */
+  export type ActivityLogFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityLog
+     */
+    select?: ActivityLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityLog
+     */
+    omit?: ActivityLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityLogInclude<ExtArgs> | null
+    /**
+     * Filter, which ActivityLog to fetch.
+     */
+    where: ActivityLogWhereUniqueInput
+  }
+
+  /**
+   * ActivityLog findUniqueOrThrow
+   */
+  export type ActivityLogFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityLog
+     */
+    select?: ActivityLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityLog
+     */
+    omit?: ActivityLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityLogInclude<ExtArgs> | null
+    /**
+     * Filter, which ActivityLog to fetch.
+     */
+    where: ActivityLogWhereUniqueInput
+  }
+
+  /**
+   * ActivityLog findFirst
+   */
+  export type ActivityLogFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityLog
+     */
+    select?: ActivityLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityLog
+     */
+    omit?: ActivityLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityLogInclude<ExtArgs> | null
+    /**
+     * Filter, which ActivityLog to fetch.
+     */
+    where?: ActivityLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ActivityLogs to fetch.
+     */
+    orderBy?: ActivityLogOrderByWithRelationInput | ActivityLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ActivityLogs.
+     */
+    cursor?: ActivityLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ActivityLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ActivityLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ActivityLogs.
+     */
+    distinct?: ActivityLogScalarFieldEnum | ActivityLogScalarFieldEnum[]
+  }
+
+  /**
+   * ActivityLog findFirstOrThrow
+   */
+  export type ActivityLogFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityLog
+     */
+    select?: ActivityLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityLog
+     */
+    omit?: ActivityLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityLogInclude<ExtArgs> | null
+    /**
+     * Filter, which ActivityLog to fetch.
+     */
+    where?: ActivityLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ActivityLogs to fetch.
+     */
+    orderBy?: ActivityLogOrderByWithRelationInput | ActivityLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ActivityLogs.
+     */
+    cursor?: ActivityLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ActivityLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ActivityLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ActivityLogs.
+     */
+    distinct?: ActivityLogScalarFieldEnum | ActivityLogScalarFieldEnum[]
+  }
+
+  /**
+   * ActivityLog findMany
+   */
+  export type ActivityLogFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityLog
+     */
+    select?: ActivityLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityLog
+     */
+    omit?: ActivityLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityLogInclude<ExtArgs> | null
+    /**
+     * Filter, which ActivityLogs to fetch.
+     */
+    where?: ActivityLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ActivityLogs to fetch.
+     */
+    orderBy?: ActivityLogOrderByWithRelationInput | ActivityLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ActivityLogs.
+     */
+    cursor?: ActivityLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ActivityLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ActivityLogs.
+     */
+    skip?: number
+    distinct?: ActivityLogScalarFieldEnum | ActivityLogScalarFieldEnum[]
+  }
+
+  /**
+   * ActivityLog create
+   */
+  export type ActivityLogCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityLog
+     */
+    select?: ActivityLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityLog
+     */
+    omit?: ActivityLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityLogInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ActivityLog.
+     */
+    data: XOR<ActivityLogCreateInput, ActivityLogUncheckedCreateInput>
+  }
+
+  /**
+   * ActivityLog createMany
+   */
+  export type ActivityLogCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ActivityLogs.
+     */
+    data: ActivityLogCreateManyInput | ActivityLogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ActivityLog createManyAndReturn
+   */
+  export type ActivityLogCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityLog
+     */
+    select?: ActivityLogSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityLog
+     */
+    omit?: ActivityLogOmit<ExtArgs> | null
+    /**
+     * The data used to create many ActivityLogs.
+     */
+    data: ActivityLogCreateManyInput | ActivityLogCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityLogIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ActivityLog update
+   */
+  export type ActivityLogUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityLog
+     */
+    select?: ActivityLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityLog
+     */
+    omit?: ActivityLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityLogInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ActivityLog.
+     */
+    data: XOR<ActivityLogUpdateInput, ActivityLogUncheckedUpdateInput>
+    /**
+     * Choose, which ActivityLog to update.
+     */
+    where: ActivityLogWhereUniqueInput
+  }
+
+  /**
+   * ActivityLog updateMany
+   */
+  export type ActivityLogUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ActivityLogs.
+     */
+    data: XOR<ActivityLogUpdateManyMutationInput, ActivityLogUncheckedUpdateManyInput>
+    /**
+     * Filter which ActivityLogs to update
+     */
+    where?: ActivityLogWhereInput
+    /**
+     * Limit how many ActivityLogs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ActivityLog updateManyAndReturn
+   */
+  export type ActivityLogUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityLog
+     */
+    select?: ActivityLogSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityLog
+     */
+    omit?: ActivityLogOmit<ExtArgs> | null
+    /**
+     * The data used to update ActivityLogs.
+     */
+    data: XOR<ActivityLogUpdateManyMutationInput, ActivityLogUncheckedUpdateManyInput>
+    /**
+     * Filter which ActivityLogs to update
+     */
+    where?: ActivityLogWhereInput
+    /**
+     * Limit how many ActivityLogs to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityLogIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ActivityLog upsert
+   */
+  export type ActivityLogUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityLog
+     */
+    select?: ActivityLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityLog
+     */
+    omit?: ActivityLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityLogInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ActivityLog to update in case it exists.
+     */
+    where: ActivityLogWhereUniqueInput
+    /**
+     * In case the ActivityLog found by the `where` argument doesn't exist, create a new ActivityLog with this data.
+     */
+    create: XOR<ActivityLogCreateInput, ActivityLogUncheckedCreateInput>
+    /**
+     * In case the ActivityLog was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ActivityLogUpdateInput, ActivityLogUncheckedUpdateInput>
+  }
+
+  /**
+   * ActivityLog delete
+   */
+  export type ActivityLogDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityLog
+     */
+    select?: ActivityLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityLog
+     */
+    omit?: ActivityLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityLogInclude<ExtArgs> | null
+    /**
+     * Filter which ActivityLog to delete.
+     */
+    where: ActivityLogWhereUniqueInput
+  }
+
+  /**
+   * ActivityLog deleteMany
+   */
+  export type ActivityLogDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ActivityLogs to delete
+     */
+    where?: ActivityLogWhereInput
+    /**
+     * Limit how many ActivityLogs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ActivityLog without action
+   */
+  export type ActivityLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityLog
+     */
+    select?: ActivityLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityLog
+     */
+    omit?: ActivityLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityLogInclude<ExtArgs> | null
   }
 
 
@@ -15603,6 +18196,7 @@ export namespace Prisma {
   export type PharmacyItemMinAggregateOutputType = {
     id: string | null
     branchId: string | null
+    supplierId: string | null
     itemName: string | null
     itemType: string | null
     category: string | null
@@ -15622,6 +18216,7 @@ export namespace Prisma {
   export type PharmacyItemMaxAggregateOutputType = {
     id: string | null
     branchId: string | null
+    supplierId: string | null
     itemName: string | null
     itemType: string | null
     category: string | null
@@ -15641,6 +18236,7 @@ export namespace Prisma {
   export type PharmacyItemCountAggregateOutputType = {
     id: number
     branchId: number
+    supplierId: number
     itemName: number
     itemType: number
     category: number
@@ -15676,6 +18272,7 @@ export namespace Prisma {
   export type PharmacyItemMinAggregateInputType = {
     id?: true
     branchId?: true
+    supplierId?: true
     itemName?: true
     itemType?: true
     category?: true
@@ -15695,6 +18292,7 @@ export namespace Prisma {
   export type PharmacyItemMaxAggregateInputType = {
     id?: true
     branchId?: true
+    supplierId?: true
     itemName?: true
     itemType?: true
     category?: true
@@ -15714,6 +18312,7 @@ export namespace Prisma {
   export type PharmacyItemCountAggregateInputType = {
     id?: true
     branchId?: true
+    supplierId?: true
     itemName?: true
     itemType?: true
     category?: true
@@ -15820,6 +18419,7 @@ export namespace Prisma {
   export type PharmacyItemGroupByOutputType = {
     id: string
     branchId: string
+    supplierId: string | null
     itemName: string
     itemType: string | null
     category: string | null
@@ -15858,6 +18458,7 @@ export namespace Prisma {
   export type PharmacyItemSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     branchId?: boolean
+    supplierId?: boolean
     itemName?: boolean
     itemType?: boolean
     category?: boolean
@@ -15873,6 +18474,7 @@ export namespace Prisma {
     updatedAt?: boolean
     isActive?: boolean
     branch?: boolean | BranchDefaultArgs<ExtArgs>
+    supplier?: boolean | PharmacyItem$supplierArgs<ExtArgs>
     transactions?: boolean | PharmacyItem$transactionsArgs<ExtArgs>
     _count?: boolean | PharmacyItemCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["pharmacyItem"]>
@@ -15880,6 +18482,7 @@ export namespace Prisma {
   export type PharmacyItemSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     branchId?: boolean
+    supplierId?: boolean
     itemName?: boolean
     itemType?: boolean
     category?: boolean
@@ -15895,11 +18498,13 @@ export namespace Prisma {
     updatedAt?: boolean
     isActive?: boolean
     branch?: boolean | BranchDefaultArgs<ExtArgs>
+    supplier?: boolean | PharmacyItem$supplierArgs<ExtArgs>
   }, ExtArgs["result"]["pharmacyItem"]>
 
   export type PharmacyItemSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     branchId?: boolean
+    supplierId?: boolean
     itemName?: boolean
     itemType?: boolean
     category?: boolean
@@ -15915,11 +18520,13 @@ export namespace Prisma {
     updatedAt?: boolean
     isActive?: boolean
     branch?: boolean | BranchDefaultArgs<ExtArgs>
+    supplier?: boolean | PharmacyItem$supplierArgs<ExtArgs>
   }, ExtArgs["result"]["pharmacyItem"]>
 
   export type PharmacyItemSelectScalar = {
     id?: boolean
     branchId?: boolean
+    supplierId?: boolean
     itemName?: boolean
     itemType?: boolean
     category?: boolean
@@ -15936,28 +18543,33 @@ export namespace Prisma {
     isActive?: boolean
   }
 
-  export type PharmacyItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "branchId" | "itemName" | "itemType" | "category" | "manufacturer" | "supplierName" | "batchNumber" | "stockQuantity" | "reorderLevel" | "purchasePrice" | "sellingPrice" | "expiryDate" | "createdAt" | "updatedAt" | "isActive", ExtArgs["result"]["pharmacyItem"]>
+  export type PharmacyItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "branchId" | "supplierId" | "itemName" | "itemType" | "category" | "manufacturer" | "supplierName" | "batchNumber" | "stockQuantity" | "reorderLevel" | "purchasePrice" | "sellingPrice" | "expiryDate" | "createdAt" | "updatedAt" | "isActive", ExtArgs["result"]["pharmacyItem"]>
   export type PharmacyItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     branch?: boolean | BranchDefaultArgs<ExtArgs>
+    supplier?: boolean | PharmacyItem$supplierArgs<ExtArgs>
     transactions?: boolean | PharmacyItem$transactionsArgs<ExtArgs>
     _count?: boolean | PharmacyItemCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type PharmacyItemIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     branch?: boolean | BranchDefaultArgs<ExtArgs>
+    supplier?: boolean | PharmacyItem$supplierArgs<ExtArgs>
   }
   export type PharmacyItemIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     branch?: boolean | BranchDefaultArgs<ExtArgs>
+    supplier?: boolean | PharmacyItem$supplierArgs<ExtArgs>
   }
 
   export type $PharmacyItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "PharmacyItem"
     objects: {
       branch: Prisma.$BranchPayload<ExtArgs>
+      supplier: Prisma.$SupplierPayload<ExtArgs> | null
       transactions: Prisma.$PharmacyStockTransactionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       branchId: string
+      supplierId: string | null
       itemName: string
       itemType: string | null
       category: string | null
@@ -16367,6 +18979,7 @@ export namespace Prisma {
   export interface Prisma__PharmacyItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    supplier<T extends PharmacyItem$supplierArgs<ExtArgs> = {}>(args?: Subset<T, PharmacyItem$supplierArgs<ExtArgs>>): Prisma__SupplierClient<$Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     transactions<T extends PharmacyItem$transactionsArgs<ExtArgs> = {}>(args?: Subset<T, PharmacyItem$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PharmacyStockTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -16399,6 +19012,7 @@ export namespace Prisma {
   interface PharmacyItemFieldRefs {
     readonly id: FieldRef<"PharmacyItem", 'String'>
     readonly branchId: FieldRef<"PharmacyItem", 'String'>
+    readonly supplierId: FieldRef<"PharmacyItem", 'String'>
     readonly itemName: FieldRef<"PharmacyItem", 'String'>
     readonly itemType: FieldRef<"PharmacyItem", 'String'>
     readonly category: FieldRef<"PharmacyItem", 'String'>
@@ -16806,6 +19420,25 @@ export namespace Prisma {
      * Limit how many PharmacyItems to delete.
      */
     limit?: number
+  }
+
+  /**
+   * PharmacyItem.supplier
+   */
+  export type PharmacyItem$supplierArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Supplier
+     */
+    select?: SupplierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Supplier
+     */
+    omit?: SupplierOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SupplierInclude<ExtArgs> | null
+    where?: SupplierWhereInput
   }
 
   /**
@@ -18071,6 +20704,7 @@ export namespace Prisma {
   export type OpticalItemMinAggregateOutputType = {
     id: string | null
     branchId: string | null
+    supplierId: string | null
     itemName: string | null
     itemType: string | null
     brand: string | null
@@ -18088,6 +20722,7 @@ export namespace Prisma {
   export type OpticalItemMaxAggregateOutputType = {
     id: string | null
     branchId: string | null
+    supplierId: string | null
     itemName: string | null
     itemType: string | null
     brand: string | null
@@ -18105,6 +20740,7 @@ export namespace Prisma {
   export type OpticalItemCountAggregateOutputType = {
     id: number
     branchId: number
+    supplierId: number
     itemName: number
     itemType: number
     brand: number
@@ -18138,6 +20774,7 @@ export namespace Prisma {
   export type OpticalItemMinAggregateInputType = {
     id?: true
     branchId?: true
+    supplierId?: true
     itemName?: true
     itemType?: true
     brand?: true
@@ -18155,6 +20792,7 @@ export namespace Prisma {
   export type OpticalItemMaxAggregateInputType = {
     id?: true
     branchId?: true
+    supplierId?: true
     itemName?: true
     itemType?: true
     brand?: true
@@ -18172,6 +20810,7 @@ export namespace Prisma {
   export type OpticalItemCountAggregateInputType = {
     id?: true
     branchId?: true
+    supplierId?: true
     itemName?: true
     itemType?: true
     brand?: true
@@ -18276,6 +20915,7 @@ export namespace Prisma {
   export type OpticalItemGroupByOutputType = {
     id: string
     branchId: string
+    supplierId: string | null
     itemName: string
     itemType: string | null
     brand: string | null
@@ -18312,6 +20952,7 @@ export namespace Prisma {
   export type OpticalItemSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     branchId?: boolean
+    supplierId?: boolean
     itemName?: boolean
     itemType?: boolean
     brand?: boolean
@@ -18325,6 +20966,7 @@ export namespace Prisma {
     updatedAt?: boolean
     isActive?: boolean
     branch?: boolean | BranchDefaultArgs<ExtArgs>
+    supplier?: boolean | OpticalItem$supplierArgs<ExtArgs>
     transactions?: boolean | OpticalItem$transactionsArgs<ExtArgs>
     _count?: boolean | OpticalItemCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["opticalItem"]>
@@ -18332,6 +20974,7 @@ export namespace Prisma {
   export type OpticalItemSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     branchId?: boolean
+    supplierId?: boolean
     itemName?: boolean
     itemType?: boolean
     brand?: boolean
@@ -18345,11 +20988,13 @@ export namespace Prisma {
     updatedAt?: boolean
     isActive?: boolean
     branch?: boolean | BranchDefaultArgs<ExtArgs>
+    supplier?: boolean | OpticalItem$supplierArgs<ExtArgs>
   }, ExtArgs["result"]["opticalItem"]>
 
   export type OpticalItemSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     branchId?: boolean
+    supplierId?: boolean
     itemName?: boolean
     itemType?: boolean
     brand?: boolean
@@ -18363,11 +21008,13 @@ export namespace Prisma {
     updatedAt?: boolean
     isActive?: boolean
     branch?: boolean | BranchDefaultArgs<ExtArgs>
+    supplier?: boolean | OpticalItem$supplierArgs<ExtArgs>
   }, ExtArgs["result"]["opticalItem"]>
 
   export type OpticalItemSelectScalar = {
     id?: boolean
     branchId?: boolean
+    supplierId?: boolean
     itemName?: boolean
     itemType?: boolean
     brand?: boolean
@@ -18382,28 +21029,33 @@ export namespace Prisma {
     isActive?: boolean
   }
 
-  export type OpticalItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "branchId" | "itemName" | "itemType" | "brand" | "manufacturer" | "supplierName" | "stockQuantity" | "reorderLevel" | "purchasePrice" | "sellingPrice" | "createdAt" | "updatedAt" | "isActive", ExtArgs["result"]["opticalItem"]>
+  export type OpticalItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "branchId" | "supplierId" | "itemName" | "itemType" | "brand" | "manufacturer" | "supplierName" | "stockQuantity" | "reorderLevel" | "purchasePrice" | "sellingPrice" | "createdAt" | "updatedAt" | "isActive", ExtArgs["result"]["opticalItem"]>
   export type OpticalItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     branch?: boolean | BranchDefaultArgs<ExtArgs>
+    supplier?: boolean | OpticalItem$supplierArgs<ExtArgs>
     transactions?: boolean | OpticalItem$transactionsArgs<ExtArgs>
     _count?: boolean | OpticalItemCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type OpticalItemIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     branch?: boolean | BranchDefaultArgs<ExtArgs>
+    supplier?: boolean | OpticalItem$supplierArgs<ExtArgs>
   }
   export type OpticalItemIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     branch?: boolean | BranchDefaultArgs<ExtArgs>
+    supplier?: boolean | OpticalItem$supplierArgs<ExtArgs>
   }
 
   export type $OpticalItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "OpticalItem"
     objects: {
       branch: Prisma.$BranchPayload<ExtArgs>
+      supplier: Prisma.$SupplierPayload<ExtArgs> | null
       transactions: Prisma.$OpticalStockTransactionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       branchId: string
+      supplierId: string | null
       itemName: string
       itemType: string | null
       brand: string | null
@@ -18811,6 +21463,7 @@ export namespace Prisma {
   export interface Prisma__OpticalItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    supplier<T extends OpticalItem$supplierArgs<ExtArgs> = {}>(args?: Subset<T, OpticalItem$supplierArgs<ExtArgs>>): Prisma__SupplierClient<$Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     transactions<T extends OpticalItem$transactionsArgs<ExtArgs> = {}>(args?: Subset<T, OpticalItem$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpticalStockTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -18843,6 +21496,7 @@ export namespace Prisma {
   interface OpticalItemFieldRefs {
     readonly id: FieldRef<"OpticalItem", 'String'>
     readonly branchId: FieldRef<"OpticalItem", 'String'>
+    readonly supplierId: FieldRef<"OpticalItem", 'String'>
     readonly itemName: FieldRef<"OpticalItem", 'String'>
     readonly itemType: FieldRef<"OpticalItem", 'String'>
     readonly brand: FieldRef<"OpticalItem", 'String'>
@@ -19248,6 +21902,25 @@ export namespace Prisma {
      * Limit how many OpticalItems to delete.
      */
     limit?: number
+  }
+
+  /**
+   * OpticalItem.supplier
+   */
+  export type OpticalItem$supplierArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Supplier
+     */
+    select?: SupplierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Supplier
+     */
+    omit?: SupplierOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SupplierInclude<ExtArgs> | null
+    where?: SupplierWhereInput
   }
 
   /**
@@ -24275,6 +26948,20 @@ export namespace Prisma {
   export type BranchScalarFieldEnum = (typeof BranchScalarFieldEnum)[keyof typeof BranchScalarFieldEnum]
 
 
+  export const SupplierScalarFieldEnum: {
+    id: 'id',
+    branchId: 'branchId',
+    name: 'name',
+    phone: 'phone',
+    email: 'email',
+    address: 'address',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SupplierScalarFieldEnum = (typeof SupplierScalarFieldEnum)[keyof typeof SupplierScalarFieldEnum]
+
+
   export const UserScalarFieldEnum: {
     id: 'id',
     fullName: 'fullName',
@@ -24293,6 +26980,20 @@ export namespace Prisma {
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+  export const ActivityLogScalarFieldEnum: {
+    id: 'id',
+    branchId: 'branchId',
+    userId: 'userId',
+    action: 'action',
+    entityType: 'entityType',
+    entityId: 'entityId',
+    details: 'details',
+    createdAt: 'createdAt'
+  };
+
+  export type ActivityLogScalarFieldEnum = (typeof ActivityLogScalarFieldEnum)[keyof typeof ActivityLogScalarFieldEnum]
 
 
   export const DoctorScalarFieldEnum: {
@@ -24416,6 +27117,7 @@ export namespace Prisma {
   export const PharmacyItemScalarFieldEnum: {
     id: 'id',
     branchId: 'branchId',
+    supplierId: 'supplierId',
     itemName: 'itemName',
     itemType: 'itemType',
     category: 'category',
@@ -24453,6 +27155,7 @@ export namespace Prisma {
   export const OpticalItemScalarFieldEnum: {
     id: 'id',
     branchId: 'branchId',
+    supplierId: 'supplierId',
     itemName: 'itemName',
     itemType: 'itemType',
     brand: 'brand',
@@ -24786,6 +27489,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionListRelationFilter
     billings?: BillingListRelationFilter
     followUps?: FollowUpListRelationFilter
+    suppliers?: SupplierListRelationFilter
+    activityLogs?: ActivityLogListRelationFilter
   }
 
   export type BranchOrderByWithRelationInput = {
@@ -24809,6 +27514,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionOrderByRelationAggregateInput
     billings?: BillingOrderByRelationAggregateInput
     followUps?: FollowUpOrderByRelationAggregateInput
+    suppliers?: SupplierOrderByRelationAggregateInput
+    activityLogs?: ActivityLogOrderByRelationAggregateInput
   }
 
   export type BranchWhereUniqueInput = Prisma.AtLeast<{
@@ -24835,6 +27542,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionListRelationFilter
     billings?: BillingListRelationFilter
     followUps?: FollowUpListRelationFilter
+    suppliers?: SupplierListRelationFilter
+    activityLogs?: ActivityLogListRelationFilter
   }, "id">
 
   export type BranchOrderByWithAggregationInput = {
@@ -24861,6 +27570,82 @@ export namespace Prisma {
     isActive?: BoolWithAggregatesFilter<"Branch"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Branch"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Branch"> | Date | string
+  }
+
+  export type SupplierWhereInput = {
+    AND?: SupplierWhereInput | SupplierWhereInput[]
+    OR?: SupplierWhereInput[]
+    NOT?: SupplierWhereInput | SupplierWhereInput[]
+    id?: StringFilter<"Supplier"> | string
+    branchId?: StringFilter<"Supplier"> | string
+    name?: StringFilter<"Supplier"> | string
+    phone?: StringNullableFilter<"Supplier"> | string | null
+    email?: StringNullableFilter<"Supplier"> | string | null
+    address?: StringNullableFilter<"Supplier"> | string | null
+    createdAt?: DateTimeFilter<"Supplier"> | Date | string
+    updatedAt?: DateTimeFilter<"Supplier"> | Date | string
+    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    pharmacyItems?: PharmacyItemListRelationFilter
+    opticalItems?: OpticalItemListRelationFilter
+  }
+
+  export type SupplierOrderByWithRelationInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    name?: SortOrder
+    phone?: SortOrderInput | SortOrder
+    email?: SortOrderInput | SortOrder
+    address?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    branch?: BranchOrderByWithRelationInput
+    pharmacyItems?: PharmacyItemOrderByRelationAggregateInput
+    opticalItems?: OpticalItemOrderByRelationAggregateInput
+  }
+
+  export type SupplierWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SupplierWhereInput | SupplierWhereInput[]
+    OR?: SupplierWhereInput[]
+    NOT?: SupplierWhereInput | SupplierWhereInput[]
+    branchId?: StringFilter<"Supplier"> | string
+    name?: StringFilter<"Supplier"> | string
+    phone?: StringNullableFilter<"Supplier"> | string | null
+    email?: StringNullableFilter<"Supplier"> | string | null
+    address?: StringNullableFilter<"Supplier"> | string | null
+    createdAt?: DateTimeFilter<"Supplier"> | Date | string
+    updatedAt?: DateTimeFilter<"Supplier"> | Date | string
+    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    pharmacyItems?: PharmacyItemListRelationFilter
+    opticalItems?: OpticalItemListRelationFilter
+  }, "id">
+
+  export type SupplierOrderByWithAggregationInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    name?: SortOrder
+    phone?: SortOrderInput | SortOrder
+    email?: SortOrderInput | SortOrder
+    address?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SupplierCountOrderByAggregateInput
+    _max?: SupplierMaxOrderByAggregateInput
+    _min?: SupplierMinOrderByAggregateInput
+  }
+
+  export type SupplierScalarWhereWithAggregatesInput = {
+    AND?: SupplierScalarWhereWithAggregatesInput | SupplierScalarWhereWithAggregatesInput[]
+    OR?: SupplierScalarWhereWithAggregatesInput[]
+    NOT?: SupplierScalarWhereWithAggregatesInput | SupplierScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Supplier"> | string
+    branchId?: StringWithAggregatesFilter<"Supplier"> | string
+    name?: StringWithAggregatesFilter<"Supplier"> | string
+    phone?: StringNullableWithAggregatesFilter<"Supplier"> | string | null
+    email?: StringNullableWithAggregatesFilter<"Supplier"> | string | null
+    address?: StringNullableWithAggregatesFilter<"Supplier"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Supplier"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Supplier"> | Date | string
   }
 
   export type UserWhereInput = {
@@ -24890,6 +27675,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionListRelationFilter
     createdBillings?: BillingListRelationFilter
     staffAssignments?: StaffAssignmentListRelationFilter
+    activityLogs?: ActivityLogListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -24916,6 +27702,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionOrderByRelationAggregateInput
     createdBillings?: BillingOrderByRelationAggregateInput
     staffAssignments?: StaffAssignmentOrderByRelationAggregateInput
+    activityLogs?: ActivityLogOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -24945,6 +27732,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionListRelationFilter
     createdBillings?: BillingListRelationFilter
     staffAssignments?: StaffAssignmentListRelationFilter
+    activityLogs?: ActivityLogListRelationFilter
   }, "id" | "username" | "email" | "resetToken">
 
   export type UserOrderByWithAggregationInput = {
@@ -24985,6 +27773,79 @@ export namespace Prisma {
     branchId?: StringWithAggregatesFilter<"User"> | string
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+  }
+
+  export type ActivityLogWhereInput = {
+    AND?: ActivityLogWhereInput | ActivityLogWhereInput[]
+    OR?: ActivityLogWhereInput[]
+    NOT?: ActivityLogWhereInput | ActivityLogWhereInput[]
+    id?: StringFilter<"ActivityLog"> | string
+    branchId?: StringFilter<"ActivityLog"> | string
+    userId?: StringFilter<"ActivityLog"> | string
+    action?: StringFilter<"ActivityLog"> | string
+    entityType?: StringFilter<"ActivityLog"> | string
+    entityId?: StringNullableFilter<"ActivityLog"> | string | null
+    details?: StringNullableFilter<"ActivityLog"> | string | null
+    createdAt?: DateTimeFilter<"ActivityLog"> | Date | string
+    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type ActivityLogOrderByWithRelationInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    userId?: SortOrder
+    action?: SortOrder
+    entityType?: SortOrder
+    entityId?: SortOrderInput | SortOrder
+    details?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    branch?: BranchOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type ActivityLogWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ActivityLogWhereInput | ActivityLogWhereInput[]
+    OR?: ActivityLogWhereInput[]
+    NOT?: ActivityLogWhereInput | ActivityLogWhereInput[]
+    branchId?: StringFilter<"ActivityLog"> | string
+    userId?: StringFilter<"ActivityLog"> | string
+    action?: StringFilter<"ActivityLog"> | string
+    entityType?: StringFilter<"ActivityLog"> | string
+    entityId?: StringNullableFilter<"ActivityLog"> | string | null
+    details?: StringNullableFilter<"ActivityLog"> | string | null
+    createdAt?: DateTimeFilter<"ActivityLog"> | Date | string
+    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type ActivityLogOrderByWithAggregationInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    userId?: SortOrder
+    action?: SortOrder
+    entityType?: SortOrder
+    entityId?: SortOrderInput | SortOrder
+    details?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: ActivityLogCountOrderByAggregateInput
+    _max?: ActivityLogMaxOrderByAggregateInput
+    _min?: ActivityLogMinOrderByAggregateInput
+  }
+
+  export type ActivityLogScalarWhereWithAggregatesInput = {
+    AND?: ActivityLogScalarWhereWithAggregatesInput | ActivityLogScalarWhereWithAggregatesInput[]
+    OR?: ActivityLogScalarWhereWithAggregatesInput[]
+    NOT?: ActivityLogScalarWhereWithAggregatesInput | ActivityLogScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ActivityLog"> | string
+    branchId?: StringWithAggregatesFilter<"ActivityLog"> | string
+    userId?: StringWithAggregatesFilter<"ActivityLog"> | string
+    action?: StringWithAggregatesFilter<"ActivityLog"> | string
+    entityType?: StringWithAggregatesFilter<"ActivityLog"> | string
+    entityId?: StringNullableWithAggregatesFilter<"ActivityLog"> | string | null
+    details?: StringNullableWithAggregatesFilter<"ActivityLog"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"ActivityLog"> | Date | string
   }
 
   export type DoctorWhereInput = {
@@ -25677,6 +28538,7 @@ export namespace Prisma {
     NOT?: PharmacyItemWhereInput | PharmacyItemWhereInput[]
     id?: StringFilter<"PharmacyItem"> | string
     branchId?: StringFilter<"PharmacyItem"> | string
+    supplierId?: StringNullableFilter<"PharmacyItem"> | string | null
     itemName?: StringFilter<"PharmacyItem"> | string
     itemType?: StringNullableFilter<"PharmacyItem"> | string | null
     category?: StringNullableFilter<"PharmacyItem"> | string | null
@@ -25692,12 +28554,14 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"PharmacyItem"> | Date | string
     isActive?: BoolFilter<"PharmacyItem"> | boolean
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    supplier?: XOR<SupplierNullableScalarRelationFilter, SupplierWhereInput> | null
     transactions?: PharmacyStockTransactionListRelationFilter
   }
 
   export type PharmacyItemOrderByWithRelationInput = {
     id?: SortOrder
     branchId?: SortOrder
+    supplierId?: SortOrderInput | SortOrder
     itemName?: SortOrder
     itemType?: SortOrderInput | SortOrder
     category?: SortOrderInput | SortOrder
@@ -25713,6 +28577,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     isActive?: SortOrder
     branch?: BranchOrderByWithRelationInput
+    supplier?: SupplierOrderByWithRelationInput
     transactions?: PharmacyStockTransactionOrderByRelationAggregateInput
   }
 
@@ -25723,6 +28588,7 @@ export namespace Prisma {
     OR?: PharmacyItemWhereInput[]
     NOT?: PharmacyItemWhereInput | PharmacyItemWhereInput[]
     branchId?: StringFilter<"PharmacyItem"> | string
+    supplierId?: StringNullableFilter<"PharmacyItem"> | string | null
     itemName?: StringFilter<"PharmacyItem"> | string
     itemType?: StringNullableFilter<"PharmacyItem"> | string | null
     category?: StringNullableFilter<"PharmacyItem"> | string | null
@@ -25738,12 +28604,14 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"PharmacyItem"> | Date | string
     isActive?: BoolFilter<"PharmacyItem"> | boolean
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    supplier?: XOR<SupplierNullableScalarRelationFilter, SupplierWhereInput> | null
     transactions?: PharmacyStockTransactionListRelationFilter
   }, "id" | "branchId_itemName_batchNumber">
 
   export type PharmacyItemOrderByWithAggregationInput = {
     id?: SortOrder
     branchId?: SortOrder
+    supplierId?: SortOrderInput | SortOrder
     itemName?: SortOrder
     itemType?: SortOrderInput | SortOrder
     category?: SortOrderInput | SortOrder
@@ -25771,6 +28639,7 @@ export namespace Prisma {
     NOT?: PharmacyItemScalarWhereWithAggregatesInput | PharmacyItemScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"PharmacyItem"> | string
     branchId?: StringWithAggregatesFilter<"PharmacyItem"> | string
+    supplierId?: StringNullableWithAggregatesFilter<"PharmacyItem"> | string | null
     itemName?: StringWithAggregatesFilter<"PharmacyItem"> | string
     itemType?: StringNullableWithAggregatesFilter<"PharmacyItem"> | string | null
     category?: StringNullableWithAggregatesFilter<"PharmacyItem"> | string | null
@@ -25879,6 +28748,7 @@ export namespace Prisma {
     NOT?: OpticalItemWhereInput | OpticalItemWhereInput[]
     id?: StringFilter<"OpticalItem"> | string
     branchId?: StringFilter<"OpticalItem"> | string
+    supplierId?: StringNullableFilter<"OpticalItem"> | string | null
     itemName?: StringFilter<"OpticalItem"> | string
     itemType?: StringNullableFilter<"OpticalItem"> | string | null
     brand?: StringNullableFilter<"OpticalItem"> | string | null
@@ -25892,12 +28762,14 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"OpticalItem"> | Date | string
     isActive?: BoolFilter<"OpticalItem"> | boolean
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    supplier?: XOR<SupplierNullableScalarRelationFilter, SupplierWhereInput> | null
     transactions?: OpticalStockTransactionListRelationFilter
   }
 
   export type OpticalItemOrderByWithRelationInput = {
     id?: SortOrder
     branchId?: SortOrder
+    supplierId?: SortOrderInput | SortOrder
     itemName?: SortOrder
     itemType?: SortOrderInput | SortOrder
     brand?: SortOrderInput | SortOrder
@@ -25911,6 +28783,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     isActive?: SortOrder
     branch?: BranchOrderByWithRelationInput
+    supplier?: SupplierOrderByWithRelationInput
     transactions?: OpticalStockTransactionOrderByRelationAggregateInput
   }
 
@@ -25921,6 +28794,7 @@ export namespace Prisma {
     OR?: OpticalItemWhereInput[]
     NOT?: OpticalItemWhereInput | OpticalItemWhereInput[]
     branchId?: StringFilter<"OpticalItem"> | string
+    supplierId?: StringNullableFilter<"OpticalItem"> | string | null
     itemName?: StringFilter<"OpticalItem"> | string
     itemType?: StringNullableFilter<"OpticalItem"> | string | null
     brand?: StringNullableFilter<"OpticalItem"> | string | null
@@ -25934,12 +28808,14 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"OpticalItem"> | Date | string
     isActive?: BoolFilter<"OpticalItem"> | boolean
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    supplier?: XOR<SupplierNullableScalarRelationFilter, SupplierWhereInput> | null
     transactions?: OpticalStockTransactionListRelationFilter
   }, "id" | "branchId_itemName_brand">
 
   export type OpticalItemOrderByWithAggregationInput = {
     id?: SortOrder
     branchId?: SortOrder
+    supplierId?: SortOrderInput | SortOrder
     itemName?: SortOrder
     itemType?: SortOrderInput | SortOrder
     brand?: SortOrderInput | SortOrder
@@ -25965,6 +28841,7 @@ export namespace Prisma {
     NOT?: OpticalItemScalarWhereWithAggregatesInput | OpticalItemScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"OpticalItem"> | string
     branchId?: StringWithAggregatesFilter<"OpticalItem"> | string
+    supplierId?: StringNullableWithAggregatesFilter<"OpticalItem"> | string | null
     itemName?: StringWithAggregatesFilter<"OpticalItem"> | string
     itemType?: StringNullableWithAggregatesFilter<"OpticalItem"> | string | null
     brand?: StringNullableWithAggregatesFilter<"OpticalItem"> | string | null
@@ -26439,6 +29316,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
     followUps?: FollowUpCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateInput = {
@@ -26462,6 +29341,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
     followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierUncheckedCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUpdateInput = {
@@ -26485,6 +29366,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateInput = {
@@ -26508,6 +29391,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUncheckedUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchCreateManyInput = {
@@ -26540,6 +29425,90 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type SupplierCreateInput = {
+    id?: string
+    name: string
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutSuppliersInput
+    pharmacyItems?: PharmacyItemCreateNestedManyWithoutSupplierInput
+    opticalItems?: OpticalItemCreateNestedManyWithoutSupplierInput
+  }
+
+  export type SupplierUncheckedCreateInput = {
+    id?: string
+    branchId: string
+    name: string
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutSupplierInput
+    opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutSupplierInput
+  }
+
+  export type SupplierUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutSuppliersNestedInput
+    pharmacyItems?: PharmacyItemUpdateManyWithoutSupplierNestedInput
+    opticalItems?: OpticalItemUpdateManyWithoutSupplierNestedInput
+  }
+
+  export type SupplierUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutSupplierNestedInput
+    opticalItems?: OpticalItemUncheckedUpdateManyWithoutSupplierNestedInput
+  }
+
+  export type SupplierCreateManyInput = {
+    id?: string
+    branchId: string
+    name: string
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SupplierUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SupplierUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     fullName: string
@@ -26562,6 +29531,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -26586,6 +29556,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -26610,6 +29581,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -26634,6 +29606,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -26683,6 +29656,81 @@ export namespace Prisma {
     branchId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActivityLogCreateInput = {
+    id?: string
+    action: string
+    entityType: string
+    entityId?: string | null
+    details?: string | null
+    createdAt?: Date | string
+    branch: BranchCreateNestedOneWithoutActivityLogsInput
+    user: UserCreateNestedOneWithoutActivityLogsInput
+  }
+
+  export type ActivityLogUncheckedCreateInput = {
+    id?: string
+    branchId: string
+    userId: string
+    action: string
+    entityType: string
+    entityId?: string | null
+    details?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ActivityLogUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    entityType?: StringFieldUpdateOperationsInput | string
+    entityId?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutActivityLogsNestedInput
+    user?: UserUpdateOneRequiredWithoutActivityLogsNestedInput
+  }
+
+  export type ActivityLogUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    entityType?: StringFieldUpdateOperationsInput | string
+    entityId?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActivityLogCreateManyInput = {
+    id?: string
+    branchId: string
+    userId: string
+    action: string
+    entityType: string
+    entityId?: string | null
+    details?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ActivityLogUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    entityType?: StringFieldUpdateOperationsInput | string
+    entityId?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActivityLogUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    entityType?: StringFieldUpdateOperationsInput | string
+    entityId?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type DoctorCreateInput = {
@@ -27436,12 +30484,14 @@ export namespace Prisma {
     updatedAt?: Date | string
     isActive?: boolean
     branch: BranchCreateNestedOneWithoutPharmacyItemsInput
+    supplier?: SupplierCreateNestedOneWithoutPharmacyItemsInput
     transactions?: PharmacyStockTransactionCreateNestedManyWithoutPharmacyItemInput
   }
 
   export type PharmacyItemUncheckedCreateInput = {
     id?: string
     branchId: string
+    supplierId?: string | null
     itemName: string
     itemType?: string | null
     category?: string | null
@@ -27476,12 +30526,14 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     branch?: BranchUpdateOneRequiredWithoutPharmacyItemsNestedInput
+    supplier?: SupplierUpdateOneWithoutPharmacyItemsNestedInput
     transactions?: PharmacyStockTransactionUpdateManyWithoutPharmacyItemNestedInput
   }
 
   export type PharmacyItemUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
     itemName?: StringFieldUpdateOperationsInput | string
     itemType?: NullableStringFieldUpdateOperationsInput | string | null
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27502,6 +30554,7 @@ export namespace Prisma {
   export type PharmacyItemCreateManyInput = {
     id?: string
     branchId: string
+    supplierId?: string | null
     itemName: string
     itemType?: string | null
     category?: string | null
@@ -27539,6 +30592,7 @@ export namespace Prisma {
   export type PharmacyItemUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
     itemName?: StringFieldUpdateOperationsInput | string
     itemType?: NullableStringFieldUpdateOperationsInput | string | null
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27650,12 +30704,14 @@ export namespace Prisma {
     updatedAt?: Date | string
     isActive?: boolean
     branch: BranchCreateNestedOneWithoutOpticalItemsInput
+    supplier?: SupplierCreateNestedOneWithoutOpticalItemsInput
     transactions?: OpticalStockTransactionCreateNestedManyWithoutOpticalItemInput
   }
 
   export type OpticalItemUncheckedCreateInput = {
     id?: string
     branchId: string
+    supplierId?: string | null
     itemName: string
     itemType?: string | null
     brand?: string | null
@@ -27686,12 +30742,14 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     branch?: BranchUpdateOneRequiredWithoutOpticalItemsNestedInput
+    supplier?: SupplierUpdateOneWithoutOpticalItemsNestedInput
     transactions?: OpticalStockTransactionUpdateManyWithoutOpticalItemNestedInput
   }
 
   export type OpticalItemUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
     itemName?: StringFieldUpdateOperationsInput | string
     itemType?: NullableStringFieldUpdateOperationsInput | string | null
     brand?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27710,6 +30768,7 @@ export namespace Prisma {
   export type OpticalItemCreateManyInput = {
     id?: string
     branchId: string
+    supplierId?: string | null
     itemName: string
     itemType?: string | null
     brand?: string | null
@@ -27743,6 +30802,7 @@ export namespace Prisma {
   export type OpticalItemUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
     itemName?: StringFieldUpdateOperationsInput | string
     itemType?: NullableStringFieldUpdateOperationsInput | string | null
     brand?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28326,6 +31386,18 @@ export namespace Prisma {
     none?: FollowUpWhereInput
   }
 
+  export type SupplierListRelationFilter = {
+    every?: SupplierWhereInput
+    some?: SupplierWhereInput
+    none?: SupplierWhereInput
+  }
+
+  export type ActivityLogListRelationFilter = {
+    every?: ActivityLogWhereInput
+    some?: ActivityLogWhereInput
+    none?: ActivityLogWhereInput
+  }
+
   export type StaffAssignmentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -28371,6 +31443,14 @@ export namespace Prisma {
   }
 
   export type FollowUpOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SupplierOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ActivityLogOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -28426,6 +31506,44 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type BranchScalarRelationFilter = {
+    is?: BranchWhereInput
+    isNot?: BranchWhereInput
+  }
+
+  export type SupplierCountOrderByAggregateInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    name?: SortOrder
+    phone?: SortOrder
+    email?: SortOrder
+    address?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SupplierMaxOrderByAggregateInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    name?: SortOrder
+    phone?: SortOrder
+    email?: SortOrder
+    address?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SupplierMinOrderByAggregateInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    name?: SortOrder
+    phone?: SortOrder
+    email?: SortOrder
+    address?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
   export type DateTimeNullableFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
@@ -28440,11 +31558,6 @@ export namespace Prisma {
   export type RoleScalarRelationFilter = {
     is?: RoleWhereInput
     isNot?: RoleWhereInput
-  }
-
-  export type BranchScalarRelationFilter = {
-    is?: BranchWhereInput
-    isNot?: BranchWhereInput
   }
 
   export type DoctorNullableScalarRelationFilter = {
@@ -28530,6 +31643,39 @@ export namespace Prisma {
   export type UserScalarRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
+  }
+
+  export type ActivityLogCountOrderByAggregateInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    userId?: SortOrder
+    action?: SortOrder
+    entityType?: SortOrder
+    entityId?: SortOrder
+    details?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ActivityLogMaxOrderByAggregateInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    userId?: SortOrder
+    action?: SortOrder
+    entityType?: SortOrder
+    entityId?: SortOrder
+    details?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ActivityLogMinOrderByAggregateInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    userId?: SortOrder
+    action?: SortOrder
+    entityType?: SortOrder
+    entityId?: SortOrder
+    details?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type ClinicalExaminationListRelationFilter = {
@@ -29047,6 +32193,11 @@ export namespace Prisma {
     _max?: NestedIntFilter<$PrismaModel>
   }
 
+  export type SupplierNullableScalarRelationFilter = {
+    is?: SupplierWhereInput | null
+    isNot?: SupplierWhereInput | null
+  }
+
   export type PharmacyItemBranchIdItemNameBatchNumberCompoundUniqueInput = {
     branchId: string
     itemName: string
@@ -29056,6 +32207,7 @@ export namespace Prisma {
   export type PharmacyItemCountOrderByAggregateInput = {
     id?: SortOrder
     branchId?: SortOrder
+    supplierId?: SortOrder
     itemName?: SortOrder
     itemType?: SortOrder
     category?: SortOrder
@@ -29082,6 +32234,7 @@ export namespace Prisma {
   export type PharmacyItemMaxOrderByAggregateInput = {
     id?: SortOrder
     branchId?: SortOrder
+    supplierId?: SortOrder
     itemName?: SortOrder
     itemType?: SortOrder
     category?: SortOrder
@@ -29101,6 +32254,7 @@ export namespace Prisma {
   export type PharmacyItemMinOrderByAggregateInput = {
     id?: SortOrder
     branchId?: SortOrder
+    supplierId?: SortOrder
     itemName?: SortOrder
     itemType?: SortOrder
     category?: SortOrder
@@ -29189,6 +32343,7 @@ export namespace Prisma {
   export type OpticalItemCountOrderByAggregateInput = {
     id?: SortOrder
     branchId?: SortOrder
+    supplierId?: SortOrder
     itemName?: SortOrder
     itemType?: SortOrder
     brand?: SortOrder
@@ -29213,6 +32368,7 @@ export namespace Prisma {
   export type OpticalItemMaxOrderByAggregateInput = {
     id?: SortOrder
     branchId?: SortOrder
+    supplierId?: SortOrder
     itemName?: SortOrder
     itemType?: SortOrder
     brand?: SortOrder
@@ -29230,6 +32386,7 @@ export namespace Prisma {
   export type OpticalItemMinOrderByAggregateInput = {
     id?: SortOrder
     branchId?: SortOrder
+    supplierId?: SortOrder
     itemName?: SortOrder
     itemType?: SortOrder
     brand?: SortOrder
@@ -29683,6 +32840,20 @@ export namespace Prisma {
     connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
   }
 
+  export type SupplierCreateNestedManyWithoutBranchInput = {
+    create?: XOR<SupplierCreateWithoutBranchInput, SupplierUncheckedCreateWithoutBranchInput> | SupplierCreateWithoutBranchInput[] | SupplierUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: SupplierCreateOrConnectWithoutBranchInput | SupplierCreateOrConnectWithoutBranchInput[]
+    createMany?: SupplierCreateManyBranchInputEnvelope
+    connect?: SupplierWhereUniqueInput | SupplierWhereUniqueInput[]
+  }
+
+  export type ActivityLogCreateNestedManyWithoutBranchInput = {
+    create?: XOR<ActivityLogCreateWithoutBranchInput, ActivityLogUncheckedCreateWithoutBranchInput> | ActivityLogCreateWithoutBranchInput[] | ActivityLogUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: ActivityLogCreateOrConnectWithoutBranchInput | ActivityLogCreateOrConnectWithoutBranchInput[]
+    createMany?: ActivityLogCreateManyBranchInputEnvelope
+    connect?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+  }
+
   export type UserUncheckedCreateNestedManyWithoutBranchInput = {
     create?: XOR<UserCreateWithoutBranchInput, UserUncheckedCreateWithoutBranchInput> | UserCreateWithoutBranchInput[] | UserUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: UserCreateOrConnectWithoutBranchInput | UserCreateOrConnectWithoutBranchInput[]
@@ -29772,6 +32943,20 @@ export namespace Prisma {
     connectOrCreate?: FollowUpCreateOrConnectWithoutBranchInput | FollowUpCreateOrConnectWithoutBranchInput[]
     createMany?: FollowUpCreateManyBranchInputEnvelope
     connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+  }
+
+  export type SupplierUncheckedCreateNestedManyWithoutBranchInput = {
+    create?: XOR<SupplierCreateWithoutBranchInput, SupplierUncheckedCreateWithoutBranchInput> | SupplierCreateWithoutBranchInput[] | SupplierUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: SupplierCreateOrConnectWithoutBranchInput | SupplierCreateOrConnectWithoutBranchInput[]
+    createMany?: SupplierCreateManyBranchInputEnvelope
+    connect?: SupplierWhereUniqueInput | SupplierWhereUniqueInput[]
+  }
+
+  export type ActivityLogUncheckedCreateNestedManyWithoutBranchInput = {
+    create?: XOR<ActivityLogCreateWithoutBranchInput, ActivityLogUncheckedCreateWithoutBranchInput> | ActivityLogCreateWithoutBranchInput[] | ActivityLogUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: ActivityLogCreateOrConnectWithoutBranchInput | ActivityLogCreateOrConnectWithoutBranchInput[]
+    createMany?: ActivityLogCreateManyBranchInputEnvelope
+    connect?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -29964,6 +33149,34 @@ export namespace Prisma {
     deleteMany?: FollowUpScalarWhereInput | FollowUpScalarWhereInput[]
   }
 
+  export type SupplierUpdateManyWithoutBranchNestedInput = {
+    create?: XOR<SupplierCreateWithoutBranchInput, SupplierUncheckedCreateWithoutBranchInput> | SupplierCreateWithoutBranchInput[] | SupplierUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: SupplierCreateOrConnectWithoutBranchInput | SupplierCreateOrConnectWithoutBranchInput[]
+    upsert?: SupplierUpsertWithWhereUniqueWithoutBranchInput | SupplierUpsertWithWhereUniqueWithoutBranchInput[]
+    createMany?: SupplierCreateManyBranchInputEnvelope
+    set?: SupplierWhereUniqueInput | SupplierWhereUniqueInput[]
+    disconnect?: SupplierWhereUniqueInput | SupplierWhereUniqueInput[]
+    delete?: SupplierWhereUniqueInput | SupplierWhereUniqueInput[]
+    connect?: SupplierWhereUniqueInput | SupplierWhereUniqueInput[]
+    update?: SupplierUpdateWithWhereUniqueWithoutBranchInput | SupplierUpdateWithWhereUniqueWithoutBranchInput[]
+    updateMany?: SupplierUpdateManyWithWhereWithoutBranchInput | SupplierUpdateManyWithWhereWithoutBranchInput[]
+    deleteMany?: SupplierScalarWhereInput | SupplierScalarWhereInput[]
+  }
+
+  export type ActivityLogUpdateManyWithoutBranchNestedInput = {
+    create?: XOR<ActivityLogCreateWithoutBranchInput, ActivityLogUncheckedCreateWithoutBranchInput> | ActivityLogCreateWithoutBranchInput[] | ActivityLogUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: ActivityLogCreateOrConnectWithoutBranchInput | ActivityLogCreateOrConnectWithoutBranchInput[]
+    upsert?: ActivityLogUpsertWithWhereUniqueWithoutBranchInput | ActivityLogUpsertWithWhereUniqueWithoutBranchInput[]
+    createMany?: ActivityLogCreateManyBranchInputEnvelope
+    set?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+    disconnect?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+    delete?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+    connect?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+    update?: ActivityLogUpdateWithWhereUniqueWithoutBranchInput | ActivityLogUpdateWithWhereUniqueWithoutBranchInput[]
+    updateMany?: ActivityLogUpdateManyWithWhereWithoutBranchInput | ActivityLogUpdateManyWithWhereWithoutBranchInput[]
+    deleteMany?: ActivityLogScalarWhereInput | ActivityLogScalarWhereInput[]
+  }
+
   export type UserUncheckedUpdateManyWithoutBranchNestedInput = {
     create?: XOR<UserCreateWithoutBranchInput, UserUncheckedCreateWithoutBranchInput> | UserCreateWithoutBranchInput[] | UserUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: UserCreateOrConnectWithoutBranchInput | UserCreateOrConnectWithoutBranchInput[]
@@ -30146,6 +33359,132 @@ export namespace Prisma {
     deleteMany?: FollowUpScalarWhereInput | FollowUpScalarWhereInput[]
   }
 
+  export type SupplierUncheckedUpdateManyWithoutBranchNestedInput = {
+    create?: XOR<SupplierCreateWithoutBranchInput, SupplierUncheckedCreateWithoutBranchInput> | SupplierCreateWithoutBranchInput[] | SupplierUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: SupplierCreateOrConnectWithoutBranchInput | SupplierCreateOrConnectWithoutBranchInput[]
+    upsert?: SupplierUpsertWithWhereUniqueWithoutBranchInput | SupplierUpsertWithWhereUniqueWithoutBranchInput[]
+    createMany?: SupplierCreateManyBranchInputEnvelope
+    set?: SupplierWhereUniqueInput | SupplierWhereUniqueInput[]
+    disconnect?: SupplierWhereUniqueInput | SupplierWhereUniqueInput[]
+    delete?: SupplierWhereUniqueInput | SupplierWhereUniqueInput[]
+    connect?: SupplierWhereUniqueInput | SupplierWhereUniqueInput[]
+    update?: SupplierUpdateWithWhereUniqueWithoutBranchInput | SupplierUpdateWithWhereUniqueWithoutBranchInput[]
+    updateMany?: SupplierUpdateManyWithWhereWithoutBranchInput | SupplierUpdateManyWithWhereWithoutBranchInput[]
+    deleteMany?: SupplierScalarWhereInput | SupplierScalarWhereInput[]
+  }
+
+  export type ActivityLogUncheckedUpdateManyWithoutBranchNestedInput = {
+    create?: XOR<ActivityLogCreateWithoutBranchInput, ActivityLogUncheckedCreateWithoutBranchInput> | ActivityLogCreateWithoutBranchInput[] | ActivityLogUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: ActivityLogCreateOrConnectWithoutBranchInput | ActivityLogCreateOrConnectWithoutBranchInput[]
+    upsert?: ActivityLogUpsertWithWhereUniqueWithoutBranchInput | ActivityLogUpsertWithWhereUniqueWithoutBranchInput[]
+    createMany?: ActivityLogCreateManyBranchInputEnvelope
+    set?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+    disconnect?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+    delete?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+    connect?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+    update?: ActivityLogUpdateWithWhereUniqueWithoutBranchInput | ActivityLogUpdateWithWhereUniqueWithoutBranchInput[]
+    updateMany?: ActivityLogUpdateManyWithWhereWithoutBranchInput | ActivityLogUpdateManyWithWhereWithoutBranchInput[]
+    deleteMany?: ActivityLogScalarWhereInput | ActivityLogScalarWhereInput[]
+  }
+
+  export type BranchCreateNestedOneWithoutSuppliersInput = {
+    create?: XOR<BranchCreateWithoutSuppliersInput, BranchUncheckedCreateWithoutSuppliersInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutSuppliersInput
+    connect?: BranchWhereUniqueInput
+  }
+
+  export type PharmacyItemCreateNestedManyWithoutSupplierInput = {
+    create?: XOR<PharmacyItemCreateWithoutSupplierInput, PharmacyItemUncheckedCreateWithoutSupplierInput> | PharmacyItemCreateWithoutSupplierInput[] | PharmacyItemUncheckedCreateWithoutSupplierInput[]
+    connectOrCreate?: PharmacyItemCreateOrConnectWithoutSupplierInput | PharmacyItemCreateOrConnectWithoutSupplierInput[]
+    createMany?: PharmacyItemCreateManySupplierInputEnvelope
+    connect?: PharmacyItemWhereUniqueInput | PharmacyItemWhereUniqueInput[]
+  }
+
+  export type OpticalItemCreateNestedManyWithoutSupplierInput = {
+    create?: XOR<OpticalItemCreateWithoutSupplierInput, OpticalItemUncheckedCreateWithoutSupplierInput> | OpticalItemCreateWithoutSupplierInput[] | OpticalItemUncheckedCreateWithoutSupplierInput[]
+    connectOrCreate?: OpticalItemCreateOrConnectWithoutSupplierInput | OpticalItemCreateOrConnectWithoutSupplierInput[]
+    createMany?: OpticalItemCreateManySupplierInputEnvelope
+    connect?: OpticalItemWhereUniqueInput | OpticalItemWhereUniqueInput[]
+  }
+
+  export type PharmacyItemUncheckedCreateNestedManyWithoutSupplierInput = {
+    create?: XOR<PharmacyItemCreateWithoutSupplierInput, PharmacyItemUncheckedCreateWithoutSupplierInput> | PharmacyItemCreateWithoutSupplierInput[] | PharmacyItemUncheckedCreateWithoutSupplierInput[]
+    connectOrCreate?: PharmacyItemCreateOrConnectWithoutSupplierInput | PharmacyItemCreateOrConnectWithoutSupplierInput[]
+    createMany?: PharmacyItemCreateManySupplierInputEnvelope
+    connect?: PharmacyItemWhereUniqueInput | PharmacyItemWhereUniqueInput[]
+  }
+
+  export type OpticalItemUncheckedCreateNestedManyWithoutSupplierInput = {
+    create?: XOR<OpticalItemCreateWithoutSupplierInput, OpticalItemUncheckedCreateWithoutSupplierInput> | OpticalItemCreateWithoutSupplierInput[] | OpticalItemUncheckedCreateWithoutSupplierInput[]
+    connectOrCreate?: OpticalItemCreateOrConnectWithoutSupplierInput | OpticalItemCreateOrConnectWithoutSupplierInput[]
+    createMany?: OpticalItemCreateManySupplierInputEnvelope
+    connect?: OpticalItemWhereUniqueInput | OpticalItemWhereUniqueInput[]
+  }
+
+  export type BranchUpdateOneRequiredWithoutSuppliersNestedInput = {
+    create?: XOR<BranchCreateWithoutSuppliersInput, BranchUncheckedCreateWithoutSuppliersInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutSuppliersInput
+    upsert?: BranchUpsertWithoutSuppliersInput
+    connect?: BranchWhereUniqueInput
+    update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutSuppliersInput, BranchUpdateWithoutSuppliersInput>, BranchUncheckedUpdateWithoutSuppliersInput>
+  }
+
+  export type PharmacyItemUpdateManyWithoutSupplierNestedInput = {
+    create?: XOR<PharmacyItemCreateWithoutSupplierInput, PharmacyItemUncheckedCreateWithoutSupplierInput> | PharmacyItemCreateWithoutSupplierInput[] | PharmacyItemUncheckedCreateWithoutSupplierInput[]
+    connectOrCreate?: PharmacyItemCreateOrConnectWithoutSupplierInput | PharmacyItemCreateOrConnectWithoutSupplierInput[]
+    upsert?: PharmacyItemUpsertWithWhereUniqueWithoutSupplierInput | PharmacyItemUpsertWithWhereUniqueWithoutSupplierInput[]
+    createMany?: PharmacyItemCreateManySupplierInputEnvelope
+    set?: PharmacyItemWhereUniqueInput | PharmacyItemWhereUniqueInput[]
+    disconnect?: PharmacyItemWhereUniqueInput | PharmacyItemWhereUniqueInput[]
+    delete?: PharmacyItemWhereUniqueInput | PharmacyItemWhereUniqueInput[]
+    connect?: PharmacyItemWhereUniqueInput | PharmacyItemWhereUniqueInput[]
+    update?: PharmacyItemUpdateWithWhereUniqueWithoutSupplierInput | PharmacyItemUpdateWithWhereUniqueWithoutSupplierInput[]
+    updateMany?: PharmacyItemUpdateManyWithWhereWithoutSupplierInput | PharmacyItemUpdateManyWithWhereWithoutSupplierInput[]
+    deleteMany?: PharmacyItemScalarWhereInput | PharmacyItemScalarWhereInput[]
+  }
+
+  export type OpticalItemUpdateManyWithoutSupplierNestedInput = {
+    create?: XOR<OpticalItemCreateWithoutSupplierInput, OpticalItemUncheckedCreateWithoutSupplierInput> | OpticalItemCreateWithoutSupplierInput[] | OpticalItemUncheckedCreateWithoutSupplierInput[]
+    connectOrCreate?: OpticalItemCreateOrConnectWithoutSupplierInput | OpticalItemCreateOrConnectWithoutSupplierInput[]
+    upsert?: OpticalItemUpsertWithWhereUniqueWithoutSupplierInput | OpticalItemUpsertWithWhereUniqueWithoutSupplierInput[]
+    createMany?: OpticalItemCreateManySupplierInputEnvelope
+    set?: OpticalItemWhereUniqueInput | OpticalItemWhereUniqueInput[]
+    disconnect?: OpticalItemWhereUniqueInput | OpticalItemWhereUniqueInput[]
+    delete?: OpticalItemWhereUniqueInput | OpticalItemWhereUniqueInput[]
+    connect?: OpticalItemWhereUniqueInput | OpticalItemWhereUniqueInput[]
+    update?: OpticalItemUpdateWithWhereUniqueWithoutSupplierInput | OpticalItemUpdateWithWhereUniqueWithoutSupplierInput[]
+    updateMany?: OpticalItemUpdateManyWithWhereWithoutSupplierInput | OpticalItemUpdateManyWithWhereWithoutSupplierInput[]
+    deleteMany?: OpticalItemScalarWhereInput | OpticalItemScalarWhereInput[]
+  }
+
+  export type PharmacyItemUncheckedUpdateManyWithoutSupplierNestedInput = {
+    create?: XOR<PharmacyItemCreateWithoutSupplierInput, PharmacyItemUncheckedCreateWithoutSupplierInput> | PharmacyItemCreateWithoutSupplierInput[] | PharmacyItemUncheckedCreateWithoutSupplierInput[]
+    connectOrCreate?: PharmacyItemCreateOrConnectWithoutSupplierInput | PharmacyItemCreateOrConnectWithoutSupplierInput[]
+    upsert?: PharmacyItemUpsertWithWhereUniqueWithoutSupplierInput | PharmacyItemUpsertWithWhereUniqueWithoutSupplierInput[]
+    createMany?: PharmacyItemCreateManySupplierInputEnvelope
+    set?: PharmacyItemWhereUniqueInput | PharmacyItemWhereUniqueInput[]
+    disconnect?: PharmacyItemWhereUniqueInput | PharmacyItemWhereUniqueInput[]
+    delete?: PharmacyItemWhereUniqueInput | PharmacyItemWhereUniqueInput[]
+    connect?: PharmacyItemWhereUniqueInput | PharmacyItemWhereUniqueInput[]
+    update?: PharmacyItemUpdateWithWhereUniqueWithoutSupplierInput | PharmacyItemUpdateWithWhereUniqueWithoutSupplierInput[]
+    updateMany?: PharmacyItemUpdateManyWithWhereWithoutSupplierInput | PharmacyItemUpdateManyWithWhereWithoutSupplierInput[]
+    deleteMany?: PharmacyItemScalarWhereInput | PharmacyItemScalarWhereInput[]
+  }
+
+  export type OpticalItemUncheckedUpdateManyWithoutSupplierNestedInput = {
+    create?: XOR<OpticalItemCreateWithoutSupplierInput, OpticalItemUncheckedCreateWithoutSupplierInput> | OpticalItemCreateWithoutSupplierInput[] | OpticalItemUncheckedCreateWithoutSupplierInput[]
+    connectOrCreate?: OpticalItemCreateOrConnectWithoutSupplierInput | OpticalItemCreateOrConnectWithoutSupplierInput[]
+    upsert?: OpticalItemUpsertWithWhereUniqueWithoutSupplierInput | OpticalItemUpsertWithWhereUniqueWithoutSupplierInput[]
+    createMany?: OpticalItemCreateManySupplierInputEnvelope
+    set?: OpticalItemWhereUniqueInput | OpticalItemWhereUniqueInput[]
+    disconnect?: OpticalItemWhereUniqueInput | OpticalItemWhereUniqueInput[]
+    delete?: OpticalItemWhereUniqueInput | OpticalItemWhereUniqueInput[]
+    connect?: OpticalItemWhereUniqueInput | OpticalItemWhereUniqueInput[]
+    update?: OpticalItemUpdateWithWhereUniqueWithoutSupplierInput | OpticalItemUpdateWithWhereUniqueWithoutSupplierInput[]
+    updateMany?: OpticalItemUpdateManyWithWhereWithoutSupplierInput | OpticalItemUpdateManyWithWhereWithoutSupplierInput[]
+    deleteMany?: OpticalItemScalarWhereInput | OpticalItemScalarWhereInput[]
+  }
+
   export type RoleCreateNestedOneWithoutUsersInput = {
     create?: XOR<RoleCreateWithoutUsersInput, RoleUncheckedCreateWithoutUsersInput>
     connectOrCreate?: RoleCreateOrConnectWithoutUsersInput
@@ -30206,6 +33545,13 @@ export namespace Prisma {
     connect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
   }
 
+  export type ActivityLogCreateNestedManyWithoutUserInput = {
+    create?: XOR<ActivityLogCreateWithoutUserInput, ActivityLogUncheckedCreateWithoutUserInput> | ActivityLogCreateWithoutUserInput[] | ActivityLogUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ActivityLogCreateOrConnectWithoutUserInput | ActivityLogCreateOrConnectWithoutUserInput[]
+    createMany?: ActivityLogCreateManyUserInputEnvelope
+    connect?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+  }
+
   export type DoctorUncheckedCreateNestedOneWithoutUserInput = {
     create?: XOR<DoctorCreateWithoutUserInput, DoctorUncheckedCreateWithoutUserInput>
     connectOrCreate?: DoctorCreateOrConnectWithoutUserInput
@@ -30252,6 +33598,13 @@ export namespace Prisma {
     connectOrCreate?: StaffAssignmentCreateOrConnectWithoutUserInput | StaffAssignmentCreateOrConnectWithoutUserInput[]
     createMany?: StaffAssignmentCreateManyUserInputEnvelope
     connect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+  }
+
+  export type ActivityLogUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<ActivityLogCreateWithoutUserInput, ActivityLogUncheckedCreateWithoutUserInput> | ActivityLogCreateWithoutUserInput[] | ActivityLogUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ActivityLogCreateOrConnectWithoutUserInput | ActivityLogCreateOrConnectWithoutUserInput[]
+    createMany?: ActivityLogCreateManyUserInputEnvelope
+    connect?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -30368,6 +33721,20 @@ export namespace Prisma {
     deleteMany?: StaffAssignmentScalarWhereInput | StaffAssignmentScalarWhereInput[]
   }
 
+  export type ActivityLogUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ActivityLogCreateWithoutUserInput, ActivityLogUncheckedCreateWithoutUserInput> | ActivityLogCreateWithoutUserInput[] | ActivityLogUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ActivityLogCreateOrConnectWithoutUserInput | ActivityLogCreateOrConnectWithoutUserInput[]
+    upsert?: ActivityLogUpsertWithWhereUniqueWithoutUserInput | ActivityLogUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ActivityLogCreateManyUserInputEnvelope
+    set?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+    disconnect?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+    delete?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+    connect?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+    update?: ActivityLogUpdateWithWhereUniqueWithoutUserInput | ActivityLogUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ActivityLogUpdateManyWithWhereWithoutUserInput | ActivityLogUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ActivityLogScalarWhereInput | ActivityLogScalarWhereInput[]
+  }
+
   export type DoctorUncheckedUpdateOneWithoutUserNestedInput = {
     create?: XOR<DoctorCreateWithoutUserInput, DoctorUncheckedCreateWithoutUserInput>
     connectOrCreate?: DoctorCreateOrConnectWithoutUserInput
@@ -30460,6 +33827,48 @@ export namespace Prisma {
     update?: StaffAssignmentUpdateWithWhereUniqueWithoutUserInput | StaffAssignmentUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: StaffAssignmentUpdateManyWithWhereWithoutUserInput | StaffAssignmentUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: StaffAssignmentScalarWhereInput | StaffAssignmentScalarWhereInput[]
+  }
+
+  export type ActivityLogUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ActivityLogCreateWithoutUserInput, ActivityLogUncheckedCreateWithoutUserInput> | ActivityLogCreateWithoutUserInput[] | ActivityLogUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ActivityLogCreateOrConnectWithoutUserInput | ActivityLogCreateOrConnectWithoutUserInput[]
+    upsert?: ActivityLogUpsertWithWhereUniqueWithoutUserInput | ActivityLogUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ActivityLogCreateManyUserInputEnvelope
+    set?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+    disconnect?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+    delete?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+    connect?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+    update?: ActivityLogUpdateWithWhereUniqueWithoutUserInput | ActivityLogUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ActivityLogUpdateManyWithWhereWithoutUserInput | ActivityLogUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ActivityLogScalarWhereInput | ActivityLogScalarWhereInput[]
+  }
+
+  export type BranchCreateNestedOneWithoutActivityLogsInput = {
+    create?: XOR<BranchCreateWithoutActivityLogsInput, BranchUncheckedCreateWithoutActivityLogsInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutActivityLogsInput
+    connect?: BranchWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutActivityLogsInput = {
+    create?: XOR<UserCreateWithoutActivityLogsInput, UserUncheckedCreateWithoutActivityLogsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutActivityLogsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type BranchUpdateOneRequiredWithoutActivityLogsNestedInput = {
+    create?: XOR<BranchCreateWithoutActivityLogsInput, BranchUncheckedCreateWithoutActivityLogsInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutActivityLogsInput
+    upsert?: BranchUpsertWithoutActivityLogsInput
+    connect?: BranchWhereUniqueInput
+    update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutActivityLogsInput, BranchUpdateWithoutActivityLogsInput>, BranchUncheckedUpdateWithoutActivityLogsInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutActivityLogsNestedInput = {
+    create?: XOR<UserCreateWithoutActivityLogsInput, UserUncheckedCreateWithoutActivityLogsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutActivityLogsInput
+    upsert?: UserUpsertWithoutActivityLogsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutActivityLogsInput, UserUpdateWithoutActivityLogsInput>, UserUncheckedUpdateWithoutActivityLogsInput>
   }
 
   export type UserCreateNestedOneWithoutDoctorInput = {
@@ -31468,6 +34877,12 @@ export namespace Prisma {
     connect?: BranchWhereUniqueInput
   }
 
+  export type SupplierCreateNestedOneWithoutPharmacyItemsInput = {
+    create?: XOR<SupplierCreateWithoutPharmacyItemsInput, SupplierUncheckedCreateWithoutPharmacyItemsInput>
+    connectOrCreate?: SupplierCreateOrConnectWithoutPharmacyItemsInput
+    connect?: SupplierWhereUniqueInput
+  }
+
   export type PharmacyStockTransactionCreateNestedManyWithoutPharmacyItemInput = {
     create?: XOR<PharmacyStockTransactionCreateWithoutPharmacyItemInput, PharmacyStockTransactionUncheckedCreateWithoutPharmacyItemInput> | PharmacyStockTransactionCreateWithoutPharmacyItemInput[] | PharmacyStockTransactionUncheckedCreateWithoutPharmacyItemInput[]
     connectOrCreate?: PharmacyStockTransactionCreateOrConnectWithoutPharmacyItemInput | PharmacyStockTransactionCreateOrConnectWithoutPharmacyItemInput[]
@@ -31488,6 +34903,16 @@ export namespace Prisma {
     upsert?: BranchUpsertWithoutPharmacyItemsInput
     connect?: BranchWhereUniqueInput
     update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutPharmacyItemsInput, BranchUpdateWithoutPharmacyItemsInput>, BranchUncheckedUpdateWithoutPharmacyItemsInput>
+  }
+
+  export type SupplierUpdateOneWithoutPharmacyItemsNestedInput = {
+    create?: XOR<SupplierCreateWithoutPharmacyItemsInput, SupplierUncheckedCreateWithoutPharmacyItemsInput>
+    connectOrCreate?: SupplierCreateOrConnectWithoutPharmacyItemsInput
+    upsert?: SupplierUpsertWithoutPharmacyItemsInput
+    disconnect?: SupplierWhereInput | boolean
+    delete?: SupplierWhereInput | boolean
+    connect?: SupplierWhereUniqueInput
+    update?: XOR<XOR<SupplierUpdateToOneWithWhereWithoutPharmacyItemsInput, SupplierUpdateWithoutPharmacyItemsInput>, SupplierUncheckedUpdateWithoutPharmacyItemsInput>
   }
 
   export type PharmacyStockTransactionUpdateManyWithoutPharmacyItemNestedInput = {
@@ -31582,6 +35007,12 @@ export namespace Prisma {
     connect?: BranchWhereUniqueInput
   }
 
+  export type SupplierCreateNestedOneWithoutOpticalItemsInput = {
+    create?: XOR<SupplierCreateWithoutOpticalItemsInput, SupplierUncheckedCreateWithoutOpticalItemsInput>
+    connectOrCreate?: SupplierCreateOrConnectWithoutOpticalItemsInput
+    connect?: SupplierWhereUniqueInput
+  }
+
   export type OpticalStockTransactionCreateNestedManyWithoutOpticalItemInput = {
     create?: XOR<OpticalStockTransactionCreateWithoutOpticalItemInput, OpticalStockTransactionUncheckedCreateWithoutOpticalItemInput> | OpticalStockTransactionCreateWithoutOpticalItemInput[] | OpticalStockTransactionUncheckedCreateWithoutOpticalItemInput[]
     connectOrCreate?: OpticalStockTransactionCreateOrConnectWithoutOpticalItemInput | OpticalStockTransactionCreateOrConnectWithoutOpticalItemInput[]
@@ -31602,6 +35033,16 @@ export namespace Prisma {
     upsert?: BranchUpsertWithoutOpticalItemsInput
     connect?: BranchWhereUniqueInput
     update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutOpticalItemsInput, BranchUpdateWithoutOpticalItemsInput>, BranchUncheckedUpdateWithoutOpticalItemsInput>
+  }
+
+  export type SupplierUpdateOneWithoutOpticalItemsNestedInput = {
+    create?: XOR<SupplierCreateWithoutOpticalItemsInput, SupplierUncheckedCreateWithoutOpticalItemsInput>
+    connectOrCreate?: SupplierCreateOrConnectWithoutOpticalItemsInput
+    upsert?: SupplierUpsertWithoutOpticalItemsInput
+    disconnect?: SupplierWhereInput | boolean
+    delete?: SupplierWhereInput | boolean
+    connect?: SupplierWhereUniqueInput
+    update?: XOR<XOR<SupplierUpdateToOneWithWhereWithoutOpticalItemsInput, SupplierUpdateWithoutOpticalItemsInput>, SupplierUncheckedUpdateWithoutOpticalItemsInput>
   }
 
   export type OpticalStockTransactionUpdateManyWithoutOpticalItemNestedInput = {
@@ -32378,6 +35819,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutRoleInput = {
@@ -32401,6 +35843,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutRoleInput = {
@@ -32470,6 +35913,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutBranchInput = {
@@ -32493,6 +35937,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutBranchInput = {
@@ -32747,11 +36192,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     isActive?: boolean
+    supplier?: SupplierCreateNestedOneWithoutPharmacyItemsInput
     transactions?: PharmacyStockTransactionCreateNestedManyWithoutPharmacyItemInput
   }
 
   export type PharmacyItemUncheckedCreateWithoutBranchInput = {
     id?: string
+    supplierId?: string | null
     itemName: string
     itemType?: string | null
     category?: string | null
@@ -32825,11 +36272,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     isActive?: boolean
+    supplier?: SupplierCreateNestedOneWithoutOpticalItemsInput
     transactions?: OpticalStockTransactionCreateNestedManyWithoutOpticalItemInput
   }
 
   export type OpticalItemUncheckedCreateWithoutBranchInput = {
     id?: string
+    supplierId?: string | null
     itemName: string
     itemType?: string | null
     brand?: string | null
@@ -32976,6 +36425,70 @@ export namespace Prisma {
 
   export type FollowUpCreateManyBranchInputEnvelope = {
     data: FollowUpCreateManyBranchInput | FollowUpCreateManyBranchInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SupplierCreateWithoutBranchInput = {
+    id?: string
+    name: string
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    pharmacyItems?: PharmacyItemCreateNestedManyWithoutSupplierInput
+    opticalItems?: OpticalItemCreateNestedManyWithoutSupplierInput
+  }
+
+  export type SupplierUncheckedCreateWithoutBranchInput = {
+    id?: string
+    name: string
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutSupplierInput
+    opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutSupplierInput
+  }
+
+  export type SupplierCreateOrConnectWithoutBranchInput = {
+    where: SupplierWhereUniqueInput
+    create: XOR<SupplierCreateWithoutBranchInput, SupplierUncheckedCreateWithoutBranchInput>
+  }
+
+  export type SupplierCreateManyBranchInputEnvelope = {
+    data: SupplierCreateManyBranchInput | SupplierCreateManyBranchInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ActivityLogCreateWithoutBranchInput = {
+    id?: string
+    action: string
+    entityType: string
+    entityId?: string | null
+    details?: string | null
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutActivityLogsInput
+  }
+
+  export type ActivityLogUncheckedCreateWithoutBranchInput = {
+    id?: string
+    userId: string
+    action: string
+    entityType: string
+    entityId?: string | null
+    details?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ActivityLogCreateOrConnectWithoutBranchInput = {
+    where: ActivityLogWhereUniqueInput
+    create: XOR<ActivityLogCreateWithoutBranchInput, ActivityLogUncheckedCreateWithoutBranchInput>
+  }
+
+  export type ActivityLogCreateManyBranchInputEnvelope = {
+    data: ActivityLogCreateManyBranchInput | ActivityLogCreateManyBranchInput[]
     skipDuplicates?: boolean
   }
 
@@ -33205,6 +36718,7 @@ export namespace Prisma {
     NOT?: PharmacyItemScalarWhereInput | PharmacyItemScalarWhereInput[]
     id?: StringFilter<"PharmacyItem"> | string
     branchId?: StringFilter<"PharmacyItem"> | string
+    supplierId?: StringNullableFilter<"PharmacyItem"> | string | null
     itemName?: StringFilter<"PharmacyItem"> | string
     itemType?: StringNullableFilter<"PharmacyItem"> | string | null
     category?: StringNullableFilter<"PharmacyItem"> | string | null
@@ -33274,6 +36788,7 @@ export namespace Prisma {
     NOT?: OpticalItemScalarWhereInput | OpticalItemScalarWhereInput[]
     id?: StringFilter<"OpticalItem"> | string
     branchId?: StringFilter<"OpticalItem"> | string
+    supplierId?: StringNullableFilter<"OpticalItem"> | string | null
     itemName?: StringFilter<"OpticalItem"> | string
     itemType?: StringNullableFilter<"OpticalItem"> | string | null
     brand?: StringNullableFilter<"OpticalItem"> | string | null
@@ -33393,6 +36908,306 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"FollowUp"> | Date | string
   }
 
+  export type SupplierUpsertWithWhereUniqueWithoutBranchInput = {
+    where: SupplierWhereUniqueInput
+    update: XOR<SupplierUpdateWithoutBranchInput, SupplierUncheckedUpdateWithoutBranchInput>
+    create: XOR<SupplierCreateWithoutBranchInput, SupplierUncheckedCreateWithoutBranchInput>
+  }
+
+  export type SupplierUpdateWithWhereUniqueWithoutBranchInput = {
+    where: SupplierWhereUniqueInput
+    data: XOR<SupplierUpdateWithoutBranchInput, SupplierUncheckedUpdateWithoutBranchInput>
+  }
+
+  export type SupplierUpdateManyWithWhereWithoutBranchInput = {
+    where: SupplierScalarWhereInput
+    data: XOR<SupplierUpdateManyMutationInput, SupplierUncheckedUpdateManyWithoutBranchInput>
+  }
+
+  export type SupplierScalarWhereInput = {
+    AND?: SupplierScalarWhereInput | SupplierScalarWhereInput[]
+    OR?: SupplierScalarWhereInput[]
+    NOT?: SupplierScalarWhereInput | SupplierScalarWhereInput[]
+    id?: StringFilter<"Supplier"> | string
+    branchId?: StringFilter<"Supplier"> | string
+    name?: StringFilter<"Supplier"> | string
+    phone?: StringNullableFilter<"Supplier"> | string | null
+    email?: StringNullableFilter<"Supplier"> | string | null
+    address?: StringNullableFilter<"Supplier"> | string | null
+    createdAt?: DateTimeFilter<"Supplier"> | Date | string
+    updatedAt?: DateTimeFilter<"Supplier"> | Date | string
+  }
+
+  export type ActivityLogUpsertWithWhereUniqueWithoutBranchInput = {
+    where: ActivityLogWhereUniqueInput
+    update: XOR<ActivityLogUpdateWithoutBranchInput, ActivityLogUncheckedUpdateWithoutBranchInput>
+    create: XOR<ActivityLogCreateWithoutBranchInput, ActivityLogUncheckedCreateWithoutBranchInput>
+  }
+
+  export type ActivityLogUpdateWithWhereUniqueWithoutBranchInput = {
+    where: ActivityLogWhereUniqueInput
+    data: XOR<ActivityLogUpdateWithoutBranchInput, ActivityLogUncheckedUpdateWithoutBranchInput>
+  }
+
+  export type ActivityLogUpdateManyWithWhereWithoutBranchInput = {
+    where: ActivityLogScalarWhereInput
+    data: XOR<ActivityLogUpdateManyMutationInput, ActivityLogUncheckedUpdateManyWithoutBranchInput>
+  }
+
+  export type ActivityLogScalarWhereInput = {
+    AND?: ActivityLogScalarWhereInput | ActivityLogScalarWhereInput[]
+    OR?: ActivityLogScalarWhereInput[]
+    NOT?: ActivityLogScalarWhereInput | ActivityLogScalarWhereInput[]
+    id?: StringFilter<"ActivityLog"> | string
+    branchId?: StringFilter<"ActivityLog"> | string
+    userId?: StringFilter<"ActivityLog"> | string
+    action?: StringFilter<"ActivityLog"> | string
+    entityType?: StringFilter<"ActivityLog"> | string
+    entityId?: StringNullableFilter<"ActivityLog"> | string | null
+    details?: StringNullableFilter<"ActivityLog"> | string | null
+    createdAt?: DateTimeFilter<"ActivityLog"> | Date | string
+  }
+
+  export type BranchCreateWithoutSuppliersInput = {
+    id?: string
+    branchName: string
+    address: string
+    phone: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserCreateNestedManyWithoutBranchInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutBranchInput
+    doctors?: DoctorCreateNestedManyWithoutBranchInput
+    patients?: PatientCreateNestedManyWithoutBranchInput
+    appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    surgeries?: SurgeryCreateNestedManyWithoutBranchInput
+    prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
+    pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
+    opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
+    opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
+    billings?: BillingCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchUncheckedCreateWithoutSuppliersInput = {
+    id?: string
+    branchName: string
+    address: string
+    phone: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserUncheckedCreateNestedManyWithoutBranchInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutBranchInput
+    doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
+    patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
+    prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
+    pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
+    opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
+    opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
+    billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchCreateOrConnectWithoutSuppliersInput = {
+    where: BranchWhereUniqueInput
+    create: XOR<BranchCreateWithoutSuppliersInput, BranchUncheckedCreateWithoutSuppliersInput>
+  }
+
+  export type PharmacyItemCreateWithoutSupplierInput = {
+    id?: string
+    itemName: string
+    itemType?: string | null
+    category?: string | null
+    manufacturer?: string | null
+    supplierName?: string | null
+    batchNumber?: string | null
+    stockQuantity?: number
+    reorderLevel?: number
+    purchasePrice: Decimal | DecimalJsLike | number | string
+    sellingPrice: Decimal | DecimalJsLike | number | string
+    expiryDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    isActive?: boolean
+    branch: BranchCreateNestedOneWithoutPharmacyItemsInput
+    transactions?: PharmacyStockTransactionCreateNestedManyWithoutPharmacyItemInput
+  }
+
+  export type PharmacyItemUncheckedCreateWithoutSupplierInput = {
+    id?: string
+    branchId: string
+    itemName: string
+    itemType?: string | null
+    category?: string | null
+    manufacturer?: string | null
+    supplierName?: string | null
+    batchNumber?: string | null
+    stockQuantity?: number
+    reorderLevel?: number
+    purchasePrice: Decimal | DecimalJsLike | number | string
+    sellingPrice: Decimal | DecimalJsLike | number | string
+    expiryDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    isActive?: boolean
+    transactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutPharmacyItemInput
+  }
+
+  export type PharmacyItemCreateOrConnectWithoutSupplierInput = {
+    where: PharmacyItemWhereUniqueInput
+    create: XOR<PharmacyItemCreateWithoutSupplierInput, PharmacyItemUncheckedCreateWithoutSupplierInput>
+  }
+
+  export type PharmacyItemCreateManySupplierInputEnvelope = {
+    data: PharmacyItemCreateManySupplierInput | PharmacyItemCreateManySupplierInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type OpticalItemCreateWithoutSupplierInput = {
+    id?: string
+    itemName: string
+    itemType?: string | null
+    brand?: string | null
+    manufacturer?: string | null
+    supplierName?: string | null
+    stockQuantity?: number
+    reorderLevel?: number
+    purchasePrice: Decimal | DecimalJsLike | number | string
+    sellingPrice: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    isActive?: boolean
+    branch: BranchCreateNestedOneWithoutOpticalItemsInput
+    transactions?: OpticalStockTransactionCreateNestedManyWithoutOpticalItemInput
+  }
+
+  export type OpticalItemUncheckedCreateWithoutSupplierInput = {
+    id?: string
+    branchId: string
+    itemName: string
+    itemType?: string | null
+    brand?: string | null
+    manufacturer?: string | null
+    supplierName?: string | null
+    stockQuantity?: number
+    reorderLevel?: number
+    purchasePrice: Decimal | DecimalJsLike | number | string
+    sellingPrice: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    isActive?: boolean
+    transactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutOpticalItemInput
+  }
+
+  export type OpticalItemCreateOrConnectWithoutSupplierInput = {
+    where: OpticalItemWhereUniqueInput
+    create: XOR<OpticalItemCreateWithoutSupplierInput, OpticalItemUncheckedCreateWithoutSupplierInput>
+  }
+
+  export type OpticalItemCreateManySupplierInputEnvelope = {
+    data: OpticalItemCreateManySupplierInput | OpticalItemCreateManySupplierInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type BranchUpsertWithoutSuppliersInput = {
+    update: XOR<BranchUpdateWithoutSuppliersInput, BranchUncheckedUpdateWithoutSuppliersInput>
+    create: XOR<BranchCreateWithoutSuppliersInput, BranchUncheckedCreateWithoutSuppliersInput>
+    where?: BranchWhereInput
+  }
+
+  export type BranchUpdateToOneWithWhereWithoutSuppliersInput = {
+    where?: BranchWhereInput
+    data: XOR<BranchUpdateWithoutSuppliersInput, BranchUncheckedUpdateWithoutSuppliersInput>
+  }
+
+  export type BranchUpdateWithoutSuppliersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchName?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUpdateManyWithoutBranchNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutBranchNestedInput
+    doctors?: DoctorUpdateManyWithoutBranchNestedInput
+    patients?: PatientUpdateManyWithoutBranchNestedInput
+    appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
+    prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
+    pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
+    opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
+    opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
+    billings?: BillingUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutBranchNestedInput
+  }
+
+  export type BranchUncheckedUpdateWithoutSuppliersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchName?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUncheckedUpdateManyWithoutBranchNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutBranchNestedInput
+    doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
+    patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
+    appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
+    prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
+    pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
+    opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
+    billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutBranchNestedInput
+  }
+
+  export type PharmacyItemUpsertWithWhereUniqueWithoutSupplierInput = {
+    where: PharmacyItemWhereUniqueInput
+    update: XOR<PharmacyItemUpdateWithoutSupplierInput, PharmacyItemUncheckedUpdateWithoutSupplierInput>
+    create: XOR<PharmacyItemCreateWithoutSupplierInput, PharmacyItemUncheckedCreateWithoutSupplierInput>
+  }
+
+  export type PharmacyItemUpdateWithWhereUniqueWithoutSupplierInput = {
+    where: PharmacyItemWhereUniqueInput
+    data: XOR<PharmacyItemUpdateWithoutSupplierInput, PharmacyItemUncheckedUpdateWithoutSupplierInput>
+  }
+
+  export type PharmacyItemUpdateManyWithWhereWithoutSupplierInput = {
+    where: PharmacyItemScalarWhereInput
+    data: XOR<PharmacyItemUpdateManyMutationInput, PharmacyItemUncheckedUpdateManyWithoutSupplierInput>
+  }
+
+  export type OpticalItemUpsertWithWhereUniqueWithoutSupplierInput = {
+    where: OpticalItemWhereUniqueInput
+    update: XOR<OpticalItemUpdateWithoutSupplierInput, OpticalItemUncheckedUpdateWithoutSupplierInput>
+    create: XOR<OpticalItemCreateWithoutSupplierInput, OpticalItemUncheckedCreateWithoutSupplierInput>
+  }
+
+  export type OpticalItemUpdateWithWhereUniqueWithoutSupplierInput = {
+    where: OpticalItemWhereUniqueInput
+    data: XOR<OpticalItemUpdateWithoutSupplierInput, OpticalItemUncheckedUpdateWithoutSupplierInput>
+  }
+
+  export type OpticalItemUpdateManyWithWhereWithoutSupplierInput = {
+    where: OpticalItemScalarWhereInput
+    data: XOR<OpticalItemUpdateManyMutationInput, OpticalItemUncheckedUpdateManyWithoutSupplierInput>
+  }
+
   export type RoleCreateWithoutUsersInput = {
     id?: string
     name: string
@@ -33430,6 +37245,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
     followUps?: FollowUpCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutUsersInput = {
@@ -33452,6 +37269,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
     followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierUncheckedCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutUsersInput = {
@@ -33710,6 +37529,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ActivityLogCreateWithoutUserInput = {
+    id?: string
+    action: string
+    entityType: string
+    entityId?: string | null
+    details?: string | null
+    createdAt?: Date | string
+    branch: BranchCreateNestedOneWithoutActivityLogsInput
+  }
+
+  export type ActivityLogUncheckedCreateWithoutUserInput = {
+    id?: string
+    branchId: string
+    action: string
+    entityType: string
+    entityId?: string | null
+    details?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ActivityLogCreateOrConnectWithoutUserInput = {
+    where: ActivityLogWhereUniqueInput
+    create: XOR<ActivityLogCreateWithoutUserInput, ActivityLogUncheckedCreateWithoutUserInput>
+  }
+
+  export type ActivityLogCreateManyUserInputEnvelope = {
+    data: ActivityLogCreateManyUserInput | ActivityLogCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type RoleUpsertWithoutUsersInput = {
     update: XOR<RoleUpdateWithoutUsersInput, RoleUncheckedUpdateWithoutUsersInput>
     create: XOR<RoleCreateWithoutUsersInput, RoleUncheckedCreateWithoutUsersInput>
@@ -33764,6 +37613,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutUsersInput = {
@@ -33786,6 +37637,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUncheckedUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type DoctorUpsertWithoutUserInput = {
@@ -33938,6 +37791,246 @@ export namespace Prisma {
     data: XOR<StaffAssignmentUpdateManyMutationInput, StaffAssignmentUncheckedUpdateManyWithoutUserInput>
   }
 
+  export type ActivityLogUpsertWithWhereUniqueWithoutUserInput = {
+    where: ActivityLogWhereUniqueInput
+    update: XOR<ActivityLogUpdateWithoutUserInput, ActivityLogUncheckedUpdateWithoutUserInput>
+    create: XOR<ActivityLogCreateWithoutUserInput, ActivityLogUncheckedCreateWithoutUserInput>
+  }
+
+  export type ActivityLogUpdateWithWhereUniqueWithoutUserInput = {
+    where: ActivityLogWhereUniqueInput
+    data: XOR<ActivityLogUpdateWithoutUserInput, ActivityLogUncheckedUpdateWithoutUserInput>
+  }
+
+  export type ActivityLogUpdateManyWithWhereWithoutUserInput = {
+    where: ActivityLogScalarWhereInput
+    data: XOR<ActivityLogUpdateManyMutationInput, ActivityLogUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type BranchCreateWithoutActivityLogsInput = {
+    id?: string
+    branchName: string
+    address: string
+    phone: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserCreateNestedManyWithoutBranchInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutBranchInput
+    doctors?: DoctorCreateNestedManyWithoutBranchInput
+    patients?: PatientCreateNestedManyWithoutBranchInput
+    appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    surgeries?: SurgeryCreateNestedManyWithoutBranchInput
+    prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
+    pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
+    opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
+    opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
+    billings?: BillingCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchUncheckedCreateWithoutActivityLogsInput = {
+    id?: string
+    branchName: string
+    address: string
+    phone: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserUncheckedCreateNestedManyWithoutBranchInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutBranchInput
+    doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
+    patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
+    prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
+    pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
+    opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
+    opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
+    billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierUncheckedCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchCreateOrConnectWithoutActivityLogsInput = {
+    where: BranchWhereUniqueInput
+    create: XOR<BranchCreateWithoutActivityLogsInput, BranchUncheckedCreateWithoutActivityLogsInput>
+  }
+
+  export type UserCreateWithoutActivityLogsInput = {
+    id?: string
+    fullName: string
+    username: string
+    email: string
+    password: string
+    phone?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
+    profileImage?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    role: RoleCreateNestedOneWithoutUsersInput
+    branch: BranchCreateNestedOneWithoutUsersInput
+    doctor?: DoctorCreateNestedOneWithoutUserInput
+    createdAppointments?: AppointmentCreateNestedManyWithoutCreatedByInput
+    recordedERExams?: ERExaminationCreateNestedManyWithoutRecordedByInput
+    pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutPerformedByInput
+    opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
+    createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutActivityLogsInput = {
+    id?: string
+    fullName: string
+    username: string
+    email: string
+    password: string
+    phone?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
+    profileImage?: string | null
+    isActive?: boolean
+    roleId: string
+    branchId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    doctor?: DoctorUncheckedCreateNestedOneWithoutUserInput
+    createdAppointments?: AppointmentUncheckedCreateNestedManyWithoutCreatedByInput
+    recordedERExams?: ERExaminationUncheckedCreateNestedManyWithoutRecordedByInput
+    pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
+    opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
+    createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutActivityLogsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutActivityLogsInput, UserUncheckedCreateWithoutActivityLogsInput>
+  }
+
+  export type BranchUpsertWithoutActivityLogsInput = {
+    update: XOR<BranchUpdateWithoutActivityLogsInput, BranchUncheckedUpdateWithoutActivityLogsInput>
+    create: XOR<BranchCreateWithoutActivityLogsInput, BranchUncheckedCreateWithoutActivityLogsInput>
+    where?: BranchWhereInput
+  }
+
+  export type BranchUpdateToOneWithWhereWithoutActivityLogsInput = {
+    where?: BranchWhereInput
+    data: XOR<BranchUpdateWithoutActivityLogsInput, BranchUncheckedUpdateWithoutActivityLogsInput>
+  }
+
+  export type BranchUpdateWithoutActivityLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchName?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUpdateManyWithoutBranchNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutBranchNestedInput
+    doctors?: DoctorUpdateManyWithoutBranchNestedInput
+    patients?: PatientUpdateManyWithoutBranchNestedInput
+    appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
+    prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
+    pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
+    opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
+    opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
+    billings?: BillingUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUpdateManyWithoutBranchNestedInput
+  }
+
+  export type BranchUncheckedUpdateWithoutActivityLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchName?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUncheckedUpdateManyWithoutBranchNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutBranchNestedInput
+    doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
+    patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
+    appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
+    prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
+    pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
+    opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
+    billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUncheckedUpdateManyWithoutBranchNestedInput
+  }
+
+  export type UserUpsertWithoutActivityLogsInput = {
+    update: XOR<UserUpdateWithoutActivityLogsInput, UserUncheckedUpdateWithoutActivityLogsInput>
+    create: XOR<UserCreateWithoutActivityLogsInput, UserUncheckedCreateWithoutActivityLogsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutActivityLogsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutActivityLogsInput, UserUncheckedUpdateWithoutActivityLogsInput>
+  }
+
+  export type UserUpdateWithoutActivityLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    profileImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: RoleUpdateOneRequiredWithoutUsersNestedInput
+    branch?: BranchUpdateOneRequiredWithoutUsersNestedInput
+    doctor?: DoctorUpdateOneWithoutUserNestedInput
+    createdAppointments?: AppointmentUpdateManyWithoutCreatedByNestedInput
+    recordedERExams?: ERExaminationUpdateManyWithoutRecordedByNestedInput
+    pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutPerformedByNestedInput
+    opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
+    createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutActivityLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    profileImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    roleId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    doctor?: DoctorUncheckedUpdateOneWithoutUserNestedInput
+    createdAppointments?: AppointmentUncheckedUpdateManyWithoutCreatedByNestedInput
+    recordedERExams?: ERExaminationUncheckedUpdateManyWithoutRecordedByNestedInput
+    pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
+    opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
+    createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  }
+
   export type UserCreateWithoutDoctorInput = {
     id?: string
     fullName: string
@@ -33959,6 +38052,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutDoctorInput = {
@@ -33982,6 +38076,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutDoctorInput = {
@@ -34009,6 +38104,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
     followUps?: FollowUpCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutDoctorsInput = {
@@ -34031,6 +38128,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
     followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierUncheckedCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutDoctorsInput = {
@@ -34206,6 +38305,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDoctorInput = {
@@ -34229,6 +38329,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type BranchUpsertWithoutDoctorsInput = {
@@ -34262,6 +38363,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutDoctorsInput = {
@@ -34284,6 +38387,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUncheckedUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type AppointmentUpsertWithWhereUniqueWithoutDoctorInput = {
@@ -34374,6 +38479,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
     followUps?: FollowUpCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutPatientsInput = {
@@ -34396,6 +38503,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
     followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierUncheckedCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutPatientsInput = {
@@ -34572,6 +38681,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutPatientsInput = {
@@ -34594,6 +38705,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUncheckedUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type AppointmentUpsertWithWhereUniqueWithoutPatientInput = {
@@ -34664,6 +38777,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
     followUps?: FollowUpCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutAppointmentsInput = {
@@ -34686,6 +38801,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
     followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierUncheckedCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutAppointmentsInput = {
@@ -34780,6 +38897,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCreatedAppointmentsInput = {
@@ -34803,6 +38921,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutCreatedAppointmentsInput = {
@@ -35045,6 +39164,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutAppointmentsInput = {
@@ -35067,6 +39188,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUncheckedUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type PatientUpsertWithoutAppointmentsInput = {
@@ -35179,6 +39302,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreatedAppointmentsInput = {
@@ -35202,6 +39326,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ERExaminationUpsertWithoutAppointmentInput = {
@@ -35400,6 +39525,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutRecordedERExamsInput = {
@@ -35423,6 +39549,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutRecordedERExamsInput = {
@@ -35509,6 +39636,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRecordedERExamsInput = {
@@ -35532,6 +39660,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type AppointmentCreateWithoutClinicalExaminationInput = {
@@ -35945,6 +40074,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
     followUps?: FollowUpCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutSurgeriesInput = {
@@ -35967,6 +40098,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
     followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierUncheckedCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutSurgeriesInput = {
@@ -36177,6 +40310,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutSurgeriesInput = {
@@ -36199,6 +40334,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUncheckedUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type DoctorUpsertWithoutSurgeriesInput = {
@@ -36374,6 +40511,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
     followUps?: FollowUpCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutPrescriptionsInput = {
@@ -36396,6 +40535,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
     followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierUncheckedCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutPrescriptionsInput = {
@@ -36622,6 +40763,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutPrescriptionsInput = {
@@ -36644,6 +40787,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUncheckedUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type BillingUpsertWithWhereUniqueWithoutPrescriptionInput = {
@@ -36698,6 +40843,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
     followUps?: FollowUpCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutPharmacyItemsInput = {
@@ -36720,11 +40867,42 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
     followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierUncheckedCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutPharmacyItemsInput = {
     where: BranchWhereUniqueInput
     create: XOR<BranchCreateWithoutPharmacyItemsInput, BranchUncheckedCreateWithoutPharmacyItemsInput>
+  }
+
+  export type SupplierCreateWithoutPharmacyItemsInput = {
+    id?: string
+    name: string
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutSuppliersInput
+    opticalItems?: OpticalItemCreateNestedManyWithoutSupplierInput
+  }
+
+  export type SupplierUncheckedCreateWithoutPharmacyItemsInput = {
+    id?: string
+    branchId: string
+    name: string
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutSupplierInput
+  }
+
+  export type SupplierCreateOrConnectWithoutPharmacyItemsInput = {
+    where: SupplierWhereUniqueInput
+    create: XOR<SupplierCreateWithoutPharmacyItemsInput, SupplierUncheckedCreateWithoutPharmacyItemsInput>
   }
 
   export type PharmacyStockTransactionCreateWithoutPharmacyItemInput = {
@@ -36790,6 +40968,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutPharmacyItemsInput = {
@@ -36812,6 +40992,43 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUncheckedUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutBranchNestedInput
+  }
+
+  export type SupplierUpsertWithoutPharmacyItemsInput = {
+    update: XOR<SupplierUpdateWithoutPharmacyItemsInput, SupplierUncheckedUpdateWithoutPharmacyItemsInput>
+    create: XOR<SupplierCreateWithoutPharmacyItemsInput, SupplierUncheckedCreateWithoutPharmacyItemsInput>
+    where?: SupplierWhereInput
+  }
+
+  export type SupplierUpdateToOneWithWhereWithoutPharmacyItemsInput = {
+    where?: SupplierWhereInput
+    data: XOR<SupplierUpdateWithoutPharmacyItemsInput, SupplierUncheckedUpdateWithoutPharmacyItemsInput>
+  }
+
+  export type SupplierUpdateWithoutPharmacyItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutSuppliersNestedInput
+    opticalItems?: OpticalItemUpdateManyWithoutSupplierNestedInput
+  }
+
+  export type SupplierUncheckedUpdateWithoutPharmacyItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    opticalItems?: OpticalItemUncheckedUpdateManyWithoutSupplierNestedInput
   }
 
   export type PharmacyStockTransactionUpsertWithWhereUniqueWithoutPharmacyItemInput = {
@@ -36847,11 +41064,13 @@ export namespace Prisma {
     updatedAt?: Date | string
     isActive?: boolean
     branch: BranchCreateNestedOneWithoutPharmacyItemsInput
+    supplier?: SupplierCreateNestedOneWithoutPharmacyItemsInput
   }
 
   export type PharmacyItemUncheckedCreateWithoutTransactionsInput = {
     id?: string
     branchId: string
+    supplierId?: string | null
     itemName: string
     itemType?: string | null
     category?: string | null
@@ -36893,6 +41112,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
     followUps?: FollowUpCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutPharmacyTransactionsInput = {
@@ -36915,6 +41136,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
     followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierUncheckedCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutPharmacyTransactionsInput = {
@@ -36988,6 +41211,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPharmacyTransactionsInput = {
@@ -37011,6 +41235,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutPharmacyTransactionsInput = {
@@ -37046,11 +41271,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     branch?: BranchUpdateOneRequiredWithoutPharmacyItemsNestedInput
+    supplier?: SupplierUpdateOneWithoutPharmacyItemsNestedInput
   }
 
   export type PharmacyItemUncheckedUpdateWithoutTransactionsInput = {
     id?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
     itemName?: StringFieldUpdateOperationsInput | string
     itemType?: NullableStringFieldUpdateOperationsInput | string | null
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37098,6 +41325,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutPharmacyTransactionsInput = {
@@ -37120,6 +41349,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUncheckedUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type BillingUpsertWithoutPharmacyTransactionsInput = {
@@ -37205,6 +41436,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPharmacyTransactionsInput = {
@@ -37228,6 +41460,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type BranchCreateWithoutOpticalItemsInput = {
@@ -37250,6 +41483,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
     followUps?: FollowUpCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutOpticalItemsInput = {
@@ -37272,11 +41507,42 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
     followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierUncheckedCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutOpticalItemsInput = {
     where: BranchWhereUniqueInput
     create: XOR<BranchCreateWithoutOpticalItemsInput, BranchUncheckedCreateWithoutOpticalItemsInput>
+  }
+
+  export type SupplierCreateWithoutOpticalItemsInput = {
+    id?: string
+    name: string
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutSuppliersInput
+    pharmacyItems?: PharmacyItemCreateNestedManyWithoutSupplierInput
+  }
+
+  export type SupplierUncheckedCreateWithoutOpticalItemsInput = {
+    id?: string
+    branchId: string
+    name: string
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutSupplierInput
+  }
+
+  export type SupplierCreateOrConnectWithoutOpticalItemsInput = {
+    where: SupplierWhereUniqueInput
+    create: XOR<SupplierCreateWithoutOpticalItemsInput, SupplierUncheckedCreateWithoutOpticalItemsInput>
   }
 
   export type OpticalStockTransactionCreateWithoutOpticalItemInput = {
@@ -37342,6 +41608,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutOpticalItemsInput = {
@@ -37364,6 +41632,43 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUncheckedUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutBranchNestedInput
+  }
+
+  export type SupplierUpsertWithoutOpticalItemsInput = {
+    update: XOR<SupplierUpdateWithoutOpticalItemsInput, SupplierUncheckedUpdateWithoutOpticalItemsInput>
+    create: XOR<SupplierCreateWithoutOpticalItemsInput, SupplierUncheckedCreateWithoutOpticalItemsInput>
+    where?: SupplierWhereInput
+  }
+
+  export type SupplierUpdateToOneWithWhereWithoutOpticalItemsInput = {
+    where?: SupplierWhereInput
+    data: XOR<SupplierUpdateWithoutOpticalItemsInput, SupplierUncheckedUpdateWithoutOpticalItemsInput>
+  }
+
+  export type SupplierUpdateWithoutOpticalItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutSuppliersNestedInput
+    pharmacyItems?: PharmacyItemUpdateManyWithoutSupplierNestedInput
+  }
+
+  export type SupplierUncheckedUpdateWithoutOpticalItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutSupplierNestedInput
   }
 
   export type OpticalStockTransactionUpsertWithWhereUniqueWithoutOpticalItemInput = {
@@ -37397,11 +41702,13 @@ export namespace Prisma {
     updatedAt?: Date | string
     isActive?: boolean
     branch: BranchCreateNestedOneWithoutOpticalItemsInput
+    supplier?: SupplierCreateNestedOneWithoutOpticalItemsInput
   }
 
   export type OpticalItemUncheckedCreateWithoutTransactionsInput = {
     id?: string
     branchId: string
+    supplierId?: string | null
     itemName: string
     itemType?: string | null
     brand?: string | null
@@ -37441,6 +41748,8 @@ export namespace Prisma {
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
     followUps?: FollowUpCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutOpticalTransactionsInput = {
@@ -37463,6 +41772,8 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
     followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierUncheckedCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutOpticalTransactionsInput = {
@@ -37536,6 +41847,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOpticalTransactionsInput = {
@@ -37559,6 +41871,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOpticalTransactionsInput = {
@@ -37592,11 +41905,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     branch?: BranchUpdateOneRequiredWithoutOpticalItemsNestedInput
+    supplier?: SupplierUpdateOneWithoutOpticalItemsNestedInput
   }
 
   export type OpticalItemUncheckedUpdateWithoutTransactionsInput = {
     id?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
     itemName?: StringFieldUpdateOperationsInput | string
     itemType?: NullableStringFieldUpdateOperationsInput | string | null
     brand?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37642,6 +41957,8 @@ export namespace Prisma {
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutOpticalTransactionsInput = {
@@ -37664,6 +41981,8 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUncheckedUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type BillingUpsertWithoutOpticalTransactionsInput = {
@@ -37749,6 +42068,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOpticalTransactionsInput = {
@@ -37772,6 +42092,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type PatientCreateWithoutBillingsInput = {
@@ -37829,6 +42150,8 @@ export namespace Prisma {
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     followUps?: FollowUpCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutBillingsInput = {
@@ -37851,6 +42174,8 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierUncheckedCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutBillingsInput = {
@@ -37990,6 +42315,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutPerformedByInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCreatedBillingsInput = {
@@ -38013,6 +42339,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutCreatedBillingsInput = {
@@ -38156,6 +42483,8 @@ export namespace Prisma {
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutBillingsInput = {
@@ -38178,6 +42507,8 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUncheckedUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type AppointmentUpsertWithoutBillingsInput = {
@@ -38341,6 +42672,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutPerformedByNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreatedBillingsInput = {
@@ -38364,6 +42696,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type PharmacyStockTransactionUpsertWithWhereUniqueWithoutBillingInput = {
@@ -38453,6 +42786,8 @@ export namespace Prisma {
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutFollowUpsInput = {
@@ -38475,6 +42810,8 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierUncheckedCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutFollowUpsInput = {
@@ -38708,6 +43045,8 @@ export namespace Prisma {
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutFollowUpsInput = {
@@ -38730,6 +43069,8 @@ export namespace Prisma {
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUncheckedUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type AppointmentUpsertWithoutCompletedFollowUpsInput = {
@@ -38931,6 +43272,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutPerformedByInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutStaffAssignmentsInput = {
@@ -38954,6 +43296,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutStaffAssignmentsInput = {
@@ -38981,6 +43324,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
     billings?: BillingCreateNestedManyWithoutBranchInput
     followUps?: FollowUpCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutStaffAssignmentsInput = {
@@ -39003,6 +43348,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
     followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierUncheckedCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutStaffAssignmentsInput = {
@@ -39042,6 +43389,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutPerformedByNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutStaffAssignmentsInput = {
@@ -39065,6 +43413,7 @@ export namespace Prisma {
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type BranchUpsertWithoutStaffAssignmentsInput = {
@@ -39098,6 +43447,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
     billings?: BillingUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutStaffAssignmentsInput = {
@@ -39120,6 +43471,8 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
     followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUncheckedUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type UserCreateManyRoleInput = {
@@ -39159,6 +43512,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRoleInput = {
@@ -39182,6 +43536,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutRoleInput = {
@@ -39286,6 +43641,7 @@ export namespace Prisma {
 
   export type PharmacyItemCreateManyBranchInput = {
     id?: string
+    supplierId?: string | null
     itemName: string
     itemType?: string | null
     category?: string | null
@@ -39315,6 +43671,7 @@ export namespace Prisma {
 
   export type OpticalItemCreateManyBranchInput = {
     id?: string
+    supplierId?: string | null
     itemName: string
     itemType?: string | null
     brand?: string | null
@@ -39374,6 +43731,26 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type SupplierCreateManyBranchInput = {
+    id?: string
+    name: string
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ActivityLogCreateManyBranchInput = {
+    id?: string
+    userId: string
+    action: string
+    entityType: string
+    entityId?: string | null
+    details?: string | null
+    createdAt?: Date | string
+  }
+
   export type UserUpdateWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
     fullName?: StringFieldUpdateOperationsInput | string
@@ -39395,6 +43772,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBranchInput = {
@@ -39418,6 +43796,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutBranchInput = {
@@ -39686,11 +44065,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    supplier?: SupplierUpdateOneWithoutPharmacyItemsNestedInput
     transactions?: PharmacyStockTransactionUpdateManyWithoutPharmacyItemNestedInput
   }
 
   export type PharmacyItemUncheckedUpdateWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
     itemName?: StringFieldUpdateOperationsInput | string
     itemType?: NullableStringFieldUpdateOperationsInput | string | null
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39710,6 +44091,7 @@ export namespace Prisma {
 
   export type PharmacyItemUncheckedUpdateManyWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
     itemName?: StringFieldUpdateOperationsInput | string
     itemType?: NullableStringFieldUpdateOperationsInput | string | null
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39773,11 +44155,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    supplier?: SupplierUpdateOneWithoutOpticalItemsNestedInput
     transactions?: OpticalStockTransactionUpdateManyWithoutOpticalItemNestedInput
   }
 
   export type OpticalItemUncheckedUpdateWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
     itemName?: StringFieldUpdateOperationsInput | string
     itemType?: NullableStringFieldUpdateOperationsInput | string | null
     brand?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39795,6 +44179,7 @@ export namespace Prisma {
 
   export type OpticalItemUncheckedUpdateManyWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
     itemName?: StringFieldUpdateOperationsInput | string
     itemType?: NullableStringFieldUpdateOperationsInput | string | null
     brand?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39948,6 +44333,218 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type SupplierUpdateWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    pharmacyItems?: PharmacyItemUpdateManyWithoutSupplierNestedInput
+    opticalItems?: OpticalItemUpdateManyWithoutSupplierNestedInput
+  }
+
+  export type SupplierUncheckedUpdateWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutSupplierNestedInput
+    opticalItems?: OpticalItemUncheckedUpdateManyWithoutSupplierNestedInput
+  }
+
+  export type SupplierUncheckedUpdateManyWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActivityLogUpdateWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    entityType?: StringFieldUpdateOperationsInput | string
+    entityId?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutActivityLogsNestedInput
+  }
+
+  export type ActivityLogUncheckedUpdateWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    entityType?: StringFieldUpdateOperationsInput | string
+    entityId?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActivityLogUncheckedUpdateManyWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    entityType?: StringFieldUpdateOperationsInput | string
+    entityId?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PharmacyItemCreateManySupplierInput = {
+    id?: string
+    branchId: string
+    itemName: string
+    itemType?: string | null
+    category?: string | null
+    manufacturer?: string | null
+    supplierName?: string | null
+    batchNumber?: string | null
+    stockQuantity?: number
+    reorderLevel?: number
+    purchasePrice: Decimal | DecimalJsLike | number | string
+    sellingPrice: Decimal | DecimalJsLike | number | string
+    expiryDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    isActive?: boolean
+  }
+
+  export type OpticalItemCreateManySupplierInput = {
+    id?: string
+    branchId: string
+    itemName: string
+    itemType?: string | null
+    brand?: string | null
+    manufacturer?: string | null
+    supplierName?: string | null
+    stockQuantity?: number
+    reorderLevel?: number
+    purchasePrice: Decimal | DecimalJsLike | number | string
+    sellingPrice: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    isActive?: boolean
+  }
+
+  export type PharmacyItemUpdateWithoutSupplierInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    itemName?: StringFieldUpdateOperationsInput | string
+    itemType?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    stockQuantity?: IntFieldUpdateOperationsInput | number
+    reorderLevel?: IntFieldUpdateOperationsInput | number
+    purchasePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    branch?: BranchUpdateOneRequiredWithoutPharmacyItemsNestedInput
+    transactions?: PharmacyStockTransactionUpdateManyWithoutPharmacyItemNestedInput
+  }
+
+  export type PharmacyItemUncheckedUpdateWithoutSupplierInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    itemName?: StringFieldUpdateOperationsInput | string
+    itemType?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    stockQuantity?: IntFieldUpdateOperationsInput | number
+    reorderLevel?: IntFieldUpdateOperationsInput | number
+    purchasePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    transactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutPharmacyItemNestedInput
+  }
+
+  export type PharmacyItemUncheckedUpdateManyWithoutSupplierInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    itemName?: StringFieldUpdateOperationsInput | string
+    itemType?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    stockQuantity?: IntFieldUpdateOperationsInput | number
+    reorderLevel?: IntFieldUpdateOperationsInput | number
+    purchasePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    expiryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type OpticalItemUpdateWithoutSupplierInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    itemName?: StringFieldUpdateOperationsInput | string
+    itemType?: NullableStringFieldUpdateOperationsInput | string | null
+    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    stockQuantity?: IntFieldUpdateOperationsInput | number
+    reorderLevel?: IntFieldUpdateOperationsInput | number
+    purchasePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    branch?: BranchUpdateOneRequiredWithoutOpticalItemsNestedInput
+    transactions?: OpticalStockTransactionUpdateManyWithoutOpticalItemNestedInput
+  }
+
+  export type OpticalItemUncheckedUpdateWithoutSupplierInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    itemName?: StringFieldUpdateOperationsInput | string
+    itemType?: NullableStringFieldUpdateOperationsInput | string | null
+    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    stockQuantity?: IntFieldUpdateOperationsInput | number
+    reorderLevel?: IntFieldUpdateOperationsInput | number
+    purchasePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    transactions?: OpticalStockTransactionUncheckedUpdateManyWithoutOpticalItemNestedInput
+  }
+
+  export type OpticalItemUncheckedUpdateManyWithoutSupplierInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    itemName?: StringFieldUpdateOperationsInput | string
+    itemType?: NullableStringFieldUpdateOperationsInput | string | null
+    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    stockQuantity?: IntFieldUpdateOperationsInput | number
+    reorderLevel?: IntFieldUpdateOperationsInput | number
+    purchasePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+  }
+
   export type AppointmentCreateManyCreatedByInput = {
     id?: string
     bookingNumber?: string | null
@@ -40019,6 +44616,16 @@ export namespace Prisma {
     branchId: string
     isPrimary?: boolean | null
     assignedAt?: Date | string
+  }
+
+  export type ActivityLogCreateManyUserInput = {
+    id?: string
+    branchId: string
+    action: string
+    entityType: string
+    entityId?: string | null
+    details?: string | null
+    createdAt?: Date | string
   }
 
   export type AppointmentUpdateWithoutCreatedByInput = {
@@ -40252,6 +44859,36 @@ export namespace Prisma {
     branchId?: StringFieldUpdateOperationsInput | string
     isPrimary?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActivityLogUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    entityType?: StringFieldUpdateOperationsInput | string
+    entityId?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutActivityLogsNestedInput
+  }
+
+  export type ActivityLogUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    entityType?: StringFieldUpdateOperationsInput | string
+    entityId?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActivityLogUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    entityType?: StringFieldUpdateOperationsInput | string
+    entityId?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AppointmentCreateManyDoctorInput = {

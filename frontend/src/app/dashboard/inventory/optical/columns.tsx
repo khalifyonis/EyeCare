@@ -1,5 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { Pencil, Trash2, AlertTriangle, PackagePlus } from 'lucide-react';
+import { Pencil, Trash2, AlertTriangle, PackagePlus, History, SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export interface OpticalRow {
@@ -8,6 +8,9 @@ export interface OpticalRow {
     itemType?: string | null;
     brand?: string | null;
     manufacturer?: string | null;
+    supplierName?: string | null;
+    supplierId?: string | null;
+    supplier?: { id: string; name: string } | null;
     stockQuantity: number;
     reorderLevel: number;
     purchasePrice?: number | string | null;
@@ -19,6 +22,8 @@ export interface OpticalColumnsProps {
     onEdit: (row: OpticalRow) => void;
     onDelete: (id: string) => void;
     onReceive: (row: OpticalRow) => void;
+    onHistory: (row: OpticalRow) => void;
+    onAdjust: (row: OpticalRow) => void;
 }
 
 function toNum(v: number | string | null | undefined): number {
@@ -26,7 +31,7 @@ function toNum(v: number | string | null | undefined): number {
     return typeof v === 'number' ? v : parseFloat(String(v)) || 0;
 }
 
-export function getOpticalColumns({ onEdit, onDelete, onReceive }: OpticalColumnsProps): ColumnDef<OpticalRow>[] {
+export function getOpticalColumns({ onEdit, onDelete, onReceive, onHistory, onAdjust }: OpticalColumnsProps): ColumnDef<OpticalRow>[] {
     return [
         {
             accessorKey: 'itemName',
@@ -47,6 +52,13 @@ export function getOpticalColumns({ onEdit, onDelete, onReceive }: OpticalColumn
             header: 'Type',
             cell: ({ row }) => (
                 <span className="text-sm text-muted-foreground">{row.original.itemType || '—'}</span>
+            ),
+        },
+        {
+            accessorKey: 'supplier',
+            header: 'Supplier',
+            cell: ({ row }) => (
+                <span className="text-sm text-muted-foreground">{row.original.supplier?.name || row.original.supplierName || '—'}</span>
             ),
         },
         {
@@ -85,6 +97,24 @@ export function getOpticalColumns({ onEdit, onDelete, onReceive }: OpticalColumn
             header: 'Actions',
             cell: ({ row }: { row: { original: OpticalRow } }) => (
                 <div className="flex items-center justify-end gap-1 px-1">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        title="Transaction history"
+                        className="h-8 w-8 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition-all active:scale-90 rounded-lg"
+                        onClick={() => onHistory(row.original)}
+                    >
+                        <History className="w-4 h-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        title="Adjust stock"
+                        className="h-8 w-8 bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 transition-all active:scale-90 rounded-lg"
+                        onClick={() => onAdjust(row.original)}
+                    >
+                        <SlidersHorizontal className="w-4 h-4" />
+                    </Button>
                     <Button
                         variant="ghost"
                         size="icon"

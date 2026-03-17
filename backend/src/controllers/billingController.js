@@ -1,5 +1,6 @@
 import prisma from '../lib/prisma.js';
 import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
+import { createActivityLog } from '../lib/activityLog.js';
 
 const getBranchFilter = (req) => {
     return (req.user.role === 'SUPERADMIN' || !req.user.branchId)
@@ -324,6 +325,15 @@ export const createBilling = async (req, res, next) => {
             }
         }
 
+        createActivityLog({
+            branchId: activeBranchId,
+            userId: req.user.id,
+            action: 'CREATED',
+            entityType: 'Billing',
+            entityId: billing.id,
+            details: `${serviceType} - ${String(billing.finalAmount)}`,
+        }).catch(() => {});
+
         res.status(201).json(billing);
     } catch (error) {
         next(error);
@@ -381,7 +391,8 @@ export const deleteBilling = async (req, res, next) => {
         const existing = await prisma.billing.findUnique({
             where: { id: req.params.id },
             include: {
-                prescription: { select: { itemType: true, itemId: true, quantity: true, branchId: true } },
+                pharmacyTransactions: { where: { transactionType: 'OUT' } },
+                opticalTransactions: { where: { transactionType: 'OUT' } },
             },
         });
         if (!existing) return res.status(404).json({ message: 'Billing not found' });
@@ -389,15 +400,50 @@ export const deleteBilling = async (req, res, next) => {
             return res.status(403).json({ message: 'Forbidden' });
         }
 
-        if ((existing.serviceType === 'PHARMACY' || existing.serviceType === 'OPTICAL') && existing.prescription?.itemId && existing.prescription.quantity > 0) {
-            await restoreStockForBilling(
-                existing.prescription.itemType,
-                existing.prescription.itemId,
-                existing.prescription.branchId,
-                existing.prescription.quantity,
-                req.user.id,
-            );
+        for (const tx of existing.pharmacyTransactions || []) {
+            await prisma.pharmacyStockTransaction.create({
+                data: {
+                    pharmacyItemId: tx.pharmacyItemId,
+                    branchId: tx.branchId,
+                    transactionType: 'IN',
+                    quantity: tx.quantity,
+                    unitPrice: 0,
+                    performedById: req.user.id,
+                },
+            });
+            await prisma.pharmacyItem.update({
+                where: { id: tx.pharmacyItemId },
+                data: { stockQuantity: { increment: tx.quantity } },
+            });
         }
+        for (const tx of existing.opticalTransactions || []) {
+            await prisma.opticalStockTransaction.create({
+                data: {
+                    opticalItemId: tx.opticalItemId,
+                    branchId: tx.branchId,
+                    transactionType: 'IN',
+                    quantity: tx.quantity,
+                    unitPrice: 0,
+                    performedById: req.user.id,
+                },
+            });
+            await prisma.opticalItem.update({
+                where: { id: tx.opticalItemId },
+                data: { stockQuantity: { increment: tx.quantity } },
+            });
+        }
+
+        await prisma.pharmacyStockTransaction.updateMany({ where: { billingId: existing.id }, data: { billingId: null } });
+        await prisma.opticalStockTransaction.updateMany({ where: { billingId: existing.id }, data: { billingId: null } });
+
+        createActivityLog({
+            branchId: existing.branchId,
+            userId: req.user.id,
+            action: 'DELETED',
+            entityType: 'Billing',
+            entityId: existing.id,
+            details: `${existing.serviceType} - ${String(existing.finalAmount)}`,
+        }).catch(() => {});
 
         await prisma.billing.delete({ where: { id: req.params.id } });
         res.status(200).json({ message: 'Billing deleted successfully' });

@@ -25,7 +25,11 @@ import {
     Receipt,
     BarChart3,
     UserPlus,
+    Package,
+    ArrowDownToLine,
+    History,
 } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter, useParams, usePathname } from 'next/navigation'
 
 import {
@@ -59,6 +63,7 @@ type NavItem = {
     icon: React.ElementType
     url: string
     subItems?: NavSubItem[]
+    comingSoon?: boolean
 }
 type NavSection = {
     section: string
@@ -66,15 +71,11 @@ type NavSection = {
 }
 
 const roleNavigation: Record<string, NavSection[]> = {
-    ADMIN: [
+    SUPERADMIN: [
         {
             section: 'OVERVIEW',
             items: [
-                {
-                    title: 'Dashboard',
-                    icon: LayoutDashboard,
-                    url: '/dashboard/admin',
-                },
+                { title: 'Dashboard', icon: LayoutDashboard, url: '/dashboard/admin' },
                 { title: 'Users', icon: UserCog, url: '/dashboard/admin/users' },
                 { title: 'Doctors', icon: Stethoscope, url: '/dashboard/admin/doctors' },
                 { title: 'Branches', icon: LayoutDashboard, url: '/dashboard/admin/branches' },
@@ -93,21 +94,108 @@ const roleNavigation: Record<string, NavSection[]> = {
             ],
         },
         {
+            section: 'INVENTORY',
+            items: [
+                {
+                    title: 'Pharmacy',
+                    icon: Pill,
+                    url: '/dashboard/inventory/pharmacy',
+                    subItems: [
+                        { title: 'Items', url: '/dashboard/inventory/pharmacy' },
+                        { title: 'Purchases', url: '/dashboard/inventory/pharmacy/purchases' },
+                        { title: 'Transaction History', url: '/dashboard/inventory/pharmacy/transactions' },
+                    ],
+                },
+                {
+                    title: 'Optical',
+                    icon: Glasses,
+                    url: '/dashboard/inventory/optical',
+                    subItems: [
+                        { title: 'Items', url: '/dashboard/inventory/optical' },
+                        { title: 'Purchases', url: '/dashboard/inventory/optical/purchases' },
+                        { title: 'Transaction History', url: '/dashboard/inventory/optical/transactions' },
+                    ],
+                },
+                { title: 'Suppliers', icon: Package, url: '/dashboard/suppliers' },
+            ],
+        },
+        {
             section: 'OPERATIONS',
             items: [
-                { title: 'Pharmacy Inventory', icon: Pill, url: '/dashboard/inventory/pharmacy' },
-                { title: 'Optical Inventory', icon: Glasses, url: '/dashboard/inventory/optical' },
                 { title: 'Billing', icon: Receipt, url: '/dashboard/billing' },
-                { title: 'Messages', icon: MessageSquare, url: '#' },
-                { title: 'Email', icon: Mail, url: '#' },
-                { title: 'Tasks', icon: ClipboardList, url: '#' },
             ],
         },
         {
             section: 'SYSTEM',
             items: [
-                { title: 'Activity Logs', icon: Activity, url: '#' },
-                { title: 'Settings', icon: Settings, url: '#' },
+                { title: 'Activity Logs', icon: Activity, url: '/dashboard/activity-log' },
+                { title: 'Tasks', icon: ClipboardList, url: '#', comingSoon: true },
+                { title: 'Notifications', icon: Mail, url: '#', comingSoon: true },
+                { title: 'Settings', icon: Settings, url: '#', comingSoon: true },
+            ],
+        },
+    ],
+    ADMIN: [
+        {
+            section: 'OVERVIEW',
+            items: [
+                { title: 'Dashboard', icon: LayoutDashboard, url: '/dashboard/admin' },
+                { title: 'Users', icon: UserCog, url: '/dashboard/admin/users' },
+                { title: 'Doctors', icon: Stethoscope, url: '/dashboard/admin/doctors' },
+                { title: 'Branches', icon: LayoutDashboard, url: '/dashboard/admin/branches' },
+            ],
+        },
+        {
+            section: 'CLINICAL',
+            items: [
+                { title: 'Patients', icon: Users, url: '/dashboard/patients' },
+                { title: 'Appointments', icon: Calendar, url: '/dashboard/appointments' },
+                { title: 'ER Examinations', icon: Eye, url: '/dashboard/examinations/er' },
+                { title: 'Clinical Examinations', icon: Eye, url: '/dashboard/examinations/clinical' },
+                { title: 'Surgeries', icon: Activity, url: '/dashboard/surgeries' },
+                { title: 'Prescriptions', icon: FileText, url: '/dashboard/prescriptions' },
+                { title: 'Medical Reports', icon: BarChart3, url: '/dashboard/reports' },
+            ],
+        },
+        {
+            section: 'INVENTORY',
+            items: [
+                {
+                    title: 'Pharmacy',
+                    icon: Pill,
+                    url: '/dashboard/inventory/pharmacy',
+                    subItems: [
+                        { title: 'Items', url: '/dashboard/inventory/pharmacy' },
+                        { title: 'Purchases', url: '/dashboard/inventory/pharmacy/purchases' },
+                        { title: 'Transaction History', url: '/dashboard/inventory/pharmacy/transactions' },
+                    ],
+                },
+                {
+                    title: 'Optical',
+                    icon: Glasses,
+                    url: '/dashboard/inventory/optical',
+                    subItems: [
+                        { title: 'Items', url: '/dashboard/inventory/optical' },
+                        { title: 'Purchases', url: '/dashboard/inventory/optical/purchases' },
+                        { title: 'Transaction History', url: '/dashboard/inventory/optical/transactions' },
+                    ],
+                },
+                { title: 'Suppliers', icon: Package, url: '/dashboard/suppliers' },
+            ],
+        },
+        {
+            section: 'OPERATIONS',
+            items: [
+                { title: 'Billing', icon: Receipt, url: '/dashboard/billing' },
+            ],
+        },
+        {
+            section: 'SYSTEM',
+            items: [
+                { title: 'Activity Logs', icon: Activity, url: '/dashboard/activity-log' },
+                { title: 'Tasks', icon: ClipboardList, url: '#', comingSoon: true },
+                { title: 'Notifications', icon: Mail, url: '#', comingSoon: true },
+                { title: 'Settings', icon: Settings, url: '#', comingSoon: true },
             ],
         },
     ],
@@ -143,12 +231,27 @@ const roleNavigation: Record<string, NavSection[]> = {
             ],
         },
         {
-            section: 'PHARMACY',
+            section: 'INVENTORY',
+            items: [
+                {
+                    title: 'Pharmacy',
+                    icon: Pill,
+                    url: '/dashboard/inventory/pharmacy',
+                    subItems: [
+                        { title: 'Items', url: '/dashboard/inventory/pharmacy' },
+                        { title: 'Purchases', url: '/dashboard/inventory/pharmacy/purchases' },
+                        { title: 'Transaction History', url: '/dashboard/inventory/pharmacy/transactions' },
+                    ],
+                },
+                { title: 'Suppliers', icon: Package, url: '/dashboard/suppliers' },
+            ],
+        },
+        {
+            section: 'DISPENSING',
             items: [
                 { title: 'Prescriptions', icon: FileText, url: '/dashboard/prescriptions' },
-                { title: 'Pharmacy Inventory', icon: Pill, url: '/dashboard/inventory/pharmacy' },
+                { title: 'Billing (Sales)', icon: Receipt, url: '/dashboard/billing' },
                 { title: 'Patients', icon: Users, url: '/dashboard/patients' },
-                { title: 'Billing', icon: Receipt, url: '/dashboard/billing' },
             ],
         },
         {
@@ -166,12 +269,27 @@ const roleNavigation: Record<string, NavSection[]> = {
             ],
         },
         {
-            section: 'OPTICAL',
+            section: 'INVENTORY',
+            items: [
+                {
+                    title: 'Optical',
+                    icon: Glasses,
+                    url: '/dashboard/inventory/optical',
+                    subItems: [
+                        { title: 'Items', url: '/dashboard/inventory/optical' },
+                        { title: 'Purchases', url: '/dashboard/inventory/optical/purchases' },
+                        { title: 'Transaction History', url: '/dashboard/inventory/optical/transactions' },
+                    ],
+                },
+                { title: 'Suppliers', icon: Package, url: '/dashboard/suppliers' },
+            ],
+        },
+        {
+            section: 'DISPENSING',
             items: [
                 { title: 'Prescriptions', icon: FileText, url: '/dashboard/prescriptions' },
-                { title: 'Optical Inventory', icon: Glasses, url: '/dashboard/inventory/optical' },
+                { title: 'Billing (Sales)', icon: Receipt, url: '/dashboard/billing' },
                 { title: 'Patients', icon: Users, url: '/dashboard/patients' },
-                { title: 'Billing', icon: Receipt, url: '/dashboard/billing' },
             ],
         },
         {
@@ -230,19 +348,24 @@ function CollapsibleNavItem({
     }, [isActive])
 
     if (!item.subItems) {
+        const isComingSoon = item.comingSoon === true
+        const canNavigate = item.url !== '#' && !isComingSoon
         return (
             <SidebarMenuItem>
                 <SidebarMenuButton
-                    tooltip={item.title}
+                    tooltip={isComingSoon ? `${item.title} (Coming soon)` : item.title}
                     isActive={isActive}
-                    onClick={() => onSelect()}
+                    onClick={() => { if (canNavigate) onSelect() }}
                     className={`h-[42px] px-3.5 transition-all duration-200 group/item rounded-lg ${isActive
                         ? '!bg-[#0EA5E9] !text-white shadow-[0_4px_12px_rgba(14,165,233,0.3)]'
                         : 'hover:bg-sidebar-accent text-sidebar-foreground hover:text-[#0EA5E9] dark:text-sidebar-foreground dark:hover:bg-sidebar-accent dark:hover:text-[#0EA5E9]'
-                        }`}
+                        } ${isComingSoon ? 'cursor-default' : ''}`}
                 >
                     <item.icon className={`h-[21px] w-[21px] shrink-0 transition-colors duration-200 ${isActive ? '!text-white' : 'text-sidebar-foreground/70 group-hover/item:text-[#0EA5E9] dark:text-sidebar-foreground/80'}`} />
                     <span className={`text-[15px] font-semibold tracking-tight transition-colors duration-200 ml-1 ${isActive ? '!text-white' : ''}`}>{item.title}</span>
+                    {isComingSoon && (
+                        <span className="ml-auto text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-950/50 px-1.5 py-0.5 rounded">Coming soon</span>
+                    )}
                 </SidebarMenuButton>
             </SidebarMenuItem>
         )
@@ -268,26 +391,28 @@ function CollapsibleNavItem({
                     className={`ml-auto size-4 transition-transform duration-300 ${open ? 'rotate-180' : ''} ${isActive ? 'text-[#0EA5E9]' : 'text-sidebar-foreground/60 group-hover/item:text-[#0EA5E9]'}`}
                 />
             </SidebarMenuButton>
-            {open && (
-                <SidebarMenuSub className="border-sidebar-border/50">
-                    {item.subItems.map((subItem) => {
-                        const isSubActive = pathname === subItem.url
-                        return (
-                            <SidebarMenuSubItem key={subItem.title}>
-                                <SidebarMenuSubButton
-                                    href={subItem.url}
-                                    className={`transition-colors duration-200 ${isSubActive
-                                        ? 'text-[#0EA5E9] font-medium bg-sidebar-accent'
-                                        : 'text-sidebar-foreground/60 hover:text-[#0EA5E9] hover:bg-sidebar-accent'
-                                        }`}
-                                >
-                                    <span>{subItem.title}</span>
-                                </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                        )
-                    })}
-                </SidebarMenuSub>
-            )}
+                            {open && (
+                                <SidebarMenuSub className="border-sidebar-border/50">
+                                    {item.subItems.map((subItem) => {
+                                        const isSubActive = pathname === subItem.url
+                                        return (
+                                            <SidebarMenuSubItem key={subItem.title}>
+                                                <SidebarMenuSubButton asChild>
+                                                    <Link
+                                                        href={subItem.url}
+                                                        className={`block w-full rounded-md px-2 py-1.5 text-sm transition-colors duration-200 ${isSubActive
+                                                            ? 'text-[#0EA5E9] font-medium bg-sidebar-accent'
+                                                            : 'text-sidebar-foreground/60 hover:text-[#0EA5E9] hover:bg-sidebar-accent'
+                                                            }`}
+                                                    >
+                                                        {subItem.title}
+                                                    </Link>
+                                                </SidebarMenuSubButton>
+                                            </SidebarMenuSubItem>
+                                        )
+                                    })}
+                                </SidebarMenuSub>
+                            )}
         </SidebarMenuItem>
     )
 }
@@ -366,7 +491,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         router.push('/login')
     }
 
-    const sections = roleNavigation[role] || []
+    const sections = roleNavigation[role] ?? roleNavigation['ADMIN'] ?? []
 
     return (
         <Sidebar collapsible="icon" className="border-sidebar-border shrink-0" {...props}>
@@ -397,15 +522,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     >
                         <SidebarMenu>
                             {section.items.map((item) => (
-                                <CollapsibleNavItem
-                                    key={item.title}
-                                    item={item}
-                                    onSelect={() => {
-                                        if (item.url && item.url !== '#') {
-                                            router.push(item.url)
-                                        }
-                                    }}
-                                />
+                                <React.Fragment key={item.title}>
+                                    {section.section === 'INVENTORY' && item.title === 'Suppliers' && (
+                                        <SidebarSeparator className="my-2 bg-sidebar-border/60" />
+                                    )}
+                                    <CollapsibleNavItem
+                                        item={item}
+                                        onSelect={() => {
+                                            if (item.url && item.url !== '#' && !item.comingSoon) {
+                                                router.push(item.url)
+                                            }
+                                        }}
+                                    />
+                                </React.Fragment>
                             ))}
                         </SidebarMenu>
                     </CollapsibleSection>
@@ -426,7 +555,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     {user?.profileImage ? (
                                         <div className="flex aspect-square size-8 overflow-hidden rounded-full border border-blue-500/20">
                                             <img
-                                                src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${user.profileImage}`}
+                                                src={`${process.env.NEXT_PUBLIC_API_URL ?? ''}${user.profileImage}`}
                                                 alt={user?.fullName || 'User'}
                                                 className="h-full w-full object-cover"
                                             />
@@ -467,7 +596,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     <Settings className="mr-2 size-4" />
                                     Settings
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => router.push('/dashboard/activity-log')}>
                                     <Activity className="mr-2 size-4" />
                                     Activity Log
                                 </DropdownMenuItem>

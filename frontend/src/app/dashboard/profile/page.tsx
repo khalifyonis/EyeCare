@@ -151,7 +151,7 @@ export default function ProfilePage() {
 
     const initials = user.fullName?.charAt(0)?.toUpperCase() || 'U';
     const profileImageUrl = user.profileImage
-        ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${user.profileImage}`
+        ? `${process.env.NEXT_PUBLIC_API_URL ?? ''}${user.profileImage}`
         : null;
 
     return (

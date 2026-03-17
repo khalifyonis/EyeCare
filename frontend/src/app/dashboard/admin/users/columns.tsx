@@ -88,7 +88,7 @@ export const getUserColumns = ({ onEdit, onDelete }: UserColumnsProps): ColumnDe
         header: sortableHeader('Full Name'),
         cell: ({ row }) => {
             const user = row.original;
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? '';
             return (
                 <div className="flex items-center gap-3 min-w-0">
                     {user.profileImage ? (

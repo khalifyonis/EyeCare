@@ -9,6 +9,8 @@ import { DataTable } from '@/components/ui/data-table';
 import { getPharmacyColumns, type PharmacyRow } from './columns';
 import { PharmacyItemDialog } from './pharmacy-item-dialog';
 import { ReceiveStockDialog } from '../receive-stock-dialog';
+import { TransactionHistoryDialog } from '../transaction-history-dialog';
+import { AdjustStockDialog } from '../adjust-stock-dialog';
 import { toast } from 'sonner';
 import { StatsCard } from '@/components/dashboard/stats-card';
 import { PageBreadcrumb } from '@/components/dashboard/page-breadcrumb';
@@ -31,6 +33,10 @@ export default function PharmacyInventoryPage() {
     const [selectionKey, setSelectionKey] = useState(0);
     const [receiveOpen, setReceiveOpen] = useState(false);
     const [receivingItem, setReceivingItem] = useState<PharmacyRow | null>(null);
+    const [historyOpen, setHistoryOpen] = useState(false);
+    const [historyItem, setHistoryItem] = useState<PharmacyRow | null>(null);
+    const [adjustOpen, setAdjustOpen] = useState(false);
+    const [adjustingItem, setAdjustingItem] = useState<PharmacyRow | null>(null);
 
     const fetchStats = useCallback(async () => {
         try {
@@ -91,6 +97,16 @@ export default function PharmacyInventoryPage() {
     const handleReceive = (row: PharmacyRow) => {
         setReceivingItem(row);
         setReceiveOpen(true);
+    };
+
+    const handleHistory = (row: PharmacyRow) => {
+        setHistoryItem(row);
+        setHistoryOpen(true);
+    };
+
+    const handleAdjust = (row: PharmacyRow) => {
+        setAdjustingItem(row);
+        setAdjustOpen(true);
     };
 
     const handleDelete = useCallback(
@@ -167,6 +183,8 @@ export default function PharmacyInventoryPage() {
                 onEdit: handleEdit,
                 onDelete: handleDelete,
                 onReceive: handleReceive,
+                onHistory: handleHistory,
+                onAdjust: handleAdjust,
             }),
         [handleDelete]
     );
@@ -276,6 +294,25 @@ export default function PharmacyInventoryPage() {
                 inventoryType="pharmacy"
                 currentStock={receivingItem?.stockQuantity}
                 purchasePrice={receivingItem?.purchasePrice}
+                onSuccess={refresh}
+            />
+
+            <TransactionHistoryDialog
+                open={historyOpen}
+                onOpenChange={setHistoryOpen}
+                itemId={historyItem?.id ?? null}
+                itemName={historyItem?.itemName ?? ''}
+                inventoryType="pharmacy"
+            />
+
+            <AdjustStockDialog
+                open={adjustOpen}
+                onOpenChange={setAdjustOpen}
+                itemId={adjustingItem?.id ?? null}
+                itemName={adjustingItem?.itemName ?? ''}
+                inventoryType="pharmacy"
+                currentStock={adjustingItem?.stockQuantity}
+                purchasePrice={adjustingItem?.purchasePrice}
                 onSuccess={refresh}
             />
         </div>

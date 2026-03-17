@@ -14,7 +14,7 @@ export const getDoctorColumns = ({ onEdit, onDelete }: DoctorColumnsProps): Colu
         header: 'Doctor Name',
         cell: ({ row }) => {
             const user = row.original;
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? '';
             return (
                 <div className="flex items-center gap-3 py-1">
                     {user.profileImage ? (

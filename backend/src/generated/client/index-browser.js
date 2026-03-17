@@ -137,6 +137,17 @@ exports.Prisma.BranchScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.SupplierScalarFieldEnum = {
+  id: 'id',
+  branchId: 'branchId',
+  name: 'name',
+  phone: 'phone',
+  email: 'email',
+  address: 'address',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   fullName: 'fullName',
@@ -152,6 +163,17 @@ exports.Prisma.UserScalarFieldEnum = {
   branchId: 'branchId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ActivityLogScalarFieldEnum = {
+  id: 'id',
+  branchId: 'branchId',
+  userId: 'userId',
+  action: 'action',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  details: 'details',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.DoctorScalarFieldEnum = {
@@ -254,6 +276,7 @@ exports.Prisma.PrescriptionScalarFieldEnum = {
 exports.Prisma.PharmacyItemScalarFieldEnum = {
   id: 'id',
   branchId: 'branchId',
+  supplierId: 'supplierId',
   itemName: 'itemName',
   itemType: 'itemType',
   category: 'category',
@@ -285,6 +308,7 @@ exports.Prisma.PharmacyStockTransactionScalarFieldEnum = {
 exports.Prisma.OpticalItemScalarFieldEnum = {
   id: 'id',
   branchId: 'branchId',
+  supplierId: 'supplierId',
   itemName: 'itemName',
   itemType: 'itemType',
   brand: 'brand',
@@ -405,7 +429,9 @@ exports.FollowUpStatus = exports.$Enums.FollowUpStatus = {
 exports.Prisma.ModelName = {
   Role: 'Role',
   Branch: 'Branch',
+  Supplier: 'Supplier',
   User: 'User',
+  ActivityLog: 'ActivityLog',
   Doctor: 'Doctor',
   Patient: 'Patient',
   Appointment: 'Appointment',

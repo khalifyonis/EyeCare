@@ -12,16 +12,19 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import api from '@/lib/axios';
 import { toast } from 'sonner';
 import type { PharmacyRow } from './columns';
+
+type SupplierOption = { id: string; name: string };
 
 type FormData = {
     itemName: string;
     itemType: string;
     category: string;
     manufacturer: string;
-    supplierName: string;
+    supplierId: string;
     batchNumber: string;
     stockQuantity: string;
     reorderLevel: string;
@@ -48,12 +51,13 @@ export function PharmacyItemDialog({
     onSuccess: () => void;
 }) {
     const isEdit = !!item?.id;
+    const [suppliers, setSuppliers] = useState<SupplierOption[]>([]);
     const [formData, setFormData] = useState<FormData>({
         itemName: '',
         itemType: '',
         category: '',
         manufacturer: '',
-        supplierName: '',
+        supplierId: '',
         batchNumber: '',
         stockQuantity: '0',
         reorderLevel: '10',
@@ -65,13 +69,22 @@ export function PharmacyItemDialog({
 
     useEffect(() => {
         if (open) {
+            api.get('/suppliers?limit=500').then((res) => {
+                const data = res.data?.data ?? res.data?.suppliers ?? [];
+                setSuppliers(Array.isArray(data) ? data : []);
+            }).catch(() => {});
+        }
+    }, [open]);
+
+    useEffect(() => {
+        if (open) {
             if (item) {
                 setFormData({
                     itemName: item.itemName || '',
                     itemType: item.itemType || '',
                     category: item.category || '',
                     manufacturer: item.manufacturer || '',
-                    supplierName: '',
+                    supplierId: item.supplierId || item.supplier?.id || '',
                     batchNumber: item.batchNumber || '',
                     stockQuantity: toStr(item.stockQuantity),
                     reorderLevel: toStr(item.reorderLevel),
@@ -85,7 +98,7 @@ export function PharmacyItemDialog({
                     itemType: '',
                     category: '',
                     manufacturer: '',
-                    supplierName: '',
+                    supplierId: '',
                     batchNumber: '',
                     stockQuantity: '0',
                     reorderLevel: '10',
@@ -110,7 +123,7 @@ export function PharmacyItemDialog({
                 itemType: formData.itemType || null,
                 category: formData.category || null,
                 manufacturer: formData.manufacturer || null,
-                supplierName: formData.supplierName || null,
+                supplierId: formData.supplierId || null,
                 batchNumber: formData.batchNumber || null,
                 stockQuantity: parseInt(formData.stockQuantity, 10) || 0,
                 reorderLevel: parseInt(formData.reorderLevel, 10) ?? 10,
@@ -186,13 +199,18 @@ export function PharmacyItemDialog({
                             />
                         </div>
                         <div>
-                            <Label htmlFor="supplierName">Supplier</Label>
-                            <Input
-                                id="supplierName"
-                                value={formData.supplierName}
-                                onChange={(e) => setFormData((p) => ({ ...p, supplierName: e.target.value }))}
-                                className="mt-1"
-                            />
+                            <Label>Supplier</Label>
+                            <Select value={formData.supplierId || 'none'} onValueChange={(v) => setFormData((p) => ({ ...p, supplierId: v === 'none' ? '' : v }))}>
+                                <SelectTrigger className="mt-1">
+                                    <SelectValue placeholder="Select supplier (optional)" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="none">None</SelectItem>
+                                    {suppliers.map((s) => (
+                                        <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div>
                             <Label htmlFor="batchNumber">Batch number</Label>

@@ -16,6 +16,8 @@ import billingRoutes from './src/routes/billingRoutes.js';
 import pharmacyItemRoutes from './src/routes/pharmacyItemRoutes.js';
 import opticalItemRoutes from './src/routes/opticalItemRoutes.js';
 import followUpRoutes from './src/routes/followUpRoutes.js';
+import supplierRoutes from './src/routes/supplierRoutes.js';
+import activityLogRoutes from './src/routes/activityLogRoutes.js';
 import errorMiddleware from './src/middlewares/errorMiddleware.js';
 
 // Keep process alive on uncaught errors (log and continue)
@@ -50,6 +52,8 @@ app.use('/api/billing', billingRoutes);
 app.use('/api/inventory/pharmacy', pharmacyItemRoutes);
 app.use('/api/inventory/optical', opticalItemRoutes);
 app.use('/api/follow-ups', followUpRoutes);
+app.use('/api/suppliers', supplierRoutes);
+app.use('/api/activity-logs', activityLogRoutes);
 
 // Health check
 app.get('/', (req, res) => {

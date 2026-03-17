@@ -31,7 +31,10 @@ export const listPharmacyItems = async (req, res, next) => {
                 orderBy: { itemName: 'asc' },
                 skip,
                 take,
-                include: { branch: { select: { id: true, branchName: true } } },
+                include: {
+                    branch: { select: { id: true, branchName: true } },
+                    supplier: { select: { id: true, name: true } },
+                },
             }),
             prisma.pharmacyItem.count({ where: whereClause }),
         ]);
@@ -47,7 +50,7 @@ export const getPharmacyItemById = async (req, res, next) => {
         const branchFilter = getBranchFilter(req);
         const row = await prisma.pharmacyItem.findFirst({
             where: { id: req.params.id, ...branchFilter },
-            include: { branch: true },
+            include: { branch: true, supplier: { select: { id: true, name: true } } },
         });
         if (!row) return res.status(404).json({ message: 'Pharmacy item not found' });
         res.status(200).json(row);
@@ -64,13 +67,20 @@ export const createPharmacyItem = async (req, res, next) => {
             return res.status(403).json({ message: 'Forbidden' });
         }
 
+        let supplierName = req.body.supplierName || null;
+        const supplierId = req.body.supplierId || null;
+        if (supplierId && branchId) {
+            const sup = await prisma.supplier.findFirst({ where: { id: supplierId, branchId }, select: { name: true } });
+            if (sup) supplierName = sup.name;
+        }
         const data = {
             branchId,
+            supplierId: supplierId || undefined,
             itemName: req.body.itemName?.trim() || '',
             itemType: req.body.itemType || null,
             category: req.body.category || null,
             manufacturer: req.body.manufacturer || null,
-            supplierName: req.body.supplierName || null,
+            supplierName,
             batchNumber: req.body.batchNumber || null,
             stockQuantity: Number(req.body.stockQuantity) ?? 0,
             reorderLevel: Number(req.body.reorderLevel) ?? 10,
@@ -81,7 +91,7 @@ export const createPharmacyItem = async (req, res, next) => {
 
         const item = await prisma.pharmacyItem.create({
             data,
-            include: { branch: { select: { id: true, branchName: true } } },
+            include: { branch: { select: { id: true, branchName: true } }, supplier: { select: { id: true, name: true } } },
         });
         res.status(201).json(item);
     } catch (error) {
@@ -104,6 +114,15 @@ export const updatePharmacyItem = async (req, res, next) => {
         if (body.category !== undefined) data.category = body.category || null;
         if (body.manufacturer !== undefined) data.manufacturer = body.manufacturer || null;
         if (body.supplierName !== undefined) data.supplierName = body.supplierName || null;
+        if (body.supplierId !== undefined) {
+            data.supplierId = body.supplierId || null;
+            if (body.supplierId) {
+                const sup = await prisma.supplier.findFirst({ where: { id: body.supplierId, branchId: existing.branchId }, select: { name: true } });
+                if (sup) data.supplierName = sup.name;
+            } else {
+                data.supplierName = null;
+            }
+        }
         if (body.batchNumber !== undefined) data.batchNumber = body.batchNumber || null;
         if (body.stockQuantity !== undefined) data.stockQuantity = Number(body.stockQuantity);
         if (body.reorderLevel !== undefined) data.reorderLevel = Number(body.reorderLevel);
@@ -114,7 +133,7 @@ export const updatePharmacyItem = async (req, res, next) => {
         const item = await prisma.pharmacyItem.update({
             where: { id: req.params.id },
             data,
-            include: { branch: { select: { id: true, branchName: true } } },
+            include: { branch: { select: { id: true, branchName: true } }, supplier: { select: { id: true, name: true } } },
         });
         res.status(200).json(item);
     } catch (error) {
@@ -172,6 +191,118 @@ export const receivePharmacyStock = async (req, res, next) => {
         ]);
 
         res.status(200).json({ item: updated, transaction });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const adjustPharmacyStock = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const branchFilter = getBranchFilter(req);
+
+        const item = await prisma.pharmacyItem.findFirst({
+            where: { id, ...branchFilter },
+        });
+        if (!item) return res.status(404).json({ message: 'Pharmacy item not found' });
+
+        const delta = Number(req.body.quantity);
+        if (!Number.isInteger(delta) || delta === 0) {
+            return res.status(400).json({ message: 'Quantity must be a non-zero integer (positive to add, negative to reduce)' });
+        }
+
+        const newStock = Number(item.stockQuantity) + delta;
+        if (newStock < 0) {
+            return res.status(400).json({ message: `Stock cannot go below zero. Current: ${item.stockQuantity}, adjustment: ${delta}` });
+        }
+
+        const unitPrice = Number(req.body.unitPrice ?? item.purchasePrice ?? 0);
+
+        const [transaction, updated] = await prisma.$transaction([
+            prisma.pharmacyStockTransaction.create({
+                data: {
+                    pharmacyItemId: id,
+                    branchId: item.branchId,
+                    transactionType: 'ADJUST',
+                    quantity: delta,
+                    unitPrice,
+                    performedById: req.user.id,
+                },
+            }),
+            prisma.pharmacyItem.update({
+                where: { id },
+                data: { stockQuantity: newStock },
+                include: { branch: { select: { id: true, branchName: true } } },
+            }),
+        ]);
+
+        res.status(200).json({ item: updated, transaction });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getPharmacyItemTransactions = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const branchFilter = getBranchFilter(req);
+
+        const item = await prisma.pharmacyItem.findFirst({
+            where: { id, ...branchFilter },
+            select: { id: true, itemName: true, stockQuantity: true },
+        });
+        if (!item) return res.status(404).json({ message: 'Pharmacy item not found' });
+
+        const transactions = await prisma.pharmacyStockTransaction.findMany({
+            where: { pharmacyItemId: id },
+            orderBy: { transactionDate: 'desc' },
+            take: 100,
+            include: {
+                performedBy: { select: { fullName: true } },
+            },
+        });
+
+        res.status(200).json({ item, transactions });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const listAllPharmacyTransactions = async (req, res, next) => {
+    try {
+        const { type, from, to } = req.query;
+        const { skip, take, page, limit } = getPaginationParams(req.query, 20, 100);
+        const branchFilter = getBranchFilter(req);
+
+        let dateFilter = {};
+        if (from && to) {
+            const f = new Date(from); f.setHours(0, 0, 0, 0);
+            const t = new Date(to); t.setHours(23, 59, 59, 999);
+            dateFilter = { transactionDate: { gte: f, lte: t } };
+        }
+
+        const where = {
+            ...branchFilter,
+            ...dateFilter,
+            ...(type ? { transactionType: type } : {}),
+        };
+
+        const [rows, total] = await Promise.all([
+            prisma.pharmacyStockTransaction.findMany({
+                where,
+                orderBy: { transactionDate: 'desc' },
+                skip,
+                take,
+                include: {
+                    pharmacyItem: { select: { id: true, itemName: true, category: true } },
+                    performedBy: { select: { id: true, fullName: true } },
+                    billing: { select: { id: true, referenceNumber: true } },
+                },
+            }),
+            prisma.pharmacyStockTransaction.count({ where }),
+        ]);
+
+        sendPaginated(res, rows, total, page, limit);
     } catch (error) {
         next(error);
     }

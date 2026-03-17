@@ -131,7 +131,7 @@ export default function DashboardLayout({
     return (
         <SidebarProvider className="h-dvh sm:h-screen overflow-hidden flex w-full min-w-0">
             <AppSidebar />
-            <SidebarInset className="bg-background flex flex-col h-dvh sm:h-screen overflow-hidden min-w-0 flex-1">
+            <SidebarInset className="bg-background flex flex-col h-dvh sm:h-screen overflow-hidden min-w-0 flex-1 relative z-10">
                 <header className="flex h-[56px] sm:h-[60px] shrink-0 items-center gap-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-background/95 px-3 sm:px-4 sticky top-0 z-30 transition-all duration-300 min-w-0">
                     <div className="flex flex-1 items-center gap-2 sm:gap-4 min-w-0">
                         <SidebarTrigger className="shrink-0 -ml-1 hover:bg-[#0EA5E9]/10 hover:text-[#0EA5E9] transition-colors" />
@@ -185,7 +185,7 @@ export default function DashboardLayout({
                                 >
                                     {headerUser.profileImage ? (
                                         <img
-                                            src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${headerUser.profileImage}`}
+                                            src={`${process.env.NEXT_PUBLIC_API_URL ?? ''}${headerUser.profileImage}`}
                                             alt={headerUser.fullName || 'User'}
                                             className="h-9 w-9 rounded-full object-cover border-2 border-[#0EA5E9]/20"
                                         />
@@ -207,7 +207,7 @@ export default function DashboardLayout({
                         )}
                     </div>
                 </header>
-                <div className="flex flex-1 flex-col gap-1.5 p-1.5 md:px-5 md:py-1.5 overflow-y-auto overflow-x-hidden min-h-0 min-w-0 bg-muted/30 dark:bg-background/80">
+                <div className="flex flex-1 flex-col gap-1.5 p-1.5 md:px-5 md:py-1.5 overflow-y-auto overflow-x-hidden min-h-0 min-w-0 bg-muted/30 dark:bg-background/80 relative z-0">
                     {children}
                 </div>
             </SidebarInset>

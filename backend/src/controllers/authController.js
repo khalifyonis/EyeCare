@@ -3,6 +3,7 @@ import pg from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import { createActivityLog } from '../lib/activityLog.js';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
@@ -55,6 +56,17 @@ export const login = async (req, res, next) => {
 
     const branches = user.staffAssignments.map(sa => sa.branch);
     const { password: _, roleId: __, role: ___, staffAssignments: ____, ...userDetails } = user;
+
+    if (user.branchId) {
+      createActivityLog({
+        branchId: user.branchId,
+        userId: user.id,
+        action: 'LOGIN',
+        entityType: 'User',
+        entityId: user.id,
+        details: 'Logged in',
+      }).catch(() => {});
+    }
 
     res.status(200).json({
       message: 'Login successful',
