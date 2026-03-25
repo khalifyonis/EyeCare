@@ -189,13 +189,64 @@ exports.Prisma.DoctorScalarFieldEnum = {
 
 exports.Prisma.PatientScalarFieldEnum = {
   id: 'id',
+  patientNumber: 'patientNumber',
   fullName: 'fullName',
+  firstName: 'firstName',
+  lastName: 'lastName',
   gender: 'gender',
   dateOfBirth: 'dateOfBirth',
   phone: 'phone',
   email: 'email',
   address: 'address',
+  city: 'city',
+  state: 'state',
+  zipCode: 'zipCode',
+  bloodGroup: 'bloodGroup',
+  weight: 'weight',
+  allergies: 'allergies',
+  chiefComplaint: 'chiefComplaint',
+  currentMedications: 'currentMedications',
+  medicalHistory: 'medicalHistory',
+  familyMedicalHistory: 'familyMedicalHistory',
+  emergencyContactName: 'emergencyContactName',
+  emergencyContactRelationship: 'emergencyContactRelationship',
+  emergencyContactPhone: 'emergencyContactPhone',
+  isActive: 'isActive',
+  assignedDoctorId: 'assignedDoctorId',
   branchId: 'branchId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.OpticalPrescriptionScalarFieldEnum = {
+  id: 'id',
+  branchId: 'branchId',
+  patientId: 'patientId',
+  createdById: 'createdById',
+  type: 'type',
+  status: 'status',
+  validityMonths: 'validityMonths',
+  expiryDate: 'expiryDate',
+  dispensedAt: 'dispensedAt',
+  notes: 'notes',
+  odSphere: 'odSphere',
+  odCylinder: 'odCylinder',
+  odAxis: 'odAxis',
+  odAdd: 'odAdd',
+  odPd: 'odPd',
+  odPrism: 'odPrism',
+  osSphere: 'osSphere',
+  osCylinder: 'osCylinder',
+  osAxis: 'osAxis',
+  osAdd: 'osAdd',
+  osPd: 'osPd',
+  osPrism: 'osPrism',
+  lensType: 'lensType',
+  lensMaterial: 'lensMaterial',
+  frameType: 'frameType',
+  coatings: 'coatings',
+  frameItemId: 'frameItemId',
+  lensItemId: 'lensItemId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -206,10 +257,53 @@ exports.Prisma.AppointmentScalarFieldEnum = {
   appointmentDate: 'appointmentDate',
   status: 'status',
   amount: 'amount',
+  type: 'type',
+  notes: 'notes',
+  location: 'location',
   branchId: 'branchId',
   patientId: 'patientId',
   doctorId: 'doctorId',
   createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.EyeExaminationScalarFieldEnum = {
+  id: 'id',
+  branchId: 'branchId',
+  patientId: 'patientId',
+  doctorId: 'doctorId',
+  chiefComplaint: 'chiefComplaint',
+  historyOfPresentIllness: 'historyOfPresentIllness',
+  vaScale: 'vaScale',
+  vaUnaidedOD: 'vaUnaidedOD',
+  vaUnaidedOS: 'vaUnaidedOS',
+  vaUnaidedNearOD: 'vaUnaidedNearOD',
+  vaUnaidedNearOS: 'vaUnaidedNearOS',
+  vaBcvaOD: 'vaBcvaOD',
+  vaBcvaOS: 'vaBcvaOS',
+  vaBcvaNearOD: 'vaBcvaNearOD',
+  vaBcvaNearOS: 'vaBcvaNearOS',
+  vaPinholeOD: 'vaPinholeOD',
+  vaPinholeOS: 'vaPinholeOS',
+  refractionSphereOD: 'refractionSphereOD',
+  refractionSphereOS: 'refractionSphereOS',
+  refractionCylinderOD: 'refractionCylinderOD',
+  refractionCylinderOS: 'refractionCylinderOS',
+  refractionAxisOD: 'refractionAxisOD',
+  refractionAxisOS: 'refractionAxisOS',
+  iopOD: 'iopOD',
+  iopOS: 'iopOS',
+  iopMethod: 'iopMethod',
+  iopTime: 'iopTime',
+  targetIopOD: 'targetIopOD',
+  targetIopOS: 'targetIopOS',
+  anteriorSegmentFindings: 'anteriorSegmentFindings',
+  fundusFindings: 'fundusFindings',
+  diagnosis: 'diagnosis',
+  plan: 'plan',
+  followUpDate: 'followUpDate',
+  nextVisitReason: 'nextVisitReason',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -249,9 +343,15 @@ exports.Prisma.SurgeryScalarFieldEnum = {
   id: 'id',
   examId: 'examId',
   branchId: 'branchId',
-  eyeSide: 'eyeSide',
+  patientId: 'patientId',
+  eye: 'eye',
   surgeryType: 'surgeryType',
-  surgeryDate: 'surgeryDate',
+  procedure: 'procedure',
+  anesthesiaType: 'anesthesiaType',
+  date: 'date',
+  time: 'time',
+  operatingRoom: 'operatingRoom',
+  cataractDetails: 'cataractDetails',
   cost: 'cost',
   status: 'status',
   notes: 'notes',
@@ -384,6 +484,11 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
+};
+
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -393,8 +498,27 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+exports.OpticalPrescriptionType = exports.$Enums.OpticalPrescriptionType = {
+  SPECTACLES: 'SPECTACLES',
+  CONTACT_LENS: 'CONTACT_LENS',
+  BOTH: 'BOTH'
+};
+
+exports.OpticalPrescriptionStatus = exports.$Enums.OpticalPrescriptionStatus = {
+  FILLED: 'FILLED',
+  DISPENSED: 'DISPENSED'
+};
+
 exports.AppointmentStatus = exports.$Enums.AppointmentStatus = {
   PENDING: 'PENDING',
+  SCHEDULED: 'SCHEDULED',
+  CONFIRMED: 'CONFIRMED',
   COMPLETED: 'COMPLETED',
   CANCELLED: 'CANCELLED'
 };
@@ -434,7 +558,9 @@ exports.Prisma.ModelName = {
   ActivityLog: 'ActivityLog',
   Doctor: 'Doctor',
   Patient: 'Patient',
+  OpticalPrescription: 'OpticalPrescription',
   Appointment: 'Appointment',
+  EyeExamination: 'EyeExamination',
   ERExamination: 'ERExamination',
   ClinicalExamination: 'ClinicalExamination',
   Surgery: 'Surgery',

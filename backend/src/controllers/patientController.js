@@ -2,26 +2,71 @@ import prisma from '../lib/prisma.js';
 import moment from 'moment';
 import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
 
+// Generate PAT-XXXXX style patient number
+async function generatePatientNumber() {
+    const count = await prisma.patient.count();
+    const num = String(count + 1).padStart(5, '0');
+    return `PAT-${num}`;
+}
+
 export const createPatient = async (req, res, next) => {
     try {
-        const { fullName, phone, email, dateOfBirth, gender, address, branchId } = req.body;
+        const {
+            fullName, firstName, lastName,
+            phone, email, dateOfBirth, gender,
+            address, city, state, zipCode,
+            bloodGroup, weight, allergies, chiefComplaint,
+            currentMedications, medicalHistory, familyMedicalHistory,
+            emergencyContactName, emergencyContactRelationship, emergencyContactPhone,
+            assignedDoctorId, isActive,
+            branchId,
+        } = req.body;
 
         const activeBranchId = branchId || req.user.branchId;
-
         if (!activeBranchId) {
             return res.status(400).json({ message: 'Branch assignment is required' });
         }
 
+        // Derive fullName from firstName+lastName if not provided
+        const resolvedFullName = (fullName || [firstName, lastName].filter(Boolean).join(' ')).trim();
+        if (!resolvedFullName) {
+            return res.status(400).json({ message: 'Patient name is required' });
+        }
+
+        const patientNumber = await generatePatientNumber();
+
         const patient = await prisma.patient.create({
             data: {
-                fullName: (fullName || '').trim(),
+                patientNumber,
+                fullName: resolvedFullName,
+                firstName: firstName || null,
+                lastName: lastName || null,
                 phone,
-                email: email || undefined,
-                dateOfBirth: dateOfBirth ? moment(dateOfBirth).toDate() : undefined,
-                gender: gender || undefined,
-                address: address || undefined,
+                email: email || null,
+                dateOfBirth: dateOfBirth ? moment(dateOfBirth).toDate() : new Date('2000-01-01'),
+                gender: gender || null,
+                address: address || null,
+                city: city || null,
+                state: state || null,
+                zipCode: zipCode || null,
+                bloodGroup: bloodGroup || null,
+                weight: weight ? parseFloat(weight) : null,
+                allergies: allergies || null,
+                chiefComplaint: chiefComplaint || null,
+                currentMedications: currentMedications || null,
+                medicalHistory: medicalHistory || null,
+                familyMedicalHistory: familyMedicalHistory || null,
+                emergencyContactName: emergencyContactName || null,
+                emergencyContactRelationship: emergencyContactRelationship || null,
+                emergencyContactPhone: emergencyContactPhone || null,
+                assignedDoctorId: assignedDoctorId || null,
+                isActive: isActive !== undefined ? Boolean(isActive) : true,
                 branchId: activeBranchId,
-            }
+            },
+            include: {
+                assignedDoctor: { include: { user: { select: { fullName: true } } } },
+                branch: { select: { branchName: true } },
+            },
         });
 
         res.status(201).json(patient);
@@ -59,9 +104,10 @@ export const getAllPatients = async (req, res, next) => {
                 skip,
                 take,
                 include: {
-                    branch: {
-                        select: { branchName: true }
-                    }
+                    branch: { select: { branchName: true } },
+                    assignedDoctor: {
+                        include: { user: { select: { fullName: true } } }
+                    },
                 }
             }),
             prisma.patient.count({ where: whereClause })
@@ -200,19 +246,48 @@ export const getPatientById = async (req, res, next) => {
 
 export const updatePatient = async (req, res, next) => {
     try {
-        const { fullName, phone, email, dateOfBirth, gender, address } = req.body;
+        const {
+            fullName, firstName, lastName,
+            phone, email, dateOfBirth, gender,
+            address, city, state, zipCode,
+            bloodGroup, weight, allergies, chiefComplaint,
+            currentMedications, medicalHistory, familyMedicalHistory,
+            emergencyContactName, emergencyContactRelationship, emergencyContactPhone,
+            assignedDoctorId, isActive,
+        } = req.body;
 
         const data = {};
         if (fullName !== undefined) data.fullName = fullName.trim();
+        if (firstName !== undefined) data.firstName = firstName || null;
+        if (lastName !== undefined) data.lastName = lastName || null;
         if (phone !== undefined) data.phone = phone;
         if (email !== undefined) data.email = email || null;
         if (dateOfBirth !== undefined) data.dateOfBirth = moment(dateOfBirth).toDate();
         if (gender !== undefined) data.gender = gender;
         if (address !== undefined) data.address = address || null;
+        if (city !== undefined) data.city = city || null;
+        if (state !== undefined) data.state = state || null;
+        if (zipCode !== undefined) data.zipCode = zipCode || null;
+        if (bloodGroup !== undefined) data.bloodGroup = bloodGroup || null;
+        if (weight !== undefined) data.weight = weight ? parseFloat(weight) : null;
+        if (allergies !== undefined) data.allergies = allergies || null;
+        if (chiefComplaint !== undefined) data.chiefComplaint = chiefComplaint || null;
+        if (currentMedications !== undefined) data.currentMedications = currentMedications || null;
+        if (medicalHistory !== undefined) data.medicalHistory = medicalHistory || null;
+        if (familyMedicalHistory !== undefined) data.familyMedicalHistory = familyMedicalHistory || null;
+        if (emergencyContactName !== undefined) data.emergencyContactName = emergencyContactName || null;
+        if (emergencyContactRelationship !== undefined) data.emergencyContactRelationship = emergencyContactRelationship || null;
+        if (emergencyContactPhone !== undefined) data.emergencyContactPhone = emergencyContactPhone || null;
+        if (assignedDoctorId !== undefined) data.assignedDoctorId = assignedDoctorId || null;
+        if (isActive !== undefined) data.isActive = Boolean(isActive);
 
         const patient = await prisma.patient.update({
             where: { id: req.params.id },
-            data
+            data,
+            include: {
+                assignedDoctor: { include: { user: { select: { fullName: true } } } },
+                branch: { select: { branchName: true } },
+            },
         });
         res.status(200).json(patient);
     } catch (error) {

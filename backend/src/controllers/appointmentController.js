@@ -19,7 +19,7 @@ const generateBookingNumber = async () => {
 
 export const createAppointment = async (req, res, next) => {
     try {
-        const { patientId, doctorId, branchId, appointmentDate, status, amount } = req.body;
+        const { patientId, doctorId, branchId, appointmentDate, status, amount, type, notes, location } = req.body;
 
         const activeBranchId = branchId || req.user.branchId;
 
@@ -38,6 +38,9 @@ export const createAppointment = async (req, res, next) => {
                 appointmentDate: new Date(appointmentDate),
                 status: status || 'PENDING',
                 amount: amount || 0,
+                type: type || 'consultation',
+                notes: notes || null,
+                location: location || null,
                 createdById: req.user.id
             },
             include: {
@@ -86,6 +89,7 @@ export const getAppointments = async (req, res, next) => {
                     { bookingNumber: { contains: search, mode: 'insensitive' } },
                     { patient: { fullName: { contains: search, mode: 'insensitive' } } },
                     { patient: { phone: { contains: search, mode: 'insensitive' } } },
+                    { doctor: { user: { fullName: { contains: search, mode: 'insensitive' } } } },
                 ]
             } : {})
         };
@@ -185,7 +189,7 @@ export const getAppointmentById = async (req, res, next) => {
 
 export const updateAppointment = async (req, res, next) => {
     try {
-        const { doctorId, appointmentDate, status, amount } = req.body;
+        const { doctorId, appointmentDate, status, amount, type, notes, location } = req.body;
 
         const existing = await prisma.appointment.findUnique({ where: { id: req.params.id } });
         if (!existing) return res.status(404).json({ message: 'Appointment not found' });
@@ -194,14 +198,18 @@ export const updateAppointment = async (req, res, next) => {
             return res.status(403).json({ message: 'Forbidden' });
         }
 
+        const data = {};
+        if (doctorId !== undefined) data.doctorId = doctorId;
+        if (appointmentDate !== undefined) data.appointmentDate = new Date(appointmentDate);
+        if (status !== undefined) data.status = status;
+        if (amount !== undefined) data.amount = amount;
+        if (type !== undefined) data.type = type;
+        if (notes !== undefined) data.notes = notes || null;
+        if (location !== undefined) data.location = location || null;
+
         const appointment = await prisma.appointment.update({
             where: { id: req.params.id },
-            data: {
-                doctorId,
-                appointmentDate: appointmentDate ? new Date(appointmentDate) : undefined,
-                status,
-                amount: amount !== undefined ? amount : undefined
-            },
+            data,
             include: {
                 patient: { select: { id: true, fullName: true } },
                 doctor: { include: { user: { select: { fullName: true } } } },

@@ -82,11 +82,7 @@ export default function ProfilePage() {
 
         setUploading(true);
         try {
-            const response = await api.post(`/users/${user.id}/profile-image`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            const response = await api.post(`/users/${user.id}/profile-image`, formData);
 
             const updatedUser = { ...user, profileImage: response.data.profileImage };
             setUser(updatedUser);

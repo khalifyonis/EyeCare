@@ -17,23 +17,30 @@ export type StoredUser = {
     activeBranch?: BranchSummary | null
 }
 
+const ROLE_ALIASES: Record<string, string> = {
+    ADMINISTRATOR: 'ADMIN',
+}
+
 export function resolveRoleName(userLike: unknown): string {
     if (!userLike || typeof userLike !== 'object') return ''
 
     const user = userLike as { roleName?: unknown; role?: unknown }
 
     if (typeof user.roleName === 'string' && user.roleName.trim()) {
-        return user.roleName.toUpperCase()
+        const r = user.roleName.toUpperCase()
+        return ROLE_ALIASES[r] || r
     }
 
     if (typeof user.role === 'string' && user.role.trim()) {
-        return user.role.toUpperCase()
+        const r = user.role.toUpperCase()
+        return ROLE_ALIASES[r] || r
     }
 
     if (user.role && typeof user.role === 'object') {
         const roleObject = user.role as { name?: unknown }
         if (typeof roleObject.name === 'string' && roleObject.name.trim()) {
-            return roleObject.name.toUpperCase()
+            const r = roleObject.name.toUpperCase()
+            return ROLE_ALIASES[r] || r
         }
     }
 
@@ -43,7 +50,7 @@ export function resolveRoleName(userLike: unknown): string {
 export function getDefaultDashboardPath(role: string): string {
     const normalizedRole = (role || '').toUpperCase()
 
-    if (normalizedRole === 'ADMIN' || normalizedRole === 'SUPERADMIN') return '/dashboard/admin'
+    if (normalizedRole === 'ADMIN' || normalizedRole === 'SUPERADMIN' || normalizedRole === 'ADMINISTRATOR') return '/dashboard/admin'
     if (normalizedRole === 'DOCTOR') return '/dashboard/doctor'
     if (normalizedRole === 'RECEPTIONIST') return '/dashboard/receptionist'
     if (normalizedRole === 'PHARMACIST') return '/dashboard/pharmacist'

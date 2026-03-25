@@ -26,6 +26,12 @@ export const authenticate = async (req, res, next) => {
             if (req.user.role === 'SUPERADMIN') {
                 req.user.branchId = requestedBranchId;
             } else {
+                // Allow the user's primary assigned branch from the token.
+                if (req.user.branchId && requestedBranchId === req.user.branchId) {
+                    req.user.branchId = requestedBranchId;
+                    return next();
+                }
+
                 const hasBranchAccess = await prisma.staffAssignment.findFirst({
                     where: {
                         userId: req.user.id,

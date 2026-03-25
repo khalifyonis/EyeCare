@@ -3,7 +3,7 @@ import { getDefaultDashboardPath } from '@/lib/auth'
 export type AllowedRoute = { prefix: string; roles: string[] }
 
 export const ROUTE_ACCESS: AllowedRoute[] = [
-    { prefix: '/dashboard/admin', roles: ['ADMIN', 'SUPERADMIN'] },
+    { prefix: '/dashboard/admin', roles: ['ADMIN', 'SUPERADMIN', 'ADMINISTRATOR'] },
     { prefix: '/dashboard/doctor', roles: ['DOCTOR'] },
     { prefix: '/dashboard/receptionist', roles: ['RECEPTIONIST'] },
     { prefix: '/dashboard/pharmacist', roles: ['PHARMACIST'] },
@@ -12,11 +12,14 @@ export const ROUTE_ACCESS: AllowedRoute[] = [
     { prefix: '/dashboard/patients', roles: ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
     { prefix: '/dashboard/appointments', roles: ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
     { prefix: '/dashboard/examinations', roles: ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
+    { prefix: '/dashboard/eye-examinations', roles: ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
     { prefix: '/dashboard/surgeries', roles: ['ADMIN', 'SUPERADMIN', 'DOCTOR'] },
+    { prefix: '/dashboard/surgery', roles: ['ADMIN', 'SUPERADMIN', 'DOCTOR'] },
     { prefix: '/dashboard/prescriptions', roles: ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
     { prefix: '/dashboard/billing', roles: ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
     { prefix: '/dashboard/inventory/pharmacy', roles: ['ADMIN', 'SUPERADMIN', 'PHARMACIST'] },
     { prefix: '/dashboard/inventory/optical', roles: ['ADMIN', 'SUPERADMIN', 'OPTICIAN'] },
+    { prefix: '/dashboard/optical-shop', roles: ['ADMIN', 'SUPERADMIN', 'ADMINISTRATOR', 'OPTICIAN'] },
     { prefix: '/dashboard/reports', roles: ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
     { prefix: '/dashboard/suppliers', roles: ['ADMIN', 'SUPERADMIN', 'PHARMACIST', 'OPTICIAN'] },
     { prefix: '/dashboard/activity-log', roles: ['ADMIN', 'SUPERADMIN'] },

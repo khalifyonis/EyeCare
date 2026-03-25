@@ -307,9 +307,15 @@ export const listAllOpticalTransactions = async (req, res, next) => {
 export const getOpticalStats = async (req, res, next) => {
     try {
         const branchFilter = getBranchFilter(req);
+        const { itemType } = req.query;
+
+        const where = {
+            ...branchFilter,
+            ...(itemType ? { itemType: { contains: itemType, mode: 'insensitive' } } : {}),
+        };
         const [total, items] = await Promise.all([
-            prisma.opticalItem.count({ where: branchFilter }),
-            prisma.opticalItem.findMany({ where: branchFilter, select: { stockQuantity: true, reorderLevel: true } }),
+            prisma.opticalItem.count({ where }),
+            prisma.opticalItem.findMany({ where, select: { stockQuantity: true, reorderLevel: true } }),
         ]);
         const lowStock = items.filter((i) => Number(i.stockQuantity) <= Number(i.reorderLevel)).length;
         res.status(200).json({ total, lowStock });

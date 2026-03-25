@@ -1,9 +1,16 @@
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 
 // Ensure upload directory exists
-const uploadDir = 'uploads/profiles/';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// Always store uploads inside `backend/uploads/profiles`, regardless of CWD.
+// This prevents ENOENT issues when the server is started from the repo root.
+const cwd = process.cwd();
+const backendRoot = path.basename(cwd).toLowerCase() === 'backend' ? cwd : path.join(cwd, 'backend');
+const uploadDir = path.join(backendRoot, 'uploads', 'profiles');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }

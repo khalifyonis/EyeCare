@@ -5,7 +5,6 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { sendOnboardingEmail } from '../services/emailService.js';
-import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -29,33 +28,35 @@ export const getAllUsers = async (req, res, next) => {
         const whereClause = (req.user.role === 'SUPERADMIN' || !req.user.branchId)
             ? {}
             : {
-                staffAssignments: {
-                    some: {
-                        branchId: req.user.branchId,
-                    }
-                }
+                OR: [
+                    // Primary branch (older data + seed users)
+                    { branchId: req.user.branchId },
+                    // Staff assignment (newer data)
+                    {
+                        staffAssignments: {
+                            some: {
+                                branchId: req.user.branchId,
+                            }
+                        }
+                    },
+                ]
             };
 
-        const { skip, take, page, limit } = getPaginationParams(req.query);
-
-        const [users, total] = await Promise.all([
-            prisma.user.findMany({
-                where: whereClause,
-                skip,
-                take,
-                include: {
-                    role: true,
-                    branch: true,
-                    staffAssignments: { include: { branch: true } }
-                },
-                orderBy: { fullName: 'asc' },
-            }),
-            prisma.user.count({ where: whereClause })
-        ]);
+        const users = await prisma.user.findMany({
+            where: whereClause,
+            include: {
+                role: true,
+                branch: true,
+                staffAssignments: { include: { branch: true } }
+            },
+            orderBy: { fullName: 'asc' },
+        });
 
         const sanitizedUsers = users.map(user => {
             const { password, ...rest } = user;
-            const branches = user.staffAssignments.map(sa => sa.branch);
+            const branches = user.staffAssignments?.length
+                ? user.staffAssignments.map(sa => sa.branch)
+                : (user.branch ? [user.branch] : []);
             return {
                 ...rest,
                 roleName: user.role.name,
@@ -64,7 +65,7 @@ export const getAllUsers = async (req, res, next) => {
             };
         });
 
-        sendPaginated(res, sanitizedUsers, total, page, limit);
+        res.status(200).json(sanitizedUsers);
     } catch (error) {
         next(error);
     }
@@ -105,11 +106,16 @@ export const getUserById = async (req, res, next) => {
             ...((req.user.role === 'SUPERADMIN' || !req.user.branchId)
                 ? {}
                 : {
-                    staffAssignments: {
-                        some: {
-                            branchId: req.user.branchId,
-                        }
-                    }
+                    OR: [
+                        { branchId: req.user.branchId },
+                        {
+                            staffAssignments: {
+                                some: {
+                                    branchId: req.user.branchId,
+                                }
+                            }
+                        },
+                    ]
                 })
         };
 
@@ -129,7 +135,9 @@ export const getUserById = async (req, res, next) => {
         }
 
         const { password, staffAssignments, ...sanitizedUser } = user;
-        const branches = staffAssignments.map(sa => sa.branch);
+        const branches = staffAssignments?.length
+            ? staffAssignments.map(sa => sa.branch)
+            : (user.branch ? [user.branch] : []);
         res.status(200).json({
             ...sanitizedUser,
             roleName: user.role.name,

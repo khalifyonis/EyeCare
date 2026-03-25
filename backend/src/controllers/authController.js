@@ -16,14 +16,20 @@ const prisma = new PrismaClient({ adapter });
 export const login = async (req, res, next) => {
   try {
     const { username, password } = req.body;
+    const identifier = typeof username === 'string' ? username.trim() : '';
 
-    if (!username || !password) {
+    if (!identifier || !password) {
       return res.status(400).json({ message: 'Username and password are required' });
     }
 
-    // Find user by username and include role
-    const user = await prisma.user.findUnique({
-      where: { username },
+    // Accept login by username or email, ignoring case for better interoperability.
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { username: { equals: identifier, mode: 'insensitive' } },
+          { email: { equals: identifier, mode: 'insensitive' } },
+        ],
+      },
       include: {
         role: true,
         staffAssignments: {
@@ -36,8 +42,23 @@ export const login = async (req, res, next) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // Verify password and tolerate legacy plain-text rows from older datasets.
+    const hashLike = typeof user.password === 'string' && /^\$2[aby]\$/.test(user.password);
+    let isPasswordValid = false;
+
+    if (hashLike) {
+      isPasswordValid = await bcrypt.compare(password, user.password);
+    } else {
+      isPasswordValid = password === user.password;
+      if (isPasswordValid) {
+        const upgradedHash = await bcrypt.hash(password, 10);
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { password: upgradedHash },
+        });
+        user.password = upgradedHash;
+      }
+    }
 
     if (!isPasswordValid) {
       return res.status(401).json({ message: 'Invalid credentials' });

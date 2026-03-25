@@ -30,7 +30,7 @@ export default function LoginPage() {
         setLoading(true);
 
         try {
-            const response = await api.post('/auth/login', { username, password });
+            const response = await api.post('/auth/login', { username: username.trim(), password });
             const { token, user } = response.data;
 
             // If user has multiple branches, show selector

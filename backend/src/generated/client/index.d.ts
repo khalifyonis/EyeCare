@@ -49,10 +49,20 @@ export type Doctor = $Result.DefaultSelection<Prisma.$DoctorPayload>
  */
 export type Patient = $Result.DefaultSelection<Prisma.$PatientPayload>
 /**
+ * Model OpticalPrescription
+ * 
+ */
+export type OpticalPrescription = $Result.DefaultSelection<Prisma.$OpticalPrescriptionPayload>
+/**
  * Model Appointment
  * 
  */
 export type Appointment = $Result.DefaultSelection<Prisma.$AppointmentPayload>
+/**
+ * Model EyeExamination
+ * 
+ */
+export type EyeExamination = $Result.DefaultSelection<Prisma.$EyeExaminationPayload>
 /**
  * Model ERExamination
  * 
@@ -113,8 +123,27 @@ export type StaffAssignment = $Result.DefaultSelection<Prisma.$StaffAssignmentPa
  * Enums
  */
 export namespace $Enums {
-  export const AppointmentStatus: {
+  export const OpticalPrescriptionType: {
+  SPECTACLES: 'SPECTACLES',
+  CONTACT_LENS: 'CONTACT_LENS',
+  BOTH: 'BOTH'
+};
+
+export type OpticalPrescriptionType = (typeof OpticalPrescriptionType)[keyof typeof OpticalPrescriptionType]
+
+
+export const OpticalPrescriptionStatus: {
+  FILLED: 'FILLED',
+  DISPENSED: 'DISPENSED'
+};
+
+export type OpticalPrescriptionStatus = (typeof OpticalPrescriptionStatus)[keyof typeof OpticalPrescriptionStatus]
+
+
+export const AppointmentStatus: {
   PENDING: 'PENDING',
+  SCHEDULED: 'SCHEDULED',
+  CONFIRMED: 'CONFIRMED',
   COMPLETED: 'COMPLETED',
   CANCELLED: 'CANCELLED'
 };
@@ -161,6 +190,14 @@ export const FollowUpStatus: {
 export type FollowUpStatus = (typeof FollowUpStatus)[keyof typeof FollowUpStatus]
 
 }
+
+export type OpticalPrescriptionType = $Enums.OpticalPrescriptionType
+
+export const OpticalPrescriptionType: typeof $Enums.OpticalPrescriptionType
+
+export type OpticalPrescriptionStatus = $Enums.OpticalPrescriptionStatus
+
+export const OpticalPrescriptionStatus: typeof $Enums.OpticalPrescriptionStatus
 
 export type AppointmentStatus = $Enums.AppointmentStatus
 
@@ -371,6 +408,16 @@ export class PrismaClient<
   get patient(): Prisma.PatientDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.opticalPrescription`: Exposes CRUD operations for the **OpticalPrescription** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more OpticalPrescriptions
+    * const opticalPrescriptions = await prisma.opticalPrescription.findMany()
+    * ```
+    */
+  get opticalPrescription(): Prisma.OpticalPrescriptionDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.appointment`: Exposes CRUD operations for the **Appointment** model.
     * Example usage:
     * ```ts
@@ -379,6 +426,16 @@ export class PrismaClient<
     * ```
     */
   get appointment(): Prisma.AppointmentDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.eyeExamination`: Exposes CRUD operations for the **EyeExamination** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EyeExaminations
+    * const eyeExaminations = await prisma.eyeExamination.findMany()
+    * ```
+    */
+  get eyeExamination(): Prisma.EyeExaminationDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.eRExamination`: Exposes CRUD operations for the **ERExamination** model.
@@ -937,7 +994,9 @@ export namespace Prisma {
     ActivityLog: 'ActivityLog',
     Doctor: 'Doctor',
     Patient: 'Patient',
+    OpticalPrescription: 'OpticalPrescription',
     Appointment: 'Appointment',
+    EyeExamination: 'EyeExamination',
     ERExamination: 'ERExamination',
     ClinicalExamination: 'ClinicalExamination',
     Surgery: 'Surgery',
@@ -967,7 +1026,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "role" | "branch" | "supplier" | "user" | "activityLog" | "doctor" | "patient" | "appointment" | "eRExamination" | "clinicalExamination" | "surgery" | "prescription" | "pharmacyItem" | "pharmacyStockTransaction" | "opticalItem" | "opticalStockTransaction" | "billing" | "followUp" | "staffAssignment"
+      modelProps: "role" | "branch" | "supplier" | "user" | "activityLog" | "doctor" | "patient" | "opticalPrescription" | "appointment" | "eyeExamination" | "eRExamination" | "clinicalExamination" | "surgery" | "prescription" | "pharmacyItem" | "pharmacyStockTransaction" | "opticalItem" | "opticalStockTransaction" | "billing" | "followUp" | "staffAssignment"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1489,6 +1548,80 @@ export namespace Prisma {
           }
         }
       }
+      OpticalPrescription: {
+        payload: Prisma.$OpticalPrescriptionPayload<ExtArgs>
+        fields: Prisma.OpticalPrescriptionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.OpticalPrescriptionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpticalPrescriptionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.OpticalPrescriptionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpticalPrescriptionPayload>
+          }
+          findFirst: {
+            args: Prisma.OpticalPrescriptionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpticalPrescriptionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.OpticalPrescriptionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpticalPrescriptionPayload>
+          }
+          findMany: {
+            args: Prisma.OpticalPrescriptionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpticalPrescriptionPayload>[]
+          }
+          create: {
+            args: Prisma.OpticalPrescriptionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpticalPrescriptionPayload>
+          }
+          createMany: {
+            args: Prisma.OpticalPrescriptionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.OpticalPrescriptionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpticalPrescriptionPayload>[]
+          }
+          delete: {
+            args: Prisma.OpticalPrescriptionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpticalPrescriptionPayload>
+          }
+          update: {
+            args: Prisma.OpticalPrescriptionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpticalPrescriptionPayload>
+          }
+          deleteMany: {
+            args: Prisma.OpticalPrescriptionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.OpticalPrescriptionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.OpticalPrescriptionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpticalPrescriptionPayload>[]
+          }
+          upsert: {
+            args: Prisma.OpticalPrescriptionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OpticalPrescriptionPayload>
+          }
+          aggregate: {
+            args: Prisma.OpticalPrescriptionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateOpticalPrescription>
+          }
+          groupBy: {
+            args: Prisma.OpticalPrescriptionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<OpticalPrescriptionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.OpticalPrescriptionCountArgs<ExtArgs>
+            result: $Utils.Optional<OpticalPrescriptionCountAggregateOutputType> | number
+          }
+        }
+      }
       Appointment: {
         payload: Prisma.$AppointmentPayload<ExtArgs>
         fields: Prisma.AppointmentFieldRefs
@@ -1560,6 +1693,80 @@ export namespace Prisma {
           count: {
             args: Prisma.AppointmentCountArgs<ExtArgs>
             result: $Utils.Optional<AppointmentCountAggregateOutputType> | number
+          }
+        }
+      }
+      EyeExamination: {
+        payload: Prisma.$EyeExaminationPayload<ExtArgs>
+        fields: Prisma.EyeExaminationFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EyeExaminationFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EyeExaminationPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EyeExaminationFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EyeExaminationPayload>
+          }
+          findFirst: {
+            args: Prisma.EyeExaminationFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EyeExaminationPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EyeExaminationFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EyeExaminationPayload>
+          }
+          findMany: {
+            args: Prisma.EyeExaminationFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EyeExaminationPayload>[]
+          }
+          create: {
+            args: Prisma.EyeExaminationCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EyeExaminationPayload>
+          }
+          createMany: {
+            args: Prisma.EyeExaminationCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EyeExaminationCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EyeExaminationPayload>[]
+          }
+          delete: {
+            args: Prisma.EyeExaminationDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EyeExaminationPayload>
+          }
+          update: {
+            args: Prisma.EyeExaminationUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EyeExaminationPayload>
+          }
+          deleteMany: {
+            args: Prisma.EyeExaminationDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EyeExaminationUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EyeExaminationUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EyeExaminationPayload>[]
+          }
+          upsert: {
+            args: Prisma.EyeExaminationUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EyeExaminationPayload>
+          }
+          aggregate: {
+            args: Prisma.EyeExaminationAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEyeExamination>
+          }
+          groupBy: {
+            args: Prisma.EyeExaminationGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EyeExaminationGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EyeExaminationCountArgs<ExtArgs>
+            result: $Utils.Optional<EyeExaminationCountAggregateOutputType> | number
           }
         }
       }
@@ -2480,7 +2687,9 @@ export namespace Prisma {
     activityLog?: ActivityLogOmit
     doctor?: DoctorOmit
     patient?: PatientOmit
+    opticalPrescription?: OpticalPrescriptionOmit
     appointment?: AppointmentOmit
+    eyeExamination?: EyeExaminationOmit
     eRExamination?: ERExaminationOmit
     clinicalExamination?: ClinicalExaminationOmit
     surgery?: SurgeryOmit
@@ -2608,8 +2817,10 @@ export namespace Prisma {
     doctors: number
     patients: number
     appointments: number
+    eyeExaminations: number
     surgeries: number
     prescriptions: number
+    opticalPrescriptions: number
     pharmacyItems: number
     pharmacyTransactions: number
     opticalItems: number
@@ -2626,8 +2837,10 @@ export namespace Prisma {
     doctors?: boolean | BranchCountOutputTypeCountDoctorsArgs
     patients?: boolean | BranchCountOutputTypeCountPatientsArgs
     appointments?: boolean | BranchCountOutputTypeCountAppointmentsArgs
+    eyeExaminations?: boolean | BranchCountOutputTypeCountEyeExaminationsArgs
     surgeries?: boolean | BranchCountOutputTypeCountSurgeriesArgs
     prescriptions?: boolean | BranchCountOutputTypeCountPrescriptionsArgs
+    opticalPrescriptions?: boolean | BranchCountOutputTypeCountOpticalPrescriptionsArgs
     pharmacyItems?: boolean | BranchCountOutputTypeCountPharmacyItemsArgs
     pharmacyTransactions?: boolean | BranchCountOutputTypeCountPharmacyTransactionsArgs
     opticalItems?: boolean | BranchCountOutputTypeCountOpticalItemsArgs
@@ -2687,6 +2900,13 @@ export namespace Prisma {
   /**
    * BranchCountOutputType without action
    */
+  export type BranchCountOutputTypeCountEyeExaminationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EyeExaminationWhereInput
+  }
+
+  /**
+   * BranchCountOutputType without action
+   */
   export type BranchCountOutputTypeCountSurgeriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SurgeryWhereInput
   }
@@ -2696,6 +2916,13 @@ export namespace Prisma {
    */
   export type BranchCountOutputTypeCountPrescriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PrescriptionWhereInput
+  }
+
+  /**
+   * BranchCountOutputType without action
+   */
+  export type BranchCountOutputTypeCountOpticalPrescriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OpticalPrescriptionWhereInput
   }
 
   /**
@@ -2807,6 +3034,7 @@ export namespace Prisma {
     createdBillings: number
     staffAssignments: number
     activityLogs: number
+    createdOpticalPrescriptions: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2817,6 +3045,7 @@ export namespace Prisma {
     createdBillings?: boolean | UserCountOutputTypeCountCreatedBillingsArgs
     staffAssignments?: boolean | UserCountOutputTypeCountStaffAssignmentsArgs
     activityLogs?: boolean | UserCountOutputTypeCountActivityLogsArgs
+    createdOpticalPrescriptions?: boolean | UserCountOutputTypeCountCreatedOpticalPrescriptionsArgs
   }
 
   // Custom InputTypes
@@ -2879,6 +3108,13 @@ export namespace Prisma {
     where?: ActivityLogWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountCreatedOpticalPrescriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OpticalPrescriptionWhereInput
+  }
+
 
   /**
    * Count Type DoctorCountOutputType
@@ -2886,14 +3122,18 @@ export namespace Prisma {
 
   export type DoctorCountOutputType = {
     appointments: number
+    eyeExaminations: number
     examinedClinicalExams: number
     surgeries: number
+    assignedPatients: number
   }
 
   export type DoctorCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     appointments?: boolean | DoctorCountOutputTypeCountAppointmentsArgs
+    eyeExaminations?: boolean | DoctorCountOutputTypeCountEyeExaminationsArgs
     examinedClinicalExams?: boolean | DoctorCountOutputTypeCountExaminedClinicalExamsArgs
     surgeries?: boolean | DoctorCountOutputTypeCountSurgeriesArgs
+    assignedPatients?: boolean | DoctorCountOutputTypeCountAssignedPatientsArgs
   }
 
   // Custom InputTypes
@@ -2917,6 +3157,13 @@ export namespace Prisma {
   /**
    * DoctorCountOutputType without action
    */
+  export type DoctorCountOutputTypeCountEyeExaminationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EyeExaminationWhereInput
+  }
+
+  /**
+   * DoctorCountOutputType without action
+   */
   export type DoctorCountOutputTypeCountExaminedClinicalExamsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ClinicalExaminationWhereInput
   }
@@ -2928,6 +3175,13 @@ export namespace Prisma {
     where?: SurgeryWhereInput
   }
 
+  /**
+   * DoctorCountOutputType without action
+   */
+  export type DoctorCountOutputTypeCountAssignedPatientsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PatientWhereInput
+  }
+
 
   /**
    * Count Type PatientCountOutputType
@@ -2935,12 +3189,18 @@ export namespace Prisma {
 
   export type PatientCountOutputType = {
     appointments: number
+    surgeries: number
+    eyeExaminations: number
+    opticalPrescriptions: number
     billings: number
     followUps: number
   }
 
   export type PatientCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     appointments?: boolean | PatientCountOutputTypeCountAppointmentsArgs
+    surgeries?: boolean | PatientCountOutputTypeCountSurgeriesArgs
+    eyeExaminations?: boolean | PatientCountOutputTypeCountEyeExaminationsArgs
+    opticalPrescriptions?: boolean | PatientCountOutputTypeCountOpticalPrescriptionsArgs
     billings?: boolean | PatientCountOutputTypeCountBillingsArgs
     followUps?: boolean | PatientCountOutputTypeCountFollowUpsArgs
   }
@@ -2961,6 +3221,27 @@ export namespace Prisma {
    */
   export type PatientCountOutputTypeCountAppointmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AppointmentWhereInput
+  }
+
+  /**
+   * PatientCountOutputType without action
+   */
+  export type PatientCountOutputTypeCountSurgeriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SurgeryWhereInput
+  }
+
+  /**
+   * PatientCountOutputType without action
+   */
+  export type PatientCountOutputTypeCountEyeExaminationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EyeExaminationWhereInput
+  }
+
+  /**
+   * PatientCountOutputType without action
+   */
+  export type PatientCountOutputTypeCountOpticalPrescriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OpticalPrescriptionWhereInput
   }
 
   /**
@@ -3184,10 +3465,14 @@ export namespace Prisma {
 
   export type OpticalItemCountOutputType = {
     transactions: number
+    framePrescriptions: number
+    lensPrescriptions: number
   }
 
   export type OpticalItemCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     transactions?: boolean | OpticalItemCountOutputTypeCountTransactionsArgs
+    framePrescriptions?: boolean | OpticalItemCountOutputTypeCountFramePrescriptionsArgs
+    lensPrescriptions?: boolean | OpticalItemCountOutputTypeCountLensPrescriptionsArgs
   }
 
   // Custom InputTypes
@@ -3206,6 +3491,20 @@ export namespace Prisma {
    */
   export type OpticalItemCountOutputTypeCountTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: OpticalStockTransactionWhereInput
+  }
+
+  /**
+   * OpticalItemCountOutputType without action
+   */
+  export type OpticalItemCountOutputTypeCountFramePrescriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OpticalPrescriptionWhereInput
+  }
+
+  /**
+   * OpticalItemCountOutputType without action
+   */
+  export type OpticalItemCountOutputTypeCountLensPrescriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OpticalPrescriptionWhereInput
   }
 
 
@@ -4482,8 +4781,10 @@ export namespace Prisma {
     doctors?: boolean | Branch$doctorsArgs<ExtArgs>
     patients?: boolean | Branch$patientsArgs<ExtArgs>
     appointments?: boolean | Branch$appointmentsArgs<ExtArgs>
+    eyeExaminations?: boolean | Branch$eyeExaminationsArgs<ExtArgs>
     surgeries?: boolean | Branch$surgeriesArgs<ExtArgs>
     prescriptions?: boolean | Branch$prescriptionsArgs<ExtArgs>
+    opticalPrescriptions?: boolean | Branch$opticalPrescriptionsArgs<ExtArgs>
     pharmacyItems?: boolean | Branch$pharmacyItemsArgs<ExtArgs>
     pharmacyTransactions?: boolean | Branch$pharmacyTransactionsArgs<ExtArgs>
     opticalItems?: boolean | Branch$opticalItemsArgs<ExtArgs>
@@ -4532,8 +4833,10 @@ export namespace Prisma {
     doctors?: boolean | Branch$doctorsArgs<ExtArgs>
     patients?: boolean | Branch$patientsArgs<ExtArgs>
     appointments?: boolean | Branch$appointmentsArgs<ExtArgs>
+    eyeExaminations?: boolean | Branch$eyeExaminationsArgs<ExtArgs>
     surgeries?: boolean | Branch$surgeriesArgs<ExtArgs>
     prescriptions?: boolean | Branch$prescriptionsArgs<ExtArgs>
+    opticalPrescriptions?: boolean | Branch$opticalPrescriptionsArgs<ExtArgs>
     pharmacyItems?: boolean | Branch$pharmacyItemsArgs<ExtArgs>
     pharmacyTransactions?: boolean | Branch$pharmacyTransactionsArgs<ExtArgs>
     opticalItems?: boolean | Branch$opticalItemsArgs<ExtArgs>
@@ -4555,8 +4858,10 @@ export namespace Prisma {
       doctors: Prisma.$DoctorPayload<ExtArgs>[]
       patients: Prisma.$PatientPayload<ExtArgs>[]
       appointments: Prisma.$AppointmentPayload<ExtArgs>[]
+      eyeExaminations: Prisma.$EyeExaminationPayload<ExtArgs>[]
       surgeries: Prisma.$SurgeryPayload<ExtArgs>[]
       prescriptions: Prisma.$PrescriptionPayload<ExtArgs>[]
+      opticalPrescriptions: Prisma.$OpticalPrescriptionPayload<ExtArgs>[]
       pharmacyItems: Prisma.$PharmacyItemPayload<ExtArgs>[]
       pharmacyTransactions: Prisma.$PharmacyStockTransactionPayload<ExtArgs>[]
       opticalItems: Prisma.$OpticalItemPayload<ExtArgs>[]
@@ -4973,8 +5278,10 @@ export namespace Prisma {
     doctors<T extends Branch$doctorsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$doctorsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DoctorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     patients<T extends Branch$patientsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$patientsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     appointments<T extends Branch$appointmentsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$appointmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    eyeExaminations<T extends Branch$eyeExaminationsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$eyeExaminationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EyeExaminationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     surgeries<T extends Branch$surgeriesArgs<ExtArgs> = {}>(args?: Subset<T, Branch$surgeriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SurgeryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     prescriptions<T extends Branch$prescriptionsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$prescriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PrescriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    opticalPrescriptions<T extends Branch$opticalPrescriptionsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$opticalPrescriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpticalPrescriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     pharmacyItems<T extends Branch$pharmacyItemsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$pharmacyItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PharmacyItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     pharmacyTransactions<T extends Branch$pharmacyTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$pharmacyTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PharmacyStockTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     opticalItems<T extends Branch$opticalItemsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$opticalItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpticalItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -5527,6 +5834,30 @@ export namespace Prisma {
   }
 
   /**
+   * Branch.eyeExaminations
+   */
+  export type Branch$eyeExaminationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EyeExamination
+     */
+    select?: EyeExaminationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EyeExamination
+     */
+    omit?: EyeExaminationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EyeExaminationInclude<ExtArgs> | null
+    where?: EyeExaminationWhereInput
+    orderBy?: EyeExaminationOrderByWithRelationInput | EyeExaminationOrderByWithRelationInput[]
+    cursor?: EyeExaminationWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EyeExaminationScalarFieldEnum | EyeExaminationScalarFieldEnum[]
+  }
+
+  /**
    * Branch.surgeries
    */
   export type Branch$surgeriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5572,6 +5903,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PrescriptionScalarFieldEnum | PrescriptionScalarFieldEnum[]
+  }
+
+  /**
+   * Branch.opticalPrescriptions
+   */
+  export type Branch$opticalPrescriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalPrescription
+     */
+    select?: OpticalPrescriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalPrescription
+     */
+    omit?: OpticalPrescriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalPrescriptionInclude<ExtArgs> | null
+    where?: OpticalPrescriptionWhereInput
+    orderBy?: OpticalPrescriptionOrderByWithRelationInput | OpticalPrescriptionOrderByWithRelationInput[]
+    cursor?: OpticalPrescriptionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OpticalPrescriptionScalarFieldEnum | OpticalPrescriptionScalarFieldEnum[]
   }
 
   /**
@@ -7186,6 +7541,7 @@ export namespace Prisma {
     createdBillings?: boolean | User$createdBillingsArgs<ExtArgs>
     staffAssignments?: boolean | User$staffAssignmentsArgs<ExtArgs>
     activityLogs?: boolean | User$activityLogsArgs<ExtArgs>
+    createdOpticalPrescriptions?: boolean | User$createdOpticalPrescriptionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -7256,6 +7612,7 @@ export namespace Prisma {
     createdBillings?: boolean | User$createdBillingsArgs<ExtArgs>
     staffAssignments?: boolean | User$staffAssignmentsArgs<ExtArgs>
     activityLogs?: boolean | User$activityLogsArgs<ExtArgs>
+    createdOpticalPrescriptions?: boolean | User$createdOpticalPrescriptionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7280,6 +7637,7 @@ export namespace Prisma {
       createdBillings: Prisma.$BillingPayload<ExtArgs>[]
       staffAssignments: Prisma.$StaffAssignmentPayload<ExtArgs>[]
       activityLogs: Prisma.$ActivityLogPayload<ExtArgs>[]
+      createdOpticalPrescriptions: Prisma.$OpticalPrescriptionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -7700,6 +8058,7 @@ export namespace Prisma {
     createdBillings<T extends User$createdBillingsArgs<ExtArgs> = {}>(args?: Subset<T, User$createdBillingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     staffAssignments<T extends User$staffAssignmentsArgs<ExtArgs> = {}>(args?: Subset<T, User$staffAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     activityLogs<T extends User$activityLogsArgs<ExtArgs> = {}>(args?: Subset<T, User$activityLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    createdOpticalPrescriptions<T extends User$createdOpticalPrescriptionsArgs<ExtArgs> = {}>(args?: Subset<T, User$createdOpticalPrescriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpticalPrescriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8323,6 +8682,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ActivityLogScalarFieldEnum | ActivityLogScalarFieldEnum[]
+  }
+
+  /**
+   * User.createdOpticalPrescriptions
+   */
+  export type User$createdOpticalPrescriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalPrescription
+     */
+    select?: OpticalPrescriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalPrescription
+     */
+    omit?: OpticalPrescriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalPrescriptionInclude<ExtArgs> | null
+    where?: OpticalPrescriptionWhereInput
+    orderBy?: OpticalPrescriptionOrderByWithRelationInput | OpticalPrescriptionOrderByWithRelationInput[]
+    cursor?: OpticalPrescriptionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OpticalPrescriptionScalarFieldEnum | OpticalPrescriptionScalarFieldEnum[]
   }
 
   /**
@@ -9640,8 +10023,10 @@ export namespace Prisma {
     user?: boolean | UserDefaultArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     appointments?: boolean | Doctor$appointmentsArgs<ExtArgs>
+    eyeExaminations?: boolean | Doctor$eyeExaminationsArgs<ExtArgs>
     examinedClinicalExams?: boolean | Doctor$examinedClinicalExamsArgs<ExtArgs>
     surgeries?: boolean | Doctor$surgeriesArgs<ExtArgs>
+    assignedPatients?: boolean | Doctor$assignedPatientsArgs<ExtArgs>
     _count?: boolean | DoctorCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["doctor"]>
 
@@ -9687,8 +10072,10 @@ export namespace Prisma {
     user?: boolean | UserDefaultArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     appointments?: boolean | Doctor$appointmentsArgs<ExtArgs>
+    eyeExaminations?: boolean | Doctor$eyeExaminationsArgs<ExtArgs>
     examinedClinicalExams?: boolean | Doctor$examinedClinicalExamsArgs<ExtArgs>
     surgeries?: boolean | Doctor$surgeriesArgs<ExtArgs>
+    assignedPatients?: boolean | Doctor$assignedPatientsArgs<ExtArgs>
     _count?: boolean | DoctorCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type DoctorIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9706,8 +10093,10 @@ export namespace Prisma {
       user: Prisma.$UserPayload<ExtArgs>
       branch: Prisma.$BranchPayload<ExtArgs>
       appointments: Prisma.$AppointmentPayload<ExtArgs>[]
+      eyeExaminations: Prisma.$EyeExaminationPayload<ExtArgs>[]
       examinedClinicalExams: Prisma.$ClinicalExaminationPayload<ExtArgs>[]
       surgeries: Prisma.$SurgeryPayload<ExtArgs>[]
+      assignedPatients: Prisma.$PatientPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -10115,8 +10504,10 @@ export namespace Prisma {
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     appointments<T extends Doctor$appointmentsArgs<ExtArgs> = {}>(args?: Subset<T, Doctor$appointmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    eyeExaminations<T extends Doctor$eyeExaminationsArgs<ExtArgs> = {}>(args?: Subset<T, Doctor$eyeExaminationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EyeExaminationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     examinedClinicalExams<T extends Doctor$examinedClinicalExamsArgs<ExtArgs> = {}>(args?: Subset<T, Doctor$examinedClinicalExamsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ClinicalExaminationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     surgeries<T extends Doctor$surgeriesArgs<ExtArgs> = {}>(args?: Subset<T, Doctor$surgeriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SurgeryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    assignedPatients<T extends Doctor$assignedPatientsArgs<ExtArgs> = {}>(args?: Subset<T, Doctor$assignedPatientsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10574,6 +10965,30 @@ export namespace Prisma {
   }
 
   /**
+   * Doctor.eyeExaminations
+   */
+  export type Doctor$eyeExaminationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EyeExamination
+     */
+    select?: EyeExaminationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EyeExamination
+     */
+    omit?: EyeExaminationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EyeExaminationInclude<ExtArgs> | null
+    where?: EyeExaminationWhereInput
+    orderBy?: EyeExaminationOrderByWithRelationInput | EyeExaminationOrderByWithRelationInput[]
+    cursor?: EyeExaminationWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EyeExaminationScalarFieldEnum | EyeExaminationScalarFieldEnum[]
+  }
+
+  /**
    * Doctor.examinedClinicalExams
    */
   export type Doctor$examinedClinicalExamsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -10622,6 +11037,30 @@ export namespace Prisma {
   }
 
   /**
+   * Doctor.assignedPatients
+   */
+  export type Doctor$assignedPatientsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Patient
+     */
+    select?: PatientSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Patient
+     */
+    omit?: PatientOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PatientInclude<ExtArgs> | null
+    where?: PatientWhereInput
+    orderBy?: PatientOrderByWithRelationInput | PatientOrderByWithRelationInput[]
+    cursor?: PatientWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PatientScalarFieldEnum | PatientScalarFieldEnum[]
+  }
+
+  /**
    * Doctor without action
    */
   export type DoctorDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -10646,18 +11085,46 @@ export namespace Prisma {
 
   export type AggregatePatient = {
     _count: PatientCountAggregateOutputType | null
+    _avg: PatientAvgAggregateOutputType | null
+    _sum: PatientSumAggregateOutputType | null
     _min: PatientMinAggregateOutputType | null
     _max: PatientMaxAggregateOutputType | null
   }
 
+  export type PatientAvgAggregateOutputType = {
+    weight: Decimal | null
+  }
+
+  export type PatientSumAggregateOutputType = {
+    weight: Decimal | null
+  }
+
   export type PatientMinAggregateOutputType = {
     id: string | null
+    patientNumber: string | null
     fullName: string | null
+    firstName: string | null
+    lastName: string | null
     gender: string | null
     dateOfBirth: Date | null
     phone: string | null
     email: string | null
     address: string | null
+    city: string | null
+    state: string | null
+    zipCode: string | null
+    bloodGroup: string | null
+    weight: Decimal | null
+    allergies: string | null
+    chiefComplaint: string | null
+    currentMedications: string | null
+    medicalHistory: string | null
+    familyMedicalHistory: string | null
+    emergencyContactName: string | null
+    emergencyContactRelationship: string | null
+    emergencyContactPhone: string | null
+    isActive: boolean | null
+    assignedDoctorId: string | null
     branchId: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -10665,12 +11132,30 @@ export namespace Prisma {
 
   export type PatientMaxAggregateOutputType = {
     id: string | null
+    patientNumber: string | null
     fullName: string | null
+    firstName: string | null
+    lastName: string | null
     gender: string | null
     dateOfBirth: Date | null
     phone: string | null
     email: string | null
     address: string | null
+    city: string | null
+    state: string | null
+    zipCode: string | null
+    bloodGroup: string | null
+    weight: Decimal | null
+    allergies: string | null
+    chiefComplaint: string | null
+    currentMedications: string | null
+    medicalHistory: string | null
+    familyMedicalHistory: string | null
+    emergencyContactName: string | null
+    emergencyContactRelationship: string | null
+    emergencyContactPhone: string | null
+    isActive: boolean | null
+    assignedDoctorId: string | null
     branchId: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -10678,12 +11163,30 @@ export namespace Prisma {
 
   export type PatientCountAggregateOutputType = {
     id: number
+    patientNumber: number
     fullName: number
+    firstName: number
+    lastName: number
     gender: number
     dateOfBirth: number
     phone: number
     email: number
     address: number
+    city: number
+    state: number
+    zipCode: number
+    bloodGroup: number
+    weight: number
+    allergies: number
+    chiefComplaint: number
+    currentMedications: number
+    medicalHistory: number
+    familyMedicalHistory: number
+    emergencyContactName: number
+    emergencyContactRelationship: number
+    emergencyContactPhone: number
+    isActive: number
+    assignedDoctorId: number
     branchId: number
     createdAt: number
     updatedAt: number
@@ -10691,14 +11194,40 @@ export namespace Prisma {
   }
 
 
+  export type PatientAvgAggregateInputType = {
+    weight?: true
+  }
+
+  export type PatientSumAggregateInputType = {
+    weight?: true
+  }
+
   export type PatientMinAggregateInputType = {
     id?: true
+    patientNumber?: true
     fullName?: true
+    firstName?: true
+    lastName?: true
     gender?: true
     dateOfBirth?: true
     phone?: true
     email?: true
     address?: true
+    city?: true
+    state?: true
+    zipCode?: true
+    bloodGroup?: true
+    weight?: true
+    allergies?: true
+    chiefComplaint?: true
+    currentMedications?: true
+    medicalHistory?: true
+    familyMedicalHistory?: true
+    emergencyContactName?: true
+    emergencyContactRelationship?: true
+    emergencyContactPhone?: true
+    isActive?: true
+    assignedDoctorId?: true
     branchId?: true
     createdAt?: true
     updatedAt?: true
@@ -10706,12 +11235,30 @@ export namespace Prisma {
 
   export type PatientMaxAggregateInputType = {
     id?: true
+    patientNumber?: true
     fullName?: true
+    firstName?: true
+    lastName?: true
     gender?: true
     dateOfBirth?: true
     phone?: true
     email?: true
     address?: true
+    city?: true
+    state?: true
+    zipCode?: true
+    bloodGroup?: true
+    weight?: true
+    allergies?: true
+    chiefComplaint?: true
+    currentMedications?: true
+    medicalHistory?: true
+    familyMedicalHistory?: true
+    emergencyContactName?: true
+    emergencyContactRelationship?: true
+    emergencyContactPhone?: true
+    isActive?: true
+    assignedDoctorId?: true
     branchId?: true
     createdAt?: true
     updatedAt?: true
@@ -10719,12 +11266,30 @@ export namespace Prisma {
 
   export type PatientCountAggregateInputType = {
     id?: true
+    patientNumber?: true
     fullName?: true
+    firstName?: true
+    lastName?: true
     gender?: true
     dateOfBirth?: true
     phone?: true
     email?: true
     address?: true
+    city?: true
+    state?: true
+    zipCode?: true
+    bloodGroup?: true
+    weight?: true
+    allergies?: true
+    chiefComplaint?: true
+    currentMedications?: true
+    medicalHistory?: true
+    familyMedicalHistory?: true
+    emergencyContactName?: true
+    emergencyContactRelationship?: true
+    emergencyContactPhone?: true
+    isActive?: true
+    assignedDoctorId?: true
     branchId?: true
     createdAt?: true
     updatedAt?: true
@@ -10769,6 +11334,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: PatientAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PatientSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: PatientMinAggregateInputType
@@ -10799,22 +11376,44 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: PatientCountAggregateInputType | true
+    _avg?: PatientAvgAggregateInputType
+    _sum?: PatientSumAggregateInputType
     _min?: PatientMinAggregateInputType
     _max?: PatientMaxAggregateInputType
   }
 
   export type PatientGroupByOutputType = {
     id: string
+    patientNumber: string | null
     fullName: string
+    firstName: string | null
+    lastName: string | null
     gender: string | null
     dateOfBirth: Date
     phone: string
     email: string | null
     address: string | null
+    city: string | null
+    state: string | null
+    zipCode: string | null
+    bloodGroup: string | null
+    weight: Decimal | null
+    allergies: string | null
+    chiefComplaint: string | null
+    currentMedications: string | null
+    medicalHistory: string | null
+    familyMedicalHistory: string | null
+    emergencyContactName: string | null
+    emergencyContactRelationship: string | null
+    emergencyContactPhone: string | null
+    isActive: boolean
+    assignedDoctorId: string | null
     branchId: string
     createdAt: Date
     updatedAt: Date
     _count: PatientCountAggregateOutputType | null
+    _avg: PatientAvgAggregateOutputType | null
+    _sum: PatientSumAggregateOutputType | null
     _min: PatientMinAggregateOutputType | null
     _max: PatientMaxAggregateOutputType | null
   }
@@ -10835,17 +11434,39 @@ export namespace Prisma {
 
   export type PatientSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    patientNumber?: boolean
     fullName?: boolean
+    firstName?: boolean
+    lastName?: boolean
     gender?: boolean
     dateOfBirth?: boolean
     phone?: boolean
     email?: boolean
     address?: boolean
+    city?: boolean
+    state?: boolean
+    zipCode?: boolean
+    bloodGroup?: boolean
+    weight?: boolean
+    allergies?: boolean
+    chiefComplaint?: boolean
+    currentMedications?: boolean
+    medicalHistory?: boolean
+    familyMedicalHistory?: boolean
+    emergencyContactName?: boolean
+    emergencyContactRelationship?: boolean
+    emergencyContactPhone?: boolean
+    isActive?: boolean
+    assignedDoctorId?: boolean
     branchId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    assignedDoctor?: boolean | Patient$assignedDoctorArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     appointments?: boolean | Patient$appointmentsArgs<ExtArgs>
+    surgeries?: boolean | Patient$surgeriesArgs<ExtArgs>
+    eyeExaminations?: boolean | Patient$eyeExaminationsArgs<ExtArgs>
+    opticalPrescriptions?: boolean | Patient$opticalPrescriptionsArgs<ExtArgs>
     billings?: boolean | Patient$billingsArgs<ExtArgs>
     followUps?: boolean | Patient$followUpsArgs<ExtArgs>
     _count?: boolean | PatientCountOutputTypeDefaultArgs<ExtArgs>
@@ -10853,76 +11474,160 @@ export namespace Prisma {
 
   export type PatientSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    patientNumber?: boolean
     fullName?: boolean
+    firstName?: boolean
+    lastName?: boolean
     gender?: boolean
     dateOfBirth?: boolean
     phone?: boolean
     email?: boolean
     address?: boolean
+    city?: boolean
+    state?: boolean
+    zipCode?: boolean
+    bloodGroup?: boolean
+    weight?: boolean
+    allergies?: boolean
+    chiefComplaint?: boolean
+    currentMedications?: boolean
+    medicalHistory?: boolean
+    familyMedicalHistory?: boolean
+    emergencyContactName?: boolean
+    emergencyContactRelationship?: boolean
+    emergencyContactPhone?: boolean
+    isActive?: boolean
+    assignedDoctorId?: boolean
     branchId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    assignedDoctor?: boolean | Patient$assignedDoctorArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["patient"]>
 
   export type PatientSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    patientNumber?: boolean
     fullName?: boolean
+    firstName?: boolean
+    lastName?: boolean
     gender?: boolean
     dateOfBirth?: boolean
     phone?: boolean
     email?: boolean
     address?: boolean
+    city?: boolean
+    state?: boolean
+    zipCode?: boolean
+    bloodGroup?: boolean
+    weight?: boolean
+    allergies?: boolean
+    chiefComplaint?: boolean
+    currentMedications?: boolean
+    medicalHistory?: boolean
+    familyMedicalHistory?: boolean
+    emergencyContactName?: boolean
+    emergencyContactRelationship?: boolean
+    emergencyContactPhone?: boolean
+    isActive?: boolean
+    assignedDoctorId?: boolean
     branchId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    assignedDoctor?: boolean | Patient$assignedDoctorArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["patient"]>
 
   export type PatientSelectScalar = {
     id?: boolean
+    patientNumber?: boolean
     fullName?: boolean
+    firstName?: boolean
+    lastName?: boolean
     gender?: boolean
     dateOfBirth?: boolean
     phone?: boolean
     email?: boolean
     address?: boolean
+    city?: boolean
+    state?: boolean
+    zipCode?: boolean
+    bloodGroup?: boolean
+    weight?: boolean
+    allergies?: boolean
+    chiefComplaint?: boolean
+    currentMedications?: boolean
+    medicalHistory?: boolean
+    familyMedicalHistory?: boolean
+    emergencyContactName?: boolean
+    emergencyContactRelationship?: boolean
+    emergencyContactPhone?: boolean
+    isActive?: boolean
+    assignedDoctorId?: boolean
     branchId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type PatientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "fullName" | "gender" | "dateOfBirth" | "phone" | "email" | "address" | "branchId" | "createdAt" | "updatedAt", ExtArgs["result"]["patient"]>
+  export type PatientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "patientNumber" | "fullName" | "firstName" | "lastName" | "gender" | "dateOfBirth" | "phone" | "email" | "address" | "city" | "state" | "zipCode" | "bloodGroup" | "weight" | "allergies" | "chiefComplaint" | "currentMedications" | "medicalHistory" | "familyMedicalHistory" | "emergencyContactName" | "emergencyContactRelationship" | "emergencyContactPhone" | "isActive" | "assignedDoctorId" | "branchId" | "createdAt" | "updatedAt", ExtArgs["result"]["patient"]>
   export type PatientInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    assignedDoctor?: boolean | Patient$assignedDoctorArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     appointments?: boolean | Patient$appointmentsArgs<ExtArgs>
+    surgeries?: boolean | Patient$surgeriesArgs<ExtArgs>
+    eyeExaminations?: boolean | Patient$eyeExaminationsArgs<ExtArgs>
+    opticalPrescriptions?: boolean | Patient$opticalPrescriptionsArgs<ExtArgs>
     billings?: boolean | Patient$billingsArgs<ExtArgs>
     followUps?: boolean | Patient$followUpsArgs<ExtArgs>
     _count?: boolean | PatientCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type PatientIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    assignedDoctor?: boolean | Patient$assignedDoctorArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
   }
   export type PatientIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    assignedDoctor?: boolean | Patient$assignedDoctorArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
   }
 
   export type $PatientPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Patient"
     objects: {
+      assignedDoctor: Prisma.$DoctorPayload<ExtArgs> | null
       branch: Prisma.$BranchPayload<ExtArgs>
       appointments: Prisma.$AppointmentPayload<ExtArgs>[]
+      surgeries: Prisma.$SurgeryPayload<ExtArgs>[]
+      eyeExaminations: Prisma.$EyeExaminationPayload<ExtArgs>[]
+      opticalPrescriptions: Prisma.$OpticalPrescriptionPayload<ExtArgs>[]
       billings: Prisma.$BillingPayload<ExtArgs>[]
       followUps: Prisma.$FollowUpPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      patientNumber: string | null
       fullName: string
+      firstName: string | null
+      lastName: string | null
       gender: string | null
       dateOfBirth: Date
       phone: string
       email: string | null
       address: string | null
+      city: string | null
+      state: string | null
+      zipCode: string | null
+      bloodGroup: string | null
+      weight: Prisma.Decimal | null
+      allergies: string | null
+      chiefComplaint: string | null
+      currentMedications: string | null
+      medicalHistory: string | null
+      familyMedicalHistory: string | null
+      emergencyContactName: string | null
+      emergencyContactRelationship: string | null
+      emergencyContactPhone: string | null
+      isActive: boolean
+      assignedDoctorId: string | null
       branchId: string
       createdAt: Date
       updatedAt: Date
@@ -11320,8 +12025,12 @@ export namespace Prisma {
    */
   export interface Prisma__PatientClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    assignedDoctor<T extends Patient$assignedDoctorArgs<ExtArgs> = {}>(args?: Subset<T, Patient$assignedDoctorArgs<ExtArgs>>): Prisma__DoctorClient<$Result.GetResult<Prisma.$DoctorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     appointments<T extends Patient$appointmentsArgs<ExtArgs> = {}>(args?: Subset<T, Patient$appointmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    surgeries<T extends Patient$surgeriesArgs<ExtArgs> = {}>(args?: Subset<T, Patient$surgeriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SurgeryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    eyeExaminations<T extends Patient$eyeExaminationsArgs<ExtArgs> = {}>(args?: Subset<T, Patient$eyeExaminationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EyeExaminationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    opticalPrescriptions<T extends Patient$opticalPrescriptionsArgs<ExtArgs> = {}>(args?: Subset<T, Patient$opticalPrescriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpticalPrescriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     billings<T extends Patient$billingsArgs<ExtArgs> = {}>(args?: Subset<T, Patient$billingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     followUps<T extends Patient$followUpsArgs<ExtArgs> = {}>(args?: Subset<T, Patient$followUpsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -11354,12 +12063,30 @@ export namespace Prisma {
    */
   interface PatientFieldRefs {
     readonly id: FieldRef<"Patient", 'String'>
+    readonly patientNumber: FieldRef<"Patient", 'String'>
     readonly fullName: FieldRef<"Patient", 'String'>
+    readonly firstName: FieldRef<"Patient", 'String'>
+    readonly lastName: FieldRef<"Patient", 'String'>
     readonly gender: FieldRef<"Patient", 'String'>
     readonly dateOfBirth: FieldRef<"Patient", 'DateTime'>
     readonly phone: FieldRef<"Patient", 'String'>
     readonly email: FieldRef<"Patient", 'String'>
     readonly address: FieldRef<"Patient", 'String'>
+    readonly city: FieldRef<"Patient", 'String'>
+    readonly state: FieldRef<"Patient", 'String'>
+    readonly zipCode: FieldRef<"Patient", 'String'>
+    readonly bloodGroup: FieldRef<"Patient", 'String'>
+    readonly weight: FieldRef<"Patient", 'Decimal'>
+    readonly allergies: FieldRef<"Patient", 'String'>
+    readonly chiefComplaint: FieldRef<"Patient", 'String'>
+    readonly currentMedications: FieldRef<"Patient", 'String'>
+    readonly medicalHistory: FieldRef<"Patient", 'String'>
+    readonly familyMedicalHistory: FieldRef<"Patient", 'String'>
+    readonly emergencyContactName: FieldRef<"Patient", 'String'>
+    readonly emergencyContactRelationship: FieldRef<"Patient", 'String'>
+    readonly emergencyContactPhone: FieldRef<"Patient", 'String'>
+    readonly isActive: FieldRef<"Patient", 'Boolean'>
+    readonly assignedDoctorId: FieldRef<"Patient", 'String'>
     readonly branchId: FieldRef<"Patient", 'String'>
     readonly createdAt: FieldRef<"Patient", 'DateTime'>
     readonly updatedAt: FieldRef<"Patient", 'DateTime'>
@@ -11759,6 +12486,25 @@ export namespace Prisma {
   }
 
   /**
+   * Patient.assignedDoctor
+   */
+  export type Patient$assignedDoctorArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Doctor
+     */
+    select?: DoctorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Doctor
+     */
+    omit?: DoctorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DoctorInclude<ExtArgs> | null
+    where?: DoctorWhereInput
+  }
+
+  /**
    * Patient.appointments
    */
   export type Patient$appointmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -11780,6 +12526,78 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: AppointmentScalarFieldEnum | AppointmentScalarFieldEnum[]
+  }
+
+  /**
+   * Patient.surgeries
+   */
+  export type Patient$surgeriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Surgery
+     */
+    select?: SurgerySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Surgery
+     */
+    omit?: SurgeryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SurgeryInclude<ExtArgs> | null
+    where?: SurgeryWhereInput
+    orderBy?: SurgeryOrderByWithRelationInput | SurgeryOrderByWithRelationInput[]
+    cursor?: SurgeryWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SurgeryScalarFieldEnum | SurgeryScalarFieldEnum[]
+  }
+
+  /**
+   * Patient.eyeExaminations
+   */
+  export type Patient$eyeExaminationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EyeExamination
+     */
+    select?: EyeExaminationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EyeExamination
+     */
+    omit?: EyeExaminationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EyeExaminationInclude<ExtArgs> | null
+    where?: EyeExaminationWhereInput
+    orderBy?: EyeExaminationOrderByWithRelationInput | EyeExaminationOrderByWithRelationInput[]
+    cursor?: EyeExaminationWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EyeExaminationScalarFieldEnum | EyeExaminationScalarFieldEnum[]
+  }
+
+  /**
+   * Patient.opticalPrescriptions
+   */
+  export type Patient$opticalPrescriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalPrescription
+     */
+    select?: OpticalPrescriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalPrescription
+     */
+    omit?: OpticalPrescriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalPrescriptionInclude<ExtArgs> | null
+    where?: OpticalPrescriptionWhereInput
+    orderBy?: OpticalPrescriptionOrderByWithRelationInput | OpticalPrescriptionOrderByWithRelationInput[]
+    cursor?: OpticalPrescriptionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OpticalPrescriptionScalarFieldEnum | OpticalPrescriptionScalarFieldEnum[]
   }
 
   /**
@@ -11850,6 +12668,1524 @@ export namespace Prisma {
 
 
   /**
+   * Model OpticalPrescription
+   */
+
+  export type AggregateOpticalPrescription = {
+    _count: OpticalPrescriptionCountAggregateOutputType | null
+    _avg: OpticalPrescriptionAvgAggregateOutputType | null
+    _sum: OpticalPrescriptionSumAggregateOutputType | null
+    _min: OpticalPrescriptionMinAggregateOutputType | null
+    _max: OpticalPrescriptionMaxAggregateOutputType | null
+  }
+
+  export type OpticalPrescriptionAvgAggregateOutputType = {
+    validityMonths: number | null
+    odAxis: number | null
+    odPd: number | null
+    osAxis: number | null
+    osPd: number | null
+  }
+
+  export type OpticalPrescriptionSumAggregateOutputType = {
+    validityMonths: number | null
+    odAxis: number | null
+    odPd: number | null
+    osAxis: number | null
+    osPd: number | null
+  }
+
+  export type OpticalPrescriptionMinAggregateOutputType = {
+    id: string | null
+    branchId: string | null
+    patientId: string | null
+    createdById: string | null
+    type: $Enums.OpticalPrescriptionType | null
+    status: $Enums.OpticalPrescriptionStatus | null
+    validityMonths: number | null
+    expiryDate: Date | null
+    dispensedAt: Date | null
+    notes: string | null
+    odSphere: string | null
+    odCylinder: string | null
+    odAxis: number | null
+    odAdd: string | null
+    odPd: number | null
+    odPrism: string | null
+    osSphere: string | null
+    osCylinder: string | null
+    osAxis: number | null
+    osAdd: string | null
+    osPd: number | null
+    osPrism: string | null
+    lensType: string | null
+    lensMaterial: string | null
+    frameType: string | null
+    frameItemId: string | null
+    lensItemId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type OpticalPrescriptionMaxAggregateOutputType = {
+    id: string | null
+    branchId: string | null
+    patientId: string | null
+    createdById: string | null
+    type: $Enums.OpticalPrescriptionType | null
+    status: $Enums.OpticalPrescriptionStatus | null
+    validityMonths: number | null
+    expiryDate: Date | null
+    dispensedAt: Date | null
+    notes: string | null
+    odSphere: string | null
+    odCylinder: string | null
+    odAxis: number | null
+    odAdd: string | null
+    odPd: number | null
+    odPrism: string | null
+    osSphere: string | null
+    osCylinder: string | null
+    osAxis: number | null
+    osAdd: string | null
+    osPd: number | null
+    osPrism: string | null
+    lensType: string | null
+    lensMaterial: string | null
+    frameType: string | null
+    frameItemId: string | null
+    lensItemId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type OpticalPrescriptionCountAggregateOutputType = {
+    id: number
+    branchId: number
+    patientId: number
+    createdById: number
+    type: number
+    status: number
+    validityMonths: number
+    expiryDate: number
+    dispensedAt: number
+    notes: number
+    odSphere: number
+    odCylinder: number
+    odAxis: number
+    odAdd: number
+    odPd: number
+    odPrism: number
+    osSphere: number
+    osCylinder: number
+    osAxis: number
+    osAdd: number
+    osPd: number
+    osPrism: number
+    lensType: number
+    lensMaterial: number
+    frameType: number
+    coatings: number
+    frameItemId: number
+    lensItemId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type OpticalPrescriptionAvgAggregateInputType = {
+    validityMonths?: true
+    odAxis?: true
+    odPd?: true
+    osAxis?: true
+    osPd?: true
+  }
+
+  export type OpticalPrescriptionSumAggregateInputType = {
+    validityMonths?: true
+    odAxis?: true
+    odPd?: true
+    osAxis?: true
+    osPd?: true
+  }
+
+  export type OpticalPrescriptionMinAggregateInputType = {
+    id?: true
+    branchId?: true
+    patientId?: true
+    createdById?: true
+    type?: true
+    status?: true
+    validityMonths?: true
+    expiryDate?: true
+    dispensedAt?: true
+    notes?: true
+    odSphere?: true
+    odCylinder?: true
+    odAxis?: true
+    odAdd?: true
+    odPd?: true
+    odPrism?: true
+    osSphere?: true
+    osCylinder?: true
+    osAxis?: true
+    osAdd?: true
+    osPd?: true
+    osPrism?: true
+    lensType?: true
+    lensMaterial?: true
+    frameType?: true
+    frameItemId?: true
+    lensItemId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type OpticalPrescriptionMaxAggregateInputType = {
+    id?: true
+    branchId?: true
+    patientId?: true
+    createdById?: true
+    type?: true
+    status?: true
+    validityMonths?: true
+    expiryDate?: true
+    dispensedAt?: true
+    notes?: true
+    odSphere?: true
+    odCylinder?: true
+    odAxis?: true
+    odAdd?: true
+    odPd?: true
+    odPrism?: true
+    osSphere?: true
+    osCylinder?: true
+    osAxis?: true
+    osAdd?: true
+    osPd?: true
+    osPrism?: true
+    lensType?: true
+    lensMaterial?: true
+    frameType?: true
+    frameItemId?: true
+    lensItemId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type OpticalPrescriptionCountAggregateInputType = {
+    id?: true
+    branchId?: true
+    patientId?: true
+    createdById?: true
+    type?: true
+    status?: true
+    validityMonths?: true
+    expiryDate?: true
+    dispensedAt?: true
+    notes?: true
+    odSphere?: true
+    odCylinder?: true
+    odAxis?: true
+    odAdd?: true
+    odPd?: true
+    odPrism?: true
+    osSphere?: true
+    osCylinder?: true
+    osAxis?: true
+    osAdd?: true
+    osPd?: true
+    osPrism?: true
+    lensType?: true
+    lensMaterial?: true
+    frameType?: true
+    coatings?: true
+    frameItemId?: true
+    lensItemId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type OpticalPrescriptionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which OpticalPrescription to aggregate.
+     */
+    where?: OpticalPrescriptionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OpticalPrescriptions to fetch.
+     */
+    orderBy?: OpticalPrescriptionOrderByWithRelationInput | OpticalPrescriptionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: OpticalPrescriptionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OpticalPrescriptions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OpticalPrescriptions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned OpticalPrescriptions
+    **/
+    _count?: true | OpticalPrescriptionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: OpticalPrescriptionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: OpticalPrescriptionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: OpticalPrescriptionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: OpticalPrescriptionMaxAggregateInputType
+  }
+
+  export type GetOpticalPrescriptionAggregateType<T extends OpticalPrescriptionAggregateArgs> = {
+        [P in keyof T & keyof AggregateOpticalPrescription]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateOpticalPrescription[P]>
+      : GetScalarType<T[P], AggregateOpticalPrescription[P]>
+  }
+
+
+
+
+  export type OpticalPrescriptionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OpticalPrescriptionWhereInput
+    orderBy?: OpticalPrescriptionOrderByWithAggregationInput | OpticalPrescriptionOrderByWithAggregationInput[]
+    by: OpticalPrescriptionScalarFieldEnum[] | OpticalPrescriptionScalarFieldEnum
+    having?: OpticalPrescriptionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: OpticalPrescriptionCountAggregateInputType | true
+    _avg?: OpticalPrescriptionAvgAggregateInputType
+    _sum?: OpticalPrescriptionSumAggregateInputType
+    _min?: OpticalPrescriptionMinAggregateInputType
+    _max?: OpticalPrescriptionMaxAggregateInputType
+  }
+
+  export type OpticalPrescriptionGroupByOutputType = {
+    id: string
+    branchId: string
+    patientId: string
+    createdById: string | null
+    type: $Enums.OpticalPrescriptionType
+    status: $Enums.OpticalPrescriptionStatus
+    validityMonths: number
+    expiryDate: Date
+    dispensedAt: Date | null
+    notes: string | null
+    odSphere: string | null
+    odCylinder: string | null
+    odAxis: number | null
+    odAdd: string | null
+    odPd: number | null
+    odPrism: string | null
+    osSphere: string | null
+    osCylinder: string | null
+    osAxis: number | null
+    osAdd: string | null
+    osPd: number | null
+    osPrism: string | null
+    lensType: string | null
+    lensMaterial: string | null
+    frameType: string | null
+    coatings: string[]
+    frameItemId: string | null
+    lensItemId: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: OpticalPrescriptionCountAggregateOutputType | null
+    _avg: OpticalPrescriptionAvgAggregateOutputType | null
+    _sum: OpticalPrescriptionSumAggregateOutputType | null
+    _min: OpticalPrescriptionMinAggregateOutputType | null
+    _max: OpticalPrescriptionMaxAggregateOutputType | null
+  }
+
+  type GetOpticalPrescriptionGroupByPayload<T extends OpticalPrescriptionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<OpticalPrescriptionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof OpticalPrescriptionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], OpticalPrescriptionGroupByOutputType[P]>
+            : GetScalarType<T[P], OpticalPrescriptionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type OpticalPrescriptionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    branchId?: boolean
+    patientId?: boolean
+    createdById?: boolean
+    type?: boolean
+    status?: boolean
+    validityMonths?: boolean
+    expiryDate?: boolean
+    dispensedAt?: boolean
+    notes?: boolean
+    odSphere?: boolean
+    odCylinder?: boolean
+    odAxis?: boolean
+    odAdd?: boolean
+    odPd?: boolean
+    odPrism?: boolean
+    osSphere?: boolean
+    osCylinder?: boolean
+    osAxis?: boolean
+    osAdd?: boolean
+    osPd?: boolean
+    osPrism?: boolean
+    lensType?: boolean
+    lensMaterial?: boolean
+    frameType?: boolean
+    coatings?: boolean
+    frameItemId?: boolean
+    lensItemId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    createdBy?: boolean | OpticalPrescription$createdByArgs<ExtArgs>
+    frameItem?: boolean | OpticalPrescription$frameItemArgs<ExtArgs>
+    lensItem?: boolean | OpticalPrescription$lensItemArgs<ExtArgs>
+  }, ExtArgs["result"]["opticalPrescription"]>
+
+  export type OpticalPrescriptionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    branchId?: boolean
+    patientId?: boolean
+    createdById?: boolean
+    type?: boolean
+    status?: boolean
+    validityMonths?: boolean
+    expiryDate?: boolean
+    dispensedAt?: boolean
+    notes?: boolean
+    odSphere?: boolean
+    odCylinder?: boolean
+    odAxis?: boolean
+    odAdd?: boolean
+    odPd?: boolean
+    odPrism?: boolean
+    osSphere?: boolean
+    osCylinder?: boolean
+    osAxis?: boolean
+    osAdd?: boolean
+    osPd?: boolean
+    osPrism?: boolean
+    lensType?: boolean
+    lensMaterial?: boolean
+    frameType?: boolean
+    coatings?: boolean
+    frameItemId?: boolean
+    lensItemId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    createdBy?: boolean | OpticalPrescription$createdByArgs<ExtArgs>
+    frameItem?: boolean | OpticalPrescription$frameItemArgs<ExtArgs>
+    lensItem?: boolean | OpticalPrescription$lensItemArgs<ExtArgs>
+  }, ExtArgs["result"]["opticalPrescription"]>
+
+  export type OpticalPrescriptionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    branchId?: boolean
+    patientId?: boolean
+    createdById?: boolean
+    type?: boolean
+    status?: boolean
+    validityMonths?: boolean
+    expiryDate?: boolean
+    dispensedAt?: boolean
+    notes?: boolean
+    odSphere?: boolean
+    odCylinder?: boolean
+    odAxis?: boolean
+    odAdd?: boolean
+    odPd?: boolean
+    odPrism?: boolean
+    osSphere?: boolean
+    osCylinder?: boolean
+    osAxis?: boolean
+    osAdd?: boolean
+    osPd?: boolean
+    osPrism?: boolean
+    lensType?: boolean
+    lensMaterial?: boolean
+    frameType?: boolean
+    coatings?: boolean
+    frameItemId?: boolean
+    lensItemId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    createdBy?: boolean | OpticalPrescription$createdByArgs<ExtArgs>
+    frameItem?: boolean | OpticalPrescription$frameItemArgs<ExtArgs>
+    lensItem?: boolean | OpticalPrescription$lensItemArgs<ExtArgs>
+  }, ExtArgs["result"]["opticalPrescription"]>
+
+  export type OpticalPrescriptionSelectScalar = {
+    id?: boolean
+    branchId?: boolean
+    patientId?: boolean
+    createdById?: boolean
+    type?: boolean
+    status?: boolean
+    validityMonths?: boolean
+    expiryDate?: boolean
+    dispensedAt?: boolean
+    notes?: boolean
+    odSphere?: boolean
+    odCylinder?: boolean
+    odAxis?: boolean
+    odAdd?: boolean
+    odPd?: boolean
+    odPrism?: boolean
+    osSphere?: boolean
+    osCylinder?: boolean
+    osAxis?: boolean
+    osAdd?: boolean
+    osPd?: boolean
+    osPrism?: boolean
+    lensType?: boolean
+    lensMaterial?: boolean
+    frameType?: boolean
+    coatings?: boolean
+    frameItemId?: boolean
+    lensItemId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type OpticalPrescriptionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "branchId" | "patientId" | "createdById" | "type" | "status" | "validityMonths" | "expiryDate" | "dispensedAt" | "notes" | "odSphere" | "odCylinder" | "odAxis" | "odAdd" | "odPd" | "odPrism" | "osSphere" | "osCylinder" | "osAxis" | "osAdd" | "osPd" | "osPrism" | "lensType" | "lensMaterial" | "frameType" | "coatings" | "frameItemId" | "lensItemId" | "createdAt" | "updatedAt", ExtArgs["result"]["opticalPrescription"]>
+  export type OpticalPrescriptionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    createdBy?: boolean | OpticalPrescription$createdByArgs<ExtArgs>
+    frameItem?: boolean | OpticalPrescription$frameItemArgs<ExtArgs>
+    lensItem?: boolean | OpticalPrescription$lensItemArgs<ExtArgs>
+  }
+  export type OpticalPrescriptionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    createdBy?: boolean | OpticalPrescription$createdByArgs<ExtArgs>
+    frameItem?: boolean | OpticalPrescription$frameItemArgs<ExtArgs>
+    lensItem?: boolean | OpticalPrescription$lensItemArgs<ExtArgs>
+  }
+  export type OpticalPrescriptionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    createdBy?: boolean | OpticalPrescription$createdByArgs<ExtArgs>
+    frameItem?: boolean | OpticalPrescription$frameItemArgs<ExtArgs>
+    lensItem?: boolean | OpticalPrescription$lensItemArgs<ExtArgs>
+  }
+
+  export type $OpticalPrescriptionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "OpticalPrescription"
+    objects: {
+      branch: Prisma.$BranchPayload<ExtArgs>
+      patient: Prisma.$PatientPayload<ExtArgs>
+      createdBy: Prisma.$UserPayload<ExtArgs> | null
+      frameItem: Prisma.$OpticalItemPayload<ExtArgs> | null
+      lensItem: Prisma.$OpticalItemPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      branchId: string
+      patientId: string
+      createdById: string | null
+      type: $Enums.OpticalPrescriptionType
+      status: $Enums.OpticalPrescriptionStatus
+      validityMonths: number
+      expiryDate: Date
+      dispensedAt: Date | null
+      notes: string | null
+      odSphere: string | null
+      odCylinder: string | null
+      odAxis: number | null
+      odAdd: string | null
+      odPd: number | null
+      odPrism: string | null
+      osSphere: string | null
+      osCylinder: string | null
+      osAxis: number | null
+      osAdd: string | null
+      osPd: number | null
+      osPrism: string | null
+      lensType: string | null
+      lensMaterial: string | null
+      frameType: string | null
+      coatings: string[]
+      frameItemId: string | null
+      lensItemId: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["opticalPrescription"]>
+    composites: {}
+  }
+
+  type OpticalPrescriptionGetPayload<S extends boolean | null | undefined | OpticalPrescriptionDefaultArgs> = $Result.GetResult<Prisma.$OpticalPrescriptionPayload, S>
+
+  type OpticalPrescriptionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<OpticalPrescriptionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: OpticalPrescriptionCountAggregateInputType | true
+    }
+
+  export interface OpticalPrescriptionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['OpticalPrescription'], meta: { name: 'OpticalPrescription' } }
+    /**
+     * Find zero or one OpticalPrescription that matches the filter.
+     * @param {OpticalPrescriptionFindUniqueArgs} args - Arguments to find a OpticalPrescription
+     * @example
+     * // Get one OpticalPrescription
+     * const opticalPrescription = await prisma.opticalPrescription.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends OpticalPrescriptionFindUniqueArgs>(args: SelectSubset<T, OpticalPrescriptionFindUniqueArgs<ExtArgs>>): Prisma__OpticalPrescriptionClient<$Result.GetResult<Prisma.$OpticalPrescriptionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one OpticalPrescription that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {OpticalPrescriptionFindUniqueOrThrowArgs} args - Arguments to find a OpticalPrescription
+     * @example
+     * // Get one OpticalPrescription
+     * const opticalPrescription = await prisma.opticalPrescription.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends OpticalPrescriptionFindUniqueOrThrowArgs>(args: SelectSubset<T, OpticalPrescriptionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__OpticalPrescriptionClient<$Result.GetResult<Prisma.$OpticalPrescriptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first OpticalPrescription that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OpticalPrescriptionFindFirstArgs} args - Arguments to find a OpticalPrescription
+     * @example
+     * // Get one OpticalPrescription
+     * const opticalPrescription = await prisma.opticalPrescription.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends OpticalPrescriptionFindFirstArgs>(args?: SelectSubset<T, OpticalPrescriptionFindFirstArgs<ExtArgs>>): Prisma__OpticalPrescriptionClient<$Result.GetResult<Prisma.$OpticalPrescriptionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first OpticalPrescription that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OpticalPrescriptionFindFirstOrThrowArgs} args - Arguments to find a OpticalPrescription
+     * @example
+     * // Get one OpticalPrescription
+     * const opticalPrescription = await prisma.opticalPrescription.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends OpticalPrescriptionFindFirstOrThrowArgs>(args?: SelectSubset<T, OpticalPrescriptionFindFirstOrThrowArgs<ExtArgs>>): Prisma__OpticalPrescriptionClient<$Result.GetResult<Prisma.$OpticalPrescriptionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more OpticalPrescriptions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OpticalPrescriptionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all OpticalPrescriptions
+     * const opticalPrescriptions = await prisma.opticalPrescription.findMany()
+     * 
+     * // Get first 10 OpticalPrescriptions
+     * const opticalPrescriptions = await prisma.opticalPrescription.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const opticalPrescriptionWithIdOnly = await prisma.opticalPrescription.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends OpticalPrescriptionFindManyArgs>(args?: SelectSubset<T, OpticalPrescriptionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpticalPrescriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a OpticalPrescription.
+     * @param {OpticalPrescriptionCreateArgs} args - Arguments to create a OpticalPrescription.
+     * @example
+     * // Create one OpticalPrescription
+     * const OpticalPrescription = await prisma.opticalPrescription.create({
+     *   data: {
+     *     // ... data to create a OpticalPrescription
+     *   }
+     * })
+     * 
+     */
+    create<T extends OpticalPrescriptionCreateArgs>(args: SelectSubset<T, OpticalPrescriptionCreateArgs<ExtArgs>>): Prisma__OpticalPrescriptionClient<$Result.GetResult<Prisma.$OpticalPrescriptionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many OpticalPrescriptions.
+     * @param {OpticalPrescriptionCreateManyArgs} args - Arguments to create many OpticalPrescriptions.
+     * @example
+     * // Create many OpticalPrescriptions
+     * const opticalPrescription = await prisma.opticalPrescription.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends OpticalPrescriptionCreateManyArgs>(args?: SelectSubset<T, OpticalPrescriptionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many OpticalPrescriptions and returns the data saved in the database.
+     * @param {OpticalPrescriptionCreateManyAndReturnArgs} args - Arguments to create many OpticalPrescriptions.
+     * @example
+     * // Create many OpticalPrescriptions
+     * const opticalPrescription = await prisma.opticalPrescription.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many OpticalPrescriptions and only return the `id`
+     * const opticalPrescriptionWithIdOnly = await prisma.opticalPrescription.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends OpticalPrescriptionCreateManyAndReturnArgs>(args?: SelectSubset<T, OpticalPrescriptionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpticalPrescriptionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a OpticalPrescription.
+     * @param {OpticalPrescriptionDeleteArgs} args - Arguments to delete one OpticalPrescription.
+     * @example
+     * // Delete one OpticalPrescription
+     * const OpticalPrescription = await prisma.opticalPrescription.delete({
+     *   where: {
+     *     // ... filter to delete one OpticalPrescription
+     *   }
+     * })
+     * 
+     */
+    delete<T extends OpticalPrescriptionDeleteArgs>(args: SelectSubset<T, OpticalPrescriptionDeleteArgs<ExtArgs>>): Prisma__OpticalPrescriptionClient<$Result.GetResult<Prisma.$OpticalPrescriptionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one OpticalPrescription.
+     * @param {OpticalPrescriptionUpdateArgs} args - Arguments to update one OpticalPrescription.
+     * @example
+     * // Update one OpticalPrescription
+     * const opticalPrescription = await prisma.opticalPrescription.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends OpticalPrescriptionUpdateArgs>(args: SelectSubset<T, OpticalPrescriptionUpdateArgs<ExtArgs>>): Prisma__OpticalPrescriptionClient<$Result.GetResult<Prisma.$OpticalPrescriptionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more OpticalPrescriptions.
+     * @param {OpticalPrescriptionDeleteManyArgs} args - Arguments to filter OpticalPrescriptions to delete.
+     * @example
+     * // Delete a few OpticalPrescriptions
+     * const { count } = await prisma.opticalPrescription.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends OpticalPrescriptionDeleteManyArgs>(args?: SelectSubset<T, OpticalPrescriptionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more OpticalPrescriptions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OpticalPrescriptionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many OpticalPrescriptions
+     * const opticalPrescription = await prisma.opticalPrescription.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends OpticalPrescriptionUpdateManyArgs>(args: SelectSubset<T, OpticalPrescriptionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more OpticalPrescriptions and returns the data updated in the database.
+     * @param {OpticalPrescriptionUpdateManyAndReturnArgs} args - Arguments to update many OpticalPrescriptions.
+     * @example
+     * // Update many OpticalPrescriptions
+     * const opticalPrescription = await prisma.opticalPrescription.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more OpticalPrescriptions and only return the `id`
+     * const opticalPrescriptionWithIdOnly = await prisma.opticalPrescription.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends OpticalPrescriptionUpdateManyAndReturnArgs>(args: SelectSubset<T, OpticalPrescriptionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpticalPrescriptionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one OpticalPrescription.
+     * @param {OpticalPrescriptionUpsertArgs} args - Arguments to update or create a OpticalPrescription.
+     * @example
+     * // Update or create a OpticalPrescription
+     * const opticalPrescription = await prisma.opticalPrescription.upsert({
+     *   create: {
+     *     // ... data to create a OpticalPrescription
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the OpticalPrescription we want to update
+     *   }
+     * })
+     */
+    upsert<T extends OpticalPrescriptionUpsertArgs>(args: SelectSubset<T, OpticalPrescriptionUpsertArgs<ExtArgs>>): Prisma__OpticalPrescriptionClient<$Result.GetResult<Prisma.$OpticalPrescriptionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of OpticalPrescriptions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OpticalPrescriptionCountArgs} args - Arguments to filter OpticalPrescriptions to count.
+     * @example
+     * // Count the number of OpticalPrescriptions
+     * const count = await prisma.opticalPrescription.count({
+     *   where: {
+     *     // ... the filter for the OpticalPrescriptions we want to count
+     *   }
+     * })
+    **/
+    count<T extends OpticalPrescriptionCountArgs>(
+      args?: Subset<T, OpticalPrescriptionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], OpticalPrescriptionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a OpticalPrescription.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OpticalPrescriptionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends OpticalPrescriptionAggregateArgs>(args: Subset<T, OpticalPrescriptionAggregateArgs>): Prisma.PrismaPromise<GetOpticalPrescriptionAggregateType<T>>
+
+    /**
+     * Group by OpticalPrescription.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OpticalPrescriptionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends OpticalPrescriptionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: OpticalPrescriptionGroupByArgs['orderBy'] }
+        : { orderBy?: OpticalPrescriptionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, OpticalPrescriptionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetOpticalPrescriptionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the OpticalPrescription model
+   */
+  readonly fields: OpticalPrescriptionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for OpticalPrescription.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__OpticalPrescriptionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    patient<T extends PatientDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PatientDefaultArgs<ExtArgs>>): Prisma__PatientClient<$Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    createdBy<T extends OpticalPrescription$createdByArgs<ExtArgs> = {}>(args?: Subset<T, OpticalPrescription$createdByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    frameItem<T extends OpticalPrescription$frameItemArgs<ExtArgs> = {}>(args?: Subset<T, OpticalPrescription$frameItemArgs<ExtArgs>>): Prisma__OpticalItemClient<$Result.GetResult<Prisma.$OpticalItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    lensItem<T extends OpticalPrescription$lensItemArgs<ExtArgs> = {}>(args?: Subset<T, OpticalPrescription$lensItemArgs<ExtArgs>>): Prisma__OpticalItemClient<$Result.GetResult<Prisma.$OpticalItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the OpticalPrescription model
+   */
+  interface OpticalPrescriptionFieldRefs {
+    readonly id: FieldRef<"OpticalPrescription", 'String'>
+    readonly branchId: FieldRef<"OpticalPrescription", 'String'>
+    readonly patientId: FieldRef<"OpticalPrescription", 'String'>
+    readonly createdById: FieldRef<"OpticalPrescription", 'String'>
+    readonly type: FieldRef<"OpticalPrescription", 'OpticalPrescriptionType'>
+    readonly status: FieldRef<"OpticalPrescription", 'OpticalPrescriptionStatus'>
+    readonly validityMonths: FieldRef<"OpticalPrescription", 'Int'>
+    readonly expiryDate: FieldRef<"OpticalPrescription", 'DateTime'>
+    readonly dispensedAt: FieldRef<"OpticalPrescription", 'DateTime'>
+    readonly notes: FieldRef<"OpticalPrescription", 'String'>
+    readonly odSphere: FieldRef<"OpticalPrescription", 'String'>
+    readonly odCylinder: FieldRef<"OpticalPrescription", 'String'>
+    readonly odAxis: FieldRef<"OpticalPrescription", 'Int'>
+    readonly odAdd: FieldRef<"OpticalPrescription", 'String'>
+    readonly odPd: FieldRef<"OpticalPrescription", 'Int'>
+    readonly odPrism: FieldRef<"OpticalPrescription", 'String'>
+    readonly osSphere: FieldRef<"OpticalPrescription", 'String'>
+    readonly osCylinder: FieldRef<"OpticalPrescription", 'String'>
+    readonly osAxis: FieldRef<"OpticalPrescription", 'Int'>
+    readonly osAdd: FieldRef<"OpticalPrescription", 'String'>
+    readonly osPd: FieldRef<"OpticalPrescription", 'Int'>
+    readonly osPrism: FieldRef<"OpticalPrescription", 'String'>
+    readonly lensType: FieldRef<"OpticalPrescription", 'String'>
+    readonly lensMaterial: FieldRef<"OpticalPrescription", 'String'>
+    readonly frameType: FieldRef<"OpticalPrescription", 'String'>
+    readonly coatings: FieldRef<"OpticalPrescription", 'String[]'>
+    readonly frameItemId: FieldRef<"OpticalPrescription", 'String'>
+    readonly lensItemId: FieldRef<"OpticalPrescription", 'String'>
+    readonly createdAt: FieldRef<"OpticalPrescription", 'DateTime'>
+    readonly updatedAt: FieldRef<"OpticalPrescription", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * OpticalPrescription findUnique
+   */
+  export type OpticalPrescriptionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalPrescription
+     */
+    select?: OpticalPrescriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalPrescription
+     */
+    omit?: OpticalPrescriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalPrescriptionInclude<ExtArgs> | null
+    /**
+     * Filter, which OpticalPrescription to fetch.
+     */
+    where: OpticalPrescriptionWhereUniqueInput
+  }
+
+  /**
+   * OpticalPrescription findUniqueOrThrow
+   */
+  export type OpticalPrescriptionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalPrescription
+     */
+    select?: OpticalPrescriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalPrescription
+     */
+    omit?: OpticalPrescriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalPrescriptionInclude<ExtArgs> | null
+    /**
+     * Filter, which OpticalPrescription to fetch.
+     */
+    where: OpticalPrescriptionWhereUniqueInput
+  }
+
+  /**
+   * OpticalPrescription findFirst
+   */
+  export type OpticalPrescriptionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalPrescription
+     */
+    select?: OpticalPrescriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalPrescription
+     */
+    omit?: OpticalPrescriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalPrescriptionInclude<ExtArgs> | null
+    /**
+     * Filter, which OpticalPrescription to fetch.
+     */
+    where?: OpticalPrescriptionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OpticalPrescriptions to fetch.
+     */
+    orderBy?: OpticalPrescriptionOrderByWithRelationInput | OpticalPrescriptionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for OpticalPrescriptions.
+     */
+    cursor?: OpticalPrescriptionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OpticalPrescriptions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OpticalPrescriptions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of OpticalPrescriptions.
+     */
+    distinct?: OpticalPrescriptionScalarFieldEnum | OpticalPrescriptionScalarFieldEnum[]
+  }
+
+  /**
+   * OpticalPrescription findFirstOrThrow
+   */
+  export type OpticalPrescriptionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalPrescription
+     */
+    select?: OpticalPrescriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalPrescription
+     */
+    omit?: OpticalPrescriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalPrescriptionInclude<ExtArgs> | null
+    /**
+     * Filter, which OpticalPrescription to fetch.
+     */
+    where?: OpticalPrescriptionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OpticalPrescriptions to fetch.
+     */
+    orderBy?: OpticalPrescriptionOrderByWithRelationInput | OpticalPrescriptionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for OpticalPrescriptions.
+     */
+    cursor?: OpticalPrescriptionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OpticalPrescriptions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OpticalPrescriptions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of OpticalPrescriptions.
+     */
+    distinct?: OpticalPrescriptionScalarFieldEnum | OpticalPrescriptionScalarFieldEnum[]
+  }
+
+  /**
+   * OpticalPrescription findMany
+   */
+  export type OpticalPrescriptionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalPrescription
+     */
+    select?: OpticalPrescriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalPrescription
+     */
+    omit?: OpticalPrescriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalPrescriptionInclude<ExtArgs> | null
+    /**
+     * Filter, which OpticalPrescriptions to fetch.
+     */
+    where?: OpticalPrescriptionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OpticalPrescriptions to fetch.
+     */
+    orderBy?: OpticalPrescriptionOrderByWithRelationInput | OpticalPrescriptionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing OpticalPrescriptions.
+     */
+    cursor?: OpticalPrescriptionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OpticalPrescriptions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OpticalPrescriptions.
+     */
+    skip?: number
+    distinct?: OpticalPrescriptionScalarFieldEnum | OpticalPrescriptionScalarFieldEnum[]
+  }
+
+  /**
+   * OpticalPrescription create
+   */
+  export type OpticalPrescriptionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalPrescription
+     */
+    select?: OpticalPrescriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalPrescription
+     */
+    omit?: OpticalPrescriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalPrescriptionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a OpticalPrescription.
+     */
+    data: XOR<OpticalPrescriptionCreateInput, OpticalPrescriptionUncheckedCreateInput>
+  }
+
+  /**
+   * OpticalPrescription createMany
+   */
+  export type OpticalPrescriptionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many OpticalPrescriptions.
+     */
+    data: OpticalPrescriptionCreateManyInput | OpticalPrescriptionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * OpticalPrescription createManyAndReturn
+   */
+  export type OpticalPrescriptionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalPrescription
+     */
+    select?: OpticalPrescriptionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalPrescription
+     */
+    omit?: OpticalPrescriptionOmit<ExtArgs> | null
+    /**
+     * The data used to create many OpticalPrescriptions.
+     */
+    data: OpticalPrescriptionCreateManyInput | OpticalPrescriptionCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalPrescriptionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * OpticalPrescription update
+   */
+  export type OpticalPrescriptionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalPrescription
+     */
+    select?: OpticalPrescriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalPrescription
+     */
+    omit?: OpticalPrescriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalPrescriptionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a OpticalPrescription.
+     */
+    data: XOR<OpticalPrescriptionUpdateInput, OpticalPrescriptionUncheckedUpdateInput>
+    /**
+     * Choose, which OpticalPrescription to update.
+     */
+    where: OpticalPrescriptionWhereUniqueInput
+  }
+
+  /**
+   * OpticalPrescription updateMany
+   */
+  export type OpticalPrescriptionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update OpticalPrescriptions.
+     */
+    data: XOR<OpticalPrescriptionUpdateManyMutationInput, OpticalPrescriptionUncheckedUpdateManyInput>
+    /**
+     * Filter which OpticalPrescriptions to update
+     */
+    where?: OpticalPrescriptionWhereInput
+    /**
+     * Limit how many OpticalPrescriptions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * OpticalPrescription updateManyAndReturn
+   */
+  export type OpticalPrescriptionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalPrescription
+     */
+    select?: OpticalPrescriptionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalPrescription
+     */
+    omit?: OpticalPrescriptionOmit<ExtArgs> | null
+    /**
+     * The data used to update OpticalPrescriptions.
+     */
+    data: XOR<OpticalPrescriptionUpdateManyMutationInput, OpticalPrescriptionUncheckedUpdateManyInput>
+    /**
+     * Filter which OpticalPrescriptions to update
+     */
+    where?: OpticalPrescriptionWhereInput
+    /**
+     * Limit how many OpticalPrescriptions to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalPrescriptionIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * OpticalPrescription upsert
+   */
+  export type OpticalPrescriptionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalPrescription
+     */
+    select?: OpticalPrescriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalPrescription
+     */
+    omit?: OpticalPrescriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalPrescriptionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the OpticalPrescription to update in case it exists.
+     */
+    where: OpticalPrescriptionWhereUniqueInput
+    /**
+     * In case the OpticalPrescription found by the `where` argument doesn't exist, create a new OpticalPrescription with this data.
+     */
+    create: XOR<OpticalPrescriptionCreateInput, OpticalPrescriptionUncheckedCreateInput>
+    /**
+     * In case the OpticalPrescription was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<OpticalPrescriptionUpdateInput, OpticalPrescriptionUncheckedUpdateInput>
+  }
+
+  /**
+   * OpticalPrescription delete
+   */
+  export type OpticalPrescriptionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalPrescription
+     */
+    select?: OpticalPrescriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalPrescription
+     */
+    omit?: OpticalPrescriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalPrescriptionInclude<ExtArgs> | null
+    /**
+     * Filter which OpticalPrescription to delete.
+     */
+    where: OpticalPrescriptionWhereUniqueInput
+  }
+
+  /**
+   * OpticalPrescription deleteMany
+   */
+  export type OpticalPrescriptionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which OpticalPrescriptions to delete
+     */
+    where?: OpticalPrescriptionWhereInput
+    /**
+     * Limit how many OpticalPrescriptions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * OpticalPrescription.createdBy
+   */
+  export type OpticalPrescription$createdByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * OpticalPrescription.frameItem
+   */
+  export type OpticalPrescription$frameItemArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalItem
+     */
+    select?: OpticalItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalItem
+     */
+    omit?: OpticalItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalItemInclude<ExtArgs> | null
+    where?: OpticalItemWhereInput
+  }
+
+  /**
+   * OpticalPrescription.lensItem
+   */
+  export type OpticalPrescription$lensItemArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalItem
+     */
+    select?: OpticalItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalItem
+     */
+    omit?: OpticalItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalItemInclude<ExtArgs> | null
+    where?: OpticalItemWhereInput
+  }
+
+  /**
+   * OpticalPrescription without action
+   */
+  export type OpticalPrescriptionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalPrescription
+     */
+    select?: OpticalPrescriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalPrescription
+     */
+    omit?: OpticalPrescriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalPrescriptionInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model Appointment
    */
 
@@ -11875,6 +14211,9 @@ export namespace Prisma {
     appointmentDate: Date | null
     status: $Enums.AppointmentStatus | null
     amount: Decimal | null
+    type: string | null
+    notes: string | null
+    location: string | null
     branchId: string | null
     patientId: string | null
     doctorId: string | null
@@ -11889,6 +14228,9 @@ export namespace Prisma {
     appointmentDate: Date | null
     status: $Enums.AppointmentStatus | null
     amount: Decimal | null
+    type: string | null
+    notes: string | null
+    location: string | null
     branchId: string | null
     patientId: string | null
     doctorId: string | null
@@ -11903,6 +14245,9 @@ export namespace Prisma {
     appointmentDate: number
     status: number
     amount: number
+    type: number
+    notes: number
+    location: number
     branchId: number
     patientId: number
     doctorId: number
@@ -11927,6 +14272,9 @@ export namespace Prisma {
     appointmentDate?: true
     status?: true
     amount?: true
+    type?: true
+    notes?: true
+    location?: true
     branchId?: true
     patientId?: true
     doctorId?: true
@@ -11941,6 +14289,9 @@ export namespace Prisma {
     appointmentDate?: true
     status?: true
     amount?: true
+    type?: true
+    notes?: true
+    location?: true
     branchId?: true
     patientId?: true
     doctorId?: true
@@ -11955,6 +14306,9 @@ export namespace Prisma {
     appointmentDate?: true
     status?: true
     amount?: true
+    type?: true
+    notes?: true
+    location?: true
     branchId?: true
     patientId?: true
     doctorId?: true
@@ -12056,6 +14410,9 @@ export namespace Prisma {
     appointmentDate: Date
     status: $Enums.AppointmentStatus
     amount: Decimal
+    type: string | null
+    notes: string | null
+    location: string | null
     branchId: string
     patientId: string
     doctorId: string
@@ -12089,6 +14446,9 @@ export namespace Prisma {
     appointmentDate?: boolean
     status?: boolean
     amount?: boolean
+    type?: boolean
+    notes?: boolean
+    location?: boolean
     branchId?: boolean
     patientId?: boolean
     doctorId?: boolean
@@ -12113,6 +14473,9 @@ export namespace Prisma {
     appointmentDate?: boolean
     status?: boolean
     amount?: boolean
+    type?: boolean
+    notes?: boolean
+    location?: boolean
     branchId?: boolean
     patientId?: boolean
     doctorId?: boolean
@@ -12131,6 +14494,9 @@ export namespace Prisma {
     appointmentDate?: boolean
     status?: boolean
     amount?: boolean
+    type?: boolean
+    notes?: boolean
+    location?: boolean
     branchId?: boolean
     patientId?: boolean
     doctorId?: boolean
@@ -12149,6 +14515,9 @@ export namespace Prisma {
     appointmentDate?: boolean
     status?: boolean
     amount?: boolean
+    type?: boolean
+    notes?: boolean
+    location?: boolean
     branchId?: boolean
     patientId?: boolean
     doctorId?: boolean
@@ -12157,7 +14526,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type AppointmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "bookingNumber" | "appointmentDate" | "status" | "amount" | "branchId" | "patientId" | "doctorId" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["appointment"]>
+  export type AppointmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "bookingNumber" | "appointmentDate" | "status" | "amount" | "type" | "notes" | "location" | "branchId" | "patientId" | "doctorId" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["appointment"]>
   export type AppointmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     patient?: boolean | PatientDefaultArgs<ExtArgs>
@@ -12202,6 +14571,9 @@ export namespace Prisma {
       appointmentDate: Date
       status: $Enums.AppointmentStatus
       amount: Prisma.Decimal
+      type: string | null
+      notes: string | null
+      location: string | null
       branchId: string
       patientId: string
       doctorId: string
@@ -12645,6 +15017,9 @@ export namespace Prisma {
     readonly appointmentDate: FieldRef<"Appointment", 'DateTime'>
     readonly status: FieldRef<"Appointment", 'AppointmentStatus'>
     readonly amount: FieldRef<"Appointment", 'Decimal'>
+    readonly type: FieldRef<"Appointment", 'String'>
+    readonly notes: FieldRef<"Appointment", 'String'>
+    readonly location: FieldRef<"Appointment", 'String'>
     readonly branchId: FieldRef<"Appointment", 'String'>
     readonly patientId: FieldRef<"Appointment", 'String'>
     readonly doctorId: FieldRef<"Appointment", 'String'>
@@ -13172,6 +15547,1534 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: AppointmentInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model EyeExamination
+   */
+
+  export type AggregateEyeExamination = {
+    _count: EyeExaminationCountAggregateOutputType | null
+    _avg: EyeExaminationAvgAggregateOutputType | null
+    _sum: EyeExaminationSumAggregateOutputType | null
+    _min: EyeExaminationMinAggregateOutputType | null
+    _max: EyeExaminationMaxAggregateOutputType | null
+  }
+
+  export type EyeExaminationAvgAggregateOutputType = {
+    iopOD: number | null
+    iopOS: number | null
+    targetIopOD: number | null
+    targetIopOS: number | null
+  }
+
+  export type EyeExaminationSumAggregateOutputType = {
+    iopOD: number | null
+    iopOS: number | null
+    targetIopOD: number | null
+    targetIopOS: number | null
+  }
+
+  export type EyeExaminationMinAggregateOutputType = {
+    id: string | null
+    branchId: string | null
+    patientId: string | null
+    doctorId: string | null
+    chiefComplaint: string | null
+    historyOfPresentIllness: string | null
+    vaScale: string | null
+    vaUnaidedOD: string | null
+    vaUnaidedOS: string | null
+    vaUnaidedNearOD: string | null
+    vaUnaidedNearOS: string | null
+    vaBcvaOD: string | null
+    vaBcvaOS: string | null
+    vaBcvaNearOD: string | null
+    vaBcvaNearOS: string | null
+    vaPinholeOD: string | null
+    vaPinholeOS: string | null
+    refractionSphereOD: string | null
+    refractionSphereOS: string | null
+    refractionCylinderOD: string | null
+    refractionCylinderOS: string | null
+    refractionAxisOD: string | null
+    refractionAxisOS: string | null
+    iopOD: number | null
+    iopOS: number | null
+    iopMethod: string | null
+    iopTime: string | null
+    targetIopOD: number | null
+    targetIopOS: number | null
+    diagnosis: string | null
+    plan: string | null
+    followUpDate: Date | null
+    nextVisitReason: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type EyeExaminationMaxAggregateOutputType = {
+    id: string | null
+    branchId: string | null
+    patientId: string | null
+    doctorId: string | null
+    chiefComplaint: string | null
+    historyOfPresentIllness: string | null
+    vaScale: string | null
+    vaUnaidedOD: string | null
+    vaUnaidedOS: string | null
+    vaUnaidedNearOD: string | null
+    vaUnaidedNearOS: string | null
+    vaBcvaOD: string | null
+    vaBcvaOS: string | null
+    vaBcvaNearOD: string | null
+    vaBcvaNearOS: string | null
+    vaPinholeOD: string | null
+    vaPinholeOS: string | null
+    refractionSphereOD: string | null
+    refractionSphereOS: string | null
+    refractionCylinderOD: string | null
+    refractionCylinderOS: string | null
+    refractionAxisOD: string | null
+    refractionAxisOS: string | null
+    iopOD: number | null
+    iopOS: number | null
+    iopMethod: string | null
+    iopTime: string | null
+    targetIopOD: number | null
+    targetIopOS: number | null
+    diagnosis: string | null
+    plan: string | null
+    followUpDate: Date | null
+    nextVisitReason: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type EyeExaminationCountAggregateOutputType = {
+    id: number
+    branchId: number
+    patientId: number
+    doctorId: number
+    chiefComplaint: number
+    historyOfPresentIllness: number
+    vaScale: number
+    vaUnaidedOD: number
+    vaUnaidedOS: number
+    vaUnaidedNearOD: number
+    vaUnaidedNearOS: number
+    vaBcvaOD: number
+    vaBcvaOS: number
+    vaBcvaNearOD: number
+    vaBcvaNearOS: number
+    vaPinholeOD: number
+    vaPinholeOS: number
+    refractionSphereOD: number
+    refractionSphereOS: number
+    refractionCylinderOD: number
+    refractionCylinderOS: number
+    refractionAxisOD: number
+    refractionAxisOS: number
+    iopOD: number
+    iopOS: number
+    iopMethod: number
+    iopTime: number
+    targetIopOD: number
+    targetIopOS: number
+    anteriorSegmentFindings: number
+    fundusFindings: number
+    diagnosis: number
+    plan: number
+    followUpDate: number
+    nextVisitReason: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type EyeExaminationAvgAggregateInputType = {
+    iopOD?: true
+    iopOS?: true
+    targetIopOD?: true
+    targetIopOS?: true
+  }
+
+  export type EyeExaminationSumAggregateInputType = {
+    iopOD?: true
+    iopOS?: true
+    targetIopOD?: true
+    targetIopOS?: true
+  }
+
+  export type EyeExaminationMinAggregateInputType = {
+    id?: true
+    branchId?: true
+    patientId?: true
+    doctorId?: true
+    chiefComplaint?: true
+    historyOfPresentIllness?: true
+    vaScale?: true
+    vaUnaidedOD?: true
+    vaUnaidedOS?: true
+    vaUnaidedNearOD?: true
+    vaUnaidedNearOS?: true
+    vaBcvaOD?: true
+    vaBcvaOS?: true
+    vaBcvaNearOD?: true
+    vaBcvaNearOS?: true
+    vaPinholeOD?: true
+    vaPinholeOS?: true
+    refractionSphereOD?: true
+    refractionSphereOS?: true
+    refractionCylinderOD?: true
+    refractionCylinderOS?: true
+    refractionAxisOD?: true
+    refractionAxisOS?: true
+    iopOD?: true
+    iopOS?: true
+    iopMethod?: true
+    iopTime?: true
+    targetIopOD?: true
+    targetIopOS?: true
+    diagnosis?: true
+    plan?: true
+    followUpDate?: true
+    nextVisitReason?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type EyeExaminationMaxAggregateInputType = {
+    id?: true
+    branchId?: true
+    patientId?: true
+    doctorId?: true
+    chiefComplaint?: true
+    historyOfPresentIllness?: true
+    vaScale?: true
+    vaUnaidedOD?: true
+    vaUnaidedOS?: true
+    vaUnaidedNearOD?: true
+    vaUnaidedNearOS?: true
+    vaBcvaOD?: true
+    vaBcvaOS?: true
+    vaBcvaNearOD?: true
+    vaBcvaNearOS?: true
+    vaPinholeOD?: true
+    vaPinholeOS?: true
+    refractionSphereOD?: true
+    refractionSphereOS?: true
+    refractionCylinderOD?: true
+    refractionCylinderOS?: true
+    refractionAxisOD?: true
+    refractionAxisOS?: true
+    iopOD?: true
+    iopOS?: true
+    iopMethod?: true
+    iopTime?: true
+    targetIopOD?: true
+    targetIopOS?: true
+    diagnosis?: true
+    plan?: true
+    followUpDate?: true
+    nextVisitReason?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type EyeExaminationCountAggregateInputType = {
+    id?: true
+    branchId?: true
+    patientId?: true
+    doctorId?: true
+    chiefComplaint?: true
+    historyOfPresentIllness?: true
+    vaScale?: true
+    vaUnaidedOD?: true
+    vaUnaidedOS?: true
+    vaUnaidedNearOD?: true
+    vaUnaidedNearOS?: true
+    vaBcvaOD?: true
+    vaBcvaOS?: true
+    vaBcvaNearOD?: true
+    vaBcvaNearOS?: true
+    vaPinholeOD?: true
+    vaPinholeOS?: true
+    refractionSphereOD?: true
+    refractionSphereOS?: true
+    refractionCylinderOD?: true
+    refractionCylinderOS?: true
+    refractionAxisOD?: true
+    refractionAxisOS?: true
+    iopOD?: true
+    iopOS?: true
+    iopMethod?: true
+    iopTime?: true
+    targetIopOD?: true
+    targetIopOS?: true
+    anteriorSegmentFindings?: true
+    fundusFindings?: true
+    diagnosis?: true
+    plan?: true
+    followUpDate?: true
+    nextVisitReason?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type EyeExaminationAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EyeExamination to aggregate.
+     */
+    where?: EyeExaminationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EyeExaminations to fetch.
+     */
+    orderBy?: EyeExaminationOrderByWithRelationInput | EyeExaminationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EyeExaminationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EyeExaminations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EyeExaminations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EyeExaminations
+    **/
+    _count?: true | EyeExaminationCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: EyeExaminationAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: EyeExaminationSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EyeExaminationMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EyeExaminationMaxAggregateInputType
+  }
+
+  export type GetEyeExaminationAggregateType<T extends EyeExaminationAggregateArgs> = {
+        [P in keyof T & keyof AggregateEyeExamination]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEyeExamination[P]>
+      : GetScalarType<T[P], AggregateEyeExamination[P]>
+  }
+
+
+
+
+  export type EyeExaminationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EyeExaminationWhereInput
+    orderBy?: EyeExaminationOrderByWithAggregationInput | EyeExaminationOrderByWithAggregationInput[]
+    by: EyeExaminationScalarFieldEnum[] | EyeExaminationScalarFieldEnum
+    having?: EyeExaminationScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EyeExaminationCountAggregateInputType | true
+    _avg?: EyeExaminationAvgAggregateInputType
+    _sum?: EyeExaminationSumAggregateInputType
+    _min?: EyeExaminationMinAggregateInputType
+    _max?: EyeExaminationMaxAggregateInputType
+  }
+
+  export type EyeExaminationGroupByOutputType = {
+    id: string
+    branchId: string
+    patientId: string
+    doctorId: string
+    chiefComplaint: string
+    historyOfPresentIllness: string | null
+    vaScale: string
+    vaUnaidedOD: string | null
+    vaUnaidedOS: string | null
+    vaUnaidedNearOD: string | null
+    vaUnaidedNearOS: string | null
+    vaBcvaOD: string | null
+    vaBcvaOS: string | null
+    vaBcvaNearOD: string | null
+    vaBcvaNearOS: string | null
+    vaPinholeOD: string | null
+    vaPinholeOS: string | null
+    refractionSphereOD: string | null
+    refractionSphereOS: string | null
+    refractionCylinderOD: string | null
+    refractionCylinderOS: string | null
+    refractionAxisOD: string | null
+    refractionAxisOS: string | null
+    iopOD: number | null
+    iopOS: number | null
+    iopMethod: string | null
+    iopTime: string | null
+    targetIopOD: number | null
+    targetIopOS: number | null
+    anteriorSegmentFindings: JsonValue | null
+    fundusFindings: JsonValue | null
+    diagnosis: string | null
+    plan: string | null
+    followUpDate: Date | null
+    nextVisitReason: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: EyeExaminationCountAggregateOutputType | null
+    _avg: EyeExaminationAvgAggregateOutputType | null
+    _sum: EyeExaminationSumAggregateOutputType | null
+    _min: EyeExaminationMinAggregateOutputType | null
+    _max: EyeExaminationMaxAggregateOutputType | null
+  }
+
+  type GetEyeExaminationGroupByPayload<T extends EyeExaminationGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EyeExaminationGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EyeExaminationGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EyeExaminationGroupByOutputType[P]>
+            : GetScalarType<T[P], EyeExaminationGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EyeExaminationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    branchId?: boolean
+    patientId?: boolean
+    doctorId?: boolean
+    chiefComplaint?: boolean
+    historyOfPresentIllness?: boolean
+    vaScale?: boolean
+    vaUnaidedOD?: boolean
+    vaUnaidedOS?: boolean
+    vaUnaidedNearOD?: boolean
+    vaUnaidedNearOS?: boolean
+    vaBcvaOD?: boolean
+    vaBcvaOS?: boolean
+    vaBcvaNearOD?: boolean
+    vaBcvaNearOS?: boolean
+    vaPinholeOD?: boolean
+    vaPinholeOS?: boolean
+    refractionSphereOD?: boolean
+    refractionSphereOS?: boolean
+    refractionCylinderOD?: boolean
+    refractionCylinderOS?: boolean
+    refractionAxisOD?: boolean
+    refractionAxisOS?: boolean
+    iopOD?: boolean
+    iopOS?: boolean
+    iopMethod?: boolean
+    iopTime?: boolean
+    targetIopOD?: boolean
+    targetIopOS?: boolean
+    anteriorSegmentFindings?: boolean
+    fundusFindings?: boolean
+    diagnosis?: boolean
+    plan?: boolean
+    followUpDate?: boolean
+    nextVisitReason?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    doctor?: boolean | DoctorDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eyeExamination"]>
+
+  export type EyeExaminationSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    branchId?: boolean
+    patientId?: boolean
+    doctorId?: boolean
+    chiefComplaint?: boolean
+    historyOfPresentIllness?: boolean
+    vaScale?: boolean
+    vaUnaidedOD?: boolean
+    vaUnaidedOS?: boolean
+    vaUnaidedNearOD?: boolean
+    vaUnaidedNearOS?: boolean
+    vaBcvaOD?: boolean
+    vaBcvaOS?: boolean
+    vaBcvaNearOD?: boolean
+    vaBcvaNearOS?: boolean
+    vaPinholeOD?: boolean
+    vaPinholeOS?: boolean
+    refractionSphereOD?: boolean
+    refractionSphereOS?: boolean
+    refractionCylinderOD?: boolean
+    refractionCylinderOS?: boolean
+    refractionAxisOD?: boolean
+    refractionAxisOS?: boolean
+    iopOD?: boolean
+    iopOS?: boolean
+    iopMethod?: boolean
+    iopTime?: boolean
+    targetIopOD?: boolean
+    targetIopOS?: boolean
+    anteriorSegmentFindings?: boolean
+    fundusFindings?: boolean
+    diagnosis?: boolean
+    plan?: boolean
+    followUpDate?: boolean
+    nextVisitReason?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    doctor?: boolean | DoctorDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eyeExamination"]>
+
+  export type EyeExaminationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    branchId?: boolean
+    patientId?: boolean
+    doctorId?: boolean
+    chiefComplaint?: boolean
+    historyOfPresentIllness?: boolean
+    vaScale?: boolean
+    vaUnaidedOD?: boolean
+    vaUnaidedOS?: boolean
+    vaUnaidedNearOD?: boolean
+    vaUnaidedNearOS?: boolean
+    vaBcvaOD?: boolean
+    vaBcvaOS?: boolean
+    vaBcvaNearOD?: boolean
+    vaBcvaNearOS?: boolean
+    vaPinholeOD?: boolean
+    vaPinholeOS?: boolean
+    refractionSphereOD?: boolean
+    refractionSphereOS?: boolean
+    refractionCylinderOD?: boolean
+    refractionCylinderOS?: boolean
+    refractionAxisOD?: boolean
+    refractionAxisOS?: boolean
+    iopOD?: boolean
+    iopOS?: boolean
+    iopMethod?: boolean
+    iopTime?: boolean
+    targetIopOD?: boolean
+    targetIopOS?: boolean
+    anteriorSegmentFindings?: boolean
+    fundusFindings?: boolean
+    diagnosis?: boolean
+    plan?: boolean
+    followUpDate?: boolean
+    nextVisitReason?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    doctor?: boolean | DoctorDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eyeExamination"]>
+
+  export type EyeExaminationSelectScalar = {
+    id?: boolean
+    branchId?: boolean
+    patientId?: boolean
+    doctorId?: boolean
+    chiefComplaint?: boolean
+    historyOfPresentIllness?: boolean
+    vaScale?: boolean
+    vaUnaidedOD?: boolean
+    vaUnaidedOS?: boolean
+    vaUnaidedNearOD?: boolean
+    vaUnaidedNearOS?: boolean
+    vaBcvaOD?: boolean
+    vaBcvaOS?: boolean
+    vaBcvaNearOD?: boolean
+    vaBcvaNearOS?: boolean
+    vaPinholeOD?: boolean
+    vaPinholeOS?: boolean
+    refractionSphereOD?: boolean
+    refractionSphereOS?: boolean
+    refractionCylinderOD?: boolean
+    refractionCylinderOS?: boolean
+    refractionAxisOD?: boolean
+    refractionAxisOS?: boolean
+    iopOD?: boolean
+    iopOS?: boolean
+    iopMethod?: boolean
+    iopTime?: boolean
+    targetIopOD?: boolean
+    targetIopOS?: boolean
+    anteriorSegmentFindings?: boolean
+    fundusFindings?: boolean
+    diagnosis?: boolean
+    plan?: boolean
+    followUpDate?: boolean
+    nextVisitReason?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type EyeExaminationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "branchId" | "patientId" | "doctorId" | "chiefComplaint" | "historyOfPresentIllness" | "vaScale" | "vaUnaidedOD" | "vaUnaidedOS" | "vaUnaidedNearOD" | "vaUnaidedNearOS" | "vaBcvaOD" | "vaBcvaOS" | "vaBcvaNearOD" | "vaBcvaNearOS" | "vaPinholeOD" | "vaPinholeOS" | "refractionSphereOD" | "refractionSphereOS" | "refractionCylinderOD" | "refractionCylinderOS" | "refractionAxisOD" | "refractionAxisOS" | "iopOD" | "iopOS" | "iopMethod" | "iopTime" | "targetIopOD" | "targetIopOS" | "anteriorSegmentFindings" | "fundusFindings" | "diagnosis" | "plan" | "followUpDate" | "nextVisitReason" | "createdAt" | "updatedAt", ExtArgs["result"]["eyeExamination"]>
+  export type EyeExaminationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    doctor?: boolean | DoctorDefaultArgs<ExtArgs>
+  }
+  export type EyeExaminationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    doctor?: boolean | DoctorDefaultArgs<ExtArgs>
+  }
+  export type EyeExaminationIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
+    doctor?: boolean | DoctorDefaultArgs<ExtArgs>
+  }
+
+  export type $EyeExaminationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EyeExamination"
+    objects: {
+      branch: Prisma.$BranchPayload<ExtArgs>
+      patient: Prisma.$PatientPayload<ExtArgs>
+      doctor: Prisma.$DoctorPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      branchId: string
+      patientId: string
+      doctorId: string
+      chiefComplaint: string
+      historyOfPresentIllness: string | null
+      vaScale: string
+      vaUnaidedOD: string | null
+      vaUnaidedOS: string | null
+      vaUnaidedNearOD: string | null
+      vaUnaidedNearOS: string | null
+      vaBcvaOD: string | null
+      vaBcvaOS: string | null
+      vaBcvaNearOD: string | null
+      vaBcvaNearOS: string | null
+      vaPinholeOD: string | null
+      vaPinholeOS: string | null
+      refractionSphereOD: string | null
+      refractionSphereOS: string | null
+      refractionCylinderOD: string | null
+      refractionCylinderOS: string | null
+      refractionAxisOD: string | null
+      refractionAxisOS: string | null
+      iopOD: number | null
+      iopOS: number | null
+      iopMethod: string | null
+      iopTime: string | null
+      targetIopOD: number | null
+      targetIopOS: number | null
+      anteriorSegmentFindings: Prisma.JsonValue | null
+      fundusFindings: Prisma.JsonValue | null
+      diagnosis: string | null
+      plan: string | null
+      followUpDate: Date | null
+      nextVisitReason: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["eyeExamination"]>
+    composites: {}
+  }
+
+  type EyeExaminationGetPayload<S extends boolean | null | undefined | EyeExaminationDefaultArgs> = $Result.GetResult<Prisma.$EyeExaminationPayload, S>
+
+  type EyeExaminationCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EyeExaminationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EyeExaminationCountAggregateInputType | true
+    }
+
+  export interface EyeExaminationDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EyeExamination'], meta: { name: 'EyeExamination' } }
+    /**
+     * Find zero or one EyeExamination that matches the filter.
+     * @param {EyeExaminationFindUniqueArgs} args - Arguments to find a EyeExamination
+     * @example
+     * // Get one EyeExamination
+     * const eyeExamination = await prisma.eyeExamination.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EyeExaminationFindUniqueArgs>(args: SelectSubset<T, EyeExaminationFindUniqueArgs<ExtArgs>>): Prisma__EyeExaminationClient<$Result.GetResult<Prisma.$EyeExaminationPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EyeExamination that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EyeExaminationFindUniqueOrThrowArgs} args - Arguments to find a EyeExamination
+     * @example
+     * // Get one EyeExamination
+     * const eyeExamination = await prisma.eyeExamination.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EyeExaminationFindUniqueOrThrowArgs>(args: SelectSubset<T, EyeExaminationFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EyeExaminationClient<$Result.GetResult<Prisma.$EyeExaminationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EyeExamination that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EyeExaminationFindFirstArgs} args - Arguments to find a EyeExamination
+     * @example
+     * // Get one EyeExamination
+     * const eyeExamination = await prisma.eyeExamination.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EyeExaminationFindFirstArgs>(args?: SelectSubset<T, EyeExaminationFindFirstArgs<ExtArgs>>): Prisma__EyeExaminationClient<$Result.GetResult<Prisma.$EyeExaminationPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EyeExamination that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EyeExaminationFindFirstOrThrowArgs} args - Arguments to find a EyeExamination
+     * @example
+     * // Get one EyeExamination
+     * const eyeExamination = await prisma.eyeExamination.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EyeExaminationFindFirstOrThrowArgs>(args?: SelectSubset<T, EyeExaminationFindFirstOrThrowArgs<ExtArgs>>): Prisma__EyeExaminationClient<$Result.GetResult<Prisma.$EyeExaminationPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EyeExaminations that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EyeExaminationFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EyeExaminations
+     * const eyeExaminations = await prisma.eyeExamination.findMany()
+     * 
+     * // Get first 10 EyeExaminations
+     * const eyeExaminations = await prisma.eyeExamination.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const eyeExaminationWithIdOnly = await prisma.eyeExamination.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EyeExaminationFindManyArgs>(args?: SelectSubset<T, EyeExaminationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EyeExaminationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EyeExamination.
+     * @param {EyeExaminationCreateArgs} args - Arguments to create a EyeExamination.
+     * @example
+     * // Create one EyeExamination
+     * const EyeExamination = await prisma.eyeExamination.create({
+     *   data: {
+     *     // ... data to create a EyeExamination
+     *   }
+     * })
+     * 
+     */
+    create<T extends EyeExaminationCreateArgs>(args: SelectSubset<T, EyeExaminationCreateArgs<ExtArgs>>): Prisma__EyeExaminationClient<$Result.GetResult<Prisma.$EyeExaminationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EyeExaminations.
+     * @param {EyeExaminationCreateManyArgs} args - Arguments to create many EyeExaminations.
+     * @example
+     * // Create many EyeExaminations
+     * const eyeExamination = await prisma.eyeExamination.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EyeExaminationCreateManyArgs>(args?: SelectSubset<T, EyeExaminationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EyeExaminations and returns the data saved in the database.
+     * @param {EyeExaminationCreateManyAndReturnArgs} args - Arguments to create many EyeExaminations.
+     * @example
+     * // Create many EyeExaminations
+     * const eyeExamination = await prisma.eyeExamination.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EyeExaminations and only return the `id`
+     * const eyeExaminationWithIdOnly = await prisma.eyeExamination.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EyeExaminationCreateManyAndReturnArgs>(args?: SelectSubset<T, EyeExaminationCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EyeExaminationPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a EyeExamination.
+     * @param {EyeExaminationDeleteArgs} args - Arguments to delete one EyeExamination.
+     * @example
+     * // Delete one EyeExamination
+     * const EyeExamination = await prisma.eyeExamination.delete({
+     *   where: {
+     *     // ... filter to delete one EyeExamination
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EyeExaminationDeleteArgs>(args: SelectSubset<T, EyeExaminationDeleteArgs<ExtArgs>>): Prisma__EyeExaminationClient<$Result.GetResult<Prisma.$EyeExaminationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EyeExamination.
+     * @param {EyeExaminationUpdateArgs} args - Arguments to update one EyeExamination.
+     * @example
+     * // Update one EyeExamination
+     * const eyeExamination = await prisma.eyeExamination.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EyeExaminationUpdateArgs>(args: SelectSubset<T, EyeExaminationUpdateArgs<ExtArgs>>): Prisma__EyeExaminationClient<$Result.GetResult<Prisma.$EyeExaminationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EyeExaminations.
+     * @param {EyeExaminationDeleteManyArgs} args - Arguments to filter EyeExaminations to delete.
+     * @example
+     * // Delete a few EyeExaminations
+     * const { count } = await prisma.eyeExamination.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EyeExaminationDeleteManyArgs>(args?: SelectSubset<T, EyeExaminationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EyeExaminations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EyeExaminationUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EyeExaminations
+     * const eyeExamination = await prisma.eyeExamination.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EyeExaminationUpdateManyArgs>(args: SelectSubset<T, EyeExaminationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EyeExaminations and returns the data updated in the database.
+     * @param {EyeExaminationUpdateManyAndReturnArgs} args - Arguments to update many EyeExaminations.
+     * @example
+     * // Update many EyeExaminations
+     * const eyeExamination = await prisma.eyeExamination.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EyeExaminations and only return the `id`
+     * const eyeExaminationWithIdOnly = await prisma.eyeExamination.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EyeExaminationUpdateManyAndReturnArgs>(args: SelectSubset<T, EyeExaminationUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EyeExaminationPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one EyeExamination.
+     * @param {EyeExaminationUpsertArgs} args - Arguments to update or create a EyeExamination.
+     * @example
+     * // Update or create a EyeExamination
+     * const eyeExamination = await prisma.eyeExamination.upsert({
+     *   create: {
+     *     // ... data to create a EyeExamination
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EyeExamination we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EyeExaminationUpsertArgs>(args: SelectSubset<T, EyeExaminationUpsertArgs<ExtArgs>>): Prisma__EyeExaminationClient<$Result.GetResult<Prisma.$EyeExaminationPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EyeExaminations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EyeExaminationCountArgs} args - Arguments to filter EyeExaminations to count.
+     * @example
+     * // Count the number of EyeExaminations
+     * const count = await prisma.eyeExamination.count({
+     *   where: {
+     *     // ... the filter for the EyeExaminations we want to count
+     *   }
+     * })
+    **/
+    count<T extends EyeExaminationCountArgs>(
+      args?: Subset<T, EyeExaminationCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EyeExaminationCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EyeExamination.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EyeExaminationAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EyeExaminationAggregateArgs>(args: Subset<T, EyeExaminationAggregateArgs>): Prisma.PrismaPromise<GetEyeExaminationAggregateType<T>>
+
+    /**
+     * Group by EyeExamination.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EyeExaminationGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EyeExaminationGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EyeExaminationGroupByArgs['orderBy'] }
+        : { orderBy?: EyeExaminationGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EyeExaminationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEyeExaminationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EyeExamination model
+   */
+  readonly fields: EyeExaminationFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EyeExamination.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EyeExaminationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    patient<T extends PatientDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PatientDefaultArgs<ExtArgs>>): Prisma__PatientClient<$Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    doctor<T extends DoctorDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DoctorDefaultArgs<ExtArgs>>): Prisma__DoctorClient<$Result.GetResult<Prisma.$DoctorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EyeExamination model
+   */
+  interface EyeExaminationFieldRefs {
+    readonly id: FieldRef<"EyeExamination", 'String'>
+    readonly branchId: FieldRef<"EyeExamination", 'String'>
+    readonly patientId: FieldRef<"EyeExamination", 'String'>
+    readonly doctorId: FieldRef<"EyeExamination", 'String'>
+    readonly chiefComplaint: FieldRef<"EyeExamination", 'String'>
+    readonly historyOfPresentIllness: FieldRef<"EyeExamination", 'String'>
+    readonly vaScale: FieldRef<"EyeExamination", 'String'>
+    readonly vaUnaidedOD: FieldRef<"EyeExamination", 'String'>
+    readonly vaUnaidedOS: FieldRef<"EyeExamination", 'String'>
+    readonly vaUnaidedNearOD: FieldRef<"EyeExamination", 'String'>
+    readonly vaUnaidedNearOS: FieldRef<"EyeExamination", 'String'>
+    readonly vaBcvaOD: FieldRef<"EyeExamination", 'String'>
+    readonly vaBcvaOS: FieldRef<"EyeExamination", 'String'>
+    readonly vaBcvaNearOD: FieldRef<"EyeExamination", 'String'>
+    readonly vaBcvaNearOS: FieldRef<"EyeExamination", 'String'>
+    readonly vaPinholeOD: FieldRef<"EyeExamination", 'String'>
+    readonly vaPinholeOS: FieldRef<"EyeExamination", 'String'>
+    readonly refractionSphereOD: FieldRef<"EyeExamination", 'String'>
+    readonly refractionSphereOS: FieldRef<"EyeExamination", 'String'>
+    readonly refractionCylinderOD: FieldRef<"EyeExamination", 'String'>
+    readonly refractionCylinderOS: FieldRef<"EyeExamination", 'String'>
+    readonly refractionAxisOD: FieldRef<"EyeExamination", 'String'>
+    readonly refractionAxisOS: FieldRef<"EyeExamination", 'String'>
+    readonly iopOD: FieldRef<"EyeExamination", 'Int'>
+    readonly iopOS: FieldRef<"EyeExamination", 'Int'>
+    readonly iopMethod: FieldRef<"EyeExamination", 'String'>
+    readonly iopTime: FieldRef<"EyeExamination", 'String'>
+    readonly targetIopOD: FieldRef<"EyeExamination", 'Int'>
+    readonly targetIopOS: FieldRef<"EyeExamination", 'Int'>
+    readonly anteriorSegmentFindings: FieldRef<"EyeExamination", 'Json'>
+    readonly fundusFindings: FieldRef<"EyeExamination", 'Json'>
+    readonly diagnosis: FieldRef<"EyeExamination", 'String'>
+    readonly plan: FieldRef<"EyeExamination", 'String'>
+    readonly followUpDate: FieldRef<"EyeExamination", 'DateTime'>
+    readonly nextVisitReason: FieldRef<"EyeExamination", 'String'>
+    readonly createdAt: FieldRef<"EyeExamination", 'DateTime'>
+    readonly updatedAt: FieldRef<"EyeExamination", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EyeExamination findUnique
+   */
+  export type EyeExaminationFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EyeExamination
+     */
+    select?: EyeExaminationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EyeExamination
+     */
+    omit?: EyeExaminationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EyeExaminationInclude<ExtArgs> | null
+    /**
+     * Filter, which EyeExamination to fetch.
+     */
+    where: EyeExaminationWhereUniqueInput
+  }
+
+  /**
+   * EyeExamination findUniqueOrThrow
+   */
+  export type EyeExaminationFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EyeExamination
+     */
+    select?: EyeExaminationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EyeExamination
+     */
+    omit?: EyeExaminationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EyeExaminationInclude<ExtArgs> | null
+    /**
+     * Filter, which EyeExamination to fetch.
+     */
+    where: EyeExaminationWhereUniqueInput
+  }
+
+  /**
+   * EyeExamination findFirst
+   */
+  export type EyeExaminationFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EyeExamination
+     */
+    select?: EyeExaminationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EyeExamination
+     */
+    omit?: EyeExaminationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EyeExaminationInclude<ExtArgs> | null
+    /**
+     * Filter, which EyeExamination to fetch.
+     */
+    where?: EyeExaminationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EyeExaminations to fetch.
+     */
+    orderBy?: EyeExaminationOrderByWithRelationInput | EyeExaminationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EyeExaminations.
+     */
+    cursor?: EyeExaminationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EyeExaminations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EyeExaminations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EyeExaminations.
+     */
+    distinct?: EyeExaminationScalarFieldEnum | EyeExaminationScalarFieldEnum[]
+  }
+
+  /**
+   * EyeExamination findFirstOrThrow
+   */
+  export type EyeExaminationFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EyeExamination
+     */
+    select?: EyeExaminationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EyeExamination
+     */
+    omit?: EyeExaminationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EyeExaminationInclude<ExtArgs> | null
+    /**
+     * Filter, which EyeExamination to fetch.
+     */
+    where?: EyeExaminationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EyeExaminations to fetch.
+     */
+    orderBy?: EyeExaminationOrderByWithRelationInput | EyeExaminationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EyeExaminations.
+     */
+    cursor?: EyeExaminationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EyeExaminations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EyeExaminations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EyeExaminations.
+     */
+    distinct?: EyeExaminationScalarFieldEnum | EyeExaminationScalarFieldEnum[]
+  }
+
+  /**
+   * EyeExamination findMany
+   */
+  export type EyeExaminationFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EyeExamination
+     */
+    select?: EyeExaminationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EyeExamination
+     */
+    omit?: EyeExaminationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EyeExaminationInclude<ExtArgs> | null
+    /**
+     * Filter, which EyeExaminations to fetch.
+     */
+    where?: EyeExaminationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EyeExaminations to fetch.
+     */
+    orderBy?: EyeExaminationOrderByWithRelationInput | EyeExaminationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EyeExaminations.
+     */
+    cursor?: EyeExaminationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EyeExaminations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EyeExaminations.
+     */
+    skip?: number
+    distinct?: EyeExaminationScalarFieldEnum | EyeExaminationScalarFieldEnum[]
+  }
+
+  /**
+   * EyeExamination create
+   */
+  export type EyeExaminationCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EyeExamination
+     */
+    select?: EyeExaminationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EyeExamination
+     */
+    omit?: EyeExaminationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EyeExaminationInclude<ExtArgs> | null
+    /**
+     * The data needed to create a EyeExamination.
+     */
+    data: XOR<EyeExaminationCreateInput, EyeExaminationUncheckedCreateInput>
+  }
+
+  /**
+   * EyeExamination createMany
+   */
+  export type EyeExaminationCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EyeExaminations.
+     */
+    data: EyeExaminationCreateManyInput | EyeExaminationCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EyeExamination createManyAndReturn
+   */
+  export type EyeExaminationCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EyeExamination
+     */
+    select?: EyeExaminationSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EyeExamination
+     */
+    omit?: EyeExaminationOmit<ExtArgs> | null
+    /**
+     * The data used to create many EyeExaminations.
+     */
+    data: EyeExaminationCreateManyInput | EyeExaminationCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EyeExaminationIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EyeExamination update
+   */
+  export type EyeExaminationUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EyeExamination
+     */
+    select?: EyeExaminationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EyeExamination
+     */
+    omit?: EyeExaminationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EyeExaminationInclude<ExtArgs> | null
+    /**
+     * The data needed to update a EyeExamination.
+     */
+    data: XOR<EyeExaminationUpdateInput, EyeExaminationUncheckedUpdateInput>
+    /**
+     * Choose, which EyeExamination to update.
+     */
+    where: EyeExaminationWhereUniqueInput
+  }
+
+  /**
+   * EyeExamination updateMany
+   */
+  export type EyeExaminationUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EyeExaminations.
+     */
+    data: XOR<EyeExaminationUpdateManyMutationInput, EyeExaminationUncheckedUpdateManyInput>
+    /**
+     * Filter which EyeExaminations to update
+     */
+    where?: EyeExaminationWhereInput
+    /**
+     * Limit how many EyeExaminations to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EyeExamination updateManyAndReturn
+   */
+  export type EyeExaminationUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EyeExamination
+     */
+    select?: EyeExaminationSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EyeExamination
+     */
+    omit?: EyeExaminationOmit<ExtArgs> | null
+    /**
+     * The data used to update EyeExaminations.
+     */
+    data: XOR<EyeExaminationUpdateManyMutationInput, EyeExaminationUncheckedUpdateManyInput>
+    /**
+     * Filter which EyeExaminations to update
+     */
+    where?: EyeExaminationWhereInput
+    /**
+     * Limit how many EyeExaminations to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EyeExaminationIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EyeExamination upsert
+   */
+  export type EyeExaminationUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EyeExamination
+     */
+    select?: EyeExaminationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EyeExamination
+     */
+    omit?: EyeExaminationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EyeExaminationInclude<ExtArgs> | null
+    /**
+     * The filter to search for the EyeExamination to update in case it exists.
+     */
+    where: EyeExaminationWhereUniqueInput
+    /**
+     * In case the EyeExamination found by the `where` argument doesn't exist, create a new EyeExamination with this data.
+     */
+    create: XOR<EyeExaminationCreateInput, EyeExaminationUncheckedCreateInput>
+    /**
+     * In case the EyeExamination was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EyeExaminationUpdateInput, EyeExaminationUncheckedUpdateInput>
+  }
+
+  /**
+   * EyeExamination delete
+   */
+  export type EyeExaminationDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EyeExamination
+     */
+    select?: EyeExaminationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EyeExamination
+     */
+    omit?: EyeExaminationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EyeExaminationInclude<ExtArgs> | null
+    /**
+     * Filter which EyeExamination to delete.
+     */
+    where: EyeExaminationWhereUniqueInput
+  }
+
+  /**
+   * EyeExamination deleteMany
+   */
+  export type EyeExaminationDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EyeExaminations to delete
+     */
+    where?: EyeExaminationWhereInput
+    /**
+     * Limit how many EyeExaminations to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * EyeExamination without action
+   */
+  export type EyeExaminationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EyeExamination
+     */
+    select?: EyeExaminationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EyeExamination
+     */
+    omit?: EyeExaminationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EyeExaminationInclude<ExtArgs> | null
   }
 
 
@@ -15699,9 +19602,14 @@ export namespace Prisma {
     id: string | null
     examId: string | null
     branchId: string | null
-    eyeSide: string | null
+    patientId: string | null
+    eye: string | null
     surgeryType: string | null
-    surgeryDate: Date | null
+    procedure: string | null
+    anesthesiaType: string | null
+    date: Date | null
+    time: string | null
+    operatingRoom: string | null
     cost: Decimal | null
     status: string | null
     notes: string | null
@@ -15714,9 +19622,14 @@ export namespace Prisma {
     id: string | null
     examId: string | null
     branchId: string | null
-    eyeSide: string | null
+    patientId: string | null
+    eye: string | null
     surgeryType: string | null
-    surgeryDate: Date | null
+    procedure: string | null
+    anesthesiaType: string | null
+    date: Date | null
+    time: string | null
+    operatingRoom: string | null
     cost: Decimal | null
     status: string | null
     notes: string | null
@@ -15729,9 +19642,15 @@ export namespace Prisma {
     id: number
     examId: number
     branchId: number
-    eyeSide: number
+    patientId: number
+    eye: number
     surgeryType: number
-    surgeryDate: number
+    procedure: number
+    anesthesiaType: number
+    date: number
+    time: number
+    operatingRoom: number
+    cataractDetails: number
     cost: number
     status: number
     notes: number
@@ -15754,9 +19673,14 @@ export namespace Prisma {
     id?: true
     examId?: true
     branchId?: true
-    eyeSide?: true
+    patientId?: true
+    eye?: true
     surgeryType?: true
-    surgeryDate?: true
+    procedure?: true
+    anesthesiaType?: true
+    date?: true
+    time?: true
+    operatingRoom?: true
     cost?: true
     status?: true
     notes?: true
@@ -15769,9 +19693,14 @@ export namespace Prisma {
     id?: true
     examId?: true
     branchId?: true
-    eyeSide?: true
+    patientId?: true
+    eye?: true
     surgeryType?: true
-    surgeryDate?: true
+    procedure?: true
+    anesthesiaType?: true
+    date?: true
+    time?: true
+    operatingRoom?: true
     cost?: true
     status?: true
     notes?: true
@@ -15784,9 +19713,15 @@ export namespace Prisma {
     id?: true
     examId?: true
     branchId?: true
-    eyeSide?: true
+    patientId?: true
+    eye?: true
     surgeryType?: true
-    surgeryDate?: true
+    procedure?: true
+    anesthesiaType?: true
+    date?: true
+    time?: true
+    operatingRoom?: true
+    cataractDetails?: true
     cost?: true
     status?: true
     notes?: true
@@ -15884,11 +19819,17 @@ export namespace Prisma {
 
   export type SurgeryGroupByOutputType = {
     id: string
-    examId: string
+    examId: string | null
     branchId: string
-    eyeSide: string
+    patientId: string
+    eye: string
     surgeryType: string
-    surgeryDate: Date
+    procedure: string | null
+    anesthesiaType: string | null
+    date: Date
+    time: string | null
+    operatingRoom: string | null
+    cataractDetails: JsonValue | null
     cost: Decimal
     status: string
     notes: string | null
@@ -15920,17 +19861,24 @@ export namespace Prisma {
     id?: boolean
     examId?: boolean
     branchId?: boolean
-    eyeSide?: boolean
+    patientId?: boolean
+    eye?: boolean
     surgeryType?: boolean
-    surgeryDate?: boolean
+    procedure?: boolean
+    anesthesiaType?: boolean
+    date?: boolean
+    time?: boolean
+    operatingRoom?: boolean
+    cataractDetails?: boolean
     cost?: boolean
     status?: boolean
     notes?: boolean
     nextFollowUpDate?: boolean
     surgeonId?: boolean
     createdAt?: boolean
-    clinicalExam?: boolean | ClinicalExaminationDefaultArgs<ExtArgs>
+    clinicalExam?: boolean | Surgery$clinicalExamArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
     surgeon?: boolean | DoctorDefaultArgs<ExtArgs>
     billings?: boolean | Surgery$billingsArgs<ExtArgs>
     followUps?: boolean | Surgery$followUpsArgs<ExtArgs>
@@ -15941,17 +19889,24 @@ export namespace Prisma {
     id?: boolean
     examId?: boolean
     branchId?: boolean
-    eyeSide?: boolean
+    patientId?: boolean
+    eye?: boolean
     surgeryType?: boolean
-    surgeryDate?: boolean
+    procedure?: boolean
+    anesthesiaType?: boolean
+    date?: boolean
+    time?: boolean
+    operatingRoom?: boolean
+    cataractDetails?: boolean
     cost?: boolean
     status?: boolean
     notes?: boolean
     nextFollowUpDate?: boolean
     surgeonId?: boolean
     createdAt?: boolean
-    clinicalExam?: boolean | ClinicalExaminationDefaultArgs<ExtArgs>
+    clinicalExam?: boolean | Surgery$clinicalExamArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
     surgeon?: boolean | DoctorDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["surgery"]>
 
@@ -15959,17 +19914,24 @@ export namespace Prisma {
     id?: boolean
     examId?: boolean
     branchId?: boolean
-    eyeSide?: boolean
+    patientId?: boolean
+    eye?: boolean
     surgeryType?: boolean
-    surgeryDate?: boolean
+    procedure?: boolean
+    anesthesiaType?: boolean
+    date?: boolean
+    time?: boolean
+    operatingRoom?: boolean
+    cataractDetails?: boolean
     cost?: boolean
     status?: boolean
     notes?: boolean
     nextFollowUpDate?: boolean
     surgeonId?: boolean
     createdAt?: boolean
-    clinicalExam?: boolean | ClinicalExaminationDefaultArgs<ExtArgs>
+    clinicalExam?: boolean | Surgery$clinicalExamArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
     surgeon?: boolean | DoctorDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["surgery"]>
 
@@ -15977,9 +19939,15 @@ export namespace Prisma {
     id?: boolean
     examId?: boolean
     branchId?: boolean
-    eyeSide?: boolean
+    patientId?: boolean
+    eye?: boolean
     surgeryType?: boolean
-    surgeryDate?: boolean
+    procedure?: boolean
+    anesthesiaType?: boolean
+    date?: boolean
+    time?: boolean
+    operatingRoom?: boolean
+    cataractDetails?: boolean
     cost?: boolean
     status?: boolean
     notes?: boolean
@@ -15988,42 +19956,52 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type SurgeryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "examId" | "branchId" | "eyeSide" | "surgeryType" | "surgeryDate" | "cost" | "status" | "notes" | "nextFollowUpDate" | "surgeonId" | "createdAt", ExtArgs["result"]["surgery"]>
+  export type SurgeryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "examId" | "branchId" | "patientId" | "eye" | "surgeryType" | "procedure" | "anesthesiaType" | "date" | "time" | "operatingRoom" | "cataractDetails" | "cost" | "status" | "notes" | "nextFollowUpDate" | "surgeonId" | "createdAt", ExtArgs["result"]["surgery"]>
   export type SurgeryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    clinicalExam?: boolean | ClinicalExaminationDefaultArgs<ExtArgs>
+    clinicalExam?: boolean | Surgery$clinicalExamArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
     surgeon?: boolean | DoctorDefaultArgs<ExtArgs>
     billings?: boolean | Surgery$billingsArgs<ExtArgs>
     followUps?: boolean | Surgery$followUpsArgs<ExtArgs>
     _count?: boolean | SurgeryCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SurgeryIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    clinicalExam?: boolean | ClinicalExaminationDefaultArgs<ExtArgs>
+    clinicalExam?: boolean | Surgery$clinicalExamArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
     surgeon?: boolean | DoctorDefaultArgs<ExtArgs>
   }
   export type SurgeryIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    clinicalExam?: boolean | ClinicalExaminationDefaultArgs<ExtArgs>
+    clinicalExam?: boolean | Surgery$clinicalExamArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
+    patient?: boolean | PatientDefaultArgs<ExtArgs>
     surgeon?: boolean | DoctorDefaultArgs<ExtArgs>
   }
 
   export type $SurgeryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Surgery"
     objects: {
-      clinicalExam: Prisma.$ClinicalExaminationPayload<ExtArgs>
+      clinicalExam: Prisma.$ClinicalExaminationPayload<ExtArgs> | null
       branch: Prisma.$BranchPayload<ExtArgs>
+      patient: Prisma.$PatientPayload<ExtArgs>
       surgeon: Prisma.$DoctorPayload<ExtArgs>
       billings: Prisma.$BillingPayload<ExtArgs>[]
       followUps: Prisma.$FollowUpPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      examId: string
+      examId: string | null
       branchId: string
-      eyeSide: string
+      patientId: string
+      eye: string
       surgeryType: string
-      surgeryDate: Date
+      procedure: string | null
+      anesthesiaType: string | null
+      date: Date
+      time: string | null
+      operatingRoom: string | null
+      cataractDetails: Prisma.JsonValue | null
       cost: Prisma.Decimal
       status: string
       notes: string | null
@@ -16424,8 +20402,9 @@ export namespace Prisma {
    */
   export interface Prisma__SurgeryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    clinicalExam<T extends ClinicalExaminationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ClinicalExaminationDefaultArgs<ExtArgs>>): Prisma__ClinicalExaminationClient<$Result.GetResult<Prisma.$ClinicalExaminationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    clinicalExam<T extends Surgery$clinicalExamArgs<ExtArgs> = {}>(args?: Subset<T, Surgery$clinicalExamArgs<ExtArgs>>): Prisma__ClinicalExaminationClient<$Result.GetResult<Prisma.$ClinicalExaminationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    patient<T extends PatientDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PatientDefaultArgs<ExtArgs>>): Prisma__PatientClient<$Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     surgeon<T extends DoctorDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DoctorDefaultArgs<ExtArgs>>): Prisma__DoctorClient<$Result.GetResult<Prisma.$DoctorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     billings<T extends Surgery$billingsArgs<ExtArgs> = {}>(args?: Subset<T, Surgery$billingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     followUps<T extends Surgery$followUpsArgs<ExtArgs> = {}>(args?: Subset<T, Surgery$followUpsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -16461,9 +20440,15 @@ export namespace Prisma {
     readonly id: FieldRef<"Surgery", 'String'>
     readonly examId: FieldRef<"Surgery", 'String'>
     readonly branchId: FieldRef<"Surgery", 'String'>
-    readonly eyeSide: FieldRef<"Surgery", 'String'>
+    readonly patientId: FieldRef<"Surgery", 'String'>
+    readonly eye: FieldRef<"Surgery", 'String'>
     readonly surgeryType: FieldRef<"Surgery", 'String'>
-    readonly surgeryDate: FieldRef<"Surgery", 'DateTime'>
+    readonly procedure: FieldRef<"Surgery", 'String'>
+    readonly anesthesiaType: FieldRef<"Surgery", 'String'>
+    readonly date: FieldRef<"Surgery", 'DateTime'>
+    readonly time: FieldRef<"Surgery", 'String'>
+    readonly operatingRoom: FieldRef<"Surgery", 'String'>
+    readonly cataractDetails: FieldRef<"Surgery", 'Json'>
     readonly cost: FieldRef<"Surgery", 'Decimal'>
     readonly status: FieldRef<"Surgery", 'String'>
     readonly notes: FieldRef<"Surgery", 'String'>
@@ -16863,6 +20848,25 @@ export namespace Prisma {
      * Limit how many Surgeries to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Surgery.clinicalExam
+   */
+  export type Surgery$clinicalExamArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClinicalExamination
+     */
+    select?: ClinicalExaminationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ClinicalExamination
+     */
+    omit?: ClinicalExaminationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClinicalExaminationInclude<ExtArgs> | null
+    where?: ClinicalExaminationWhereInput
   }
 
   /**
@@ -20968,6 +24972,8 @@ export namespace Prisma {
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     supplier?: boolean | OpticalItem$supplierArgs<ExtArgs>
     transactions?: boolean | OpticalItem$transactionsArgs<ExtArgs>
+    framePrescriptions?: boolean | OpticalItem$framePrescriptionsArgs<ExtArgs>
+    lensPrescriptions?: boolean | OpticalItem$lensPrescriptionsArgs<ExtArgs>
     _count?: boolean | OpticalItemCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["opticalItem"]>
 
@@ -21034,6 +25040,8 @@ export namespace Prisma {
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     supplier?: boolean | OpticalItem$supplierArgs<ExtArgs>
     transactions?: boolean | OpticalItem$transactionsArgs<ExtArgs>
+    framePrescriptions?: boolean | OpticalItem$framePrescriptionsArgs<ExtArgs>
+    lensPrescriptions?: boolean | OpticalItem$lensPrescriptionsArgs<ExtArgs>
     _count?: boolean | OpticalItemCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type OpticalItemIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -21051,6 +25059,8 @@ export namespace Prisma {
       branch: Prisma.$BranchPayload<ExtArgs>
       supplier: Prisma.$SupplierPayload<ExtArgs> | null
       transactions: Prisma.$OpticalStockTransactionPayload<ExtArgs>[]
+      framePrescriptions: Prisma.$OpticalPrescriptionPayload<ExtArgs>[]
+      lensPrescriptions: Prisma.$OpticalPrescriptionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -21465,6 +25475,8 @@ export namespace Prisma {
     branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     supplier<T extends OpticalItem$supplierArgs<ExtArgs> = {}>(args?: Subset<T, OpticalItem$supplierArgs<ExtArgs>>): Prisma__SupplierClient<$Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     transactions<T extends OpticalItem$transactionsArgs<ExtArgs> = {}>(args?: Subset<T, OpticalItem$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpticalStockTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    framePrescriptions<T extends OpticalItem$framePrescriptionsArgs<ExtArgs> = {}>(args?: Subset<T, OpticalItem$framePrescriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpticalPrescriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    lensPrescriptions<T extends OpticalItem$lensPrescriptionsArgs<ExtArgs> = {}>(args?: Subset<T, OpticalItem$lensPrescriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OpticalPrescriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -21945,6 +25957,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: OpticalStockTransactionScalarFieldEnum | OpticalStockTransactionScalarFieldEnum[]
+  }
+
+  /**
+   * OpticalItem.framePrescriptions
+   */
+  export type OpticalItem$framePrescriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalPrescription
+     */
+    select?: OpticalPrescriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalPrescription
+     */
+    omit?: OpticalPrescriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalPrescriptionInclude<ExtArgs> | null
+    where?: OpticalPrescriptionWhereInput
+    orderBy?: OpticalPrescriptionOrderByWithRelationInput | OpticalPrescriptionOrderByWithRelationInput[]
+    cursor?: OpticalPrescriptionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OpticalPrescriptionScalarFieldEnum | OpticalPrescriptionScalarFieldEnum[]
+  }
+
+  /**
+   * OpticalItem.lensPrescriptions
+   */
+  export type OpticalItem$lensPrescriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OpticalPrescription
+     */
+    select?: OpticalPrescriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OpticalPrescription
+     */
+    omit?: OpticalPrescriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OpticalPrescriptionInclude<ExtArgs> | null
+    where?: OpticalPrescriptionWhereInput
+    orderBy?: OpticalPrescriptionOrderByWithRelationInput | OpticalPrescriptionOrderByWithRelationInput[]
+    cursor?: OpticalPrescriptionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OpticalPrescriptionScalarFieldEnum | OpticalPrescriptionScalarFieldEnum[]
   }
 
   /**
@@ -27012,12 +31072,30 @@ export namespace Prisma {
 
   export const PatientScalarFieldEnum: {
     id: 'id',
+    patientNumber: 'patientNumber',
     fullName: 'fullName',
+    firstName: 'firstName',
+    lastName: 'lastName',
     gender: 'gender',
     dateOfBirth: 'dateOfBirth',
     phone: 'phone',
     email: 'email',
     address: 'address',
+    city: 'city',
+    state: 'state',
+    zipCode: 'zipCode',
+    bloodGroup: 'bloodGroup',
+    weight: 'weight',
+    allergies: 'allergies',
+    chiefComplaint: 'chiefComplaint',
+    currentMedications: 'currentMedications',
+    medicalHistory: 'medicalHistory',
+    familyMedicalHistory: 'familyMedicalHistory',
+    emergencyContactName: 'emergencyContactName',
+    emergencyContactRelationship: 'emergencyContactRelationship',
+    emergencyContactPhone: 'emergencyContactPhone',
+    isActive: 'isActive',
+    assignedDoctorId: 'assignedDoctorId',
     branchId: 'branchId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -27026,12 +31104,51 @@ export namespace Prisma {
   export type PatientScalarFieldEnum = (typeof PatientScalarFieldEnum)[keyof typeof PatientScalarFieldEnum]
 
 
+  export const OpticalPrescriptionScalarFieldEnum: {
+    id: 'id',
+    branchId: 'branchId',
+    patientId: 'patientId',
+    createdById: 'createdById',
+    type: 'type',
+    status: 'status',
+    validityMonths: 'validityMonths',
+    expiryDate: 'expiryDate',
+    dispensedAt: 'dispensedAt',
+    notes: 'notes',
+    odSphere: 'odSphere',
+    odCylinder: 'odCylinder',
+    odAxis: 'odAxis',
+    odAdd: 'odAdd',
+    odPd: 'odPd',
+    odPrism: 'odPrism',
+    osSphere: 'osSphere',
+    osCylinder: 'osCylinder',
+    osAxis: 'osAxis',
+    osAdd: 'osAdd',
+    osPd: 'osPd',
+    osPrism: 'osPrism',
+    lensType: 'lensType',
+    lensMaterial: 'lensMaterial',
+    frameType: 'frameType',
+    coatings: 'coatings',
+    frameItemId: 'frameItemId',
+    lensItemId: 'lensItemId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type OpticalPrescriptionScalarFieldEnum = (typeof OpticalPrescriptionScalarFieldEnum)[keyof typeof OpticalPrescriptionScalarFieldEnum]
+
+
   export const AppointmentScalarFieldEnum: {
     id: 'id',
     bookingNumber: 'bookingNumber',
     appointmentDate: 'appointmentDate',
     status: 'status',
     amount: 'amount',
+    type: 'type',
+    notes: 'notes',
+    location: 'location',
     branchId: 'branchId',
     patientId: 'patientId',
     doctorId: 'doctorId',
@@ -27041,6 +31158,49 @@ export namespace Prisma {
   };
 
   export type AppointmentScalarFieldEnum = (typeof AppointmentScalarFieldEnum)[keyof typeof AppointmentScalarFieldEnum]
+
+
+  export const EyeExaminationScalarFieldEnum: {
+    id: 'id',
+    branchId: 'branchId',
+    patientId: 'patientId',
+    doctorId: 'doctorId',
+    chiefComplaint: 'chiefComplaint',
+    historyOfPresentIllness: 'historyOfPresentIllness',
+    vaScale: 'vaScale',
+    vaUnaidedOD: 'vaUnaidedOD',
+    vaUnaidedOS: 'vaUnaidedOS',
+    vaUnaidedNearOD: 'vaUnaidedNearOD',
+    vaUnaidedNearOS: 'vaUnaidedNearOS',
+    vaBcvaOD: 'vaBcvaOD',
+    vaBcvaOS: 'vaBcvaOS',
+    vaBcvaNearOD: 'vaBcvaNearOD',
+    vaBcvaNearOS: 'vaBcvaNearOS',
+    vaPinholeOD: 'vaPinholeOD',
+    vaPinholeOS: 'vaPinholeOS',
+    refractionSphereOD: 'refractionSphereOD',
+    refractionSphereOS: 'refractionSphereOS',
+    refractionCylinderOD: 'refractionCylinderOD',
+    refractionCylinderOS: 'refractionCylinderOS',
+    refractionAxisOD: 'refractionAxisOD',
+    refractionAxisOS: 'refractionAxisOS',
+    iopOD: 'iopOD',
+    iopOS: 'iopOS',
+    iopMethod: 'iopMethod',
+    iopTime: 'iopTime',
+    targetIopOD: 'targetIopOD',
+    targetIopOS: 'targetIopOS',
+    anteriorSegmentFindings: 'anteriorSegmentFindings',
+    fundusFindings: 'fundusFindings',
+    diagnosis: 'diagnosis',
+    plan: 'plan',
+    followUpDate: 'followUpDate',
+    nextVisitReason: 'nextVisitReason',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type EyeExaminationScalarFieldEnum = (typeof EyeExaminationScalarFieldEnum)[keyof typeof EyeExaminationScalarFieldEnum]
 
 
   export const ERExaminationScalarFieldEnum: {
@@ -27084,9 +31244,15 @@ export namespace Prisma {
     id: 'id',
     examId: 'examId',
     branchId: 'branchId',
-    eyeSide: 'eyeSide',
+    patientId: 'patientId',
+    eye: 'eye',
     surgeryType: 'surgeryType',
-    surgeryDate: 'surgeryDate',
+    procedure: 'procedure',
+    anesthesiaType: 'anesthesiaType',
+    date: 'date',
+    time: 'time',
+    operatingRoom: 'operatingRoom',
+    cataractDetails: 'cataractDetails',
     cost: 'cost',
     status: 'status',
     notes: 'notes',
@@ -27249,6 +31415,14 @@ export namespace Prisma {
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
   export const QueryMode: {
     default: 'default',
     insensitive: 'insensitive'
@@ -27263,6 +31437,15 @@ export namespace Prisma {
   };
 
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   /**
@@ -27306,20 +31489,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'AppointmentStatus'
-   */
-  export type EnumAppointmentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AppointmentStatus'>
-    
-
-
-  /**
-   * Reference to a field of type 'AppointmentStatus[]'
-   */
-  export type ListEnumAppointmentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AppointmentStatus[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Decimal'
    */
   export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
@@ -27334,6 +31503,34 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'OpticalPrescriptionType'
+   */
+  export type EnumOpticalPrescriptionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OpticalPrescriptionType'>
+    
+
+
+  /**
+   * Reference to a field of type 'OpticalPrescriptionType[]'
+   */
+  export type ListEnumOpticalPrescriptionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OpticalPrescriptionType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'OpticalPrescriptionStatus'
+   */
+  export type EnumOpticalPrescriptionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OpticalPrescriptionStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'OpticalPrescriptionStatus[]'
+   */
+  export type ListEnumOpticalPrescriptionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OpticalPrescriptionStatus[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -27344,6 +31541,34 @@ export namespace Prisma {
    * Reference to a field of type 'Int[]'
    */
   export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'AppointmentStatus'
+   */
+  export type EnumAppointmentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AppointmentStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'AppointmentStatus[]'
+   */
+  export type ListEnumAppointmentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AppointmentStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -27481,8 +31706,10 @@ export namespace Prisma {
     doctors?: DoctorListRelationFilter
     patients?: PatientListRelationFilter
     appointments?: AppointmentListRelationFilter
+    eyeExaminations?: EyeExaminationListRelationFilter
     surgeries?: SurgeryListRelationFilter
     prescriptions?: PrescriptionListRelationFilter
+    opticalPrescriptions?: OpticalPrescriptionListRelationFilter
     pharmacyItems?: PharmacyItemListRelationFilter
     pharmacyTransactions?: PharmacyStockTransactionListRelationFilter
     opticalItems?: OpticalItemListRelationFilter
@@ -27506,8 +31733,10 @@ export namespace Prisma {
     doctors?: DoctorOrderByRelationAggregateInput
     patients?: PatientOrderByRelationAggregateInput
     appointments?: AppointmentOrderByRelationAggregateInput
+    eyeExaminations?: EyeExaminationOrderByRelationAggregateInput
     surgeries?: SurgeryOrderByRelationAggregateInput
     prescriptions?: PrescriptionOrderByRelationAggregateInput
+    opticalPrescriptions?: OpticalPrescriptionOrderByRelationAggregateInput
     pharmacyItems?: PharmacyItemOrderByRelationAggregateInput
     pharmacyTransactions?: PharmacyStockTransactionOrderByRelationAggregateInput
     opticalItems?: OpticalItemOrderByRelationAggregateInput
@@ -27534,8 +31763,10 @@ export namespace Prisma {
     doctors?: DoctorListRelationFilter
     patients?: PatientListRelationFilter
     appointments?: AppointmentListRelationFilter
+    eyeExaminations?: EyeExaminationListRelationFilter
     surgeries?: SurgeryListRelationFilter
     prescriptions?: PrescriptionListRelationFilter
+    opticalPrescriptions?: OpticalPrescriptionListRelationFilter
     pharmacyItems?: PharmacyItemListRelationFilter
     pharmacyTransactions?: PharmacyStockTransactionListRelationFilter
     opticalItems?: OpticalItemListRelationFilter
@@ -27676,6 +31907,7 @@ export namespace Prisma {
     createdBillings?: BillingListRelationFilter
     staffAssignments?: StaffAssignmentListRelationFilter
     activityLogs?: ActivityLogListRelationFilter
+    createdOpticalPrescriptions?: OpticalPrescriptionListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -27703,6 +31935,7 @@ export namespace Prisma {
     createdBillings?: BillingOrderByRelationAggregateInput
     staffAssignments?: StaffAssignmentOrderByRelationAggregateInput
     activityLogs?: ActivityLogOrderByRelationAggregateInput
+    createdOpticalPrescriptions?: OpticalPrescriptionOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -27733,6 +31966,7 @@ export namespace Prisma {
     createdBillings?: BillingListRelationFilter
     staffAssignments?: StaffAssignmentListRelationFilter
     activityLogs?: ActivityLogListRelationFilter
+    createdOpticalPrescriptions?: OpticalPrescriptionListRelationFilter
   }, "id" | "username" | "email" | "resetToken">
 
   export type UserOrderByWithAggregationInput = {
@@ -27863,8 +32097,10 @@ export namespace Prisma {
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     appointments?: AppointmentListRelationFilter
+    eyeExaminations?: EyeExaminationListRelationFilter
     examinedClinicalExams?: ClinicalExaminationListRelationFilter
     surgeries?: SurgeryListRelationFilter
+    assignedPatients?: PatientListRelationFilter
   }
 
   export type DoctorOrderByWithRelationInput = {
@@ -27879,8 +32115,10 @@ export namespace Prisma {
     user?: UserOrderByWithRelationInput
     branch?: BranchOrderByWithRelationInput
     appointments?: AppointmentOrderByRelationAggregateInput
+    eyeExaminations?: EyeExaminationOrderByRelationAggregateInput
     examinedClinicalExams?: ClinicalExaminationOrderByRelationAggregateInput
     surgeries?: SurgeryOrderByRelationAggregateInput
+    assignedPatients?: PatientOrderByRelationAggregateInput
   }
 
   export type DoctorWhereUniqueInput = Prisma.AtLeast<{
@@ -27898,8 +32136,10 @@ export namespace Prisma {
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     appointments?: AppointmentListRelationFilter
+    eyeExaminations?: EyeExaminationListRelationFilter
     examinedClinicalExams?: ClinicalExaminationListRelationFilter
     surgeries?: SurgeryListRelationFilter
+    assignedPatients?: PatientListRelationFilter
   }, "id" | "userId" | "licenseNumber">
 
   export type DoctorOrderByWithAggregationInput = {
@@ -27935,72 +32175,158 @@ export namespace Prisma {
     OR?: PatientWhereInput[]
     NOT?: PatientWhereInput | PatientWhereInput[]
     id?: StringFilter<"Patient"> | string
+    patientNumber?: StringNullableFilter<"Patient"> | string | null
     fullName?: StringFilter<"Patient"> | string
+    firstName?: StringNullableFilter<"Patient"> | string | null
+    lastName?: StringNullableFilter<"Patient"> | string | null
     gender?: StringNullableFilter<"Patient"> | string | null
     dateOfBirth?: DateTimeFilter<"Patient"> | Date | string
     phone?: StringFilter<"Patient"> | string
     email?: StringNullableFilter<"Patient"> | string | null
     address?: StringNullableFilter<"Patient"> | string | null
+    city?: StringNullableFilter<"Patient"> | string | null
+    state?: StringNullableFilter<"Patient"> | string | null
+    zipCode?: StringNullableFilter<"Patient"> | string | null
+    bloodGroup?: StringNullableFilter<"Patient"> | string | null
+    weight?: DecimalNullableFilter<"Patient"> | Decimal | DecimalJsLike | number | string | null
+    allergies?: StringNullableFilter<"Patient"> | string | null
+    chiefComplaint?: StringNullableFilter<"Patient"> | string | null
+    currentMedications?: StringNullableFilter<"Patient"> | string | null
+    medicalHistory?: StringNullableFilter<"Patient"> | string | null
+    familyMedicalHistory?: StringNullableFilter<"Patient"> | string | null
+    emergencyContactName?: StringNullableFilter<"Patient"> | string | null
+    emergencyContactRelationship?: StringNullableFilter<"Patient"> | string | null
+    emergencyContactPhone?: StringNullableFilter<"Patient"> | string | null
+    isActive?: BoolFilter<"Patient"> | boolean
+    assignedDoctorId?: StringNullableFilter<"Patient"> | string | null
     branchId?: StringFilter<"Patient"> | string
     createdAt?: DateTimeFilter<"Patient"> | Date | string
     updatedAt?: DateTimeFilter<"Patient"> | Date | string
+    assignedDoctor?: XOR<DoctorNullableScalarRelationFilter, DoctorWhereInput> | null
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     appointments?: AppointmentListRelationFilter
+    surgeries?: SurgeryListRelationFilter
+    eyeExaminations?: EyeExaminationListRelationFilter
+    opticalPrescriptions?: OpticalPrescriptionListRelationFilter
     billings?: BillingListRelationFilter
     followUps?: FollowUpListRelationFilter
   }
 
   export type PatientOrderByWithRelationInput = {
     id?: SortOrder
+    patientNumber?: SortOrderInput | SortOrder
     fullName?: SortOrder
+    firstName?: SortOrderInput | SortOrder
+    lastName?: SortOrderInput | SortOrder
     gender?: SortOrderInput | SortOrder
     dateOfBirth?: SortOrder
     phone?: SortOrder
     email?: SortOrderInput | SortOrder
     address?: SortOrderInput | SortOrder
+    city?: SortOrderInput | SortOrder
+    state?: SortOrderInput | SortOrder
+    zipCode?: SortOrderInput | SortOrder
+    bloodGroup?: SortOrderInput | SortOrder
+    weight?: SortOrderInput | SortOrder
+    allergies?: SortOrderInput | SortOrder
+    chiefComplaint?: SortOrderInput | SortOrder
+    currentMedications?: SortOrderInput | SortOrder
+    medicalHistory?: SortOrderInput | SortOrder
+    familyMedicalHistory?: SortOrderInput | SortOrder
+    emergencyContactName?: SortOrderInput | SortOrder
+    emergencyContactRelationship?: SortOrderInput | SortOrder
+    emergencyContactPhone?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    assignedDoctorId?: SortOrderInput | SortOrder
     branchId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    assignedDoctor?: DoctorOrderByWithRelationInput
     branch?: BranchOrderByWithRelationInput
     appointments?: AppointmentOrderByRelationAggregateInput
+    surgeries?: SurgeryOrderByRelationAggregateInput
+    eyeExaminations?: EyeExaminationOrderByRelationAggregateInput
+    opticalPrescriptions?: OpticalPrescriptionOrderByRelationAggregateInput
     billings?: BillingOrderByRelationAggregateInput
     followUps?: FollowUpOrderByRelationAggregateInput
   }
 
   export type PatientWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    patientNumber?: string
     phone?: string
     AND?: PatientWhereInput | PatientWhereInput[]
     OR?: PatientWhereInput[]
     NOT?: PatientWhereInput | PatientWhereInput[]
     fullName?: StringFilter<"Patient"> | string
+    firstName?: StringNullableFilter<"Patient"> | string | null
+    lastName?: StringNullableFilter<"Patient"> | string | null
     gender?: StringNullableFilter<"Patient"> | string | null
     dateOfBirth?: DateTimeFilter<"Patient"> | Date | string
     email?: StringNullableFilter<"Patient"> | string | null
     address?: StringNullableFilter<"Patient"> | string | null
+    city?: StringNullableFilter<"Patient"> | string | null
+    state?: StringNullableFilter<"Patient"> | string | null
+    zipCode?: StringNullableFilter<"Patient"> | string | null
+    bloodGroup?: StringNullableFilter<"Patient"> | string | null
+    weight?: DecimalNullableFilter<"Patient"> | Decimal | DecimalJsLike | number | string | null
+    allergies?: StringNullableFilter<"Patient"> | string | null
+    chiefComplaint?: StringNullableFilter<"Patient"> | string | null
+    currentMedications?: StringNullableFilter<"Patient"> | string | null
+    medicalHistory?: StringNullableFilter<"Patient"> | string | null
+    familyMedicalHistory?: StringNullableFilter<"Patient"> | string | null
+    emergencyContactName?: StringNullableFilter<"Patient"> | string | null
+    emergencyContactRelationship?: StringNullableFilter<"Patient"> | string | null
+    emergencyContactPhone?: StringNullableFilter<"Patient"> | string | null
+    isActive?: BoolFilter<"Patient"> | boolean
+    assignedDoctorId?: StringNullableFilter<"Patient"> | string | null
     branchId?: StringFilter<"Patient"> | string
     createdAt?: DateTimeFilter<"Patient"> | Date | string
     updatedAt?: DateTimeFilter<"Patient"> | Date | string
+    assignedDoctor?: XOR<DoctorNullableScalarRelationFilter, DoctorWhereInput> | null
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     appointments?: AppointmentListRelationFilter
+    surgeries?: SurgeryListRelationFilter
+    eyeExaminations?: EyeExaminationListRelationFilter
+    opticalPrescriptions?: OpticalPrescriptionListRelationFilter
     billings?: BillingListRelationFilter
     followUps?: FollowUpListRelationFilter
-  }, "id" | "phone">
+  }, "id" | "patientNumber" | "phone">
 
   export type PatientOrderByWithAggregationInput = {
     id?: SortOrder
+    patientNumber?: SortOrderInput | SortOrder
     fullName?: SortOrder
+    firstName?: SortOrderInput | SortOrder
+    lastName?: SortOrderInput | SortOrder
     gender?: SortOrderInput | SortOrder
     dateOfBirth?: SortOrder
     phone?: SortOrder
     email?: SortOrderInput | SortOrder
     address?: SortOrderInput | SortOrder
+    city?: SortOrderInput | SortOrder
+    state?: SortOrderInput | SortOrder
+    zipCode?: SortOrderInput | SortOrder
+    bloodGroup?: SortOrderInput | SortOrder
+    weight?: SortOrderInput | SortOrder
+    allergies?: SortOrderInput | SortOrder
+    chiefComplaint?: SortOrderInput | SortOrder
+    currentMedications?: SortOrderInput | SortOrder
+    medicalHistory?: SortOrderInput | SortOrder
+    familyMedicalHistory?: SortOrderInput | SortOrder
+    emergencyContactName?: SortOrderInput | SortOrder
+    emergencyContactRelationship?: SortOrderInput | SortOrder
+    emergencyContactPhone?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    assignedDoctorId?: SortOrderInput | SortOrder
     branchId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: PatientCountOrderByAggregateInput
+    _avg?: PatientAvgOrderByAggregateInput
     _max?: PatientMaxOrderByAggregateInput
     _min?: PatientMinOrderByAggregateInput
+    _sum?: PatientSumOrderByAggregateInput
   }
 
   export type PatientScalarWhereWithAggregatesInput = {
@@ -28008,15 +32334,227 @@ export namespace Prisma {
     OR?: PatientScalarWhereWithAggregatesInput[]
     NOT?: PatientScalarWhereWithAggregatesInput | PatientScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Patient"> | string
+    patientNumber?: StringNullableWithAggregatesFilter<"Patient"> | string | null
     fullName?: StringWithAggregatesFilter<"Patient"> | string
+    firstName?: StringNullableWithAggregatesFilter<"Patient"> | string | null
+    lastName?: StringNullableWithAggregatesFilter<"Patient"> | string | null
     gender?: StringNullableWithAggregatesFilter<"Patient"> | string | null
     dateOfBirth?: DateTimeWithAggregatesFilter<"Patient"> | Date | string
     phone?: StringWithAggregatesFilter<"Patient"> | string
     email?: StringNullableWithAggregatesFilter<"Patient"> | string | null
     address?: StringNullableWithAggregatesFilter<"Patient"> | string | null
+    city?: StringNullableWithAggregatesFilter<"Patient"> | string | null
+    state?: StringNullableWithAggregatesFilter<"Patient"> | string | null
+    zipCode?: StringNullableWithAggregatesFilter<"Patient"> | string | null
+    bloodGroup?: StringNullableWithAggregatesFilter<"Patient"> | string | null
+    weight?: DecimalNullableWithAggregatesFilter<"Patient"> | Decimal | DecimalJsLike | number | string | null
+    allergies?: StringNullableWithAggregatesFilter<"Patient"> | string | null
+    chiefComplaint?: StringNullableWithAggregatesFilter<"Patient"> | string | null
+    currentMedications?: StringNullableWithAggregatesFilter<"Patient"> | string | null
+    medicalHistory?: StringNullableWithAggregatesFilter<"Patient"> | string | null
+    familyMedicalHistory?: StringNullableWithAggregatesFilter<"Patient"> | string | null
+    emergencyContactName?: StringNullableWithAggregatesFilter<"Patient"> | string | null
+    emergencyContactRelationship?: StringNullableWithAggregatesFilter<"Patient"> | string | null
+    emergencyContactPhone?: StringNullableWithAggregatesFilter<"Patient"> | string | null
+    isActive?: BoolWithAggregatesFilter<"Patient"> | boolean
+    assignedDoctorId?: StringNullableWithAggregatesFilter<"Patient"> | string | null
     branchId?: StringWithAggregatesFilter<"Patient"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Patient"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Patient"> | Date | string
+  }
+
+  export type OpticalPrescriptionWhereInput = {
+    AND?: OpticalPrescriptionWhereInput | OpticalPrescriptionWhereInput[]
+    OR?: OpticalPrescriptionWhereInput[]
+    NOT?: OpticalPrescriptionWhereInput | OpticalPrescriptionWhereInput[]
+    id?: StringFilter<"OpticalPrescription"> | string
+    branchId?: StringFilter<"OpticalPrescription"> | string
+    patientId?: StringFilter<"OpticalPrescription"> | string
+    createdById?: StringNullableFilter<"OpticalPrescription"> | string | null
+    type?: EnumOpticalPrescriptionTypeFilter<"OpticalPrescription"> | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFilter<"OpticalPrescription"> | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFilter<"OpticalPrescription"> | number
+    expiryDate?: DateTimeFilter<"OpticalPrescription"> | Date | string
+    dispensedAt?: DateTimeNullableFilter<"OpticalPrescription"> | Date | string | null
+    notes?: StringNullableFilter<"OpticalPrescription"> | string | null
+    odSphere?: StringNullableFilter<"OpticalPrescription"> | string | null
+    odCylinder?: StringNullableFilter<"OpticalPrescription"> | string | null
+    odAxis?: IntNullableFilter<"OpticalPrescription"> | number | null
+    odAdd?: StringNullableFilter<"OpticalPrescription"> | string | null
+    odPd?: IntNullableFilter<"OpticalPrescription"> | number | null
+    odPrism?: StringNullableFilter<"OpticalPrescription"> | string | null
+    osSphere?: StringNullableFilter<"OpticalPrescription"> | string | null
+    osCylinder?: StringNullableFilter<"OpticalPrescription"> | string | null
+    osAxis?: IntNullableFilter<"OpticalPrescription"> | number | null
+    osAdd?: StringNullableFilter<"OpticalPrescription"> | string | null
+    osPd?: IntNullableFilter<"OpticalPrescription"> | number | null
+    osPrism?: StringNullableFilter<"OpticalPrescription"> | string | null
+    lensType?: StringNullableFilter<"OpticalPrescription"> | string | null
+    lensMaterial?: StringNullableFilter<"OpticalPrescription"> | string | null
+    frameType?: StringNullableFilter<"OpticalPrescription"> | string | null
+    coatings?: StringNullableListFilter<"OpticalPrescription">
+    frameItemId?: StringNullableFilter<"OpticalPrescription"> | string | null
+    lensItemId?: StringNullableFilter<"OpticalPrescription"> | string | null
+    createdAt?: DateTimeFilter<"OpticalPrescription"> | Date | string
+    updatedAt?: DateTimeFilter<"OpticalPrescription"> | Date | string
+    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
+    createdBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    frameItem?: XOR<OpticalItemNullableScalarRelationFilter, OpticalItemWhereInput> | null
+    lensItem?: XOR<OpticalItemNullableScalarRelationFilter, OpticalItemWhereInput> | null
+  }
+
+  export type OpticalPrescriptionOrderByWithRelationInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    patientId?: SortOrder
+    createdById?: SortOrderInput | SortOrder
+    type?: SortOrder
+    status?: SortOrder
+    validityMonths?: SortOrder
+    expiryDate?: SortOrder
+    dispensedAt?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    odSphere?: SortOrderInput | SortOrder
+    odCylinder?: SortOrderInput | SortOrder
+    odAxis?: SortOrderInput | SortOrder
+    odAdd?: SortOrderInput | SortOrder
+    odPd?: SortOrderInput | SortOrder
+    odPrism?: SortOrderInput | SortOrder
+    osSphere?: SortOrderInput | SortOrder
+    osCylinder?: SortOrderInput | SortOrder
+    osAxis?: SortOrderInput | SortOrder
+    osAdd?: SortOrderInput | SortOrder
+    osPd?: SortOrderInput | SortOrder
+    osPrism?: SortOrderInput | SortOrder
+    lensType?: SortOrderInput | SortOrder
+    lensMaterial?: SortOrderInput | SortOrder
+    frameType?: SortOrderInput | SortOrder
+    coatings?: SortOrder
+    frameItemId?: SortOrderInput | SortOrder
+    lensItemId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    branch?: BranchOrderByWithRelationInput
+    patient?: PatientOrderByWithRelationInput
+    createdBy?: UserOrderByWithRelationInput
+    frameItem?: OpticalItemOrderByWithRelationInput
+    lensItem?: OpticalItemOrderByWithRelationInput
+  }
+
+  export type OpticalPrescriptionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: OpticalPrescriptionWhereInput | OpticalPrescriptionWhereInput[]
+    OR?: OpticalPrescriptionWhereInput[]
+    NOT?: OpticalPrescriptionWhereInput | OpticalPrescriptionWhereInput[]
+    branchId?: StringFilter<"OpticalPrescription"> | string
+    patientId?: StringFilter<"OpticalPrescription"> | string
+    createdById?: StringNullableFilter<"OpticalPrescription"> | string | null
+    type?: EnumOpticalPrescriptionTypeFilter<"OpticalPrescription"> | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFilter<"OpticalPrescription"> | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFilter<"OpticalPrescription"> | number
+    expiryDate?: DateTimeFilter<"OpticalPrescription"> | Date | string
+    dispensedAt?: DateTimeNullableFilter<"OpticalPrescription"> | Date | string | null
+    notes?: StringNullableFilter<"OpticalPrescription"> | string | null
+    odSphere?: StringNullableFilter<"OpticalPrescription"> | string | null
+    odCylinder?: StringNullableFilter<"OpticalPrescription"> | string | null
+    odAxis?: IntNullableFilter<"OpticalPrescription"> | number | null
+    odAdd?: StringNullableFilter<"OpticalPrescription"> | string | null
+    odPd?: IntNullableFilter<"OpticalPrescription"> | number | null
+    odPrism?: StringNullableFilter<"OpticalPrescription"> | string | null
+    osSphere?: StringNullableFilter<"OpticalPrescription"> | string | null
+    osCylinder?: StringNullableFilter<"OpticalPrescription"> | string | null
+    osAxis?: IntNullableFilter<"OpticalPrescription"> | number | null
+    osAdd?: StringNullableFilter<"OpticalPrescription"> | string | null
+    osPd?: IntNullableFilter<"OpticalPrescription"> | number | null
+    osPrism?: StringNullableFilter<"OpticalPrescription"> | string | null
+    lensType?: StringNullableFilter<"OpticalPrescription"> | string | null
+    lensMaterial?: StringNullableFilter<"OpticalPrescription"> | string | null
+    frameType?: StringNullableFilter<"OpticalPrescription"> | string | null
+    coatings?: StringNullableListFilter<"OpticalPrescription">
+    frameItemId?: StringNullableFilter<"OpticalPrescription"> | string | null
+    lensItemId?: StringNullableFilter<"OpticalPrescription"> | string | null
+    createdAt?: DateTimeFilter<"OpticalPrescription"> | Date | string
+    updatedAt?: DateTimeFilter<"OpticalPrescription"> | Date | string
+    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
+    createdBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    frameItem?: XOR<OpticalItemNullableScalarRelationFilter, OpticalItemWhereInput> | null
+    lensItem?: XOR<OpticalItemNullableScalarRelationFilter, OpticalItemWhereInput> | null
+  }, "id">
+
+  export type OpticalPrescriptionOrderByWithAggregationInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    patientId?: SortOrder
+    createdById?: SortOrderInput | SortOrder
+    type?: SortOrder
+    status?: SortOrder
+    validityMonths?: SortOrder
+    expiryDate?: SortOrder
+    dispensedAt?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    odSphere?: SortOrderInput | SortOrder
+    odCylinder?: SortOrderInput | SortOrder
+    odAxis?: SortOrderInput | SortOrder
+    odAdd?: SortOrderInput | SortOrder
+    odPd?: SortOrderInput | SortOrder
+    odPrism?: SortOrderInput | SortOrder
+    osSphere?: SortOrderInput | SortOrder
+    osCylinder?: SortOrderInput | SortOrder
+    osAxis?: SortOrderInput | SortOrder
+    osAdd?: SortOrderInput | SortOrder
+    osPd?: SortOrderInput | SortOrder
+    osPrism?: SortOrderInput | SortOrder
+    lensType?: SortOrderInput | SortOrder
+    lensMaterial?: SortOrderInput | SortOrder
+    frameType?: SortOrderInput | SortOrder
+    coatings?: SortOrder
+    frameItemId?: SortOrderInput | SortOrder
+    lensItemId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: OpticalPrescriptionCountOrderByAggregateInput
+    _avg?: OpticalPrescriptionAvgOrderByAggregateInput
+    _max?: OpticalPrescriptionMaxOrderByAggregateInput
+    _min?: OpticalPrescriptionMinOrderByAggregateInput
+    _sum?: OpticalPrescriptionSumOrderByAggregateInput
+  }
+
+  export type OpticalPrescriptionScalarWhereWithAggregatesInput = {
+    AND?: OpticalPrescriptionScalarWhereWithAggregatesInput | OpticalPrescriptionScalarWhereWithAggregatesInput[]
+    OR?: OpticalPrescriptionScalarWhereWithAggregatesInput[]
+    NOT?: OpticalPrescriptionScalarWhereWithAggregatesInput | OpticalPrescriptionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"OpticalPrescription"> | string
+    branchId?: StringWithAggregatesFilter<"OpticalPrescription"> | string
+    patientId?: StringWithAggregatesFilter<"OpticalPrescription"> | string
+    createdById?: StringNullableWithAggregatesFilter<"OpticalPrescription"> | string | null
+    type?: EnumOpticalPrescriptionTypeWithAggregatesFilter<"OpticalPrescription"> | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusWithAggregatesFilter<"OpticalPrescription"> | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntWithAggregatesFilter<"OpticalPrescription"> | number
+    expiryDate?: DateTimeWithAggregatesFilter<"OpticalPrescription"> | Date | string
+    dispensedAt?: DateTimeNullableWithAggregatesFilter<"OpticalPrescription"> | Date | string | null
+    notes?: StringNullableWithAggregatesFilter<"OpticalPrescription"> | string | null
+    odSphere?: StringNullableWithAggregatesFilter<"OpticalPrescription"> | string | null
+    odCylinder?: StringNullableWithAggregatesFilter<"OpticalPrescription"> | string | null
+    odAxis?: IntNullableWithAggregatesFilter<"OpticalPrescription"> | number | null
+    odAdd?: StringNullableWithAggregatesFilter<"OpticalPrescription"> | string | null
+    odPd?: IntNullableWithAggregatesFilter<"OpticalPrescription"> | number | null
+    odPrism?: StringNullableWithAggregatesFilter<"OpticalPrescription"> | string | null
+    osSphere?: StringNullableWithAggregatesFilter<"OpticalPrescription"> | string | null
+    osCylinder?: StringNullableWithAggregatesFilter<"OpticalPrescription"> | string | null
+    osAxis?: IntNullableWithAggregatesFilter<"OpticalPrescription"> | number | null
+    osAdd?: StringNullableWithAggregatesFilter<"OpticalPrescription"> | string | null
+    osPd?: IntNullableWithAggregatesFilter<"OpticalPrescription"> | number | null
+    osPrism?: StringNullableWithAggregatesFilter<"OpticalPrescription"> | string | null
+    lensType?: StringNullableWithAggregatesFilter<"OpticalPrescription"> | string | null
+    lensMaterial?: StringNullableWithAggregatesFilter<"OpticalPrescription"> | string | null
+    frameType?: StringNullableWithAggregatesFilter<"OpticalPrescription"> | string | null
+    coatings?: StringNullableListFilter<"OpticalPrescription">
+    frameItemId?: StringNullableWithAggregatesFilter<"OpticalPrescription"> | string | null
+    lensItemId?: StringNullableWithAggregatesFilter<"OpticalPrescription"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"OpticalPrescription"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"OpticalPrescription"> | Date | string
   }
 
   export type AppointmentWhereInput = {
@@ -28028,6 +32566,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFilter<"Appointment"> | Date | string
     status?: EnumAppointmentStatusFilter<"Appointment"> | $Enums.AppointmentStatus
     amount?: DecimalFilter<"Appointment"> | Decimal | DecimalJsLike | number | string
+    type?: StringNullableFilter<"Appointment"> | string | null
+    notes?: StringNullableFilter<"Appointment"> | string | null
+    location?: StringNullableFilter<"Appointment"> | string | null
     branchId?: StringFilter<"Appointment"> | string
     patientId?: StringFilter<"Appointment"> | string
     doctorId?: StringFilter<"Appointment"> | string
@@ -28051,6 +32592,9 @@ export namespace Prisma {
     appointmentDate?: SortOrder
     status?: SortOrder
     amount?: SortOrder
+    type?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    location?: SortOrderInput | SortOrder
     branchId?: SortOrder
     patientId?: SortOrder
     doctorId?: SortOrder
@@ -28077,6 +32621,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFilter<"Appointment"> | Date | string
     status?: EnumAppointmentStatusFilter<"Appointment"> | $Enums.AppointmentStatus
     amount?: DecimalFilter<"Appointment"> | Decimal | DecimalJsLike | number | string
+    type?: StringNullableFilter<"Appointment"> | string | null
+    notes?: StringNullableFilter<"Appointment"> | string | null
+    location?: StringNullableFilter<"Appointment"> | string | null
     branchId?: StringFilter<"Appointment"> | string
     patientId?: StringFilter<"Appointment"> | string
     doctorId?: StringFilter<"Appointment"> | string
@@ -28100,6 +32647,9 @@ export namespace Prisma {
     appointmentDate?: SortOrder
     status?: SortOrder
     amount?: SortOrder
+    type?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    location?: SortOrderInput | SortOrder
     branchId?: SortOrder
     patientId?: SortOrder
     doctorId?: SortOrder
@@ -28122,12 +32672,238 @@ export namespace Prisma {
     appointmentDate?: DateTimeWithAggregatesFilter<"Appointment"> | Date | string
     status?: EnumAppointmentStatusWithAggregatesFilter<"Appointment"> | $Enums.AppointmentStatus
     amount?: DecimalWithAggregatesFilter<"Appointment"> | Decimal | DecimalJsLike | number | string
+    type?: StringNullableWithAggregatesFilter<"Appointment"> | string | null
+    notes?: StringNullableWithAggregatesFilter<"Appointment"> | string | null
+    location?: StringNullableWithAggregatesFilter<"Appointment"> | string | null
     branchId?: StringWithAggregatesFilter<"Appointment"> | string
     patientId?: StringWithAggregatesFilter<"Appointment"> | string
     doctorId?: StringWithAggregatesFilter<"Appointment"> | string
     createdById?: StringWithAggregatesFilter<"Appointment"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Appointment"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Appointment"> | Date | string
+  }
+
+  export type EyeExaminationWhereInput = {
+    AND?: EyeExaminationWhereInput | EyeExaminationWhereInput[]
+    OR?: EyeExaminationWhereInput[]
+    NOT?: EyeExaminationWhereInput | EyeExaminationWhereInput[]
+    id?: StringFilter<"EyeExamination"> | string
+    branchId?: StringFilter<"EyeExamination"> | string
+    patientId?: StringFilter<"EyeExamination"> | string
+    doctorId?: StringFilter<"EyeExamination"> | string
+    chiefComplaint?: StringFilter<"EyeExamination"> | string
+    historyOfPresentIllness?: StringNullableFilter<"EyeExamination"> | string | null
+    vaScale?: StringFilter<"EyeExamination"> | string
+    vaUnaidedOD?: StringNullableFilter<"EyeExamination"> | string | null
+    vaUnaidedOS?: StringNullableFilter<"EyeExamination"> | string | null
+    vaUnaidedNearOD?: StringNullableFilter<"EyeExamination"> | string | null
+    vaUnaidedNearOS?: StringNullableFilter<"EyeExamination"> | string | null
+    vaBcvaOD?: StringNullableFilter<"EyeExamination"> | string | null
+    vaBcvaOS?: StringNullableFilter<"EyeExamination"> | string | null
+    vaBcvaNearOD?: StringNullableFilter<"EyeExamination"> | string | null
+    vaBcvaNearOS?: StringNullableFilter<"EyeExamination"> | string | null
+    vaPinholeOD?: StringNullableFilter<"EyeExamination"> | string | null
+    vaPinholeOS?: StringNullableFilter<"EyeExamination"> | string | null
+    refractionSphereOD?: StringNullableFilter<"EyeExamination"> | string | null
+    refractionSphereOS?: StringNullableFilter<"EyeExamination"> | string | null
+    refractionCylinderOD?: StringNullableFilter<"EyeExamination"> | string | null
+    refractionCylinderOS?: StringNullableFilter<"EyeExamination"> | string | null
+    refractionAxisOD?: StringNullableFilter<"EyeExamination"> | string | null
+    refractionAxisOS?: StringNullableFilter<"EyeExamination"> | string | null
+    iopOD?: IntNullableFilter<"EyeExamination"> | number | null
+    iopOS?: IntNullableFilter<"EyeExamination"> | number | null
+    iopMethod?: StringNullableFilter<"EyeExamination"> | string | null
+    iopTime?: StringNullableFilter<"EyeExamination"> | string | null
+    targetIopOD?: IntNullableFilter<"EyeExamination"> | number | null
+    targetIopOS?: IntNullableFilter<"EyeExamination"> | number | null
+    anteriorSegmentFindings?: JsonNullableFilter<"EyeExamination">
+    fundusFindings?: JsonNullableFilter<"EyeExamination">
+    diagnosis?: StringNullableFilter<"EyeExamination"> | string | null
+    plan?: StringNullableFilter<"EyeExamination"> | string | null
+    followUpDate?: DateTimeNullableFilter<"EyeExamination"> | Date | string | null
+    nextVisitReason?: StringNullableFilter<"EyeExamination"> | string | null
+    createdAt?: DateTimeFilter<"EyeExamination"> | Date | string
+    updatedAt?: DateTimeFilter<"EyeExamination"> | Date | string
+    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
+    doctor?: XOR<DoctorScalarRelationFilter, DoctorWhereInput>
+  }
+
+  export type EyeExaminationOrderByWithRelationInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    patientId?: SortOrder
+    doctorId?: SortOrder
+    chiefComplaint?: SortOrder
+    historyOfPresentIllness?: SortOrderInput | SortOrder
+    vaScale?: SortOrder
+    vaUnaidedOD?: SortOrderInput | SortOrder
+    vaUnaidedOS?: SortOrderInput | SortOrder
+    vaUnaidedNearOD?: SortOrderInput | SortOrder
+    vaUnaidedNearOS?: SortOrderInput | SortOrder
+    vaBcvaOD?: SortOrderInput | SortOrder
+    vaBcvaOS?: SortOrderInput | SortOrder
+    vaBcvaNearOD?: SortOrderInput | SortOrder
+    vaBcvaNearOS?: SortOrderInput | SortOrder
+    vaPinholeOD?: SortOrderInput | SortOrder
+    vaPinholeOS?: SortOrderInput | SortOrder
+    refractionSphereOD?: SortOrderInput | SortOrder
+    refractionSphereOS?: SortOrderInput | SortOrder
+    refractionCylinderOD?: SortOrderInput | SortOrder
+    refractionCylinderOS?: SortOrderInput | SortOrder
+    refractionAxisOD?: SortOrderInput | SortOrder
+    refractionAxisOS?: SortOrderInput | SortOrder
+    iopOD?: SortOrderInput | SortOrder
+    iopOS?: SortOrderInput | SortOrder
+    iopMethod?: SortOrderInput | SortOrder
+    iopTime?: SortOrderInput | SortOrder
+    targetIopOD?: SortOrderInput | SortOrder
+    targetIopOS?: SortOrderInput | SortOrder
+    anteriorSegmentFindings?: SortOrderInput | SortOrder
+    fundusFindings?: SortOrderInput | SortOrder
+    diagnosis?: SortOrderInput | SortOrder
+    plan?: SortOrderInput | SortOrder
+    followUpDate?: SortOrderInput | SortOrder
+    nextVisitReason?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    branch?: BranchOrderByWithRelationInput
+    patient?: PatientOrderByWithRelationInput
+    doctor?: DoctorOrderByWithRelationInput
+  }
+
+  export type EyeExaminationWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: EyeExaminationWhereInput | EyeExaminationWhereInput[]
+    OR?: EyeExaminationWhereInput[]
+    NOT?: EyeExaminationWhereInput | EyeExaminationWhereInput[]
+    branchId?: StringFilter<"EyeExamination"> | string
+    patientId?: StringFilter<"EyeExamination"> | string
+    doctorId?: StringFilter<"EyeExamination"> | string
+    chiefComplaint?: StringFilter<"EyeExamination"> | string
+    historyOfPresentIllness?: StringNullableFilter<"EyeExamination"> | string | null
+    vaScale?: StringFilter<"EyeExamination"> | string
+    vaUnaidedOD?: StringNullableFilter<"EyeExamination"> | string | null
+    vaUnaidedOS?: StringNullableFilter<"EyeExamination"> | string | null
+    vaUnaidedNearOD?: StringNullableFilter<"EyeExamination"> | string | null
+    vaUnaidedNearOS?: StringNullableFilter<"EyeExamination"> | string | null
+    vaBcvaOD?: StringNullableFilter<"EyeExamination"> | string | null
+    vaBcvaOS?: StringNullableFilter<"EyeExamination"> | string | null
+    vaBcvaNearOD?: StringNullableFilter<"EyeExamination"> | string | null
+    vaBcvaNearOS?: StringNullableFilter<"EyeExamination"> | string | null
+    vaPinholeOD?: StringNullableFilter<"EyeExamination"> | string | null
+    vaPinholeOS?: StringNullableFilter<"EyeExamination"> | string | null
+    refractionSphereOD?: StringNullableFilter<"EyeExamination"> | string | null
+    refractionSphereOS?: StringNullableFilter<"EyeExamination"> | string | null
+    refractionCylinderOD?: StringNullableFilter<"EyeExamination"> | string | null
+    refractionCylinderOS?: StringNullableFilter<"EyeExamination"> | string | null
+    refractionAxisOD?: StringNullableFilter<"EyeExamination"> | string | null
+    refractionAxisOS?: StringNullableFilter<"EyeExamination"> | string | null
+    iopOD?: IntNullableFilter<"EyeExamination"> | number | null
+    iopOS?: IntNullableFilter<"EyeExamination"> | number | null
+    iopMethod?: StringNullableFilter<"EyeExamination"> | string | null
+    iopTime?: StringNullableFilter<"EyeExamination"> | string | null
+    targetIopOD?: IntNullableFilter<"EyeExamination"> | number | null
+    targetIopOS?: IntNullableFilter<"EyeExamination"> | number | null
+    anteriorSegmentFindings?: JsonNullableFilter<"EyeExamination">
+    fundusFindings?: JsonNullableFilter<"EyeExamination">
+    diagnosis?: StringNullableFilter<"EyeExamination"> | string | null
+    plan?: StringNullableFilter<"EyeExamination"> | string | null
+    followUpDate?: DateTimeNullableFilter<"EyeExamination"> | Date | string | null
+    nextVisitReason?: StringNullableFilter<"EyeExamination"> | string | null
+    createdAt?: DateTimeFilter<"EyeExamination"> | Date | string
+    updatedAt?: DateTimeFilter<"EyeExamination"> | Date | string
+    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
+    doctor?: XOR<DoctorScalarRelationFilter, DoctorWhereInput>
+  }, "id">
+
+  export type EyeExaminationOrderByWithAggregationInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    patientId?: SortOrder
+    doctorId?: SortOrder
+    chiefComplaint?: SortOrder
+    historyOfPresentIllness?: SortOrderInput | SortOrder
+    vaScale?: SortOrder
+    vaUnaidedOD?: SortOrderInput | SortOrder
+    vaUnaidedOS?: SortOrderInput | SortOrder
+    vaUnaidedNearOD?: SortOrderInput | SortOrder
+    vaUnaidedNearOS?: SortOrderInput | SortOrder
+    vaBcvaOD?: SortOrderInput | SortOrder
+    vaBcvaOS?: SortOrderInput | SortOrder
+    vaBcvaNearOD?: SortOrderInput | SortOrder
+    vaBcvaNearOS?: SortOrderInput | SortOrder
+    vaPinholeOD?: SortOrderInput | SortOrder
+    vaPinholeOS?: SortOrderInput | SortOrder
+    refractionSphereOD?: SortOrderInput | SortOrder
+    refractionSphereOS?: SortOrderInput | SortOrder
+    refractionCylinderOD?: SortOrderInput | SortOrder
+    refractionCylinderOS?: SortOrderInput | SortOrder
+    refractionAxisOD?: SortOrderInput | SortOrder
+    refractionAxisOS?: SortOrderInput | SortOrder
+    iopOD?: SortOrderInput | SortOrder
+    iopOS?: SortOrderInput | SortOrder
+    iopMethod?: SortOrderInput | SortOrder
+    iopTime?: SortOrderInput | SortOrder
+    targetIopOD?: SortOrderInput | SortOrder
+    targetIopOS?: SortOrderInput | SortOrder
+    anteriorSegmentFindings?: SortOrderInput | SortOrder
+    fundusFindings?: SortOrderInput | SortOrder
+    diagnosis?: SortOrderInput | SortOrder
+    plan?: SortOrderInput | SortOrder
+    followUpDate?: SortOrderInput | SortOrder
+    nextVisitReason?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: EyeExaminationCountOrderByAggregateInput
+    _avg?: EyeExaminationAvgOrderByAggregateInput
+    _max?: EyeExaminationMaxOrderByAggregateInput
+    _min?: EyeExaminationMinOrderByAggregateInput
+    _sum?: EyeExaminationSumOrderByAggregateInput
+  }
+
+  export type EyeExaminationScalarWhereWithAggregatesInput = {
+    AND?: EyeExaminationScalarWhereWithAggregatesInput | EyeExaminationScalarWhereWithAggregatesInput[]
+    OR?: EyeExaminationScalarWhereWithAggregatesInput[]
+    NOT?: EyeExaminationScalarWhereWithAggregatesInput | EyeExaminationScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"EyeExamination"> | string
+    branchId?: StringWithAggregatesFilter<"EyeExamination"> | string
+    patientId?: StringWithAggregatesFilter<"EyeExamination"> | string
+    doctorId?: StringWithAggregatesFilter<"EyeExamination"> | string
+    chiefComplaint?: StringWithAggregatesFilter<"EyeExamination"> | string
+    historyOfPresentIllness?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    vaScale?: StringWithAggregatesFilter<"EyeExamination"> | string
+    vaUnaidedOD?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    vaUnaidedOS?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    vaUnaidedNearOD?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    vaUnaidedNearOS?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    vaBcvaOD?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    vaBcvaOS?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    vaBcvaNearOD?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    vaBcvaNearOS?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    vaPinholeOD?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    vaPinholeOS?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    refractionSphereOD?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    refractionSphereOS?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    refractionCylinderOD?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    refractionCylinderOS?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    refractionAxisOD?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    refractionAxisOS?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    iopOD?: IntNullableWithAggregatesFilter<"EyeExamination"> | number | null
+    iopOS?: IntNullableWithAggregatesFilter<"EyeExamination"> | number | null
+    iopMethod?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    iopTime?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    targetIopOD?: IntNullableWithAggregatesFilter<"EyeExamination"> | number | null
+    targetIopOS?: IntNullableWithAggregatesFilter<"EyeExamination"> | number | null
+    anteriorSegmentFindings?: JsonNullableWithAggregatesFilter<"EyeExamination">
+    fundusFindings?: JsonNullableWithAggregatesFilter<"EyeExamination">
+    diagnosis?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    plan?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    followUpDate?: DateTimeNullableWithAggregatesFilter<"EyeExamination"> | Date | string | null
+    nextVisitReason?: StringNullableWithAggregatesFilter<"EyeExamination"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"EyeExamination"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"EyeExamination"> | Date | string
   }
 
   export type ERExaminationWhereInput = {
@@ -28339,19 +33115,26 @@ export namespace Prisma {
     OR?: SurgeryWhereInput[]
     NOT?: SurgeryWhereInput | SurgeryWhereInput[]
     id?: StringFilter<"Surgery"> | string
-    examId?: StringFilter<"Surgery"> | string
+    examId?: StringNullableFilter<"Surgery"> | string | null
     branchId?: StringFilter<"Surgery"> | string
-    eyeSide?: StringFilter<"Surgery"> | string
+    patientId?: StringFilter<"Surgery"> | string
+    eye?: StringFilter<"Surgery"> | string
     surgeryType?: StringFilter<"Surgery"> | string
-    surgeryDate?: DateTimeFilter<"Surgery"> | Date | string
+    procedure?: StringNullableFilter<"Surgery"> | string | null
+    anesthesiaType?: StringNullableFilter<"Surgery"> | string | null
+    date?: DateTimeFilter<"Surgery"> | Date | string
+    time?: StringNullableFilter<"Surgery"> | string | null
+    operatingRoom?: StringNullableFilter<"Surgery"> | string | null
+    cataractDetails?: JsonNullableFilter<"Surgery">
     cost?: DecimalFilter<"Surgery"> | Decimal | DecimalJsLike | number | string
     status?: StringFilter<"Surgery"> | string
     notes?: StringNullableFilter<"Surgery"> | string | null
     nextFollowUpDate?: DateTimeNullableFilter<"Surgery"> | Date | string | null
     surgeonId?: StringFilter<"Surgery"> | string
     createdAt?: DateTimeFilter<"Surgery"> | Date | string
-    clinicalExam?: XOR<ClinicalExaminationScalarRelationFilter, ClinicalExaminationWhereInput>
+    clinicalExam?: XOR<ClinicalExaminationNullableScalarRelationFilter, ClinicalExaminationWhereInput> | null
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
     surgeon?: XOR<DoctorScalarRelationFilter, DoctorWhereInput>
     billings?: BillingListRelationFilter
     followUps?: FollowUpListRelationFilter
@@ -28359,11 +33142,17 @@ export namespace Prisma {
 
   export type SurgeryOrderByWithRelationInput = {
     id?: SortOrder
-    examId?: SortOrder
+    examId?: SortOrderInput | SortOrder
     branchId?: SortOrder
-    eyeSide?: SortOrder
+    patientId?: SortOrder
+    eye?: SortOrder
     surgeryType?: SortOrder
-    surgeryDate?: SortOrder
+    procedure?: SortOrderInput | SortOrder
+    anesthesiaType?: SortOrderInput | SortOrder
+    date?: SortOrder
+    time?: SortOrderInput | SortOrder
+    operatingRoom?: SortOrderInput | SortOrder
+    cataractDetails?: SortOrderInput | SortOrder
     cost?: SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
@@ -28372,6 +33161,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     clinicalExam?: ClinicalExaminationOrderByWithRelationInput
     branch?: BranchOrderByWithRelationInput
+    patient?: PatientOrderByWithRelationInput
     surgeon?: DoctorOrderByWithRelationInput
     billings?: BillingOrderByRelationAggregateInput
     followUps?: FollowUpOrderByRelationAggregateInput
@@ -28384,17 +33174,24 @@ export namespace Prisma {
     OR?: SurgeryWhereInput[]
     NOT?: SurgeryWhereInput | SurgeryWhereInput[]
     branchId?: StringFilter<"Surgery"> | string
-    eyeSide?: StringFilter<"Surgery"> | string
+    patientId?: StringFilter<"Surgery"> | string
+    eye?: StringFilter<"Surgery"> | string
     surgeryType?: StringFilter<"Surgery"> | string
-    surgeryDate?: DateTimeFilter<"Surgery"> | Date | string
+    procedure?: StringNullableFilter<"Surgery"> | string | null
+    anesthesiaType?: StringNullableFilter<"Surgery"> | string | null
+    date?: DateTimeFilter<"Surgery"> | Date | string
+    time?: StringNullableFilter<"Surgery"> | string | null
+    operatingRoom?: StringNullableFilter<"Surgery"> | string | null
+    cataractDetails?: JsonNullableFilter<"Surgery">
     cost?: DecimalFilter<"Surgery"> | Decimal | DecimalJsLike | number | string
     status?: StringFilter<"Surgery"> | string
     notes?: StringNullableFilter<"Surgery"> | string | null
     nextFollowUpDate?: DateTimeNullableFilter<"Surgery"> | Date | string | null
     surgeonId?: StringFilter<"Surgery"> | string
     createdAt?: DateTimeFilter<"Surgery"> | Date | string
-    clinicalExam?: XOR<ClinicalExaminationScalarRelationFilter, ClinicalExaminationWhereInput>
+    clinicalExam?: XOR<ClinicalExaminationNullableScalarRelationFilter, ClinicalExaminationWhereInput> | null
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    patient?: XOR<PatientScalarRelationFilter, PatientWhereInput>
     surgeon?: XOR<DoctorScalarRelationFilter, DoctorWhereInput>
     billings?: BillingListRelationFilter
     followUps?: FollowUpListRelationFilter
@@ -28402,11 +33199,17 @@ export namespace Prisma {
 
   export type SurgeryOrderByWithAggregationInput = {
     id?: SortOrder
-    examId?: SortOrder
+    examId?: SortOrderInput | SortOrder
     branchId?: SortOrder
-    eyeSide?: SortOrder
+    patientId?: SortOrder
+    eye?: SortOrder
     surgeryType?: SortOrder
-    surgeryDate?: SortOrder
+    procedure?: SortOrderInput | SortOrder
+    anesthesiaType?: SortOrderInput | SortOrder
+    date?: SortOrder
+    time?: SortOrderInput | SortOrder
+    operatingRoom?: SortOrderInput | SortOrder
+    cataractDetails?: SortOrderInput | SortOrder
     cost?: SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
@@ -28425,11 +33228,17 @@ export namespace Prisma {
     OR?: SurgeryScalarWhereWithAggregatesInput[]
     NOT?: SurgeryScalarWhereWithAggregatesInput | SurgeryScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Surgery"> | string
-    examId?: StringWithAggregatesFilter<"Surgery"> | string
+    examId?: StringNullableWithAggregatesFilter<"Surgery"> | string | null
     branchId?: StringWithAggregatesFilter<"Surgery"> | string
-    eyeSide?: StringWithAggregatesFilter<"Surgery"> | string
+    patientId?: StringWithAggregatesFilter<"Surgery"> | string
+    eye?: StringWithAggregatesFilter<"Surgery"> | string
     surgeryType?: StringWithAggregatesFilter<"Surgery"> | string
-    surgeryDate?: DateTimeWithAggregatesFilter<"Surgery"> | Date | string
+    procedure?: StringNullableWithAggregatesFilter<"Surgery"> | string | null
+    anesthesiaType?: StringNullableWithAggregatesFilter<"Surgery"> | string | null
+    date?: DateTimeWithAggregatesFilter<"Surgery"> | Date | string
+    time?: StringNullableWithAggregatesFilter<"Surgery"> | string | null
+    operatingRoom?: StringNullableWithAggregatesFilter<"Surgery"> | string | null
+    cataractDetails?: JsonNullableWithAggregatesFilter<"Surgery">
     cost?: DecimalWithAggregatesFilter<"Surgery"> | Decimal | DecimalJsLike | number | string
     status?: StringWithAggregatesFilter<"Surgery"> | string
     notes?: StringNullableWithAggregatesFilter<"Surgery"> | string | null
@@ -28764,6 +33573,8 @@ export namespace Prisma {
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     supplier?: XOR<SupplierNullableScalarRelationFilter, SupplierWhereInput> | null
     transactions?: OpticalStockTransactionListRelationFilter
+    framePrescriptions?: OpticalPrescriptionListRelationFilter
+    lensPrescriptions?: OpticalPrescriptionListRelationFilter
   }
 
   export type OpticalItemOrderByWithRelationInput = {
@@ -28785,6 +33596,8 @@ export namespace Prisma {
     branch?: BranchOrderByWithRelationInput
     supplier?: SupplierOrderByWithRelationInput
     transactions?: OpticalStockTransactionOrderByRelationAggregateInput
+    framePrescriptions?: OpticalPrescriptionOrderByRelationAggregateInput
+    lensPrescriptions?: OpticalPrescriptionOrderByRelationAggregateInput
   }
 
   export type OpticalItemWhereUniqueInput = Prisma.AtLeast<{
@@ -28810,6 +33623,8 @@ export namespace Prisma {
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     supplier?: XOR<SupplierNullableScalarRelationFilter, SupplierWhereInput> | null
     transactions?: OpticalStockTransactionListRelationFilter
+    framePrescriptions?: OpticalPrescriptionListRelationFilter
+    lensPrescriptions?: OpticalPrescriptionListRelationFilter
   }, "id" | "branchId_itemName_brand">
 
   export type OpticalItemOrderByWithAggregationInput = {
@@ -29308,8 +34123,10 @@ export namespace Prisma {
     doctors?: DoctorCreateNestedManyWithoutBranchInput
     patients?: PatientCreateNestedManyWithoutBranchInput
     appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
@@ -29333,8 +34150,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
     patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
@@ -29358,8 +34177,10 @@ export namespace Prisma {
     doctors?: DoctorUpdateManyWithoutBranchNestedInput
     patients?: PatientUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
@@ -29383,8 +34204,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
     patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
@@ -29532,6 +34355,7 @@ export namespace Prisma {
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
     activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -29557,6 +34381,7 @@ export namespace Prisma {
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
     activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserUpdateInput = {
@@ -29582,6 +34407,7 @@ export namespace Prisma {
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
     activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutCreatedByNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -29607,6 +34433,7 @@ export namespace Prisma {
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
     activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutCreatedByNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -29743,8 +34570,10 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutDoctorInput
     branch: BranchCreateNestedOneWithoutDoctorsInput
     appointments?: AppointmentCreateNestedManyWithoutDoctorInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutDoctorInput
     examinedClinicalExams?: ClinicalExaminationCreateNestedManyWithoutExaminedByInput
     surgeries?: SurgeryCreateNestedManyWithoutSurgeonInput
+    assignedPatients?: PatientCreateNestedManyWithoutAssignedDoctorInput
   }
 
   export type DoctorUncheckedCreateInput = {
@@ -29757,8 +34586,10 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutDoctorInput
     examinedClinicalExams?: ClinicalExaminationUncheckedCreateNestedManyWithoutExaminedByInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutSurgeonInput
+    assignedPatients?: PatientUncheckedCreateNestedManyWithoutAssignedDoctorInput
   }
 
   export type DoctorUpdateInput = {
@@ -29771,8 +34602,10 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutDoctorNestedInput
     branch?: BranchUpdateOneRequiredWithoutDoctorsNestedInput
     appointments?: AppointmentUpdateManyWithoutDoctorNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutDoctorNestedInput
     examinedClinicalExams?: ClinicalExaminationUpdateManyWithoutExaminedByNestedInput
     surgeries?: SurgeryUpdateManyWithoutSurgeonNestedInput
+    assignedPatients?: PatientUpdateManyWithoutAssignedDoctorNestedInput
   }
 
   export type DoctorUncheckedUpdateInput = {
@@ -29785,8 +34618,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutDoctorNestedInput
     examinedClinicalExams?: ClinicalExaminationUncheckedUpdateManyWithoutExaminedByNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutSurgeonNestedInput
+    assignedPatients?: PatientUncheckedUpdateManyWithoutAssignedDoctorNestedInput
   }
 
   export type DoctorCreateManyInput = {
@@ -29822,76 +34657,178 @@ export namespace Prisma {
 
   export type PatientCreateInput = {
     id?: string
+    patientNumber?: string | null
     fullName: string
+    firstName?: string | null
+    lastName?: string | null
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
     email?: string | null
     address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    assignedDoctor?: DoctorCreateNestedOneWithoutAssignedPatientsInput
     branch: BranchCreateNestedOneWithoutPatientsInput
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
+    surgeries?: SurgeryCreateNestedManyWithoutPatientInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutPatientInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutPatientInput
     billings?: BillingCreateNestedManyWithoutPatientInput
     followUps?: FollowUpCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateInput = {
     id?: string
+    patientNumber?: string | null
     fullName: string
+    firstName?: string | null
+    lastName?: string | null
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
     email?: string | null
     address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
+    assignedDoctorId?: string | null
     branchId: string
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
+    surgeries?: SurgeryUncheckedCreateNestedManyWithoutPatientInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutPatientInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutPatientInput
     billings?: BillingUncheckedCreateNestedManyWithoutPatientInput
     followUps?: FollowUpUncheckedCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedDoctor?: DoctorUpdateOneWithoutAssignedPatientsNestedInput
     branch?: BranchUpdateOneRequiredWithoutPatientsNestedInput
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
+    surgeries?: SurgeryUpdateManyWithoutPatientNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutPatientNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutPatientNestedInput
     billings?: BillingUpdateManyWithoutPatientNestedInput
     followUps?: FollowUpUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    assignedDoctorId?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+    surgeries?: SurgeryUncheckedUpdateManyWithoutPatientNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutPatientNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutPatientNestedInput
     billings?: BillingUncheckedUpdateManyWithoutPatientNestedInput
     followUps?: FollowUpUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientCreateManyInput = {
     id?: string
+    patientNumber?: string | null
     fullName: string
+    firstName?: string | null
+    lastName?: string | null
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
     email?: string | null
     address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
+    assignedDoctorId?: string | null
     branchId: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -29899,25 +34836,286 @@ export namespace Prisma {
 
   export type PatientUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PatientUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    assignedDoctorId?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OpticalPrescriptionCreateInput = {
+    id?: string
+    type?: $Enums.OpticalPrescriptionType
+    status?: $Enums.OpticalPrescriptionStatus
+    validityMonths?: number
+    expiryDate: Date | string
+    dispensedAt?: Date | string | null
+    notes?: string | null
+    odSphere?: string | null
+    odCylinder?: string | null
+    odAxis?: number | null
+    odAdd?: string | null
+    odPd?: number | null
+    odPrism?: string | null
+    osSphere?: string | null
+    osCylinder?: string | null
+    osAxis?: number | null
+    osAdd?: string | null
+    osPd?: number | null
+    osPrism?: string | null
+    lensType?: string | null
+    lensMaterial?: string | null
+    frameType?: string | null
+    coatings?: OpticalPrescriptionCreatecoatingsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutOpticalPrescriptionsInput
+    patient: PatientCreateNestedOneWithoutOpticalPrescriptionsInput
+    createdBy?: UserCreateNestedOneWithoutCreatedOpticalPrescriptionsInput
+    frameItem?: OpticalItemCreateNestedOneWithoutFramePrescriptionsInput
+    lensItem?: OpticalItemCreateNestedOneWithoutLensPrescriptionsInput
+  }
+
+  export type OpticalPrescriptionUncheckedCreateInput = {
+    id?: string
+    branchId: string
+    patientId: string
+    createdById?: string | null
+    type?: $Enums.OpticalPrescriptionType
+    status?: $Enums.OpticalPrescriptionStatus
+    validityMonths?: number
+    expiryDate: Date | string
+    dispensedAt?: Date | string | null
+    notes?: string | null
+    odSphere?: string | null
+    odCylinder?: string | null
+    odAxis?: number | null
+    odAdd?: string | null
+    odPd?: number | null
+    odPrism?: string | null
+    osSphere?: string | null
+    osCylinder?: string | null
+    osAxis?: number | null
+    osAdd?: string | null
+    osPd?: number | null
+    osPrism?: string | null
+    lensType?: string | null
+    lensMaterial?: string | null
+    frameType?: string | null
+    coatings?: OpticalPrescriptionCreatecoatingsInput | string[]
+    frameItemId?: string | null
+    lensItemId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OpticalPrescriptionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutOpticalPrescriptionsNestedInput
+    patient?: PatientUpdateOneRequiredWithoutOpticalPrescriptionsNestedInput
+    createdBy?: UserUpdateOneWithoutCreatedOpticalPrescriptionsNestedInput
+    frameItem?: OpticalItemUpdateOneWithoutFramePrescriptionsNestedInput
+    lensItem?: OpticalItemUpdateOneWithoutLensPrescriptionsNestedInput
+  }
+
+  export type OpticalPrescriptionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    createdById?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    frameItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    lensItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OpticalPrescriptionCreateManyInput = {
+    id?: string
+    branchId: string
+    patientId: string
+    createdById?: string | null
+    type?: $Enums.OpticalPrescriptionType
+    status?: $Enums.OpticalPrescriptionStatus
+    validityMonths?: number
+    expiryDate: Date | string
+    dispensedAt?: Date | string | null
+    notes?: string | null
+    odSphere?: string | null
+    odCylinder?: string | null
+    odAxis?: number | null
+    odAdd?: string | null
+    odPd?: number | null
+    odPrism?: string | null
+    osSphere?: string | null
+    osCylinder?: string | null
+    osAxis?: number | null
+    osAdd?: string | null
+    osPd?: number | null
+    osPrism?: string | null
+    lensType?: string | null
+    lensMaterial?: string | null
+    frameType?: string | null
+    coatings?: OpticalPrescriptionCreatecoatingsInput | string[]
+    frameItemId?: string | null
+    lensItemId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OpticalPrescriptionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OpticalPrescriptionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    createdById?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    frameItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    lensItemId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29928,6 +35126,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     branch: BranchCreateNestedOneWithoutAppointmentsInput
@@ -29947,6 +35148,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     branchId: string
     patientId: string
     doctorId: string
@@ -29966,6 +35170,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     branch?: BranchUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -29985,6 +35192,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
     doctorId?: StringFieldUpdateOperationsInput | string
@@ -30004,6 +35214,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     branchId: string
     patientId: string
     doctorId: string
@@ -30018,6 +35231,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30028,10 +35244,290 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
     doctorId?: StringFieldUpdateOperationsInput | string
     createdById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EyeExaminationCreateInput = {
+    id?: string
+    chiefComplaint: string
+    historyOfPresentIllness?: string | null
+    vaScale?: string
+    vaUnaidedOD?: string | null
+    vaUnaidedOS?: string | null
+    vaUnaidedNearOD?: string | null
+    vaUnaidedNearOS?: string | null
+    vaBcvaOD?: string | null
+    vaBcvaOS?: string | null
+    vaBcvaNearOD?: string | null
+    vaBcvaNearOS?: string | null
+    vaPinholeOD?: string | null
+    vaPinholeOS?: string | null
+    refractionSphereOD?: string | null
+    refractionSphereOS?: string | null
+    refractionCylinderOD?: string | null
+    refractionCylinderOS?: string | null
+    refractionAxisOD?: string | null
+    refractionAxisOS?: string | null
+    iopOD?: number | null
+    iopOS?: number | null
+    iopMethod?: string | null
+    iopTime?: string | null
+    targetIopOD?: number | null
+    targetIopOS?: number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: string | null
+    plan?: string | null
+    followUpDate?: Date | string | null
+    nextVisitReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutEyeExaminationsInput
+    patient: PatientCreateNestedOneWithoutEyeExaminationsInput
+    doctor: DoctorCreateNestedOneWithoutEyeExaminationsInput
+  }
+
+  export type EyeExaminationUncheckedCreateInput = {
+    id?: string
+    branchId: string
+    patientId: string
+    doctorId: string
+    chiefComplaint: string
+    historyOfPresentIllness?: string | null
+    vaScale?: string
+    vaUnaidedOD?: string | null
+    vaUnaidedOS?: string | null
+    vaUnaidedNearOD?: string | null
+    vaUnaidedNearOS?: string | null
+    vaBcvaOD?: string | null
+    vaBcvaOS?: string | null
+    vaBcvaNearOD?: string | null
+    vaBcvaNearOS?: string | null
+    vaPinholeOD?: string | null
+    vaPinholeOS?: string | null
+    refractionSphereOD?: string | null
+    refractionSphereOS?: string | null
+    refractionCylinderOD?: string | null
+    refractionCylinderOS?: string | null
+    refractionAxisOD?: string | null
+    refractionAxisOS?: string | null
+    iopOD?: number | null
+    iopOS?: number | null
+    iopMethod?: string | null
+    iopTime?: string | null
+    targetIopOD?: number | null
+    targetIopOS?: number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: string | null
+    plan?: string | null
+    followUpDate?: Date | string | null
+    nextVisitReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type EyeExaminationUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: StringFieldUpdateOperationsInput | string
+    historyOfPresentIllness?: NullableStringFieldUpdateOperationsInput | string | null
+    vaScale?: StringFieldUpdateOperationsInput | string
+    vaUnaidedOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOS?: NullableStringFieldUpdateOperationsInput | string | null
+    iopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    iopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    iopMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    iopTime?: NullableStringFieldUpdateOperationsInput | string | null
+    targetIopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    targetIopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    plan?: NullableStringFieldUpdateOperationsInput | string | null
+    followUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextVisitReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutEyeExaminationsNestedInput
+    patient?: PatientUpdateOneRequiredWithoutEyeExaminationsNestedInput
+    doctor?: DoctorUpdateOneRequiredWithoutEyeExaminationsNestedInput
+  }
+
+  export type EyeExaminationUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    doctorId?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: StringFieldUpdateOperationsInput | string
+    historyOfPresentIllness?: NullableStringFieldUpdateOperationsInput | string | null
+    vaScale?: StringFieldUpdateOperationsInput | string
+    vaUnaidedOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOS?: NullableStringFieldUpdateOperationsInput | string | null
+    iopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    iopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    iopMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    iopTime?: NullableStringFieldUpdateOperationsInput | string | null
+    targetIopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    targetIopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    plan?: NullableStringFieldUpdateOperationsInput | string | null
+    followUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextVisitReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EyeExaminationCreateManyInput = {
+    id?: string
+    branchId: string
+    patientId: string
+    doctorId: string
+    chiefComplaint: string
+    historyOfPresentIllness?: string | null
+    vaScale?: string
+    vaUnaidedOD?: string | null
+    vaUnaidedOS?: string | null
+    vaUnaidedNearOD?: string | null
+    vaUnaidedNearOS?: string | null
+    vaBcvaOD?: string | null
+    vaBcvaOS?: string | null
+    vaBcvaNearOD?: string | null
+    vaBcvaNearOS?: string | null
+    vaPinholeOD?: string | null
+    vaPinholeOS?: string | null
+    refractionSphereOD?: string | null
+    refractionSphereOS?: string | null
+    refractionCylinderOD?: string | null
+    refractionCylinderOS?: string | null
+    refractionAxisOD?: string | null
+    refractionAxisOS?: string | null
+    iopOD?: number | null
+    iopOS?: number | null
+    iopMethod?: string | null
+    iopTime?: string | null
+    targetIopOD?: number | null
+    targetIopOS?: number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: string | null
+    plan?: string | null
+    followUpDate?: Date | string | null
+    nextVisitReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type EyeExaminationUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: StringFieldUpdateOperationsInput | string
+    historyOfPresentIllness?: NullableStringFieldUpdateOperationsInput | string | null
+    vaScale?: StringFieldUpdateOperationsInput | string
+    vaUnaidedOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOS?: NullableStringFieldUpdateOperationsInput | string | null
+    iopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    iopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    iopMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    iopTime?: NullableStringFieldUpdateOperationsInput | string | null
+    targetIopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    targetIopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    plan?: NullableStringFieldUpdateOperationsInput | string | null
+    followUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextVisitReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EyeExaminationUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    doctorId?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: StringFieldUpdateOperationsInput | string
+    historyOfPresentIllness?: NullableStringFieldUpdateOperationsInput | string | null
+    vaScale?: StringFieldUpdateOperationsInput | string
+    vaUnaidedOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOS?: NullableStringFieldUpdateOperationsInput | string | null
+    iopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    iopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    iopMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    iopTime?: NullableStringFieldUpdateOperationsInput | string | null
+    targetIopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    targetIopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    plan?: NullableStringFieldUpdateOperationsInput | string | null
+    followUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextVisitReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30263,16 +35759,22 @@ export namespace Prisma {
 
   export type SurgeryCreateInput = {
     id?: string
-    eyeSide: string
+    eye: string
     surgeryType: string
-    surgeryDate: Date | string
-    cost: Decimal | DecimalJsLike | number | string
+    procedure?: string | null
+    anesthesiaType?: string | null
+    date: Date | string
+    time?: string | null
+    operatingRoom?: string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
     nextFollowUpDate?: Date | string | null
     createdAt?: Date | string
-    clinicalExam: ClinicalExaminationCreateNestedOneWithoutSurgeryInput
+    clinicalExam?: ClinicalExaminationCreateNestedOneWithoutSurgeryInput
     branch: BranchCreateNestedOneWithoutSurgeriesInput
+    patient: PatientCreateNestedOneWithoutSurgeriesInput
     surgeon: DoctorCreateNestedOneWithoutSurgeriesInput
     billings?: BillingCreateNestedManyWithoutSurgeryInput
     followUps?: FollowUpCreateNestedManyWithoutSurgeryInput
@@ -30280,12 +35782,18 @@ export namespace Prisma {
 
   export type SurgeryUncheckedCreateInput = {
     id?: string
-    examId: string
+    examId?: string | null
     branchId: string
-    eyeSide: string
+    patientId: string
+    eye: string
     surgeryType: string
-    surgeryDate: Date | string
-    cost: Decimal | DecimalJsLike | number | string
+    procedure?: string | null
+    anesthesiaType?: string | null
+    date: Date | string
+    time?: string | null
+    operatingRoom?: string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
     nextFollowUpDate?: Date | string | null
@@ -30297,16 +35805,22 @@ export namespace Prisma {
 
   export type SurgeryUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    eyeSide?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
     surgeryType?: StringFieldUpdateOperationsInput | string
-    surgeryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    clinicalExam?: ClinicalExaminationUpdateOneRequiredWithoutSurgeryNestedInput
+    clinicalExam?: ClinicalExaminationUpdateOneWithoutSurgeryNestedInput
     branch?: BranchUpdateOneRequiredWithoutSurgeriesNestedInput
+    patient?: PatientUpdateOneRequiredWithoutSurgeriesNestedInput
     surgeon?: DoctorUpdateOneRequiredWithoutSurgeriesNestedInput
     billings?: BillingUpdateManyWithoutSurgeryNestedInput
     followUps?: FollowUpUpdateManyWithoutSurgeryNestedInput
@@ -30314,11 +35828,17 @@ export namespace Prisma {
 
   export type SurgeryUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    examId?: StringFieldUpdateOperationsInput | string
+    examId?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
-    eyeSide?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
     surgeryType?: StringFieldUpdateOperationsInput | string
-    surgeryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30331,12 +35851,18 @@ export namespace Prisma {
 
   export type SurgeryCreateManyInput = {
     id?: string
-    examId: string
+    examId?: string | null
     branchId: string
-    eyeSide: string
+    patientId: string
+    eye: string
     surgeryType: string
-    surgeryDate: Date | string
-    cost: Decimal | DecimalJsLike | number | string
+    procedure?: string | null
+    anesthesiaType?: string | null
+    date: Date | string
+    time?: string | null
+    operatingRoom?: string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
     nextFollowUpDate?: Date | string | null
@@ -30346,9 +35872,14 @@ export namespace Prisma {
 
   export type SurgeryUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    eyeSide?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
     surgeryType?: StringFieldUpdateOperationsInput | string
-    surgeryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30358,11 +35889,17 @@ export namespace Prisma {
 
   export type SurgeryUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    examId?: StringFieldUpdateOperationsInput | string
+    examId?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
-    eyeSide?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
     surgeryType?: StringFieldUpdateOperationsInput | string
-    surgeryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30706,6 +36243,8 @@ export namespace Prisma {
     branch: BranchCreateNestedOneWithoutOpticalItemsInput
     supplier?: SupplierCreateNestedOneWithoutOpticalItemsInput
     transactions?: OpticalStockTransactionCreateNestedManyWithoutOpticalItemInput
+    framePrescriptions?: OpticalPrescriptionCreateNestedManyWithoutFrameItemInput
+    lensPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutLensItemInput
   }
 
   export type OpticalItemUncheckedCreateInput = {
@@ -30725,6 +36264,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     isActive?: boolean
     transactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutOpticalItemInput
+    framePrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutFrameItemInput
+    lensPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutLensItemInput
   }
 
   export type OpticalItemUpdateInput = {
@@ -30744,6 +36285,8 @@ export namespace Prisma {
     branch?: BranchUpdateOneRequiredWithoutOpticalItemsNestedInput
     supplier?: SupplierUpdateOneWithoutOpticalItemsNestedInput
     transactions?: OpticalStockTransactionUpdateManyWithoutOpticalItemNestedInput
+    framePrescriptions?: OpticalPrescriptionUpdateManyWithoutFrameItemNestedInput
+    lensPrescriptions?: OpticalPrescriptionUpdateManyWithoutLensItemNestedInput
   }
 
   export type OpticalItemUncheckedUpdateInput = {
@@ -30763,6 +36306,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     transactions?: OpticalStockTransactionUncheckedUpdateManyWithoutOpticalItemNestedInput
+    framePrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutFrameItemNestedInput
+    lensPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutLensItemNestedInput
   }
 
   export type OpticalItemCreateManyInput = {
@@ -31338,6 +36883,12 @@ export namespace Prisma {
     none?: AppointmentWhereInput
   }
 
+  export type EyeExaminationListRelationFilter = {
+    every?: EyeExaminationWhereInput
+    some?: EyeExaminationWhereInput
+    none?: EyeExaminationWhereInput
+  }
+
   export type SurgeryListRelationFilter = {
     every?: SurgeryWhereInput
     some?: SurgeryWhereInput
@@ -31348,6 +36899,12 @@ export namespace Prisma {
     every?: PrescriptionWhereInput
     some?: PrescriptionWhereInput
     none?: PrescriptionWhereInput
+  }
+
+  export type OpticalPrescriptionListRelationFilter = {
+    every?: OpticalPrescriptionWhereInput
+    some?: OpticalPrescriptionWhereInput
+    none?: OpticalPrescriptionWhereInput
   }
 
   export type PharmacyItemListRelationFilter = {
@@ -31414,11 +36971,19 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type EyeExaminationOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type SurgeryOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type PrescriptionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type OpticalPrescriptionOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -31721,27 +37286,78 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type DecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
   export type PatientCountOrderByAggregateInput = {
     id?: SortOrder
+    patientNumber?: SortOrder
     fullName?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
     gender?: SortOrder
     dateOfBirth?: SortOrder
     phone?: SortOrder
     email?: SortOrder
     address?: SortOrder
+    city?: SortOrder
+    state?: SortOrder
+    zipCode?: SortOrder
+    bloodGroup?: SortOrder
+    weight?: SortOrder
+    allergies?: SortOrder
+    chiefComplaint?: SortOrder
+    currentMedications?: SortOrder
+    medicalHistory?: SortOrder
+    familyMedicalHistory?: SortOrder
+    emergencyContactName?: SortOrder
+    emergencyContactRelationship?: SortOrder
+    emergencyContactPhone?: SortOrder
+    isActive?: SortOrder
+    assignedDoctorId?: SortOrder
     branchId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
+  export type PatientAvgOrderByAggregateInput = {
+    weight?: SortOrder
+  }
+
   export type PatientMaxOrderByAggregateInput = {
     id?: SortOrder
+    patientNumber?: SortOrder
     fullName?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
     gender?: SortOrder
     dateOfBirth?: SortOrder
     phone?: SortOrder
     email?: SortOrder
     address?: SortOrder
+    city?: SortOrder
+    state?: SortOrder
+    zipCode?: SortOrder
+    bloodGroup?: SortOrder
+    weight?: SortOrder
+    allergies?: SortOrder
+    chiefComplaint?: SortOrder
+    currentMedications?: SortOrder
+    medicalHistory?: SortOrder
+    familyMedicalHistory?: SortOrder
+    emergencyContactName?: SortOrder
+    emergencyContactRelationship?: SortOrder
+    emergencyContactPhone?: SortOrder
+    isActive?: SortOrder
+    assignedDoctorId?: SortOrder
     branchId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -31749,15 +37365,277 @@ export namespace Prisma {
 
   export type PatientMinOrderByAggregateInput = {
     id?: SortOrder
+    patientNumber?: SortOrder
     fullName?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
     gender?: SortOrder
     dateOfBirth?: SortOrder
     phone?: SortOrder
     email?: SortOrder
     address?: SortOrder
+    city?: SortOrder
+    state?: SortOrder
+    zipCode?: SortOrder
+    bloodGroup?: SortOrder
+    weight?: SortOrder
+    allergies?: SortOrder
+    chiefComplaint?: SortOrder
+    currentMedications?: SortOrder
+    medicalHistory?: SortOrder
+    familyMedicalHistory?: SortOrder
+    emergencyContactName?: SortOrder
+    emergencyContactRelationship?: SortOrder
+    emergencyContactPhone?: SortOrder
+    isActive?: SortOrder
+    assignedDoctorId?: SortOrder
     branchId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type PatientSumOrderByAggregateInput = {
+    weight?: SortOrder
+  }
+
+  export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
+  export type EnumOpticalPrescriptionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.OpticalPrescriptionType | EnumOpticalPrescriptionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.OpticalPrescriptionType[] | ListEnumOpticalPrescriptionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.OpticalPrescriptionType[] | ListEnumOpticalPrescriptionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumOpticalPrescriptionTypeFilter<$PrismaModel> | $Enums.OpticalPrescriptionType
+  }
+
+  export type EnumOpticalPrescriptionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.OpticalPrescriptionStatus | EnumOpticalPrescriptionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.OpticalPrescriptionStatus[] | ListEnumOpticalPrescriptionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.OpticalPrescriptionStatus[] | ListEnumOpticalPrescriptionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumOpticalPrescriptionStatusFilter<$PrismaModel> | $Enums.OpticalPrescriptionStatus
+  }
+
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
+  export type PatientScalarRelationFilter = {
+    is?: PatientWhereInput
+    isNot?: PatientWhereInput
+  }
+
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
+  }
+
+  export type OpticalItemNullableScalarRelationFilter = {
+    is?: OpticalItemWhereInput | null
+    isNot?: OpticalItemWhereInput | null
+  }
+
+  export type OpticalPrescriptionCountOrderByAggregateInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    patientId?: SortOrder
+    createdById?: SortOrder
+    type?: SortOrder
+    status?: SortOrder
+    validityMonths?: SortOrder
+    expiryDate?: SortOrder
+    dispensedAt?: SortOrder
+    notes?: SortOrder
+    odSphere?: SortOrder
+    odCylinder?: SortOrder
+    odAxis?: SortOrder
+    odAdd?: SortOrder
+    odPd?: SortOrder
+    odPrism?: SortOrder
+    osSphere?: SortOrder
+    osCylinder?: SortOrder
+    osAxis?: SortOrder
+    osAdd?: SortOrder
+    osPd?: SortOrder
+    osPrism?: SortOrder
+    lensType?: SortOrder
+    lensMaterial?: SortOrder
+    frameType?: SortOrder
+    coatings?: SortOrder
+    frameItemId?: SortOrder
+    lensItemId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type OpticalPrescriptionAvgOrderByAggregateInput = {
+    validityMonths?: SortOrder
+    odAxis?: SortOrder
+    odPd?: SortOrder
+    osAxis?: SortOrder
+    osPd?: SortOrder
+  }
+
+  export type OpticalPrescriptionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    patientId?: SortOrder
+    createdById?: SortOrder
+    type?: SortOrder
+    status?: SortOrder
+    validityMonths?: SortOrder
+    expiryDate?: SortOrder
+    dispensedAt?: SortOrder
+    notes?: SortOrder
+    odSphere?: SortOrder
+    odCylinder?: SortOrder
+    odAxis?: SortOrder
+    odAdd?: SortOrder
+    odPd?: SortOrder
+    odPrism?: SortOrder
+    osSphere?: SortOrder
+    osCylinder?: SortOrder
+    osAxis?: SortOrder
+    osAdd?: SortOrder
+    osPd?: SortOrder
+    osPrism?: SortOrder
+    lensType?: SortOrder
+    lensMaterial?: SortOrder
+    frameType?: SortOrder
+    frameItemId?: SortOrder
+    lensItemId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type OpticalPrescriptionMinOrderByAggregateInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    patientId?: SortOrder
+    createdById?: SortOrder
+    type?: SortOrder
+    status?: SortOrder
+    validityMonths?: SortOrder
+    expiryDate?: SortOrder
+    dispensedAt?: SortOrder
+    notes?: SortOrder
+    odSphere?: SortOrder
+    odCylinder?: SortOrder
+    odAxis?: SortOrder
+    odAdd?: SortOrder
+    odPd?: SortOrder
+    odPrism?: SortOrder
+    osSphere?: SortOrder
+    osCylinder?: SortOrder
+    osAxis?: SortOrder
+    osAdd?: SortOrder
+    osPd?: SortOrder
+    osPrism?: SortOrder
+    lensType?: SortOrder
+    lensMaterial?: SortOrder
+    frameType?: SortOrder
+    frameItemId?: SortOrder
+    lensItemId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type OpticalPrescriptionSumOrderByAggregateInput = {
+    validityMonths?: SortOrder
+    odAxis?: SortOrder
+    odPd?: SortOrder
+    osAxis?: SortOrder
+    osPd?: SortOrder
+  }
+
+  export type EnumOpticalPrescriptionTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.OpticalPrescriptionType | EnumOpticalPrescriptionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.OpticalPrescriptionType[] | ListEnumOpticalPrescriptionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.OpticalPrescriptionType[] | ListEnumOpticalPrescriptionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumOpticalPrescriptionTypeWithAggregatesFilter<$PrismaModel> | $Enums.OpticalPrescriptionType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumOpticalPrescriptionTypeFilter<$PrismaModel>
+    _max?: NestedEnumOpticalPrescriptionTypeFilter<$PrismaModel>
+  }
+
+  export type EnumOpticalPrescriptionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.OpticalPrescriptionStatus | EnumOpticalPrescriptionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.OpticalPrescriptionStatus[] | ListEnumOpticalPrescriptionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.OpticalPrescriptionStatus[] | ListEnumOpticalPrescriptionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumOpticalPrescriptionStatusWithAggregatesFilter<$PrismaModel> | $Enums.OpticalPrescriptionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumOpticalPrescriptionStatusFilter<$PrismaModel>
+    _max?: NestedEnumOpticalPrescriptionStatusFilter<$PrismaModel>
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type EnumAppointmentStatusFilter<$PrismaModel = never> = {
@@ -31776,11 +37654,6 @@ export namespace Prisma {
     gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
-  }
-
-  export type PatientScalarRelationFilter = {
-    is?: PatientWhereInput
-    isNot?: PatientWhereInput
   }
 
   export type DoctorScalarRelationFilter = {
@@ -31804,6 +37677,9 @@ export namespace Prisma {
     appointmentDate?: SortOrder
     status?: SortOrder
     amount?: SortOrder
+    type?: SortOrder
+    notes?: SortOrder
+    location?: SortOrder
     branchId?: SortOrder
     patientId?: SortOrder
     doctorId?: SortOrder
@@ -31822,6 +37698,9 @@ export namespace Prisma {
     appointmentDate?: SortOrder
     status?: SortOrder
     amount?: SortOrder
+    type?: SortOrder
+    notes?: SortOrder
+    location?: SortOrder
     branchId?: SortOrder
     patientId?: SortOrder
     doctorId?: SortOrder
@@ -31836,6 +37715,9 @@ export namespace Prisma {
     appointmentDate?: SortOrder
     status?: SortOrder
     amount?: SortOrder
+    type?: SortOrder
+    notes?: SortOrder
+    location?: SortOrder
     branchId?: SortOrder
     patientId?: SortOrder
     doctorId?: SortOrder
@@ -31873,16 +37755,184 @@ export namespace Prisma {
     _min?: NestedDecimalFilter<$PrismaModel>
     _max?: NestedDecimalFilter<$PrismaModel>
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
 
-  export type DecimalNullableFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type EyeExaminationCountOrderByAggregateInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    patientId?: SortOrder
+    doctorId?: SortOrder
+    chiefComplaint?: SortOrder
+    historyOfPresentIllness?: SortOrder
+    vaScale?: SortOrder
+    vaUnaidedOD?: SortOrder
+    vaUnaidedOS?: SortOrder
+    vaUnaidedNearOD?: SortOrder
+    vaUnaidedNearOS?: SortOrder
+    vaBcvaOD?: SortOrder
+    vaBcvaOS?: SortOrder
+    vaBcvaNearOD?: SortOrder
+    vaBcvaNearOS?: SortOrder
+    vaPinholeOD?: SortOrder
+    vaPinholeOS?: SortOrder
+    refractionSphereOD?: SortOrder
+    refractionSphereOS?: SortOrder
+    refractionCylinderOD?: SortOrder
+    refractionCylinderOS?: SortOrder
+    refractionAxisOD?: SortOrder
+    refractionAxisOS?: SortOrder
+    iopOD?: SortOrder
+    iopOS?: SortOrder
+    iopMethod?: SortOrder
+    iopTime?: SortOrder
+    targetIopOD?: SortOrder
+    targetIopOS?: SortOrder
+    anteriorSegmentFindings?: SortOrder
+    fundusFindings?: SortOrder
+    diagnosis?: SortOrder
+    plan?: SortOrder
+    followUpDate?: SortOrder
+    nextVisitReason?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EyeExaminationAvgOrderByAggregateInput = {
+    iopOD?: SortOrder
+    iopOS?: SortOrder
+    targetIopOD?: SortOrder
+    targetIopOS?: SortOrder
+  }
+
+  export type EyeExaminationMaxOrderByAggregateInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    patientId?: SortOrder
+    doctorId?: SortOrder
+    chiefComplaint?: SortOrder
+    historyOfPresentIllness?: SortOrder
+    vaScale?: SortOrder
+    vaUnaidedOD?: SortOrder
+    vaUnaidedOS?: SortOrder
+    vaUnaidedNearOD?: SortOrder
+    vaUnaidedNearOS?: SortOrder
+    vaBcvaOD?: SortOrder
+    vaBcvaOS?: SortOrder
+    vaBcvaNearOD?: SortOrder
+    vaBcvaNearOS?: SortOrder
+    vaPinholeOD?: SortOrder
+    vaPinholeOS?: SortOrder
+    refractionSphereOD?: SortOrder
+    refractionSphereOS?: SortOrder
+    refractionCylinderOD?: SortOrder
+    refractionCylinderOS?: SortOrder
+    refractionAxisOD?: SortOrder
+    refractionAxisOS?: SortOrder
+    iopOD?: SortOrder
+    iopOS?: SortOrder
+    iopMethod?: SortOrder
+    iopTime?: SortOrder
+    targetIopOD?: SortOrder
+    targetIopOS?: SortOrder
+    diagnosis?: SortOrder
+    plan?: SortOrder
+    followUpDate?: SortOrder
+    nextVisitReason?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EyeExaminationMinOrderByAggregateInput = {
+    id?: SortOrder
+    branchId?: SortOrder
+    patientId?: SortOrder
+    doctorId?: SortOrder
+    chiefComplaint?: SortOrder
+    historyOfPresentIllness?: SortOrder
+    vaScale?: SortOrder
+    vaUnaidedOD?: SortOrder
+    vaUnaidedOS?: SortOrder
+    vaUnaidedNearOD?: SortOrder
+    vaUnaidedNearOS?: SortOrder
+    vaBcvaOD?: SortOrder
+    vaBcvaOS?: SortOrder
+    vaBcvaNearOD?: SortOrder
+    vaBcvaNearOS?: SortOrder
+    vaPinholeOD?: SortOrder
+    vaPinholeOS?: SortOrder
+    refractionSphereOD?: SortOrder
+    refractionSphereOS?: SortOrder
+    refractionCylinderOD?: SortOrder
+    refractionCylinderOS?: SortOrder
+    refractionAxisOD?: SortOrder
+    refractionAxisOS?: SortOrder
+    iopOD?: SortOrder
+    iopOS?: SortOrder
+    iopMethod?: SortOrder
+    iopTime?: SortOrder
+    targetIopOD?: SortOrder
+    targetIopOS?: SortOrder
+    diagnosis?: SortOrder
+    plan?: SortOrder
+    followUpDate?: SortOrder
+    nextVisitReason?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EyeExaminationSumOrderByAggregateInput = {
+    iopOD?: SortOrder
+    iopOS?: SortOrder
+    targetIopOD?: SortOrder
+    targetIopOS?: SortOrder
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type AppointmentScalarRelationFilter = {
@@ -31940,33 +37990,6 @@ export namespace Prisma {
   export type ERExaminationSumOrderByAggregateInput = {
     iopRight?: SortOrder
     iopLeft?: SortOrder
-  }
-
-  export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedDecimalNullableFilter<$PrismaModel>
-    _sum?: NestedDecimalNullableFilter<$PrismaModel>
-    _min?: NestedDecimalNullableFilter<$PrismaModel>
-    _max?: NestedDecimalNullableFilter<$PrismaModel>
-  }
-
-  export type IntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type SurgeryNullableScalarRelationFilter = {
@@ -32043,34 +38066,19 @@ export namespace Prisma {
     axisLeft?: SortOrder
   }
 
-  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
-  export type ClinicalExaminationScalarRelationFilter = {
-    is?: ClinicalExaminationWhereInput
-    isNot?: ClinicalExaminationWhereInput
-  }
-
   export type SurgeryCountOrderByAggregateInput = {
     id?: SortOrder
     examId?: SortOrder
     branchId?: SortOrder
-    eyeSide?: SortOrder
+    patientId?: SortOrder
+    eye?: SortOrder
     surgeryType?: SortOrder
-    surgeryDate?: SortOrder
+    procedure?: SortOrder
+    anesthesiaType?: SortOrder
+    date?: SortOrder
+    time?: SortOrder
+    operatingRoom?: SortOrder
+    cataractDetails?: SortOrder
     cost?: SortOrder
     status?: SortOrder
     notes?: SortOrder
@@ -32087,9 +38095,14 @@ export namespace Prisma {
     id?: SortOrder
     examId?: SortOrder
     branchId?: SortOrder
-    eyeSide?: SortOrder
+    patientId?: SortOrder
+    eye?: SortOrder
     surgeryType?: SortOrder
-    surgeryDate?: SortOrder
+    procedure?: SortOrder
+    anesthesiaType?: SortOrder
+    date?: SortOrder
+    time?: SortOrder
+    operatingRoom?: SortOrder
     cost?: SortOrder
     status?: SortOrder
     notes?: SortOrder
@@ -32102,9 +38115,14 @@ export namespace Prisma {
     id?: SortOrder
     examId?: SortOrder
     branchId?: SortOrder
-    eyeSide?: SortOrder
+    patientId?: SortOrder
+    eye?: SortOrder
     surgeryType?: SortOrder
-    surgeryDate?: SortOrder
+    procedure?: SortOrder
+    anesthesiaType?: SortOrder
+    date?: SortOrder
+    time?: SortOrder
+    operatingRoom?: SortOrder
     cost?: SortOrder
     status?: SortOrder
     notes?: SortOrder
@@ -32117,15 +38135,9 @@ export namespace Prisma {
     cost?: SortOrder
   }
 
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
+  export type ClinicalExaminationScalarRelationFilter = {
+    is?: ClinicalExaminationWhereInput
+    isNot?: ClinicalExaminationWhereInput
   }
 
   export type PrescriptionCountOrderByAggregateInput = {
@@ -32175,22 +38187,6 @@ export namespace Prisma {
   export type PrescriptionSumOrderByAggregateInput = {
     quantity?: SortOrder
     reviewAfterDays?: SortOrder
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type SupplierNullableScalarRelationFilter = {
@@ -32784,6 +38780,13 @@ export namespace Prisma {
     connect?: AppointmentWhereUniqueInput | AppointmentWhereUniqueInput[]
   }
 
+  export type EyeExaminationCreateNestedManyWithoutBranchInput = {
+    create?: XOR<EyeExaminationCreateWithoutBranchInput, EyeExaminationUncheckedCreateWithoutBranchInput> | EyeExaminationCreateWithoutBranchInput[] | EyeExaminationUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: EyeExaminationCreateOrConnectWithoutBranchInput | EyeExaminationCreateOrConnectWithoutBranchInput[]
+    createMany?: EyeExaminationCreateManyBranchInputEnvelope
+    connect?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+  }
+
   export type SurgeryCreateNestedManyWithoutBranchInput = {
     create?: XOR<SurgeryCreateWithoutBranchInput, SurgeryUncheckedCreateWithoutBranchInput> | SurgeryCreateWithoutBranchInput[] | SurgeryUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: SurgeryCreateOrConnectWithoutBranchInput | SurgeryCreateOrConnectWithoutBranchInput[]
@@ -32796,6 +38799,13 @@ export namespace Prisma {
     connectOrCreate?: PrescriptionCreateOrConnectWithoutBranchInput | PrescriptionCreateOrConnectWithoutBranchInput[]
     createMany?: PrescriptionCreateManyBranchInputEnvelope
     connect?: PrescriptionWhereUniqueInput | PrescriptionWhereUniqueInput[]
+  }
+
+  export type OpticalPrescriptionCreateNestedManyWithoutBranchInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutBranchInput, OpticalPrescriptionUncheckedCreateWithoutBranchInput> | OpticalPrescriptionCreateWithoutBranchInput[] | OpticalPrescriptionUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutBranchInput | OpticalPrescriptionCreateOrConnectWithoutBranchInput[]
+    createMany?: OpticalPrescriptionCreateManyBranchInputEnvelope
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
   }
 
   export type PharmacyItemCreateNestedManyWithoutBranchInput = {
@@ -32889,6 +38899,13 @@ export namespace Prisma {
     connect?: AppointmentWhereUniqueInput | AppointmentWhereUniqueInput[]
   }
 
+  export type EyeExaminationUncheckedCreateNestedManyWithoutBranchInput = {
+    create?: XOR<EyeExaminationCreateWithoutBranchInput, EyeExaminationUncheckedCreateWithoutBranchInput> | EyeExaminationCreateWithoutBranchInput[] | EyeExaminationUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: EyeExaminationCreateOrConnectWithoutBranchInput | EyeExaminationCreateOrConnectWithoutBranchInput[]
+    createMany?: EyeExaminationCreateManyBranchInputEnvelope
+    connect?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+  }
+
   export type SurgeryUncheckedCreateNestedManyWithoutBranchInput = {
     create?: XOR<SurgeryCreateWithoutBranchInput, SurgeryUncheckedCreateWithoutBranchInput> | SurgeryCreateWithoutBranchInput[] | SurgeryUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: SurgeryCreateOrConnectWithoutBranchInput | SurgeryCreateOrConnectWithoutBranchInput[]
@@ -32901,6 +38918,13 @@ export namespace Prisma {
     connectOrCreate?: PrescriptionCreateOrConnectWithoutBranchInput | PrescriptionCreateOrConnectWithoutBranchInput[]
     createMany?: PrescriptionCreateManyBranchInputEnvelope
     connect?: PrescriptionWhereUniqueInput | PrescriptionWhereUniqueInput[]
+  }
+
+  export type OpticalPrescriptionUncheckedCreateNestedManyWithoutBranchInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutBranchInput, OpticalPrescriptionUncheckedCreateWithoutBranchInput> | OpticalPrescriptionCreateWithoutBranchInput[] | OpticalPrescriptionUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutBranchInput | OpticalPrescriptionCreateOrConnectWithoutBranchInput[]
+    createMany?: OpticalPrescriptionCreateManyBranchInputEnvelope
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
   }
 
   export type PharmacyItemUncheckedCreateNestedManyWithoutBranchInput = {
@@ -33037,6 +39061,20 @@ export namespace Prisma {
     deleteMany?: AppointmentScalarWhereInput | AppointmentScalarWhereInput[]
   }
 
+  export type EyeExaminationUpdateManyWithoutBranchNestedInput = {
+    create?: XOR<EyeExaminationCreateWithoutBranchInput, EyeExaminationUncheckedCreateWithoutBranchInput> | EyeExaminationCreateWithoutBranchInput[] | EyeExaminationUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: EyeExaminationCreateOrConnectWithoutBranchInput | EyeExaminationCreateOrConnectWithoutBranchInput[]
+    upsert?: EyeExaminationUpsertWithWhereUniqueWithoutBranchInput | EyeExaminationUpsertWithWhereUniqueWithoutBranchInput[]
+    createMany?: EyeExaminationCreateManyBranchInputEnvelope
+    set?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    disconnect?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    delete?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    connect?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    update?: EyeExaminationUpdateWithWhereUniqueWithoutBranchInput | EyeExaminationUpdateWithWhereUniqueWithoutBranchInput[]
+    updateMany?: EyeExaminationUpdateManyWithWhereWithoutBranchInput | EyeExaminationUpdateManyWithWhereWithoutBranchInput[]
+    deleteMany?: EyeExaminationScalarWhereInput | EyeExaminationScalarWhereInput[]
+  }
+
   export type SurgeryUpdateManyWithoutBranchNestedInput = {
     create?: XOR<SurgeryCreateWithoutBranchInput, SurgeryUncheckedCreateWithoutBranchInput> | SurgeryCreateWithoutBranchInput[] | SurgeryUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: SurgeryCreateOrConnectWithoutBranchInput | SurgeryCreateOrConnectWithoutBranchInput[]
@@ -33063,6 +39101,20 @@ export namespace Prisma {
     update?: PrescriptionUpdateWithWhereUniqueWithoutBranchInput | PrescriptionUpdateWithWhereUniqueWithoutBranchInput[]
     updateMany?: PrescriptionUpdateManyWithWhereWithoutBranchInput | PrescriptionUpdateManyWithWhereWithoutBranchInput[]
     deleteMany?: PrescriptionScalarWhereInput | PrescriptionScalarWhereInput[]
+  }
+
+  export type OpticalPrescriptionUpdateManyWithoutBranchNestedInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutBranchInput, OpticalPrescriptionUncheckedCreateWithoutBranchInput> | OpticalPrescriptionCreateWithoutBranchInput[] | OpticalPrescriptionUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutBranchInput | OpticalPrescriptionCreateOrConnectWithoutBranchInput[]
+    upsert?: OpticalPrescriptionUpsertWithWhereUniqueWithoutBranchInput | OpticalPrescriptionUpsertWithWhereUniqueWithoutBranchInput[]
+    createMany?: OpticalPrescriptionCreateManyBranchInputEnvelope
+    set?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    disconnect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    delete?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    update?: OpticalPrescriptionUpdateWithWhereUniqueWithoutBranchInput | OpticalPrescriptionUpdateWithWhereUniqueWithoutBranchInput[]
+    updateMany?: OpticalPrescriptionUpdateManyWithWhereWithoutBranchInput | OpticalPrescriptionUpdateManyWithWhereWithoutBranchInput[]
+    deleteMany?: OpticalPrescriptionScalarWhereInput | OpticalPrescriptionScalarWhereInput[]
   }
 
   export type PharmacyItemUpdateManyWithoutBranchNestedInput = {
@@ -33247,6 +39299,20 @@ export namespace Prisma {
     deleteMany?: AppointmentScalarWhereInput | AppointmentScalarWhereInput[]
   }
 
+  export type EyeExaminationUncheckedUpdateManyWithoutBranchNestedInput = {
+    create?: XOR<EyeExaminationCreateWithoutBranchInput, EyeExaminationUncheckedCreateWithoutBranchInput> | EyeExaminationCreateWithoutBranchInput[] | EyeExaminationUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: EyeExaminationCreateOrConnectWithoutBranchInput | EyeExaminationCreateOrConnectWithoutBranchInput[]
+    upsert?: EyeExaminationUpsertWithWhereUniqueWithoutBranchInput | EyeExaminationUpsertWithWhereUniqueWithoutBranchInput[]
+    createMany?: EyeExaminationCreateManyBranchInputEnvelope
+    set?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    disconnect?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    delete?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    connect?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    update?: EyeExaminationUpdateWithWhereUniqueWithoutBranchInput | EyeExaminationUpdateWithWhereUniqueWithoutBranchInput[]
+    updateMany?: EyeExaminationUpdateManyWithWhereWithoutBranchInput | EyeExaminationUpdateManyWithWhereWithoutBranchInput[]
+    deleteMany?: EyeExaminationScalarWhereInput | EyeExaminationScalarWhereInput[]
+  }
+
   export type SurgeryUncheckedUpdateManyWithoutBranchNestedInput = {
     create?: XOR<SurgeryCreateWithoutBranchInput, SurgeryUncheckedCreateWithoutBranchInput> | SurgeryCreateWithoutBranchInput[] | SurgeryUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: SurgeryCreateOrConnectWithoutBranchInput | SurgeryCreateOrConnectWithoutBranchInput[]
@@ -33273,6 +39339,20 @@ export namespace Prisma {
     update?: PrescriptionUpdateWithWhereUniqueWithoutBranchInput | PrescriptionUpdateWithWhereUniqueWithoutBranchInput[]
     updateMany?: PrescriptionUpdateManyWithWhereWithoutBranchInput | PrescriptionUpdateManyWithWhereWithoutBranchInput[]
     deleteMany?: PrescriptionScalarWhereInput | PrescriptionScalarWhereInput[]
+  }
+
+  export type OpticalPrescriptionUncheckedUpdateManyWithoutBranchNestedInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutBranchInput, OpticalPrescriptionUncheckedCreateWithoutBranchInput> | OpticalPrescriptionCreateWithoutBranchInput[] | OpticalPrescriptionUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutBranchInput | OpticalPrescriptionCreateOrConnectWithoutBranchInput[]
+    upsert?: OpticalPrescriptionUpsertWithWhereUniqueWithoutBranchInput | OpticalPrescriptionUpsertWithWhereUniqueWithoutBranchInput[]
+    createMany?: OpticalPrescriptionCreateManyBranchInputEnvelope
+    set?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    disconnect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    delete?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    update?: OpticalPrescriptionUpdateWithWhereUniqueWithoutBranchInput | OpticalPrescriptionUpdateWithWhereUniqueWithoutBranchInput[]
+    updateMany?: OpticalPrescriptionUpdateManyWithWhereWithoutBranchInput | OpticalPrescriptionUpdateManyWithWhereWithoutBranchInput[]
+    deleteMany?: OpticalPrescriptionScalarWhereInput | OpticalPrescriptionScalarWhereInput[]
   }
 
   export type PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput = {
@@ -33552,6 +39632,13 @@ export namespace Prisma {
     connect?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
   }
 
+  export type OpticalPrescriptionCreateNestedManyWithoutCreatedByInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutCreatedByInput, OpticalPrescriptionUncheckedCreateWithoutCreatedByInput> | OpticalPrescriptionCreateWithoutCreatedByInput[] | OpticalPrescriptionUncheckedCreateWithoutCreatedByInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutCreatedByInput | OpticalPrescriptionCreateOrConnectWithoutCreatedByInput[]
+    createMany?: OpticalPrescriptionCreateManyCreatedByInputEnvelope
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+  }
+
   export type DoctorUncheckedCreateNestedOneWithoutUserInput = {
     create?: XOR<DoctorCreateWithoutUserInput, DoctorUncheckedCreateWithoutUserInput>
     connectOrCreate?: DoctorCreateOrConnectWithoutUserInput
@@ -33605,6 +39692,13 @@ export namespace Prisma {
     connectOrCreate?: ActivityLogCreateOrConnectWithoutUserInput | ActivityLogCreateOrConnectWithoutUserInput[]
     createMany?: ActivityLogCreateManyUserInputEnvelope
     connect?: ActivityLogWhereUniqueInput | ActivityLogWhereUniqueInput[]
+  }
+
+  export type OpticalPrescriptionUncheckedCreateNestedManyWithoutCreatedByInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutCreatedByInput, OpticalPrescriptionUncheckedCreateWithoutCreatedByInput> | OpticalPrescriptionCreateWithoutCreatedByInput[] | OpticalPrescriptionUncheckedCreateWithoutCreatedByInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutCreatedByInput | OpticalPrescriptionCreateOrConnectWithoutCreatedByInput[]
+    createMany?: OpticalPrescriptionCreateManyCreatedByInputEnvelope
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -33735,6 +39829,20 @@ export namespace Prisma {
     deleteMany?: ActivityLogScalarWhereInput | ActivityLogScalarWhereInput[]
   }
 
+  export type OpticalPrescriptionUpdateManyWithoutCreatedByNestedInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutCreatedByInput, OpticalPrescriptionUncheckedCreateWithoutCreatedByInput> | OpticalPrescriptionCreateWithoutCreatedByInput[] | OpticalPrescriptionUncheckedCreateWithoutCreatedByInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutCreatedByInput | OpticalPrescriptionCreateOrConnectWithoutCreatedByInput[]
+    upsert?: OpticalPrescriptionUpsertWithWhereUniqueWithoutCreatedByInput | OpticalPrescriptionUpsertWithWhereUniqueWithoutCreatedByInput[]
+    createMany?: OpticalPrescriptionCreateManyCreatedByInputEnvelope
+    set?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    disconnect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    delete?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    update?: OpticalPrescriptionUpdateWithWhereUniqueWithoutCreatedByInput | OpticalPrescriptionUpdateWithWhereUniqueWithoutCreatedByInput[]
+    updateMany?: OpticalPrescriptionUpdateManyWithWhereWithoutCreatedByInput | OpticalPrescriptionUpdateManyWithWhereWithoutCreatedByInput[]
+    deleteMany?: OpticalPrescriptionScalarWhereInput | OpticalPrescriptionScalarWhereInput[]
+  }
+
   export type DoctorUncheckedUpdateOneWithoutUserNestedInput = {
     create?: XOR<DoctorCreateWithoutUserInput, DoctorUncheckedCreateWithoutUserInput>
     connectOrCreate?: DoctorCreateOrConnectWithoutUserInput
@@ -33843,6 +39951,20 @@ export namespace Prisma {
     deleteMany?: ActivityLogScalarWhereInput | ActivityLogScalarWhereInput[]
   }
 
+  export type OpticalPrescriptionUncheckedUpdateManyWithoutCreatedByNestedInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutCreatedByInput, OpticalPrescriptionUncheckedCreateWithoutCreatedByInput> | OpticalPrescriptionCreateWithoutCreatedByInput[] | OpticalPrescriptionUncheckedCreateWithoutCreatedByInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutCreatedByInput | OpticalPrescriptionCreateOrConnectWithoutCreatedByInput[]
+    upsert?: OpticalPrescriptionUpsertWithWhereUniqueWithoutCreatedByInput | OpticalPrescriptionUpsertWithWhereUniqueWithoutCreatedByInput[]
+    createMany?: OpticalPrescriptionCreateManyCreatedByInputEnvelope
+    set?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    disconnect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    delete?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    update?: OpticalPrescriptionUpdateWithWhereUniqueWithoutCreatedByInput | OpticalPrescriptionUpdateWithWhereUniqueWithoutCreatedByInput[]
+    updateMany?: OpticalPrescriptionUpdateManyWithWhereWithoutCreatedByInput | OpticalPrescriptionUpdateManyWithWhereWithoutCreatedByInput[]
+    deleteMany?: OpticalPrescriptionScalarWhereInput | OpticalPrescriptionScalarWhereInput[]
+  }
+
   export type BranchCreateNestedOneWithoutActivityLogsInput = {
     create?: XOR<BranchCreateWithoutActivityLogsInput, BranchUncheckedCreateWithoutActivityLogsInput>
     connectOrCreate?: BranchCreateOrConnectWithoutActivityLogsInput
@@ -33890,6 +40012,13 @@ export namespace Prisma {
     connect?: AppointmentWhereUniqueInput | AppointmentWhereUniqueInput[]
   }
 
+  export type EyeExaminationCreateNestedManyWithoutDoctorInput = {
+    create?: XOR<EyeExaminationCreateWithoutDoctorInput, EyeExaminationUncheckedCreateWithoutDoctorInput> | EyeExaminationCreateWithoutDoctorInput[] | EyeExaminationUncheckedCreateWithoutDoctorInput[]
+    connectOrCreate?: EyeExaminationCreateOrConnectWithoutDoctorInput | EyeExaminationCreateOrConnectWithoutDoctorInput[]
+    createMany?: EyeExaminationCreateManyDoctorInputEnvelope
+    connect?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+  }
+
   export type ClinicalExaminationCreateNestedManyWithoutExaminedByInput = {
     create?: XOR<ClinicalExaminationCreateWithoutExaminedByInput, ClinicalExaminationUncheckedCreateWithoutExaminedByInput> | ClinicalExaminationCreateWithoutExaminedByInput[] | ClinicalExaminationUncheckedCreateWithoutExaminedByInput[]
     connectOrCreate?: ClinicalExaminationCreateOrConnectWithoutExaminedByInput | ClinicalExaminationCreateOrConnectWithoutExaminedByInput[]
@@ -33904,11 +40033,25 @@ export namespace Prisma {
     connect?: SurgeryWhereUniqueInput | SurgeryWhereUniqueInput[]
   }
 
+  export type PatientCreateNestedManyWithoutAssignedDoctorInput = {
+    create?: XOR<PatientCreateWithoutAssignedDoctorInput, PatientUncheckedCreateWithoutAssignedDoctorInput> | PatientCreateWithoutAssignedDoctorInput[] | PatientUncheckedCreateWithoutAssignedDoctorInput[]
+    connectOrCreate?: PatientCreateOrConnectWithoutAssignedDoctorInput | PatientCreateOrConnectWithoutAssignedDoctorInput[]
+    createMany?: PatientCreateManyAssignedDoctorInputEnvelope
+    connect?: PatientWhereUniqueInput | PatientWhereUniqueInput[]
+  }
+
   export type AppointmentUncheckedCreateNestedManyWithoutDoctorInput = {
     create?: XOR<AppointmentCreateWithoutDoctorInput, AppointmentUncheckedCreateWithoutDoctorInput> | AppointmentCreateWithoutDoctorInput[] | AppointmentUncheckedCreateWithoutDoctorInput[]
     connectOrCreate?: AppointmentCreateOrConnectWithoutDoctorInput | AppointmentCreateOrConnectWithoutDoctorInput[]
     createMany?: AppointmentCreateManyDoctorInputEnvelope
     connect?: AppointmentWhereUniqueInput | AppointmentWhereUniqueInput[]
+  }
+
+  export type EyeExaminationUncheckedCreateNestedManyWithoutDoctorInput = {
+    create?: XOR<EyeExaminationCreateWithoutDoctorInput, EyeExaminationUncheckedCreateWithoutDoctorInput> | EyeExaminationCreateWithoutDoctorInput[] | EyeExaminationUncheckedCreateWithoutDoctorInput[]
+    connectOrCreate?: EyeExaminationCreateOrConnectWithoutDoctorInput | EyeExaminationCreateOrConnectWithoutDoctorInput[]
+    createMany?: EyeExaminationCreateManyDoctorInputEnvelope
+    connect?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
   }
 
   export type ClinicalExaminationUncheckedCreateNestedManyWithoutExaminedByInput = {
@@ -33923,6 +40066,13 @@ export namespace Prisma {
     connectOrCreate?: SurgeryCreateOrConnectWithoutSurgeonInput | SurgeryCreateOrConnectWithoutSurgeonInput[]
     createMany?: SurgeryCreateManySurgeonInputEnvelope
     connect?: SurgeryWhereUniqueInput | SurgeryWhereUniqueInput[]
+  }
+
+  export type PatientUncheckedCreateNestedManyWithoutAssignedDoctorInput = {
+    create?: XOR<PatientCreateWithoutAssignedDoctorInput, PatientUncheckedCreateWithoutAssignedDoctorInput> | PatientCreateWithoutAssignedDoctorInput[] | PatientUncheckedCreateWithoutAssignedDoctorInput[]
+    connectOrCreate?: PatientCreateOrConnectWithoutAssignedDoctorInput | PatientCreateOrConnectWithoutAssignedDoctorInput[]
+    createMany?: PatientCreateManyAssignedDoctorInputEnvelope
+    connect?: PatientWhereUniqueInput | PatientWhereUniqueInput[]
   }
 
   export type UserUpdateOneRequiredWithoutDoctorNestedInput = {
@@ -33955,6 +40105,20 @@ export namespace Prisma {
     deleteMany?: AppointmentScalarWhereInput | AppointmentScalarWhereInput[]
   }
 
+  export type EyeExaminationUpdateManyWithoutDoctorNestedInput = {
+    create?: XOR<EyeExaminationCreateWithoutDoctorInput, EyeExaminationUncheckedCreateWithoutDoctorInput> | EyeExaminationCreateWithoutDoctorInput[] | EyeExaminationUncheckedCreateWithoutDoctorInput[]
+    connectOrCreate?: EyeExaminationCreateOrConnectWithoutDoctorInput | EyeExaminationCreateOrConnectWithoutDoctorInput[]
+    upsert?: EyeExaminationUpsertWithWhereUniqueWithoutDoctorInput | EyeExaminationUpsertWithWhereUniqueWithoutDoctorInput[]
+    createMany?: EyeExaminationCreateManyDoctorInputEnvelope
+    set?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    disconnect?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    delete?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    connect?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    update?: EyeExaminationUpdateWithWhereUniqueWithoutDoctorInput | EyeExaminationUpdateWithWhereUniqueWithoutDoctorInput[]
+    updateMany?: EyeExaminationUpdateManyWithWhereWithoutDoctorInput | EyeExaminationUpdateManyWithWhereWithoutDoctorInput[]
+    deleteMany?: EyeExaminationScalarWhereInput | EyeExaminationScalarWhereInput[]
+  }
+
   export type ClinicalExaminationUpdateManyWithoutExaminedByNestedInput = {
     create?: XOR<ClinicalExaminationCreateWithoutExaminedByInput, ClinicalExaminationUncheckedCreateWithoutExaminedByInput> | ClinicalExaminationCreateWithoutExaminedByInput[] | ClinicalExaminationUncheckedCreateWithoutExaminedByInput[]
     connectOrCreate?: ClinicalExaminationCreateOrConnectWithoutExaminedByInput | ClinicalExaminationCreateOrConnectWithoutExaminedByInput[]
@@ -33983,6 +40147,20 @@ export namespace Prisma {
     deleteMany?: SurgeryScalarWhereInput | SurgeryScalarWhereInput[]
   }
 
+  export type PatientUpdateManyWithoutAssignedDoctorNestedInput = {
+    create?: XOR<PatientCreateWithoutAssignedDoctorInput, PatientUncheckedCreateWithoutAssignedDoctorInput> | PatientCreateWithoutAssignedDoctorInput[] | PatientUncheckedCreateWithoutAssignedDoctorInput[]
+    connectOrCreate?: PatientCreateOrConnectWithoutAssignedDoctorInput | PatientCreateOrConnectWithoutAssignedDoctorInput[]
+    upsert?: PatientUpsertWithWhereUniqueWithoutAssignedDoctorInput | PatientUpsertWithWhereUniqueWithoutAssignedDoctorInput[]
+    createMany?: PatientCreateManyAssignedDoctorInputEnvelope
+    set?: PatientWhereUniqueInput | PatientWhereUniqueInput[]
+    disconnect?: PatientWhereUniqueInput | PatientWhereUniqueInput[]
+    delete?: PatientWhereUniqueInput | PatientWhereUniqueInput[]
+    connect?: PatientWhereUniqueInput | PatientWhereUniqueInput[]
+    update?: PatientUpdateWithWhereUniqueWithoutAssignedDoctorInput | PatientUpdateWithWhereUniqueWithoutAssignedDoctorInput[]
+    updateMany?: PatientUpdateManyWithWhereWithoutAssignedDoctorInput | PatientUpdateManyWithWhereWithoutAssignedDoctorInput[]
+    deleteMany?: PatientScalarWhereInput | PatientScalarWhereInput[]
+  }
+
   export type AppointmentUncheckedUpdateManyWithoutDoctorNestedInput = {
     create?: XOR<AppointmentCreateWithoutDoctorInput, AppointmentUncheckedCreateWithoutDoctorInput> | AppointmentCreateWithoutDoctorInput[] | AppointmentUncheckedCreateWithoutDoctorInput[]
     connectOrCreate?: AppointmentCreateOrConnectWithoutDoctorInput | AppointmentCreateOrConnectWithoutDoctorInput[]
@@ -33995,6 +40173,20 @@ export namespace Prisma {
     update?: AppointmentUpdateWithWhereUniqueWithoutDoctorInput | AppointmentUpdateWithWhereUniqueWithoutDoctorInput[]
     updateMany?: AppointmentUpdateManyWithWhereWithoutDoctorInput | AppointmentUpdateManyWithWhereWithoutDoctorInput[]
     deleteMany?: AppointmentScalarWhereInput | AppointmentScalarWhereInput[]
+  }
+
+  export type EyeExaminationUncheckedUpdateManyWithoutDoctorNestedInput = {
+    create?: XOR<EyeExaminationCreateWithoutDoctorInput, EyeExaminationUncheckedCreateWithoutDoctorInput> | EyeExaminationCreateWithoutDoctorInput[] | EyeExaminationUncheckedCreateWithoutDoctorInput[]
+    connectOrCreate?: EyeExaminationCreateOrConnectWithoutDoctorInput | EyeExaminationCreateOrConnectWithoutDoctorInput[]
+    upsert?: EyeExaminationUpsertWithWhereUniqueWithoutDoctorInput | EyeExaminationUpsertWithWhereUniqueWithoutDoctorInput[]
+    createMany?: EyeExaminationCreateManyDoctorInputEnvelope
+    set?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    disconnect?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    delete?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    connect?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    update?: EyeExaminationUpdateWithWhereUniqueWithoutDoctorInput | EyeExaminationUpdateWithWhereUniqueWithoutDoctorInput[]
+    updateMany?: EyeExaminationUpdateManyWithWhereWithoutDoctorInput | EyeExaminationUpdateManyWithWhereWithoutDoctorInput[]
+    deleteMany?: EyeExaminationScalarWhereInput | EyeExaminationScalarWhereInput[]
   }
 
   export type ClinicalExaminationUncheckedUpdateManyWithoutExaminedByNestedInput = {
@@ -34025,6 +40217,26 @@ export namespace Prisma {
     deleteMany?: SurgeryScalarWhereInput | SurgeryScalarWhereInput[]
   }
 
+  export type PatientUncheckedUpdateManyWithoutAssignedDoctorNestedInput = {
+    create?: XOR<PatientCreateWithoutAssignedDoctorInput, PatientUncheckedCreateWithoutAssignedDoctorInput> | PatientCreateWithoutAssignedDoctorInput[] | PatientUncheckedCreateWithoutAssignedDoctorInput[]
+    connectOrCreate?: PatientCreateOrConnectWithoutAssignedDoctorInput | PatientCreateOrConnectWithoutAssignedDoctorInput[]
+    upsert?: PatientUpsertWithWhereUniqueWithoutAssignedDoctorInput | PatientUpsertWithWhereUniqueWithoutAssignedDoctorInput[]
+    createMany?: PatientCreateManyAssignedDoctorInputEnvelope
+    set?: PatientWhereUniqueInput | PatientWhereUniqueInput[]
+    disconnect?: PatientWhereUniqueInput | PatientWhereUniqueInput[]
+    delete?: PatientWhereUniqueInput | PatientWhereUniqueInput[]
+    connect?: PatientWhereUniqueInput | PatientWhereUniqueInput[]
+    update?: PatientUpdateWithWhereUniqueWithoutAssignedDoctorInput | PatientUpdateWithWhereUniqueWithoutAssignedDoctorInput[]
+    updateMany?: PatientUpdateManyWithWhereWithoutAssignedDoctorInput | PatientUpdateManyWithWhereWithoutAssignedDoctorInput[]
+    deleteMany?: PatientScalarWhereInput | PatientScalarWhereInput[]
+  }
+
+  export type DoctorCreateNestedOneWithoutAssignedPatientsInput = {
+    create?: XOR<DoctorCreateWithoutAssignedPatientsInput, DoctorUncheckedCreateWithoutAssignedPatientsInput>
+    connectOrCreate?: DoctorCreateOrConnectWithoutAssignedPatientsInput
+    connect?: DoctorWhereUniqueInput
+  }
+
   export type BranchCreateNestedOneWithoutPatientsInput = {
     create?: XOR<BranchCreateWithoutPatientsInput, BranchUncheckedCreateWithoutPatientsInput>
     connectOrCreate?: BranchCreateOrConnectWithoutPatientsInput
@@ -34036,6 +40248,27 @@ export namespace Prisma {
     connectOrCreate?: AppointmentCreateOrConnectWithoutPatientInput | AppointmentCreateOrConnectWithoutPatientInput[]
     createMany?: AppointmentCreateManyPatientInputEnvelope
     connect?: AppointmentWhereUniqueInput | AppointmentWhereUniqueInput[]
+  }
+
+  export type SurgeryCreateNestedManyWithoutPatientInput = {
+    create?: XOR<SurgeryCreateWithoutPatientInput, SurgeryUncheckedCreateWithoutPatientInput> | SurgeryCreateWithoutPatientInput[] | SurgeryUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: SurgeryCreateOrConnectWithoutPatientInput | SurgeryCreateOrConnectWithoutPatientInput[]
+    createMany?: SurgeryCreateManyPatientInputEnvelope
+    connect?: SurgeryWhereUniqueInput | SurgeryWhereUniqueInput[]
+  }
+
+  export type EyeExaminationCreateNestedManyWithoutPatientInput = {
+    create?: XOR<EyeExaminationCreateWithoutPatientInput, EyeExaminationUncheckedCreateWithoutPatientInput> | EyeExaminationCreateWithoutPatientInput[] | EyeExaminationUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: EyeExaminationCreateOrConnectWithoutPatientInput | EyeExaminationCreateOrConnectWithoutPatientInput[]
+    createMany?: EyeExaminationCreateManyPatientInputEnvelope
+    connect?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+  }
+
+  export type OpticalPrescriptionCreateNestedManyWithoutPatientInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutPatientInput, OpticalPrescriptionUncheckedCreateWithoutPatientInput> | OpticalPrescriptionCreateWithoutPatientInput[] | OpticalPrescriptionUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutPatientInput | OpticalPrescriptionCreateOrConnectWithoutPatientInput[]
+    createMany?: OpticalPrescriptionCreateManyPatientInputEnvelope
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
   }
 
   export type BillingCreateNestedManyWithoutPatientInput = {
@@ -34059,6 +40292,27 @@ export namespace Prisma {
     connect?: AppointmentWhereUniqueInput | AppointmentWhereUniqueInput[]
   }
 
+  export type SurgeryUncheckedCreateNestedManyWithoutPatientInput = {
+    create?: XOR<SurgeryCreateWithoutPatientInput, SurgeryUncheckedCreateWithoutPatientInput> | SurgeryCreateWithoutPatientInput[] | SurgeryUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: SurgeryCreateOrConnectWithoutPatientInput | SurgeryCreateOrConnectWithoutPatientInput[]
+    createMany?: SurgeryCreateManyPatientInputEnvelope
+    connect?: SurgeryWhereUniqueInput | SurgeryWhereUniqueInput[]
+  }
+
+  export type EyeExaminationUncheckedCreateNestedManyWithoutPatientInput = {
+    create?: XOR<EyeExaminationCreateWithoutPatientInput, EyeExaminationUncheckedCreateWithoutPatientInput> | EyeExaminationCreateWithoutPatientInput[] | EyeExaminationUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: EyeExaminationCreateOrConnectWithoutPatientInput | EyeExaminationCreateOrConnectWithoutPatientInput[]
+    createMany?: EyeExaminationCreateManyPatientInputEnvelope
+    connect?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+  }
+
+  export type OpticalPrescriptionUncheckedCreateNestedManyWithoutPatientInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutPatientInput, OpticalPrescriptionUncheckedCreateWithoutPatientInput> | OpticalPrescriptionCreateWithoutPatientInput[] | OpticalPrescriptionUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutPatientInput | OpticalPrescriptionCreateOrConnectWithoutPatientInput[]
+    createMany?: OpticalPrescriptionCreateManyPatientInputEnvelope
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+  }
+
   export type BillingUncheckedCreateNestedManyWithoutPatientInput = {
     create?: XOR<BillingCreateWithoutPatientInput, BillingUncheckedCreateWithoutPatientInput> | BillingCreateWithoutPatientInput[] | BillingUncheckedCreateWithoutPatientInput[]
     connectOrCreate?: BillingCreateOrConnectWithoutPatientInput | BillingCreateOrConnectWithoutPatientInput[]
@@ -34071,6 +40325,24 @@ export namespace Prisma {
     connectOrCreate?: FollowUpCreateOrConnectWithoutPatientInput | FollowUpCreateOrConnectWithoutPatientInput[]
     createMany?: FollowUpCreateManyPatientInputEnvelope
     connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
+  }
+
+  export type NullableDecimalFieldUpdateOperationsInput = {
+    set?: Decimal | DecimalJsLike | number | string | null
+    increment?: Decimal | DecimalJsLike | number | string
+    decrement?: Decimal | DecimalJsLike | number | string
+    multiply?: Decimal | DecimalJsLike | number | string
+    divide?: Decimal | DecimalJsLike | number | string
+  }
+
+  export type DoctorUpdateOneWithoutAssignedPatientsNestedInput = {
+    create?: XOR<DoctorCreateWithoutAssignedPatientsInput, DoctorUncheckedCreateWithoutAssignedPatientsInput>
+    connectOrCreate?: DoctorCreateOrConnectWithoutAssignedPatientsInput
+    upsert?: DoctorUpsertWithoutAssignedPatientsInput
+    disconnect?: DoctorWhereInput | boolean
+    delete?: DoctorWhereInput | boolean
+    connect?: DoctorWhereUniqueInput
+    update?: XOR<XOR<DoctorUpdateToOneWithWhereWithoutAssignedPatientsInput, DoctorUpdateWithoutAssignedPatientsInput>, DoctorUncheckedUpdateWithoutAssignedPatientsInput>
   }
 
   export type BranchUpdateOneRequiredWithoutPatientsNestedInput = {
@@ -34093,6 +40365,48 @@ export namespace Prisma {
     update?: AppointmentUpdateWithWhereUniqueWithoutPatientInput | AppointmentUpdateWithWhereUniqueWithoutPatientInput[]
     updateMany?: AppointmentUpdateManyWithWhereWithoutPatientInput | AppointmentUpdateManyWithWhereWithoutPatientInput[]
     deleteMany?: AppointmentScalarWhereInput | AppointmentScalarWhereInput[]
+  }
+
+  export type SurgeryUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<SurgeryCreateWithoutPatientInput, SurgeryUncheckedCreateWithoutPatientInput> | SurgeryCreateWithoutPatientInput[] | SurgeryUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: SurgeryCreateOrConnectWithoutPatientInput | SurgeryCreateOrConnectWithoutPatientInput[]
+    upsert?: SurgeryUpsertWithWhereUniqueWithoutPatientInput | SurgeryUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: SurgeryCreateManyPatientInputEnvelope
+    set?: SurgeryWhereUniqueInput | SurgeryWhereUniqueInput[]
+    disconnect?: SurgeryWhereUniqueInput | SurgeryWhereUniqueInput[]
+    delete?: SurgeryWhereUniqueInput | SurgeryWhereUniqueInput[]
+    connect?: SurgeryWhereUniqueInput | SurgeryWhereUniqueInput[]
+    update?: SurgeryUpdateWithWhereUniqueWithoutPatientInput | SurgeryUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: SurgeryUpdateManyWithWhereWithoutPatientInput | SurgeryUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: SurgeryScalarWhereInput | SurgeryScalarWhereInput[]
+  }
+
+  export type EyeExaminationUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<EyeExaminationCreateWithoutPatientInput, EyeExaminationUncheckedCreateWithoutPatientInput> | EyeExaminationCreateWithoutPatientInput[] | EyeExaminationUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: EyeExaminationCreateOrConnectWithoutPatientInput | EyeExaminationCreateOrConnectWithoutPatientInput[]
+    upsert?: EyeExaminationUpsertWithWhereUniqueWithoutPatientInput | EyeExaminationUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: EyeExaminationCreateManyPatientInputEnvelope
+    set?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    disconnect?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    delete?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    connect?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    update?: EyeExaminationUpdateWithWhereUniqueWithoutPatientInput | EyeExaminationUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: EyeExaminationUpdateManyWithWhereWithoutPatientInput | EyeExaminationUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: EyeExaminationScalarWhereInput | EyeExaminationScalarWhereInput[]
+  }
+
+  export type OpticalPrescriptionUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutPatientInput, OpticalPrescriptionUncheckedCreateWithoutPatientInput> | OpticalPrescriptionCreateWithoutPatientInput[] | OpticalPrescriptionUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutPatientInput | OpticalPrescriptionCreateOrConnectWithoutPatientInput[]
+    upsert?: OpticalPrescriptionUpsertWithWhereUniqueWithoutPatientInput | OpticalPrescriptionUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: OpticalPrescriptionCreateManyPatientInputEnvelope
+    set?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    disconnect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    delete?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    update?: OpticalPrescriptionUpdateWithWhereUniqueWithoutPatientInput | OpticalPrescriptionUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: OpticalPrescriptionUpdateManyWithWhereWithoutPatientInput | OpticalPrescriptionUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: OpticalPrescriptionScalarWhereInput | OpticalPrescriptionScalarWhereInput[]
   }
 
   export type BillingUpdateManyWithoutPatientNestedInput = {
@@ -34137,6 +40451,48 @@ export namespace Prisma {
     deleteMany?: AppointmentScalarWhereInput | AppointmentScalarWhereInput[]
   }
 
+  export type SurgeryUncheckedUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<SurgeryCreateWithoutPatientInput, SurgeryUncheckedCreateWithoutPatientInput> | SurgeryCreateWithoutPatientInput[] | SurgeryUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: SurgeryCreateOrConnectWithoutPatientInput | SurgeryCreateOrConnectWithoutPatientInput[]
+    upsert?: SurgeryUpsertWithWhereUniqueWithoutPatientInput | SurgeryUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: SurgeryCreateManyPatientInputEnvelope
+    set?: SurgeryWhereUniqueInput | SurgeryWhereUniqueInput[]
+    disconnect?: SurgeryWhereUniqueInput | SurgeryWhereUniqueInput[]
+    delete?: SurgeryWhereUniqueInput | SurgeryWhereUniqueInput[]
+    connect?: SurgeryWhereUniqueInput | SurgeryWhereUniqueInput[]
+    update?: SurgeryUpdateWithWhereUniqueWithoutPatientInput | SurgeryUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: SurgeryUpdateManyWithWhereWithoutPatientInput | SurgeryUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: SurgeryScalarWhereInput | SurgeryScalarWhereInput[]
+  }
+
+  export type EyeExaminationUncheckedUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<EyeExaminationCreateWithoutPatientInput, EyeExaminationUncheckedCreateWithoutPatientInput> | EyeExaminationCreateWithoutPatientInput[] | EyeExaminationUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: EyeExaminationCreateOrConnectWithoutPatientInput | EyeExaminationCreateOrConnectWithoutPatientInput[]
+    upsert?: EyeExaminationUpsertWithWhereUniqueWithoutPatientInput | EyeExaminationUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: EyeExaminationCreateManyPatientInputEnvelope
+    set?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    disconnect?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    delete?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    connect?: EyeExaminationWhereUniqueInput | EyeExaminationWhereUniqueInput[]
+    update?: EyeExaminationUpdateWithWhereUniqueWithoutPatientInput | EyeExaminationUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: EyeExaminationUpdateManyWithWhereWithoutPatientInput | EyeExaminationUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: EyeExaminationScalarWhereInput | EyeExaminationScalarWhereInput[]
+  }
+
+  export type OpticalPrescriptionUncheckedUpdateManyWithoutPatientNestedInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutPatientInput, OpticalPrescriptionUncheckedCreateWithoutPatientInput> | OpticalPrescriptionCreateWithoutPatientInput[] | OpticalPrescriptionUncheckedCreateWithoutPatientInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutPatientInput | OpticalPrescriptionCreateOrConnectWithoutPatientInput[]
+    upsert?: OpticalPrescriptionUpsertWithWhereUniqueWithoutPatientInput | OpticalPrescriptionUpsertWithWhereUniqueWithoutPatientInput[]
+    createMany?: OpticalPrescriptionCreateManyPatientInputEnvelope
+    set?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    disconnect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    delete?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    update?: OpticalPrescriptionUpdateWithWhereUniqueWithoutPatientInput | OpticalPrescriptionUpdateWithWhereUniqueWithoutPatientInput[]
+    updateMany?: OpticalPrescriptionUpdateManyWithWhereWithoutPatientInput | OpticalPrescriptionUpdateManyWithWhereWithoutPatientInput[]
+    deleteMany?: OpticalPrescriptionScalarWhereInput | OpticalPrescriptionScalarWhereInput[]
+  }
+
   export type BillingUncheckedUpdateManyWithoutPatientNestedInput = {
     create?: XOR<BillingCreateWithoutPatientInput, BillingUncheckedCreateWithoutPatientInput> | BillingCreateWithoutPatientInput[] | BillingUncheckedCreateWithoutPatientInput[]
     connectOrCreate?: BillingCreateOrConnectWithoutPatientInput | BillingCreateOrConnectWithoutPatientInput[]
@@ -34163,6 +40519,115 @@ export namespace Prisma {
     update?: FollowUpUpdateWithWhereUniqueWithoutPatientInput | FollowUpUpdateWithWhereUniqueWithoutPatientInput[]
     updateMany?: FollowUpUpdateManyWithWhereWithoutPatientInput | FollowUpUpdateManyWithWhereWithoutPatientInput[]
     deleteMany?: FollowUpScalarWhereInput | FollowUpScalarWhereInput[]
+  }
+
+  export type OpticalPrescriptionCreatecoatingsInput = {
+    set: string[]
+  }
+
+  export type BranchCreateNestedOneWithoutOpticalPrescriptionsInput = {
+    create?: XOR<BranchCreateWithoutOpticalPrescriptionsInput, BranchUncheckedCreateWithoutOpticalPrescriptionsInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutOpticalPrescriptionsInput
+    connect?: BranchWhereUniqueInput
+  }
+
+  export type PatientCreateNestedOneWithoutOpticalPrescriptionsInput = {
+    create?: XOR<PatientCreateWithoutOpticalPrescriptionsInput, PatientUncheckedCreateWithoutOpticalPrescriptionsInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutOpticalPrescriptionsInput
+    connect?: PatientWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutCreatedOpticalPrescriptionsInput = {
+    create?: XOR<UserCreateWithoutCreatedOpticalPrescriptionsInput, UserUncheckedCreateWithoutCreatedOpticalPrescriptionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCreatedOpticalPrescriptionsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type OpticalItemCreateNestedOneWithoutFramePrescriptionsInput = {
+    create?: XOR<OpticalItemCreateWithoutFramePrescriptionsInput, OpticalItemUncheckedCreateWithoutFramePrescriptionsInput>
+    connectOrCreate?: OpticalItemCreateOrConnectWithoutFramePrescriptionsInput
+    connect?: OpticalItemWhereUniqueInput
+  }
+
+  export type OpticalItemCreateNestedOneWithoutLensPrescriptionsInput = {
+    create?: XOR<OpticalItemCreateWithoutLensPrescriptionsInput, OpticalItemUncheckedCreateWithoutLensPrescriptionsInput>
+    connectOrCreate?: OpticalItemCreateOrConnectWithoutLensPrescriptionsInput
+    connect?: OpticalItemWhereUniqueInput
+  }
+
+  export type EnumOpticalPrescriptionTypeFieldUpdateOperationsInput = {
+    set?: $Enums.OpticalPrescriptionType
+  }
+
+  export type EnumOpticalPrescriptionStatusFieldUpdateOperationsInput = {
+    set?: $Enums.OpticalPrescriptionStatus
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type OpticalPrescriptionUpdatecoatingsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type BranchUpdateOneRequiredWithoutOpticalPrescriptionsNestedInput = {
+    create?: XOR<BranchCreateWithoutOpticalPrescriptionsInput, BranchUncheckedCreateWithoutOpticalPrescriptionsInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutOpticalPrescriptionsInput
+    upsert?: BranchUpsertWithoutOpticalPrescriptionsInput
+    connect?: BranchWhereUniqueInput
+    update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutOpticalPrescriptionsInput, BranchUpdateWithoutOpticalPrescriptionsInput>, BranchUncheckedUpdateWithoutOpticalPrescriptionsInput>
+  }
+
+  export type PatientUpdateOneRequiredWithoutOpticalPrescriptionsNestedInput = {
+    create?: XOR<PatientCreateWithoutOpticalPrescriptionsInput, PatientUncheckedCreateWithoutOpticalPrescriptionsInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutOpticalPrescriptionsInput
+    upsert?: PatientUpsertWithoutOpticalPrescriptionsInput
+    connect?: PatientWhereUniqueInput
+    update?: XOR<XOR<PatientUpdateToOneWithWhereWithoutOpticalPrescriptionsInput, PatientUpdateWithoutOpticalPrescriptionsInput>, PatientUncheckedUpdateWithoutOpticalPrescriptionsInput>
+  }
+
+  export type UserUpdateOneWithoutCreatedOpticalPrescriptionsNestedInput = {
+    create?: XOR<UserCreateWithoutCreatedOpticalPrescriptionsInput, UserUncheckedCreateWithoutCreatedOpticalPrescriptionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCreatedOpticalPrescriptionsInput
+    upsert?: UserUpsertWithoutCreatedOpticalPrescriptionsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutCreatedOpticalPrescriptionsInput, UserUpdateWithoutCreatedOpticalPrescriptionsInput>, UserUncheckedUpdateWithoutCreatedOpticalPrescriptionsInput>
+  }
+
+  export type OpticalItemUpdateOneWithoutFramePrescriptionsNestedInput = {
+    create?: XOR<OpticalItemCreateWithoutFramePrescriptionsInput, OpticalItemUncheckedCreateWithoutFramePrescriptionsInput>
+    connectOrCreate?: OpticalItemCreateOrConnectWithoutFramePrescriptionsInput
+    upsert?: OpticalItemUpsertWithoutFramePrescriptionsInput
+    disconnect?: OpticalItemWhereInput | boolean
+    delete?: OpticalItemWhereInput | boolean
+    connect?: OpticalItemWhereUniqueInput
+    update?: XOR<XOR<OpticalItemUpdateToOneWithWhereWithoutFramePrescriptionsInput, OpticalItemUpdateWithoutFramePrescriptionsInput>, OpticalItemUncheckedUpdateWithoutFramePrescriptionsInput>
+  }
+
+  export type OpticalItemUpdateOneWithoutLensPrescriptionsNestedInput = {
+    create?: XOR<OpticalItemCreateWithoutLensPrescriptionsInput, OpticalItemUncheckedCreateWithoutLensPrescriptionsInput>
+    connectOrCreate?: OpticalItemCreateOrConnectWithoutLensPrescriptionsInput
+    upsert?: OpticalItemUpsertWithoutLensPrescriptionsInput
+    disconnect?: OpticalItemWhereInput | boolean
+    delete?: OpticalItemWhereInput | boolean
+    connect?: OpticalItemWhereUniqueInput
+    update?: XOR<XOR<OpticalItemUpdateToOneWithWhereWithoutLensPrescriptionsInput, OpticalItemUpdateWithoutLensPrescriptionsInput>, OpticalItemUncheckedUpdateWithoutLensPrescriptionsInput>
   }
 
   export type BranchCreateNestedOneWithoutAppointmentsInput = {
@@ -34423,6 +40888,48 @@ export namespace Prisma {
     deleteMany?: FollowUpScalarWhereInput | FollowUpScalarWhereInput[]
   }
 
+  export type BranchCreateNestedOneWithoutEyeExaminationsInput = {
+    create?: XOR<BranchCreateWithoutEyeExaminationsInput, BranchUncheckedCreateWithoutEyeExaminationsInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutEyeExaminationsInput
+    connect?: BranchWhereUniqueInput
+  }
+
+  export type PatientCreateNestedOneWithoutEyeExaminationsInput = {
+    create?: XOR<PatientCreateWithoutEyeExaminationsInput, PatientUncheckedCreateWithoutEyeExaminationsInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutEyeExaminationsInput
+    connect?: PatientWhereUniqueInput
+  }
+
+  export type DoctorCreateNestedOneWithoutEyeExaminationsInput = {
+    create?: XOR<DoctorCreateWithoutEyeExaminationsInput, DoctorUncheckedCreateWithoutEyeExaminationsInput>
+    connectOrCreate?: DoctorCreateOrConnectWithoutEyeExaminationsInput
+    connect?: DoctorWhereUniqueInput
+  }
+
+  export type BranchUpdateOneRequiredWithoutEyeExaminationsNestedInput = {
+    create?: XOR<BranchCreateWithoutEyeExaminationsInput, BranchUncheckedCreateWithoutEyeExaminationsInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutEyeExaminationsInput
+    upsert?: BranchUpsertWithoutEyeExaminationsInput
+    connect?: BranchWhereUniqueInput
+    update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutEyeExaminationsInput, BranchUpdateWithoutEyeExaminationsInput>, BranchUncheckedUpdateWithoutEyeExaminationsInput>
+  }
+
+  export type PatientUpdateOneRequiredWithoutEyeExaminationsNestedInput = {
+    create?: XOR<PatientCreateWithoutEyeExaminationsInput, PatientUncheckedCreateWithoutEyeExaminationsInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutEyeExaminationsInput
+    upsert?: PatientUpsertWithoutEyeExaminationsInput
+    connect?: PatientWhereUniqueInput
+    update?: XOR<XOR<PatientUpdateToOneWithWhereWithoutEyeExaminationsInput, PatientUpdateWithoutEyeExaminationsInput>, PatientUncheckedUpdateWithoutEyeExaminationsInput>
+  }
+
+  export type DoctorUpdateOneRequiredWithoutEyeExaminationsNestedInput = {
+    create?: XOR<DoctorCreateWithoutEyeExaminationsInput, DoctorUncheckedCreateWithoutEyeExaminationsInput>
+    connectOrCreate?: DoctorCreateOrConnectWithoutEyeExaminationsInput
+    upsert?: DoctorUpsertWithoutEyeExaminationsInput
+    connect?: DoctorWhereUniqueInput
+    update?: XOR<XOR<DoctorUpdateToOneWithWhereWithoutEyeExaminationsInput, DoctorUpdateWithoutEyeExaminationsInput>, DoctorUncheckedUpdateWithoutEyeExaminationsInput>
+  }
+
   export type AppointmentCreateNestedOneWithoutErExaminationInput = {
     create?: XOR<AppointmentCreateWithoutErExaminationInput, AppointmentUncheckedCreateWithoutErExaminationInput>
     connectOrCreate?: AppointmentCreateOrConnectWithoutErExaminationInput
@@ -34433,14 +40940,6 @@ export namespace Prisma {
     create?: XOR<UserCreateWithoutRecordedERExamsInput, UserUncheckedCreateWithoutRecordedERExamsInput>
     connectOrCreate?: UserCreateOrConnectWithoutRecordedERExamsInput
     connect?: UserWhereUniqueInput
-  }
-
-  export type NullableDecimalFieldUpdateOperationsInput = {
-    set?: Decimal | DecimalJsLike | number | string | null
-    increment?: Decimal | DecimalJsLike | number | string
-    decrement?: Decimal | DecimalJsLike | number | string
-    multiply?: Decimal | DecimalJsLike | number | string
-    divide?: Decimal | DecimalJsLike | number | string
   }
 
   export type AppointmentUpdateOneRequiredWithoutErExaminationNestedInput = {
@@ -34509,14 +41008,6 @@ export namespace Prisma {
     connectOrCreate?: FollowUpCreateOrConnectWithoutClinicalExaminationInput | FollowUpCreateOrConnectWithoutClinicalExaminationInput[]
     createMany?: FollowUpCreateManyClinicalExaminationInputEnvelope
     connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
-  }
-
-  export type NullableIntFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type AppointmentUpdateOneRequiredWithoutClinicalExaminationNestedInput = {
@@ -34623,6 +41114,12 @@ export namespace Prisma {
     connect?: BranchWhereUniqueInput
   }
 
+  export type PatientCreateNestedOneWithoutSurgeriesInput = {
+    create?: XOR<PatientCreateWithoutSurgeriesInput, PatientUncheckedCreateWithoutSurgeriesInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutSurgeriesInput
+    connect?: PatientWhereUniqueInput
+  }
+
   export type DoctorCreateNestedOneWithoutSurgeriesInput = {
     create?: XOR<DoctorCreateWithoutSurgeriesInput, DoctorUncheckedCreateWithoutSurgeriesInput>
     connectOrCreate?: DoctorCreateOrConnectWithoutSurgeriesInput
@@ -34657,10 +41154,12 @@ export namespace Prisma {
     connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
   }
 
-  export type ClinicalExaminationUpdateOneRequiredWithoutSurgeryNestedInput = {
+  export type ClinicalExaminationUpdateOneWithoutSurgeryNestedInput = {
     create?: XOR<ClinicalExaminationCreateWithoutSurgeryInput, ClinicalExaminationUncheckedCreateWithoutSurgeryInput>
     connectOrCreate?: ClinicalExaminationCreateOrConnectWithoutSurgeryInput
     upsert?: ClinicalExaminationUpsertWithoutSurgeryInput
+    disconnect?: ClinicalExaminationWhereInput | boolean
+    delete?: ClinicalExaminationWhereInput | boolean
     connect?: ClinicalExaminationWhereUniqueInput
     update?: XOR<XOR<ClinicalExaminationUpdateToOneWithWhereWithoutSurgeryInput, ClinicalExaminationUpdateWithoutSurgeryInput>, ClinicalExaminationUncheckedUpdateWithoutSurgeryInput>
   }
@@ -34671,6 +41170,14 @@ export namespace Prisma {
     upsert?: BranchUpsertWithoutSurgeriesInput
     connect?: BranchWhereUniqueInput
     update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutSurgeriesInput, BranchUpdateWithoutSurgeriesInput>, BranchUncheckedUpdateWithoutSurgeriesInput>
+  }
+
+  export type PatientUpdateOneRequiredWithoutSurgeriesNestedInput = {
+    create?: XOR<PatientCreateWithoutSurgeriesInput, PatientUncheckedCreateWithoutSurgeriesInput>
+    connectOrCreate?: PatientCreateOrConnectWithoutSurgeriesInput
+    upsert?: PatientUpsertWithoutSurgeriesInput
+    connect?: PatientWhereUniqueInput
+    update?: XOR<XOR<PatientUpdateToOneWithWhereWithoutSurgeriesInput, PatientUpdateWithoutSurgeriesInput>, PatientUncheckedUpdateWithoutSurgeriesInput>
   }
 
   export type DoctorUpdateOneRequiredWithoutSurgeriesNestedInput = {
@@ -34781,14 +41288,6 @@ export namespace Prisma {
     connectOrCreate?: FollowUpCreateOrConnectWithoutPrescriptionInput | FollowUpCreateOrConnectWithoutPrescriptionInput[]
     createMany?: FollowUpCreateManyPrescriptionInputEnvelope
     connect?: FollowUpWhereUniqueInput | FollowUpWhereUniqueInput[]
-  }
-
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type AppointmentUpdateOneRequiredWithoutPrescriptionsNestedInput = {
@@ -35020,11 +41519,39 @@ export namespace Prisma {
     connect?: OpticalStockTransactionWhereUniqueInput | OpticalStockTransactionWhereUniqueInput[]
   }
 
+  export type OpticalPrescriptionCreateNestedManyWithoutFrameItemInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutFrameItemInput, OpticalPrescriptionUncheckedCreateWithoutFrameItemInput> | OpticalPrescriptionCreateWithoutFrameItemInput[] | OpticalPrescriptionUncheckedCreateWithoutFrameItemInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutFrameItemInput | OpticalPrescriptionCreateOrConnectWithoutFrameItemInput[]
+    createMany?: OpticalPrescriptionCreateManyFrameItemInputEnvelope
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+  }
+
+  export type OpticalPrescriptionCreateNestedManyWithoutLensItemInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutLensItemInput, OpticalPrescriptionUncheckedCreateWithoutLensItemInput> | OpticalPrescriptionCreateWithoutLensItemInput[] | OpticalPrescriptionUncheckedCreateWithoutLensItemInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutLensItemInput | OpticalPrescriptionCreateOrConnectWithoutLensItemInput[]
+    createMany?: OpticalPrescriptionCreateManyLensItemInputEnvelope
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+  }
+
   export type OpticalStockTransactionUncheckedCreateNestedManyWithoutOpticalItemInput = {
     create?: XOR<OpticalStockTransactionCreateWithoutOpticalItemInput, OpticalStockTransactionUncheckedCreateWithoutOpticalItemInput> | OpticalStockTransactionCreateWithoutOpticalItemInput[] | OpticalStockTransactionUncheckedCreateWithoutOpticalItemInput[]
     connectOrCreate?: OpticalStockTransactionCreateOrConnectWithoutOpticalItemInput | OpticalStockTransactionCreateOrConnectWithoutOpticalItemInput[]
     createMany?: OpticalStockTransactionCreateManyOpticalItemInputEnvelope
     connect?: OpticalStockTransactionWhereUniqueInput | OpticalStockTransactionWhereUniqueInput[]
+  }
+
+  export type OpticalPrescriptionUncheckedCreateNestedManyWithoutFrameItemInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutFrameItemInput, OpticalPrescriptionUncheckedCreateWithoutFrameItemInput> | OpticalPrescriptionCreateWithoutFrameItemInput[] | OpticalPrescriptionUncheckedCreateWithoutFrameItemInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutFrameItemInput | OpticalPrescriptionCreateOrConnectWithoutFrameItemInput[]
+    createMany?: OpticalPrescriptionCreateManyFrameItemInputEnvelope
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+  }
+
+  export type OpticalPrescriptionUncheckedCreateNestedManyWithoutLensItemInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutLensItemInput, OpticalPrescriptionUncheckedCreateWithoutLensItemInput> | OpticalPrescriptionCreateWithoutLensItemInput[] | OpticalPrescriptionUncheckedCreateWithoutLensItemInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutLensItemInput | OpticalPrescriptionCreateOrConnectWithoutLensItemInput[]
+    createMany?: OpticalPrescriptionCreateManyLensItemInputEnvelope
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
   }
 
   export type BranchUpdateOneRequiredWithoutOpticalItemsNestedInput = {
@@ -35059,6 +41586,34 @@ export namespace Prisma {
     deleteMany?: OpticalStockTransactionScalarWhereInput | OpticalStockTransactionScalarWhereInput[]
   }
 
+  export type OpticalPrescriptionUpdateManyWithoutFrameItemNestedInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutFrameItemInput, OpticalPrescriptionUncheckedCreateWithoutFrameItemInput> | OpticalPrescriptionCreateWithoutFrameItemInput[] | OpticalPrescriptionUncheckedCreateWithoutFrameItemInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutFrameItemInput | OpticalPrescriptionCreateOrConnectWithoutFrameItemInput[]
+    upsert?: OpticalPrescriptionUpsertWithWhereUniqueWithoutFrameItemInput | OpticalPrescriptionUpsertWithWhereUniqueWithoutFrameItemInput[]
+    createMany?: OpticalPrescriptionCreateManyFrameItemInputEnvelope
+    set?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    disconnect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    delete?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    update?: OpticalPrescriptionUpdateWithWhereUniqueWithoutFrameItemInput | OpticalPrescriptionUpdateWithWhereUniqueWithoutFrameItemInput[]
+    updateMany?: OpticalPrescriptionUpdateManyWithWhereWithoutFrameItemInput | OpticalPrescriptionUpdateManyWithWhereWithoutFrameItemInput[]
+    deleteMany?: OpticalPrescriptionScalarWhereInput | OpticalPrescriptionScalarWhereInput[]
+  }
+
+  export type OpticalPrescriptionUpdateManyWithoutLensItemNestedInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutLensItemInput, OpticalPrescriptionUncheckedCreateWithoutLensItemInput> | OpticalPrescriptionCreateWithoutLensItemInput[] | OpticalPrescriptionUncheckedCreateWithoutLensItemInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutLensItemInput | OpticalPrescriptionCreateOrConnectWithoutLensItemInput[]
+    upsert?: OpticalPrescriptionUpsertWithWhereUniqueWithoutLensItemInput | OpticalPrescriptionUpsertWithWhereUniqueWithoutLensItemInput[]
+    createMany?: OpticalPrescriptionCreateManyLensItemInputEnvelope
+    set?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    disconnect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    delete?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    update?: OpticalPrescriptionUpdateWithWhereUniqueWithoutLensItemInput | OpticalPrescriptionUpdateWithWhereUniqueWithoutLensItemInput[]
+    updateMany?: OpticalPrescriptionUpdateManyWithWhereWithoutLensItemInput | OpticalPrescriptionUpdateManyWithWhereWithoutLensItemInput[]
+    deleteMany?: OpticalPrescriptionScalarWhereInput | OpticalPrescriptionScalarWhereInput[]
+  }
+
   export type OpticalStockTransactionUncheckedUpdateManyWithoutOpticalItemNestedInput = {
     create?: XOR<OpticalStockTransactionCreateWithoutOpticalItemInput, OpticalStockTransactionUncheckedCreateWithoutOpticalItemInput> | OpticalStockTransactionCreateWithoutOpticalItemInput[] | OpticalStockTransactionUncheckedCreateWithoutOpticalItemInput[]
     connectOrCreate?: OpticalStockTransactionCreateOrConnectWithoutOpticalItemInput | OpticalStockTransactionCreateOrConnectWithoutOpticalItemInput[]
@@ -35071,6 +41626,34 @@ export namespace Prisma {
     update?: OpticalStockTransactionUpdateWithWhereUniqueWithoutOpticalItemInput | OpticalStockTransactionUpdateWithWhereUniqueWithoutOpticalItemInput[]
     updateMany?: OpticalStockTransactionUpdateManyWithWhereWithoutOpticalItemInput | OpticalStockTransactionUpdateManyWithWhereWithoutOpticalItemInput[]
     deleteMany?: OpticalStockTransactionScalarWhereInput | OpticalStockTransactionScalarWhereInput[]
+  }
+
+  export type OpticalPrescriptionUncheckedUpdateManyWithoutFrameItemNestedInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutFrameItemInput, OpticalPrescriptionUncheckedCreateWithoutFrameItemInput> | OpticalPrescriptionCreateWithoutFrameItemInput[] | OpticalPrescriptionUncheckedCreateWithoutFrameItemInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutFrameItemInput | OpticalPrescriptionCreateOrConnectWithoutFrameItemInput[]
+    upsert?: OpticalPrescriptionUpsertWithWhereUniqueWithoutFrameItemInput | OpticalPrescriptionUpsertWithWhereUniqueWithoutFrameItemInput[]
+    createMany?: OpticalPrescriptionCreateManyFrameItemInputEnvelope
+    set?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    disconnect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    delete?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    update?: OpticalPrescriptionUpdateWithWhereUniqueWithoutFrameItemInput | OpticalPrescriptionUpdateWithWhereUniqueWithoutFrameItemInput[]
+    updateMany?: OpticalPrescriptionUpdateManyWithWhereWithoutFrameItemInput | OpticalPrescriptionUpdateManyWithWhereWithoutFrameItemInput[]
+    deleteMany?: OpticalPrescriptionScalarWhereInput | OpticalPrescriptionScalarWhereInput[]
+  }
+
+  export type OpticalPrescriptionUncheckedUpdateManyWithoutLensItemNestedInput = {
+    create?: XOR<OpticalPrescriptionCreateWithoutLensItemInput, OpticalPrescriptionUncheckedCreateWithoutLensItemInput> | OpticalPrescriptionCreateWithoutLensItemInput[] | OpticalPrescriptionUncheckedCreateWithoutLensItemInput[]
+    connectOrCreate?: OpticalPrescriptionCreateOrConnectWithoutLensItemInput | OpticalPrescriptionCreateOrConnectWithoutLensItemInput[]
+    upsert?: OpticalPrescriptionUpsertWithWhereUniqueWithoutLensItemInput | OpticalPrescriptionUpsertWithWhereUniqueWithoutLensItemInput[]
+    createMany?: OpticalPrescriptionCreateManyLensItemInputEnvelope
+    set?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    disconnect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    delete?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    connect?: OpticalPrescriptionWhereUniqueInput | OpticalPrescriptionWhereUniqueInput[]
+    update?: OpticalPrescriptionUpdateWithWhereUniqueWithoutLensItemInput | OpticalPrescriptionUpdateWithWhereUniqueWithoutLensItemInput[]
+    updateMany?: OpticalPrescriptionUpdateManyWithWhereWithoutLensItemInput | OpticalPrescriptionUpdateManyWithWhereWithoutLensItemInput[]
+    deleteMany?: OpticalPrescriptionScalarWhereInput | OpticalPrescriptionScalarWhereInput[]
   }
 
   export type OpticalItemCreateNestedOneWithoutTransactionsInput = {
@@ -35592,6 +42175,121 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
+  export type NestedDecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumOpticalPrescriptionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.OpticalPrescriptionType | EnumOpticalPrescriptionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.OpticalPrescriptionType[] | ListEnumOpticalPrescriptionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.OpticalPrescriptionType[] | ListEnumOpticalPrescriptionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumOpticalPrescriptionTypeFilter<$PrismaModel> | $Enums.OpticalPrescriptionType
+  }
+
+  export type NestedEnumOpticalPrescriptionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.OpticalPrescriptionStatus | EnumOpticalPrescriptionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.OpticalPrescriptionStatus[] | ListEnumOpticalPrescriptionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.OpticalPrescriptionStatus[] | ListEnumOpticalPrescriptionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumOpticalPrescriptionStatusFilter<$PrismaModel> | $Enums.OpticalPrescriptionStatus
+  }
+
+  export type NestedEnumOpticalPrescriptionTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.OpticalPrescriptionType | EnumOpticalPrescriptionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.OpticalPrescriptionType[] | ListEnumOpticalPrescriptionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.OpticalPrescriptionType[] | ListEnumOpticalPrescriptionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumOpticalPrescriptionTypeWithAggregatesFilter<$PrismaModel> | $Enums.OpticalPrescriptionType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumOpticalPrescriptionTypeFilter<$PrismaModel>
+    _max?: NestedEnumOpticalPrescriptionTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumOpticalPrescriptionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.OpticalPrescriptionStatus | EnumOpticalPrescriptionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.OpticalPrescriptionStatus[] | ListEnumOpticalPrescriptionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.OpticalPrescriptionStatus[] | ListEnumOpticalPrescriptionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumOpticalPrescriptionStatusWithAggregatesFilter<$PrismaModel> | $Enums.OpticalPrescriptionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumOpticalPrescriptionStatusFilter<$PrismaModel>
+    _max?: NestedEnumOpticalPrescriptionStatusFilter<$PrismaModel>
+  }
+
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedEnumAppointmentStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.AppointmentStatus | EnumAppointmentStatusFieldRefInput<$PrismaModel>
     in?: $Enums.AppointmentStatus[] | ListEnumAppointmentStatusFieldRefInput<$PrismaModel>
@@ -35635,86 +42333,28 @@ export namespace Prisma {
     _min?: NestedDecimalFilter<$PrismaModel>
     _max?: NestedDecimalFilter<$PrismaModel>
   }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
 
-  export type NestedDecimalNullableFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
-  }
-
-  export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedDecimalNullableFilter<$PrismaModel>
-    _sum?: NestedDecimalNullableFilter<$PrismaModel>
-    _min?: NestedDecimalNullableFilter<$PrismaModel>
-    _max?: NestedDecimalNullableFilter<$PrismaModel>
-  }
-
-  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
-  export type NestedFloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
-  }
-
-  export type NestedFloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type NestedEnumServiceTypeFilter<$PrismaModel = never> = {
@@ -35820,6 +42460,7 @@ export namespace Prisma {
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
     activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserUncheckedCreateWithoutRoleInput = {
@@ -35844,6 +42485,7 @@ export namespace Prisma {
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
     activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserCreateOrConnectWithoutRoleInput = {
@@ -35914,6 +42556,7 @@ export namespace Prisma {
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
     activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserUncheckedCreateWithoutBranchInput = {
@@ -35938,6 +42581,7 @@ export namespace Prisma {
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
     activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserCreateOrConnectWithoutBranchInput = {
@@ -35983,8 +42627,10 @@ export namespace Prisma {
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutDoctorInput
     appointments?: AppointmentCreateNestedManyWithoutDoctorInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutDoctorInput
     examinedClinicalExams?: ClinicalExaminationCreateNestedManyWithoutExaminedByInput
     surgeries?: SurgeryCreateNestedManyWithoutSurgeonInput
+    assignedPatients?: PatientCreateNestedManyWithoutAssignedDoctorInput
   }
 
   export type DoctorUncheckedCreateWithoutBranchInput = {
@@ -35996,8 +42642,10 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutDoctorInput
     examinedClinicalExams?: ClinicalExaminationUncheckedCreateNestedManyWithoutExaminedByInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutSurgeonInput
+    assignedPatients?: PatientUncheckedCreateNestedManyWithoutAssignedDoctorInput
   }
 
   export type DoctorCreateOrConnectWithoutBranchInput = {
@@ -36012,30 +42660,72 @@ export namespace Prisma {
 
   export type PatientCreateWithoutBranchInput = {
     id?: string
+    patientNumber?: string | null
     fullName: string
+    firstName?: string | null
+    lastName?: string | null
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
     email?: string | null
     address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    assignedDoctor?: DoctorCreateNestedOneWithoutAssignedPatientsInput
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
+    surgeries?: SurgeryCreateNestedManyWithoutPatientInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutPatientInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutPatientInput
     billings?: BillingCreateNestedManyWithoutPatientInput
     followUps?: FollowUpCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutBranchInput = {
     id?: string
+    patientNumber?: string | null
     fullName: string
+    firstName?: string | null
+    lastName?: string | null
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
     email?: string | null
     address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
+    assignedDoctorId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
+    surgeries?: SurgeryUncheckedCreateNestedManyWithoutPatientInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutPatientInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutPatientInput
     billings?: BillingUncheckedCreateNestedManyWithoutPatientInput
     followUps?: FollowUpUncheckedCreateNestedManyWithoutPatientInput
   }
@@ -36056,6 +42746,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     patient: PatientCreateNestedOneWithoutAppointmentsInput
@@ -36074,6 +42767,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     patientId: string
     doctorId: string
     createdById: string
@@ -36096,17 +42792,111 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type EyeExaminationCreateWithoutBranchInput = {
+    id?: string
+    chiefComplaint: string
+    historyOfPresentIllness?: string | null
+    vaScale?: string
+    vaUnaidedOD?: string | null
+    vaUnaidedOS?: string | null
+    vaUnaidedNearOD?: string | null
+    vaUnaidedNearOS?: string | null
+    vaBcvaOD?: string | null
+    vaBcvaOS?: string | null
+    vaBcvaNearOD?: string | null
+    vaBcvaNearOS?: string | null
+    vaPinholeOD?: string | null
+    vaPinholeOS?: string | null
+    refractionSphereOD?: string | null
+    refractionSphereOS?: string | null
+    refractionCylinderOD?: string | null
+    refractionCylinderOS?: string | null
+    refractionAxisOD?: string | null
+    refractionAxisOS?: string | null
+    iopOD?: number | null
+    iopOS?: number | null
+    iopMethod?: string | null
+    iopTime?: string | null
+    targetIopOD?: number | null
+    targetIopOS?: number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: string | null
+    plan?: string | null
+    followUpDate?: Date | string | null
+    nextVisitReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutEyeExaminationsInput
+    doctor: DoctorCreateNestedOneWithoutEyeExaminationsInput
+  }
+
+  export type EyeExaminationUncheckedCreateWithoutBranchInput = {
+    id?: string
+    patientId: string
+    doctorId: string
+    chiefComplaint: string
+    historyOfPresentIllness?: string | null
+    vaScale?: string
+    vaUnaidedOD?: string | null
+    vaUnaidedOS?: string | null
+    vaUnaidedNearOD?: string | null
+    vaUnaidedNearOS?: string | null
+    vaBcvaOD?: string | null
+    vaBcvaOS?: string | null
+    vaBcvaNearOD?: string | null
+    vaBcvaNearOS?: string | null
+    vaPinholeOD?: string | null
+    vaPinholeOS?: string | null
+    refractionSphereOD?: string | null
+    refractionSphereOS?: string | null
+    refractionCylinderOD?: string | null
+    refractionCylinderOS?: string | null
+    refractionAxisOD?: string | null
+    refractionAxisOS?: string | null
+    iopOD?: number | null
+    iopOS?: number | null
+    iopMethod?: string | null
+    iopTime?: string | null
+    targetIopOD?: number | null
+    targetIopOS?: number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: string | null
+    plan?: string | null
+    followUpDate?: Date | string | null
+    nextVisitReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type EyeExaminationCreateOrConnectWithoutBranchInput = {
+    where: EyeExaminationWhereUniqueInput
+    create: XOR<EyeExaminationCreateWithoutBranchInput, EyeExaminationUncheckedCreateWithoutBranchInput>
+  }
+
+  export type EyeExaminationCreateManyBranchInputEnvelope = {
+    data: EyeExaminationCreateManyBranchInput | EyeExaminationCreateManyBranchInput[]
+    skipDuplicates?: boolean
+  }
+
   export type SurgeryCreateWithoutBranchInput = {
     id?: string
-    eyeSide: string
+    eye: string
     surgeryType: string
-    surgeryDate: Date | string
-    cost: Decimal | DecimalJsLike | number | string
+    procedure?: string | null
+    anesthesiaType?: string | null
+    date: Date | string
+    time?: string | null
+    operatingRoom?: string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
     nextFollowUpDate?: Date | string | null
     createdAt?: Date | string
-    clinicalExam: ClinicalExaminationCreateNestedOneWithoutSurgeryInput
+    clinicalExam?: ClinicalExaminationCreateNestedOneWithoutSurgeryInput
+    patient: PatientCreateNestedOneWithoutSurgeriesInput
     surgeon: DoctorCreateNestedOneWithoutSurgeriesInput
     billings?: BillingCreateNestedManyWithoutSurgeryInput
     followUps?: FollowUpCreateNestedManyWithoutSurgeryInput
@@ -36114,11 +42904,17 @@ export namespace Prisma {
 
   export type SurgeryUncheckedCreateWithoutBranchInput = {
     id?: string
-    examId: string
-    eyeSide: string
+    examId?: string | null
+    patientId: string
+    eye: string
     surgeryType: string
-    surgeryDate: Date | string
-    cost: Decimal | DecimalJsLike | number | string
+    procedure?: string | null
+    anesthesiaType?: string | null
+    date: Date | string
+    time?: string | null
+    operatingRoom?: string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
     nextFollowUpDate?: Date | string | null
@@ -36173,6 +42969,80 @@ export namespace Prisma {
 
   export type PrescriptionCreateManyBranchInputEnvelope = {
     data: PrescriptionCreateManyBranchInput | PrescriptionCreateManyBranchInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type OpticalPrescriptionCreateWithoutBranchInput = {
+    id?: string
+    type?: $Enums.OpticalPrescriptionType
+    status?: $Enums.OpticalPrescriptionStatus
+    validityMonths?: number
+    expiryDate: Date | string
+    dispensedAt?: Date | string | null
+    notes?: string | null
+    odSphere?: string | null
+    odCylinder?: string | null
+    odAxis?: number | null
+    odAdd?: string | null
+    odPd?: number | null
+    odPrism?: string | null
+    osSphere?: string | null
+    osCylinder?: string | null
+    osAxis?: number | null
+    osAdd?: string | null
+    osPd?: number | null
+    osPrism?: string | null
+    lensType?: string | null
+    lensMaterial?: string | null
+    frameType?: string | null
+    coatings?: OpticalPrescriptionCreatecoatingsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    patient: PatientCreateNestedOneWithoutOpticalPrescriptionsInput
+    createdBy?: UserCreateNestedOneWithoutCreatedOpticalPrescriptionsInput
+    frameItem?: OpticalItemCreateNestedOneWithoutFramePrescriptionsInput
+    lensItem?: OpticalItemCreateNestedOneWithoutLensPrescriptionsInput
+  }
+
+  export type OpticalPrescriptionUncheckedCreateWithoutBranchInput = {
+    id?: string
+    patientId: string
+    createdById?: string | null
+    type?: $Enums.OpticalPrescriptionType
+    status?: $Enums.OpticalPrescriptionStatus
+    validityMonths?: number
+    expiryDate: Date | string
+    dispensedAt?: Date | string | null
+    notes?: string | null
+    odSphere?: string | null
+    odCylinder?: string | null
+    odAxis?: number | null
+    odAdd?: string | null
+    odPd?: number | null
+    odPrism?: string | null
+    osSphere?: string | null
+    osCylinder?: string | null
+    osAxis?: number | null
+    osAdd?: string | null
+    osPd?: number | null
+    osPrism?: string | null
+    lensType?: string | null
+    lensMaterial?: string | null
+    frameType?: string | null
+    coatings?: OpticalPrescriptionCreatecoatingsInput | string[]
+    frameItemId?: string | null
+    lensItemId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OpticalPrescriptionCreateOrConnectWithoutBranchInput = {
+    where: OpticalPrescriptionWhereUniqueInput
+    create: XOR<OpticalPrescriptionCreateWithoutBranchInput, OpticalPrescriptionUncheckedCreateWithoutBranchInput>
+  }
+
+  export type OpticalPrescriptionCreateManyBranchInputEnvelope = {
+    data: OpticalPrescriptionCreateManyBranchInput | OpticalPrescriptionCreateManyBranchInput[]
     skipDuplicates?: boolean
   }
 
@@ -36274,6 +43144,8 @@ export namespace Prisma {
     isActive?: boolean
     supplier?: SupplierCreateNestedOneWithoutOpticalItemsInput
     transactions?: OpticalStockTransactionCreateNestedManyWithoutOpticalItemInput
+    framePrescriptions?: OpticalPrescriptionCreateNestedManyWithoutFrameItemInput
+    lensPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutLensItemInput
   }
 
   export type OpticalItemUncheckedCreateWithoutBranchInput = {
@@ -36292,6 +43164,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     isActive?: boolean
     transactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutOpticalItemInput
+    framePrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutFrameItemInput
+    lensPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutLensItemInput
   }
 
   export type OpticalItemCreateOrConnectWithoutBranchInput = {
@@ -36586,12 +43460,30 @@ export namespace Prisma {
     OR?: PatientScalarWhereInput[]
     NOT?: PatientScalarWhereInput | PatientScalarWhereInput[]
     id?: StringFilter<"Patient"> | string
+    patientNumber?: StringNullableFilter<"Patient"> | string | null
     fullName?: StringFilter<"Patient"> | string
+    firstName?: StringNullableFilter<"Patient"> | string | null
+    lastName?: StringNullableFilter<"Patient"> | string | null
     gender?: StringNullableFilter<"Patient"> | string | null
     dateOfBirth?: DateTimeFilter<"Patient"> | Date | string
     phone?: StringFilter<"Patient"> | string
     email?: StringNullableFilter<"Patient"> | string | null
     address?: StringNullableFilter<"Patient"> | string | null
+    city?: StringNullableFilter<"Patient"> | string | null
+    state?: StringNullableFilter<"Patient"> | string | null
+    zipCode?: StringNullableFilter<"Patient"> | string | null
+    bloodGroup?: StringNullableFilter<"Patient"> | string | null
+    weight?: DecimalNullableFilter<"Patient"> | Decimal | DecimalJsLike | number | string | null
+    allergies?: StringNullableFilter<"Patient"> | string | null
+    chiefComplaint?: StringNullableFilter<"Patient"> | string | null
+    currentMedications?: StringNullableFilter<"Patient"> | string | null
+    medicalHistory?: StringNullableFilter<"Patient"> | string | null
+    familyMedicalHistory?: StringNullableFilter<"Patient"> | string | null
+    emergencyContactName?: StringNullableFilter<"Patient"> | string | null
+    emergencyContactRelationship?: StringNullableFilter<"Patient"> | string | null
+    emergencyContactPhone?: StringNullableFilter<"Patient"> | string | null
+    isActive?: BoolFilter<"Patient"> | boolean
+    assignedDoctorId?: StringNullableFilter<"Patient"> | string | null
     branchId?: StringFilter<"Patient"> | string
     createdAt?: DateTimeFilter<"Patient"> | Date | string
     updatedAt?: DateTimeFilter<"Patient"> | Date | string
@@ -36622,12 +43514,74 @@ export namespace Prisma {
     appointmentDate?: DateTimeFilter<"Appointment"> | Date | string
     status?: EnumAppointmentStatusFilter<"Appointment"> | $Enums.AppointmentStatus
     amount?: DecimalFilter<"Appointment"> | Decimal | DecimalJsLike | number | string
+    type?: StringNullableFilter<"Appointment"> | string | null
+    notes?: StringNullableFilter<"Appointment"> | string | null
+    location?: StringNullableFilter<"Appointment"> | string | null
     branchId?: StringFilter<"Appointment"> | string
     patientId?: StringFilter<"Appointment"> | string
     doctorId?: StringFilter<"Appointment"> | string
     createdById?: StringFilter<"Appointment"> | string
     createdAt?: DateTimeFilter<"Appointment"> | Date | string
     updatedAt?: DateTimeFilter<"Appointment"> | Date | string
+  }
+
+  export type EyeExaminationUpsertWithWhereUniqueWithoutBranchInput = {
+    where: EyeExaminationWhereUniqueInput
+    update: XOR<EyeExaminationUpdateWithoutBranchInput, EyeExaminationUncheckedUpdateWithoutBranchInput>
+    create: XOR<EyeExaminationCreateWithoutBranchInput, EyeExaminationUncheckedCreateWithoutBranchInput>
+  }
+
+  export type EyeExaminationUpdateWithWhereUniqueWithoutBranchInput = {
+    where: EyeExaminationWhereUniqueInput
+    data: XOR<EyeExaminationUpdateWithoutBranchInput, EyeExaminationUncheckedUpdateWithoutBranchInput>
+  }
+
+  export type EyeExaminationUpdateManyWithWhereWithoutBranchInput = {
+    where: EyeExaminationScalarWhereInput
+    data: XOR<EyeExaminationUpdateManyMutationInput, EyeExaminationUncheckedUpdateManyWithoutBranchInput>
+  }
+
+  export type EyeExaminationScalarWhereInput = {
+    AND?: EyeExaminationScalarWhereInput | EyeExaminationScalarWhereInput[]
+    OR?: EyeExaminationScalarWhereInput[]
+    NOT?: EyeExaminationScalarWhereInput | EyeExaminationScalarWhereInput[]
+    id?: StringFilter<"EyeExamination"> | string
+    branchId?: StringFilter<"EyeExamination"> | string
+    patientId?: StringFilter<"EyeExamination"> | string
+    doctorId?: StringFilter<"EyeExamination"> | string
+    chiefComplaint?: StringFilter<"EyeExamination"> | string
+    historyOfPresentIllness?: StringNullableFilter<"EyeExamination"> | string | null
+    vaScale?: StringFilter<"EyeExamination"> | string
+    vaUnaidedOD?: StringNullableFilter<"EyeExamination"> | string | null
+    vaUnaidedOS?: StringNullableFilter<"EyeExamination"> | string | null
+    vaUnaidedNearOD?: StringNullableFilter<"EyeExamination"> | string | null
+    vaUnaidedNearOS?: StringNullableFilter<"EyeExamination"> | string | null
+    vaBcvaOD?: StringNullableFilter<"EyeExamination"> | string | null
+    vaBcvaOS?: StringNullableFilter<"EyeExamination"> | string | null
+    vaBcvaNearOD?: StringNullableFilter<"EyeExamination"> | string | null
+    vaBcvaNearOS?: StringNullableFilter<"EyeExamination"> | string | null
+    vaPinholeOD?: StringNullableFilter<"EyeExamination"> | string | null
+    vaPinholeOS?: StringNullableFilter<"EyeExamination"> | string | null
+    refractionSphereOD?: StringNullableFilter<"EyeExamination"> | string | null
+    refractionSphereOS?: StringNullableFilter<"EyeExamination"> | string | null
+    refractionCylinderOD?: StringNullableFilter<"EyeExamination"> | string | null
+    refractionCylinderOS?: StringNullableFilter<"EyeExamination"> | string | null
+    refractionAxisOD?: StringNullableFilter<"EyeExamination"> | string | null
+    refractionAxisOS?: StringNullableFilter<"EyeExamination"> | string | null
+    iopOD?: IntNullableFilter<"EyeExamination"> | number | null
+    iopOS?: IntNullableFilter<"EyeExamination"> | number | null
+    iopMethod?: StringNullableFilter<"EyeExamination"> | string | null
+    iopTime?: StringNullableFilter<"EyeExamination"> | string | null
+    targetIopOD?: IntNullableFilter<"EyeExamination"> | number | null
+    targetIopOS?: IntNullableFilter<"EyeExamination"> | number | null
+    anteriorSegmentFindings?: JsonNullableFilter<"EyeExamination">
+    fundusFindings?: JsonNullableFilter<"EyeExamination">
+    diagnosis?: StringNullableFilter<"EyeExamination"> | string | null
+    plan?: StringNullableFilter<"EyeExamination"> | string | null
+    followUpDate?: DateTimeNullableFilter<"EyeExamination"> | Date | string | null
+    nextVisitReason?: StringNullableFilter<"EyeExamination"> | string | null
+    createdAt?: DateTimeFilter<"EyeExamination"> | Date | string
+    updatedAt?: DateTimeFilter<"EyeExamination"> | Date | string
   }
 
   export type SurgeryUpsertWithWhereUniqueWithoutBranchInput = {
@@ -36651,11 +43605,17 @@ export namespace Prisma {
     OR?: SurgeryScalarWhereInput[]
     NOT?: SurgeryScalarWhereInput | SurgeryScalarWhereInput[]
     id?: StringFilter<"Surgery"> | string
-    examId?: StringFilter<"Surgery"> | string
+    examId?: StringNullableFilter<"Surgery"> | string | null
     branchId?: StringFilter<"Surgery"> | string
-    eyeSide?: StringFilter<"Surgery"> | string
+    patientId?: StringFilter<"Surgery"> | string
+    eye?: StringFilter<"Surgery"> | string
     surgeryType?: StringFilter<"Surgery"> | string
-    surgeryDate?: DateTimeFilter<"Surgery"> | Date | string
+    procedure?: StringNullableFilter<"Surgery"> | string | null
+    anesthesiaType?: StringNullableFilter<"Surgery"> | string | null
+    date?: DateTimeFilter<"Surgery"> | Date | string
+    time?: StringNullableFilter<"Surgery"> | string | null
+    operatingRoom?: StringNullableFilter<"Surgery"> | string | null
+    cataractDetails?: JsonNullableFilter<"Surgery">
     cost?: DecimalFilter<"Surgery"> | Decimal | DecimalJsLike | number | string
     status?: StringFilter<"Surgery"> | string
     notes?: StringNullableFilter<"Surgery"> | string | null
@@ -36694,6 +43654,58 @@ export namespace Prisma {
     instructions?: StringNullableFilter<"Prescription"> | string | null
     reviewAfterDays?: IntNullableFilter<"Prescription"> | number | null
     createdAt?: DateTimeFilter<"Prescription"> | Date | string
+  }
+
+  export type OpticalPrescriptionUpsertWithWhereUniqueWithoutBranchInput = {
+    where: OpticalPrescriptionWhereUniqueInput
+    update: XOR<OpticalPrescriptionUpdateWithoutBranchInput, OpticalPrescriptionUncheckedUpdateWithoutBranchInput>
+    create: XOR<OpticalPrescriptionCreateWithoutBranchInput, OpticalPrescriptionUncheckedCreateWithoutBranchInput>
+  }
+
+  export type OpticalPrescriptionUpdateWithWhereUniqueWithoutBranchInput = {
+    where: OpticalPrescriptionWhereUniqueInput
+    data: XOR<OpticalPrescriptionUpdateWithoutBranchInput, OpticalPrescriptionUncheckedUpdateWithoutBranchInput>
+  }
+
+  export type OpticalPrescriptionUpdateManyWithWhereWithoutBranchInput = {
+    where: OpticalPrescriptionScalarWhereInput
+    data: XOR<OpticalPrescriptionUpdateManyMutationInput, OpticalPrescriptionUncheckedUpdateManyWithoutBranchInput>
+  }
+
+  export type OpticalPrescriptionScalarWhereInput = {
+    AND?: OpticalPrescriptionScalarWhereInput | OpticalPrescriptionScalarWhereInput[]
+    OR?: OpticalPrescriptionScalarWhereInput[]
+    NOT?: OpticalPrescriptionScalarWhereInput | OpticalPrescriptionScalarWhereInput[]
+    id?: StringFilter<"OpticalPrescription"> | string
+    branchId?: StringFilter<"OpticalPrescription"> | string
+    patientId?: StringFilter<"OpticalPrescription"> | string
+    createdById?: StringNullableFilter<"OpticalPrescription"> | string | null
+    type?: EnumOpticalPrescriptionTypeFilter<"OpticalPrescription"> | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFilter<"OpticalPrescription"> | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFilter<"OpticalPrescription"> | number
+    expiryDate?: DateTimeFilter<"OpticalPrescription"> | Date | string
+    dispensedAt?: DateTimeNullableFilter<"OpticalPrescription"> | Date | string | null
+    notes?: StringNullableFilter<"OpticalPrescription"> | string | null
+    odSphere?: StringNullableFilter<"OpticalPrescription"> | string | null
+    odCylinder?: StringNullableFilter<"OpticalPrescription"> | string | null
+    odAxis?: IntNullableFilter<"OpticalPrescription"> | number | null
+    odAdd?: StringNullableFilter<"OpticalPrescription"> | string | null
+    odPd?: IntNullableFilter<"OpticalPrescription"> | number | null
+    odPrism?: StringNullableFilter<"OpticalPrescription"> | string | null
+    osSphere?: StringNullableFilter<"OpticalPrescription"> | string | null
+    osCylinder?: StringNullableFilter<"OpticalPrescription"> | string | null
+    osAxis?: IntNullableFilter<"OpticalPrescription"> | number | null
+    osAdd?: StringNullableFilter<"OpticalPrescription"> | string | null
+    osPd?: IntNullableFilter<"OpticalPrescription"> | number | null
+    osPrism?: StringNullableFilter<"OpticalPrescription"> | string | null
+    lensType?: StringNullableFilter<"OpticalPrescription"> | string | null
+    lensMaterial?: StringNullableFilter<"OpticalPrescription"> | string | null
+    frameType?: StringNullableFilter<"OpticalPrescription"> | string | null
+    coatings?: StringNullableListFilter<"OpticalPrescription">
+    frameItemId?: StringNullableFilter<"OpticalPrescription"> | string | null
+    lensItemId?: StringNullableFilter<"OpticalPrescription"> | string | null
+    createdAt?: DateTimeFilter<"OpticalPrescription"> | Date | string
+    updatedAt?: DateTimeFilter<"OpticalPrescription"> | Date | string
   }
 
   export type PharmacyItemUpsertWithWhereUniqueWithoutBranchInput = {
@@ -36981,8 +43993,10 @@ export namespace Prisma {
     doctors?: DoctorCreateNestedManyWithoutBranchInput
     patients?: PatientCreateNestedManyWithoutBranchInput
     appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
@@ -37005,8 +44019,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
     patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
@@ -37087,6 +44103,8 @@ export namespace Prisma {
     isActive?: boolean
     branch: BranchCreateNestedOneWithoutOpticalItemsInput
     transactions?: OpticalStockTransactionCreateNestedManyWithoutOpticalItemInput
+    framePrescriptions?: OpticalPrescriptionCreateNestedManyWithoutFrameItemInput
+    lensPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutLensItemInput
   }
 
   export type OpticalItemUncheckedCreateWithoutSupplierInput = {
@@ -37105,6 +44123,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     isActive?: boolean
     transactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutOpticalItemInput
+    framePrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutFrameItemInput
+    lensPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutLensItemInput
   }
 
   export type OpticalItemCreateOrConnectWithoutSupplierInput = {
@@ -37141,8 +44161,10 @@ export namespace Prisma {
     doctors?: DoctorUpdateManyWithoutBranchNestedInput
     patients?: PatientUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
@@ -37165,8 +44187,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
     patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
@@ -37237,8 +44261,10 @@ export namespace Prisma {
     doctors?: DoctorCreateNestedManyWithoutBranchInput
     patients?: PatientCreateNestedManyWithoutBranchInput
     appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
@@ -37261,8 +44287,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
     patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
@@ -37287,8 +44315,10 @@ export namespace Prisma {
     updatedAt?: Date | string
     branch: BranchCreateNestedOneWithoutDoctorsInput
     appointments?: AppointmentCreateNestedManyWithoutDoctorInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutDoctorInput
     examinedClinicalExams?: ClinicalExaminationCreateNestedManyWithoutExaminedByInput
     surgeries?: SurgeryCreateNestedManyWithoutSurgeonInput
+    assignedPatients?: PatientCreateNestedManyWithoutAssignedDoctorInput
   }
 
   export type DoctorUncheckedCreateWithoutUserInput = {
@@ -37300,8 +44330,10 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutDoctorInput
     examinedClinicalExams?: ClinicalExaminationUncheckedCreateNestedManyWithoutExaminedByInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutSurgeonInput
+    assignedPatients?: PatientUncheckedCreateNestedManyWithoutAssignedDoctorInput
   }
 
   export type DoctorCreateOrConnectWithoutUserInput = {
@@ -37315,6 +44347,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     branch: BranchCreateNestedOneWithoutAppointmentsInput
@@ -37333,6 +44368,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     branchId: string
     patientId: string
     doctorId: string
@@ -37559,6 +44597,80 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type OpticalPrescriptionCreateWithoutCreatedByInput = {
+    id?: string
+    type?: $Enums.OpticalPrescriptionType
+    status?: $Enums.OpticalPrescriptionStatus
+    validityMonths?: number
+    expiryDate: Date | string
+    dispensedAt?: Date | string | null
+    notes?: string | null
+    odSphere?: string | null
+    odCylinder?: string | null
+    odAxis?: number | null
+    odAdd?: string | null
+    odPd?: number | null
+    odPrism?: string | null
+    osSphere?: string | null
+    osCylinder?: string | null
+    osAxis?: number | null
+    osAdd?: string | null
+    osPd?: number | null
+    osPrism?: string | null
+    lensType?: string | null
+    lensMaterial?: string | null
+    frameType?: string | null
+    coatings?: OpticalPrescriptionCreatecoatingsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutOpticalPrescriptionsInput
+    patient: PatientCreateNestedOneWithoutOpticalPrescriptionsInput
+    frameItem?: OpticalItemCreateNestedOneWithoutFramePrescriptionsInput
+    lensItem?: OpticalItemCreateNestedOneWithoutLensPrescriptionsInput
+  }
+
+  export type OpticalPrescriptionUncheckedCreateWithoutCreatedByInput = {
+    id?: string
+    branchId: string
+    patientId: string
+    type?: $Enums.OpticalPrescriptionType
+    status?: $Enums.OpticalPrescriptionStatus
+    validityMonths?: number
+    expiryDate: Date | string
+    dispensedAt?: Date | string | null
+    notes?: string | null
+    odSphere?: string | null
+    odCylinder?: string | null
+    odAxis?: number | null
+    odAdd?: string | null
+    odPd?: number | null
+    odPrism?: string | null
+    osSphere?: string | null
+    osCylinder?: string | null
+    osAxis?: number | null
+    osAdd?: string | null
+    osPd?: number | null
+    osPrism?: string | null
+    lensType?: string | null
+    lensMaterial?: string | null
+    frameType?: string | null
+    coatings?: OpticalPrescriptionCreatecoatingsInput | string[]
+    frameItemId?: string | null
+    lensItemId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OpticalPrescriptionCreateOrConnectWithoutCreatedByInput = {
+    where: OpticalPrescriptionWhereUniqueInput
+    create: XOR<OpticalPrescriptionCreateWithoutCreatedByInput, OpticalPrescriptionUncheckedCreateWithoutCreatedByInput>
+  }
+
+  export type OpticalPrescriptionCreateManyCreatedByInputEnvelope = {
+    data: OpticalPrescriptionCreateManyCreatedByInput | OpticalPrescriptionCreateManyCreatedByInput[]
+    skipDuplicates?: boolean
+  }
+
   export type RoleUpsertWithoutUsersInput = {
     update: XOR<RoleUpdateWithoutUsersInput, RoleUncheckedUpdateWithoutUsersInput>
     create: XOR<RoleCreateWithoutUsersInput, RoleUncheckedCreateWithoutUsersInput>
@@ -37605,8 +44717,10 @@ export namespace Prisma {
     doctors?: DoctorUpdateManyWithoutBranchNestedInput
     patients?: PatientUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
@@ -37629,8 +44743,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
     patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
@@ -37661,8 +44777,10 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     branch?: BranchUpdateOneRequiredWithoutDoctorsNestedInput
     appointments?: AppointmentUpdateManyWithoutDoctorNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutDoctorNestedInput
     examinedClinicalExams?: ClinicalExaminationUpdateManyWithoutExaminedByNestedInput
     surgeries?: SurgeryUpdateManyWithoutSurgeonNestedInput
+    assignedPatients?: PatientUpdateManyWithoutAssignedDoctorNestedInput
   }
 
   export type DoctorUncheckedUpdateWithoutUserInput = {
@@ -37674,8 +44792,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutDoctorNestedInput
     examinedClinicalExams?: ClinicalExaminationUncheckedUpdateManyWithoutExaminedByNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutSurgeonNestedInput
+    assignedPatients?: PatientUncheckedUpdateManyWithoutAssignedDoctorNestedInput
   }
 
   export type AppointmentUpsertWithWhereUniqueWithoutCreatedByInput = {
@@ -37807,6 +44927,22 @@ export namespace Prisma {
     data: XOR<ActivityLogUpdateManyMutationInput, ActivityLogUncheckedUpdateManyWithoutUserInput>
   }
 
+  export type OpticalPrescriptionUpsertWithWhereUniqueWithoutCreatedByInput = {
+    where: OpticalPrescriptionWhereUniqueInput
+    update: XOR<OpticalPrescriptionUpdateWithoutCreatedByInput, OpticalPrescriptionUncheckedUpdateWithoutCreatedByInput>
+    create: XOR<OpticalPrescriptionCreateWithoutCreatedByInput, OpticalPrescriptionUncheckedCreateWithoutCreatedByInput>
+  }
+
+  export type OpticalPrescriptionUpdateWithWhereUniqueWithoutCreatedByInput = {
+    where: OpticalPrescriptionWhereUniqueInput
+    data: XOR<OpticalPrescriptionUpdateWithoutCreatedByInput, OpticalPrescriptionUncheckedUpdateWithoutCreatedByInput>
+  }
+
+  export type OpticalPrescriptionUpdateManyWithWhereWithoutCreatedByInput = {
+    where: OpticalPrescriptionScalarWhereInput
+    data: XOR<OpticalPrescriptionUpdateManyMutationInput, OpticalPrescriptionUncheckedUpdateManyWithoutCreatedByInput>
+  }
+
   export type BranchCreateWithoutActivityLogsInput = {
     id?: string
     branchName: string
@@ -37820,8 +44956,10 @@ export namespace Prisma {
     doctors?: DoctorCreateNestedManyWithoutBranchInput
     patients?: PatientCreateNestedManyWithoutBranchInput
     appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
@@ -37844,8 +44982,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
     patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
@@ -37882,6 +45022,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserUncheckedCreateWithoutActivityLogsInput = {
@@ -37906,6 +45047,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserCreateOrConnectWithoutActivityLogsInput = {
@@ -37937,8 +45079,10 @@ export namespace Prisma {
     doctors?: DoctorUpdateManyWithoutBranchNestedInput
     patients?: PatientUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
@@ -37961,8 +45105,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
     patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
@@ -38005,6 +45151,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutCreatedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutActivityLogsInput = {
@@ -38029,6 +45176,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutCreatedByNestedInput
   }
 
   export type UserCreateWithoutDoctorInput = {
@@ -38053,6 +45201,7 @@ export namespace Prisma {
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
     activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserUncheckedCreateWithoutDoctorInput = {
@@ -38077,6 +45226,7 @@ export namespace Prisma {
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
     activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserCreateOrConnectWithoutDoctorInput = {
@@ -38096,8 +45246,10 @@ export namespace Prisma {
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutBranchInput
     patients?: PatientCreateNestedManyWithoutBranchInput
     appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
@@ -38120,8 +45272,10 @@ export namespace Prisma {
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutBranchInput
     patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
@@ -38143,6 +45297,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     branch: BranchCreateNestedOneWithoutAppointmentsInput
@@ -38161,6 +45318,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     branchId: string
     patientId: string
     createdById: string
@@ -38180,6 +45340,94 @@ export namespace Prisma {
 
   export type AppointmentCreateManyDoctorInputEnvelope = {
     data: AppointmentCreateManyDoctorInput | AppointmentCreateManyDoctorInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EyeExaminationCreateWithoutDoctorInput = {
+    id?: string
+    chiefComplaint: string
+    historyOfPresentIllness?: string | null
+    vaScale?: string
+    vaUnaidedOD?: string | null
+    vaUnaidedOS?: string | null
+    vaUnaidedNearOD?: string | null
+    vaUnaidedNearOS?: string | null
+    vaBcvaOD?: string | null
+    vaBcvaOS?: string | null
+    vaBcvaNearOD?: string | null
+    vaBcvaNearOS?: string | null
+    vaPinholeOD?: string | null
+    vaPinholeOS?: string | null
+    refractionSphereOD?: string | null
+    refractionSphereOS?: string | null
+    refractionCylinderOD?: string | null
+    refractionCylinderOS?: string | null
+    refractionAxisOD?: string | null
+    refractionAxisOS?: string | null
+    iopOD?: number | null
+    iopOS?: number | null
+    iopMethod?: string | null
+    iopTime?: string | null
+    targetIopOD?: number | null
+    targetIopOS?: number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: string | null
+    plan?: string | null
+    followUpDate?: Date | string | null
+    nextVisitReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutEyeExaminationsInput
+    patient: PatientCreateNestedOneWithoutEyeExaminationsInput
+  }
+
+  export type EyeExaminationUncheckedCreateWithoutDoctorInput = {
+    id?: string
+    branchId: string
+    patientId: string
+    chiefComplaint: string
+    historyOfPresentIllness?: string | null
+    vaScale?: string
+    vaUnaidedOD?: string | null
+    vaUnaidedOS?: string | null
+    vaUnaidedNearOD?: string | null
+    vaUnaidedNearOS?: string | null
+    vaBcvaOD?: string | null
+    vaBcvaOS?: string | null
+    vaBcvaNearOD?: string | null
+    vaBcvaNearOS?: string | null
+    vaPinholeOD?: string | null
+    vaPinholeOS?: string | null
+    refractionSphereOD?: string | null
+    refractionSphereOS?: string | null
+    refractionCylinderOD?: string | null
+    refractionCylinderOS?: string | null
+    refractionAxisOD?: string | null
+    refractionAxisOS?: string | null
+    iopOD?: number | null
+    iopOS?: number | null
+    iopMethod?: string | null
+    iopTime?: string | null
+    targetIopOD?: number | null
+    targetIopOS?: number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: string | null
+    plan?: string | null
+    followUpDate?: Date | string | null
+    nextVisitReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type EyeExaminationCreateOrConnectWithoutDoctorInput = {
+    where: EyeExaminationWhereUniqueInput
+    create: XOR<EyeExaminationCreateWithoutDoctorInput, EyeExaminationUncheckedCreateWithoutDoctorInput>
+  }
+
+  export type EyeExaminationCreateManyDoctorInputEnvelope = {
+    data: EyeExaminationCreateManyDoctorInput | EyeExaminationCreateManyDoctorInput[]
     skipDuplicates?: boolean
   }
 
@@ -38233,28 +45481,40 @@ export namespace Prisma {
 
   export type SurgeryCreateWithoutSurgeonInput = {
     id?: string
-    eyeSide: string
+    eye: string
     surgeryType: string
-    surgeryDate: Date | string
-    cost: Decimal | DecimalJsLike | number | string
+    procedure?: string | null
+    anesthesiaType?: string | null
+    date: Date | string
+    time?: string | null
+    operatingRoom?: string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
     nextFollowUpDate?: Date | string | null
     createdAt?: Date | string
-    clinicalExam: ClinicalExaminationCreateNestedOneWithoutSurgeryInput
+    clinicalExam?: ClinicalExaminationCreateNestedOneWithoutSurgeryInput
     branch: BranchCreateNestedOneWithoutSurgeriesInput
+    patient: PatientCreateNestedOneWithoutSurgeriesInput
     billings?: BillingCreateNestedManyWithoutSurgeryInput
     followUps?: FollowUpCreateNestedManyWithoutSurgeryInput
   }
 
   export type SurgeryUncheckedCreateWithoutSurgeonInput = {
     id?: string
-    examId: string
+    examId?: string | null
     branchId: string
-    eyeSide: string
+    patientId: string
+    eye: string
     surgeryType: string
-    surgeryDate: Date | string
-    cost: Decimal | DecimalJsLike | number | string
+    procedure?: string | null
+    anesthesiaType?: string | null
+    date: Date | string
+    time?: string | null
+    operatingRoom?: string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
     nextFollowUpDate?: Date | string | null
@@ -38270,6 +45530,88 @@ export namespace Prisma {
 
   export type SurgeryCreateManySurgeonInputEnvelope = {
     data: SurgeryCreateManySurgeonInput | SurgeryCreateManySurgeonInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type PatientCreateWithoutAssignedDoctorInput = {
+    id?: string
+    patientNumber?: string | null
+    fullName: string
+    firstName?: string | null
+    lastName?: string | null
+    gender?: string | null
+    dateOfBirth: Date | string
+    phone: string
+    email?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutPatientsInput
+    appointments?: AppointmentCreateNestedManyWithoutPatientInput
+    surgeries?: SurgeryCreateNestedManyWithoutPatientInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutPatientInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutPatientInput
+    billings?: BillingCreateNestedManyWithoutPatientInput
+    followUps?: FollowUpCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientUncheckedCreateWithoutAssignedDoctorInput = {
+    id?: string
+    patientNumber?: string | null
+    fullName: string
+    firstName?: string | null
+    lastName?: string | null
+    gender?: string | null
+    dateOfBirth: Date | string
+    phone: string
+    email?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
+    branchId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
+    surgeries?: SurgeryUncheckedCreateNestedManyWithoutPatientInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutPatientInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutPatientInput
+    billings?: BillingUncheckedCreateNestedManyWithoutPatientInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientCreateOrConnectWithoutAssignedDoctorInput = {
+    where: PatientWhereUniqueInput
+    create: XOR<PatientCreateWithoutAssignedDoctorInput, PatientUncheckedCreateWithoutAssignedDoctorInput>
+  }
+
+  export type PatientCreateManyAssignedDoctorInputEnvelope = {
+    data: PatientCreateManyAssignedDoctorInput | PatientCreateManyAssignedDoctorInput[]
     skipDuplicates?: boolean
   }
 
@@ -38306,6 +45648,7 @@ export namespace Prisma {
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
     activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutCreatedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDoctorInput = {
@@ -38330,6 +45673,7 @@ export namespace Prisma {
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
     activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutCreatedByNestedInput
   }
 
   export type BranchUpsertWithoutDoctorsInput = {
@@ -38355,8 +45699,10 @@ export namespace Prisma {
     staffAssignments?: StaffAssignmentUpdateManyWithoutBranchNestedInput
     patients?: PatientUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
@@ -38379,8 +45725,10 @@ export namespace Prisma {
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutBranchNestedInput
     patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
@@ -38405,6 +45753,22 @@ export namespace Prisma {
   export type AppointmentUpdateManyWithWhereWithoutDoctorInput = {
     where: AppointmentScalarWhereInput
     data: XOR<AppointmentUpdateManyMutationInput, AppointmentUncheckedUpdateManyWithoutDoctorInput>
+  }
+
+  export type EyeExaminationUpsertWithWhereUniqueWithoutDoctorInput = {
+    where: EyeExaminationWhereUniqueInput
+    update: XOR<EyeExaminationUpdateWithoutDoctorInput, EyeExaminationUncheckedUpdateWithoutDoctorInput>
+    create: XOR<EyeExaminationCreateWithoutDoctorInput, EyeExaminationUncheckedCreateWithoutDoctorInput>
+  }
+
+  export type EyeExaminationUpdateWithWhereUniqueWithoutDoctorInput = {
+    where: EyeExaminationWhereUniqueInput
+    data: XOR<EyeExaminationUpdateWithoutDoctorInput, EyeExaminationUncheckedUpdateWithoutDoctorInput>
+  }
+
+  export type EyeExaminationUpdateManyWithWhereWithoutDoctorInput = {
+    where: EyeExaminationScalarWhereInput
+    data: XOR<EyeExaminationUpdateManyMutationInput, EyeExaminationUncheckedUpdateManyWithoutDoctorInput>
   }
 
   export type ClinicalExaminationUpsertWithWhereUniqueWithoutExaminedByInput = {
@@ -38459,6 +45823,57 @@ export namespace Prisma {
     data: XOR<SurgeryUpdateManyMutationInput, SurgeryUncheckedUpdateManyWithoutSurgeonInput>
   }
 
+  export type PatientUpsertWithWhereUniqueWithoutAssignedDoctorInput = {
+    where: PatientWhereUniqueInput
+    update: XOR<PatientUpdateWithoutAssignedDoctorInput, PatientUncheckedUpdateWithoutAssignedDoctorInput>
+    create: XOR<PatientCreateWithoutAssignedDoctorInput, PatientUncheckedCreateWithoutAssignedDoctorInput>
+  }
+
+  export type PatientUpdateWithWhereUniqueWithoutAssignedDoctorInput = {
+    where: PatientWhereUniqueInput
+    data: XOR<PatientUpdateWithoutAssignedDoctorInput, PatientUncheckedUpdateWithoutAssignedDoctorInput>
+  }
+
+  export type PatientUpdateManyWithWhereWithoutAssignedDoctorInput = {
+    where: PatientScalarWhereInput
+    data: XOR<PatientUpdateManyMutationInput, PatientUncheckedUpdateManyWithoutAssignedDoctorInput>
+  }
+
+  export type DoctorCreateWithoutAssignedPatientsInput = {
+    id?: string
+    licenseNumber: string
+    specialization: string
+    phone?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutDoctorInput
+    branch: BranchCreateNestedOneWithoutDoctorsInput
+    appointments?: AppointmentCreateNestedManyWithoutDoctorInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutDoctorInput
+    examinedClinicalExams?: ClinicalExaminationCreateNestedManyWithoutExaminedByInput
+    surgeries?: SurgeryCreateNestedManyWithoutSurgeonInput
+  }
+
+  export type DoctorUncheckedCreateWithoutAssignedPatientsInput = {
+    id?: string
+    userId: string
+    licenseNumber: string
+    specialization: string
+    phone?: string | null
+    branchId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutDoctorInput
+    examinedClinicalExams?: ClinicalExaminationUncheckedCreateNestedManyWithoutExaminedByInput
+    surgeries?: SurgeryUncheckedCreateNestedManyWithoutSurgeonInput
+  }
+
+  export type DoctorCreateOrConnectWithoutAssignedPatientsInput = {
+    where: DoctorWhereUniqueInput
+    create: XOR<DoctorCreateWithoutAssignedPatientsInput, DoctorUncheckedCreateWithoutAssignedPatientsInput>
+  }
+
   export type BranchCreateWithoutPatientsInput = {
     id?: string
     branchName: string
@@ -38471,8 +45886,10 @@ export namespace Prisma {
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutBranchInput
     doctors?: DoctorCreateNestedManyWithoutBranchInput
     appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
@@ -38495,8 +45912,10 @@ export namespace Prisma {
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutBranchInput
     doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
@@ -38518,6 +45937,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     branch: BranchCreateNestedOneWithoutAppointmentsInput
@@ -38536,6 +45958,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     branchId: string
     doctorId: string
     createdById: string
@@ -38555,6 +45980,222 @@ export namespace Prisma {
 
   export type AppointmentCreateManyPatientInputEnvelope = {
     data: AppointmentCreateManyPatientInput | AppointmentCreateManyPatientInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SurgeryCreateWithoutPatientInput = {
+    id?: string
+    eye: string
+    surgeryType: string
+    procedure?: string | null
+    anesthesiaType?: string | null
+    date: Date | string
+    time?: string | null
+    operatingRoom?: string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: Decimal | DecimalJsLike | number | string
+    status?: string
+    notes?: string | null
+    nextFollowUpDate?: Date | string | null
+    createdAt?: Date | string
+    clinicalExam?: ClinicalExaminationCreateNestedOneWithoutSurgeryInput
+    branch: BranchCreateNestedOneWithoutSurgeriesInput
+    surgeon: DoctorCreateNestedOneWithoutSurgeriesInput
+    billings?: BillingCreateNestedManyWithoutSurgeryInput
+    followUps?: FollowUpCreateNestedManyWithoutSurgeryInput
+  }
+
+  export type SurgeryUncheckedCreateWithoutPatientInput = {
+    id?: string
+    examId?: string | null
+    branchId: string
+    eye: string
+    surgeryType: string
+    procedure?: string | null
+    anesthesiaType?: string | null
+    date: Date | string
+    time?: string | null
+    operatingRoom?: string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: Decimal | DecimalJsLike | number | string
+    status?: string
+    notes?: string | null
+    nextFollowUpDate?: Date | string | null
+    surgeonId: string
+    createdAt?: Date | string
+    billings?: BillingUncheckedCreateNestedManyWithoutSurgeryInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutSurgeryInput
+  }
+
+  export type SurgeryCreateOrConnectWithoutPatientInput = {
+    where: SurgeryWhereUniqueInput
+    create: XOR<SurgeryCreateWithoutPatientInput, SurgeryUncheckedCreateWithoutPatientInput>
+  }
+
+  export type SurgeryCreateManyPatientInputEnvelope = {
+    data: SurgeryCreateManyPatientInput | SurgeryCreateManyPatientInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EyeExaminationCreateWithoutPatientInput = {
+    id?: string
+    chiefComplaint: string
+    historyOfPresentIllness?: string | null
+    vaScale?: string
+    vaUnaidedOD?: string | null
+    vaUnaidedOS?: string | null
+    vaUnaidedNearOD?: string | null
+    vaUnaidedNearOS?: string | null
+    vaBcvaOD?: string | null
+    vaBcvaOS?: string | null
+    vaBcvaNearOD?: string | null
+    vaBcvaNearOS?: string | null
+    vaPinholeOD?: string | null
+    vaPinholeOS?: string | null
+    refractionSphereOD?: string | null
+    refractionSphereOS?: string | null
+    refractionCylinderOD?: string | null
+    refractionCylinderOS?: string | null
+    refractionAxisOD?: string | null
+    refractionAxisOS?: string | null
+    iopOD?: number | null
+    iopOS?: number | null
+    iopMethod?: string | null
+    iopTime?: string | null
+    targetIopOD?: number | null
+    targetIopOS?: number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: string | null
+    plan?: string | null
+    followUpDate?: Date | string | null
+    nextVisitReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutEyeExaminationsInput
+    doctor: DoctorCreateNestedOneWithoutEyeExaminationsInput
+  }
+
+  export type EyeExaminationUncheckedCreateWithoutPatientInput = {
+    id?: string
+    branchId: string
+    doctorId: string
+    chiefComplaint: string
+    historyOfPresentIllness?: string | null
+    vaScale?: string
+    vaUnaidedOD?: string | null
+    vaUnaidedOS?: string | null
+    vaUnaidedNearOD?: string | null
+    vaUnaidedNearOS?: string | null
+    vaBcvaOD?: string | null
+    vaBcvaOS?: string | null
+    vaBcvaNearOD?: string | null
+    vaBcvaNearOS?: string | null
+    vaPinholeOD?: string | null
+    vaPinholeOS?: string | null
+    refractionSphereOD?: string | null
+    refractionSphereOS?: string | null
+    refractionCylinderOD?: string | null
+    refractionCylinderOS?: string | null
+    refractionAxisOD?: string | null
+    refractionAxisOS?: string | null
+    iopOD?: number | null
+    iopOS?: number | null
+    iopMethod?: string | null
+    iopTime?: string | null
+    targetIopOD?: number | null
+    targetIopOS?: number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: string | null
+    plan?: string | null
+    followUpDate?: Date | string | null
+    nextVisitReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type EyeExaminationCreateOrConnectWithoutPatientInput = {
+    where: EyeExaminationWhereUniqueInput
+    create: XOR<EyeExaminationCreateWithoutPatientInput, EyeExaminationUncheckedCreateWithoutPatientInput>
+  }
+
+  export type EyeExaminationCreateManyPatientInputEnvelope = {
+    data: EyeExaminationCreateManyPatientInput | EyeExaminationCreateManyPatientInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type OpticalPrescriptionCreateWithoutPatientInput = {
+    id?: string
+    type?: $Enums.OpticalPrescriptionType
+    status?: $Enums.OpticalPrescriptionStatus
+    validityMonths?: number
+    expiryDate: Date | string
+    dispensedAt?: Date | string | null
+    notes?: string | null
+    odSphere?: string | null
+    odCylinder?: string | null
+    odAxis?: number | null
+    odAdd?: string | null
+    odPd?: number | null
+    odPrism?: string | null
+    osSphere?: string | null
+    osCylinder?: string | null
+    osAxis?: number | null
+    osAdd?: string | null
+    osPd?: number | null
+    osPrism?: string | null
+    lensType?: string | null
+    lensMaterial?: string | null
+    frameType?: string | null
+    coatings?: OpticalPrescriptionCreatecoatingsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutOpticalPrescriptionsInput
+    createdBy?: UserCreateNestedOneWithoutCreatedOpticalPrescriptionsInput
+    frameItem?: OpticalItemCreateNestedOneWithoutFramePrescriptionsInput
+    lensItem?: OpticalItemCreateNestedOneWithoutLensPrescriptionsInput
+  }
+
+  export type OpticalPrescriptionUncheckedCreateWithoutPatientInput = {
+    id?: string
+    branchId: string
+    createdById?: string | null
+    type?: $Enums.OpticalPrescriptionType
+    status?: $Enums.OpticalPrescriptionStatus
+    validityMonths?: number
+    expiryDate: Date | string
+    dispensedAt?: Date | string | null
+    notes?: string | null
+    odSphere?: string | null
+    odCylinder?: string | null
+    odAxis?: number | null
+    odAdd?: string | null
+    odPd?: number | null
+    odPrism?: string | null
+    osSphere?: string | null
+    osCylinder?: string | null
+    osAxis?: number | null
+    osAdd?: string | null
+    osPd?: number | null
+    osPrism?: string | null
+    lensType?: string | null
+    lensMaterial?: string | null
+    frameType?: string | null
+    coatings?: OpticalPrescriptionCreatecoatingsInput | string[]
+    frameItemId?: string | null
+    lensItemId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OpticalPrescriptionCreateOrConnectWithoutPatientInput = {
+    where: OpticalPrescriptionWhereUniqueInput
+    create: XOR<OpticalPrescriptionCreateWithoutPatientInput, OpticalPrescriptionUncheckedCreateWithoutPatientInput>
+  }
+
+  export type OpticalPrescriptionCreateManyPatientInputEnvelope = {
+    data: OpticalPrescriptionCreateManyPatientInput | OpticalPrescriptionCreateManyPatientInput[]
     skipDuplicates?: boolean
   }
 
@@ -38650,6 +46291,47 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type DoctorUpsertWithoutAssignedPatientsInput = {
+    update: XOR<DoctorUpdateWithoutAssignedPatientsInput, DoctorUncheckedUpdateWithoutAssignedPatientsInput>
+    create: XOR<DoctorCreateWithoutAssignedPatientsInput, DoctorUncheckedCreateWithoutAssignedPatientsInput>
+    where?: DoctorWhereInput
+  }
+
+  export type DoctorUpdateToOneWithWhereWithoutAssignedPatientsInput = {
+    where?: DoctorWhereInput
+    data: XOR<DoctorUpdateWithoutAssignedPatientsInput, DoctorUncheckedUpdateWithoutAssignedPatientsInput>
+  }
+
+  export type DoctorUpdateWithoutAssignedPatientsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    licenseNumber?: StringFieldUpdateOperationsInput | string
+    specialization?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutDoctorNestedInput
+    branch?: BranchUpdateOneRequiredWithoutDoctorsNestedInput
+    appointments?: AppointmentUpdateManyWithoutDoctorNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutDoctorNestedInput
+    examinedClinicalExams?: ClinicalExaminationUpdateManyWithoutExaminedByNestedInput
+    surgeries?: SurgeryUpdateManyWithoutSurgeonNestedInput
+  }
+
+  export type DoctorUncheckedUpdateWithoutAssignedPatientsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    licenseNumber?: StringFieldUpdateOperationsInput | string
+    specialization?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    branchId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointments?: AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutDoctorNestedInput
+    examinedClinicalExams?: ClinicalExaminationUncheckedUpdateManyWithoutExaminedByNestedInput
+    surgeries?: SurgeryUncheckedUpdateManyWithoutSurgeonNestedInput
+  }
+
   export type BranchUpsertWithoutPatientsInput = {
     update: XOR<BranchUpdateWithoutPatientsInput, BranchUncheckedUpdateWithoutPatientsInput>
     create: XOR<BranchCreateWithoutPatientsInput, BranchUncheckedCreateWithoutPatientsInput>
@@ -38673,8 +46355,10 @@ export namespace Prisma {
     staffAssignments?: StaffAssignmentUpdateManyWithoutBranchNestedInput
     doctors?: DoctorUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
@@ -38697,8 +46381,10 @@ export namespace Prisma {
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutBranchNestedInput
     doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
@@ -38723,6 +46409,54 @@ export namespace Prisma {
   export type AppointmentUpdateManyWithWhereWithoutPatientInput = {
     where: AppointmentScalarWhereInput
     data: XOR<AppointmentUpdateManyMutationInput, AppointmentUncheckedUpdateManyWithoutPatientInput>
+  }
+
+  export type SurgeryUpsertWithWhereUniqueWithoutPatientInput = {
+    where: SurgeryWhereUniqueInput
+    update: XOR<SurgeryUpdateWithoutPatientInput, SurgeryUncheckedUpdateWithoutPatientInput>
+    create: XOR<SurgeryCreateWithoutPatientInput, SurgeryUncheckedCreateWithoutPatientInput>
+  }
+
+  export type SurgeryUpdateWithWhereUniqueWithoutPatientInput = {
+    where: SurgeryWhereUniqueInput
+    data: XOR<SurgeryUpdateWithoutPatientInput, SurgeryUncheckedUpdateWithoutPatientInput>
+  }
+
+  export type SurgeryUpdateManyWithWhereWithoutPatientInput = {
+    where: SurgeryScalarWhereInput
+    data: XOR<SurgeryUpdateManyMutationInput, SurgeryUncheckedUpdateManyWithoutPatientInput>
+  }
+
+  export type EyeExaminationUpsertWithWhereUniqueWithoutPatientInput = {
+    where: EyeExaminationWhereUniqueInput
+    update: XOR<EyeExaminationUpdateWithoutPatientInput, EyeExaminationUncheckedUpdateWithoutPatientInput>
+    create: XOR<EyeExaminationCreateWithoutPatientInput, EyeExaminationUncheckedCreateWithoutPatientInput>
+  }
+
+  export type EyeExaminationUpdateWithWhereUniqueWithoutPatientInput = {
+    where: EyeExaminationWhereUniqueInput
+    data: XOR<EyeExaminationUpdateWithoutPatientInput, EyeExaminationUncheckedUpdateWithoutPatientInput>
+  }
+
+  export type EyeExaminationUpdateManyWithWhereWithoutPatientInput = {
+    where: EyeExaminationScalarWhereInput
+    data: XOR<EyeExaminationUpdateManyMutationInput, EyeExaminationUncheckedUpdateManyWithoutPatientInput>
+  }
+
+  export type OpticalPrescriptionUpsertWithWhereUniqueWithoutPatientInput = {
+    where: OpticalPrescriptionWhereUniqueInput
+    update: XOR<OpticalPrescriptionUpdateWithoutPatientInput, OpticalPrescriptionUncheckedUpdateWithoutPatientInput>
+    create: XOR<OpticalPrescriptionCreateWithoutPatientInput, OpticalPrescriptionUncheckedCreateWithoutPatientInput>
+  }
+
+  export type OpticalPrescriptionUpdateWithWhereUniqueWithoutPatientInput = {
+    where: OpticalPrescriptionWhereUniqueInput
+    data: XOR<OpticalPrescriptionUpdateWithoutPatientInput, OpticalPrescriptionUncheckedUpdateWithoutPatientInput>
+  }
+
+  export type OpticalPrescriptionUpdateManyWithWhereWithoutPatientInput = {
+    where: OpticalPrescriptionScalarWhereInput
+    data: XOR<OpticalPrescriptionUpdateManyMutationInput, OpticalPrescriptionUncheckedUpdateManyWithoutPatientInput>
   }
 
   export type BillingUpsertWithWhereUniqueWithoutPatientInput = {
@@ -38757,6 +46491,594 @@ export namespace Prisma {
     data: XOR<FollowUpUpdateManyMutationInput, FollowUpUncheckedUpdateManyWithoutPatientInput>
   }
 
+  export type BranchCreateWithoutOpticalPrescriptionsInput = {
+    id?: string
+    branchName: string
+    address: string
+    phone: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserCreateNestedManyWithoutBranchInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutBranchInput
+    doctors?: DoctorCreateNestedManyWithoutBranchInput
+    patients?: PatientCreateNestedManyWithoutBranchInput
+    appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutBranchInput
+    surgeries?: SurgeryCreateNestedManyWithoutBranchInput
+    prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
+    pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
+    opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
+    opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
+    billings?: BillingCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchUncheckedCreateWithoutOpticalPrescriptionsInput = {
+    id?: string
+    branchName: string
+    address: string
+    phone: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserUncheckedCreateNestedManyWithoutBranchInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutBranchInput
+    doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
+    patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutBranchInput
+    surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
+    prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
+    pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
+    opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
+    opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
+    billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierUncheckedCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchCreateOrConnectWithoutOpticalPrescriptionsInput = {
+    where: BranchWhereUniqueInput
+    create: XOR<BranchCreateWithoutOpticalPrescriptionsInput, BranchUncheckedCreateWithoutOpticalPrescriptionsInput>
+  }
+
+  export type PatientCreateWithoutOpticalPrescriptionsInput = {
+    id?: string
+    patientNumber?: string | null
+    fullName: string
+    firstName?: string | null
+    lastName?: string | null
+    gender?: string | null
+    dateOfBirth: Date | string
+    phone: string
+    email?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    assignedDoctor?: DoctorCreateNestedOneWithoutAssignedPatientsInput
+    branch: BranchCreateNestedOneWithoutPatientsInput
+    appointments?: AppointmentCreateNestedManyWithoutPatientInput
+    surgeries?: SurgeryCreateNestedManyWithoutPatientInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutPatientInput
+    billings?: BillingCreateNestedManyWithoutPatientInput
+    followUps?: FollowUpCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientUncheckedCreateWithoutOpticalPrescriptionsInput = {
+    id?: string
+    patientNumber?: string | null
+    fullName: string
+    firstName?: string | null
+    lastName?: string | null
+    gender?: string | null
+    dateOfBirth: Date | string
+    phone: string
+    email?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
+    assignedDoctorId?: string | null
+    branchId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
+    surgeries?: SurgeryUncheckedCreateNestedManyWithoutPatientInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutPatientInput
+    billings?: BillingUncheckedCreateNestedManyWithoutPatientInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientCreateOrConnectWithoutOpticalPrescriptionsInput = {
+    where: PatientWhereUniqueInput
+    create: XOR<PatientCreateWithoutOpticalPrescriptionsInput, PatientUncheckedCreateWithoutOpticalPrescriptionsInput>
+  }
+
+  export type UserCreateWithoutCreatedOpticalPrescriptionsInput = {
+    id?: string
+    fullName: string
+    username: string
+    email: string
+    password: string
+    phone?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
+    profileImage?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    role: RoleCreateNestedOneWithoutUsersInput
+    branch: BranchCreateNestedOneWithoutUsersInput
+    doctor?: DoctorCreateNestedOneWithoutUserInput
+    createdAppointments?: AppointmentCreateNestedManyWithoutCreatedByInput
+    recordedERExams?: ERExaminationCreateNestedManyWithoutRecordedByInput
+    pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutPerformedByInput
+    opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
+    createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutCreatedOpticalPrescriptionsInput = {
+    id?: string
+    fullName: string
+    username: string
+    email: string
+    password: string
+    phone?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
+    profileImage?: string | null
+    isActive?: boolean
+    roleId: string
+    branchId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    doctor?: DoctorUncheckedCreateNestedOneWithoutUserInput
+    createdAppointments?: AppointmentUncheckedCreateNestedManyWithoutCreatedByInput
+    recordedERExams?: ERExaminationUncheckedCreateNestedManyWithoutRecordedByInput
+    pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
+    opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
+    createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutCreatedOpticalPrescriptionsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutCreatedOpticalPrescriptionsInput, UserUncheckedCreateWithoutCreatedOpticalPrescriptionsInput>
+  }
+
+  export type OpticalItemCreateWithoutFramePrescriptionsInput = {
+    id?: string
+    itemName: string
+    itemType?: string | null
+    brand?: string | null
+    manufacturer?: string | null
+    supplierName?: string | null
+    stockQuantity?: number
+    reorderLevel?: number
+    purchasePrice: Decimal | DecimalJsLike | number | string
+    sellingPrice: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    isActive?: boolean
+    branch: BranchCreateNestedOneWithoutOpticalItemsInput
+    supplier?: SupplierCreateNestedOneWithoutOpticalItemsInput
+    transactions?: OpticalStockTransactionCreateNestedManyWithoutOpticalItemInput
+    lensPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutLensItemInput
+  }
+
+  export type OpticalItemUncheckedCreateWithoutFramePrescriptionsInput = {
+    id?: string
+    branchId: string
+    supplierId?: string | null
+    itemName: string
+    itemType?: string | null
+    brand?: string | null
+    manufacturer?: string | null
+    supplierName?: string | null
+    stockQuantity?: number
+    reorderLevel?: number
+    purchasePrice: Decimal | DecimalJsLike | number | string
+    sellingPrice: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    isActive?: boolean
+    transactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutOpticalItemInput
+    lensPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutLensItemInput
+  }
+
+  export type OpticalItemCreateOrConnectWithoutFramePrescriptionsInput = {
+    where: OpticalItemWhereUniqueInput
+    create: XOR<OpticalItemCreateWithoutFramePrescriptionsInput, OpticalItemUncheckedCreateWithoutFramePrescriptionsInput>
+  }
+
+  export type OpticalItemCreateWithoutLensPrescriptionsInput = {
+    id?: string
+    itemName: string
+    itemType?: string | null
+    brand?: string | null
+    manufacturer?: string | null
+    supplierName?: string | null
+    stockQuantity?: number
+    reorderLevel?: number
+    purchasePrice: Decimal | DecimalJsLike | number | string
+    sellingPrice: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    isActive?: boolean
+    branch: BranchCreateNestedOneWithoutOpticalItemsInput
+    supplier?: SupplierCreateNestedOneWithoutOpticalItemsInput
+    transactions?: OpticalStockTransactionCreateNestedManyWithoutOpticalItemInput
+    framePrescriptions?: OpticalPrescriptionCreateNestedManyWithoutFrameItemInput
+  }
+
+  export type OpticalItemUncheckedCreateWithoutLensPrescriptionsInput = {
+    id?: string
+    branchId: string
+    supplierId?: string | null
+    itemName: string
+    itemType?: string | null
+    brand?: string | null
+    manufacturer?: string | null
+    supplierName?: string | null
+    stockQuantity?: number
+    reorderLevel?: number
+    purchasePrice: Decimal | DecimalJsLike | number | string
+    sellingPrice: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    isActive?: boolean
+    transactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutOpticalItemInput
+    framePrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutFrameItemInput
+  }
+
+  export type OpticalItemCreateOrConnectWithoutLensPrescriptionsInput = {
+    where: OpticalItemWhereUniqueInput
+    create: XOR<OpticalItemCreateWithoutLensPrescriptionsInput, OpticalItemUncheckedCreateWithoutLensPrescriptionsInput>
+  }
+
+  export type BranchUpsertWithoutOpticalPrescriptionsInput = {
+    update: XOR<BranchUpdateWithoutOpticalPrescriptionsInput, BranchUncheckedUpdateWithoutOpticalPrescriptionsInput>
+    create: XOR<BranchCreateWithoutOpticalPrescriptionsInput, BranchUncheckedCreateWithoutOpticalPrescriptionsInput>
+    where?: BranchWhereInput
+  }
+
+  export type BranchUpdateToOneWithWhereWithoutOpticalPrescriptionsInput = {
+    where?: BranchWhereInput
+    data: XOR<BranchUpdateWithoutOpticalPrescriptionsInput, BranchUncheckedUpdateWithoutOpticalPrescriptionsInput>
+  }
+
+  export type BranchUpdateWithoutOpticalPrescriptionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchName?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUpdateManyWithoutBranchNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutBranchNestedInput
+    doctors?: DoctorUpdateManyWithoutBranchNestedInput
+    patients?: PatientUpdateManyWithoutBranchNestedInput
+    appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutBranchNestedInput
+    surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
+    prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
+    pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
+    opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
+    opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
+    billings?: BillingUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutBranchNestedInput
+  }
+
+  export type BranchUncheckedUpdateWithoutOpticalPrescriptionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchName?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUncheckedUpdateManyWithoutBranchNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutBranchNestedInput
+    doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
+    patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
+    appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutBranchNestedInput
+    surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
+    prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
+    pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
+    opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
+    billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUncheckedUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutBranchNestedInput
+  }
+
+  export type PatientUpsertWithoutOpticalPrescriptionsInput = {
+    update: XOR<PatientUpdateWithoutOpticalPrescriptionsInput, PatientUncheckedUpdateWithoutOpticalPrescriptionsInput>
+    create: XOR<PatientCreateWithoutOpticalPrescriptionsInput, PatientUncheckedCreateWithoutOpticalPrescriptionsInput>
+    where?: PatientWhereInput
+  }
+
+  export type PatientUpdateToOneWithWhereWithoutOpticalPrescriptionsInput = {
+    where?: PatientWhereInput
+    data: XOR<PatientUpdateWithoutOpticalPrescriptionsInput, PatientUncheckedUpdateWithoutOpticalPrescriptionsInput>
+  }
+
+  export type PatientUpdateWithoutOpticalPrescriptionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedDoctor?: DoctorUpdateOneWithoutAssignedPatientsNestedInput
+    branch?: BranchUpdateOneRequiredWithoutPatientsNestedInput
+    appointments?: AppointmentUpdateManyWithoutPatientNestedInput
+    surgeries?: SurgeryUpdateManyWithoutPatientNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutPatientNestedInput
+    billings?: BillingUpdateManyWithoutPatientNestedInput
+    followUps?: FollowUpUpdateManyWithoutPatientNestedInput
+  }
+
+  export type PatientUncheckedUpdateWithoutOpticalPrescriptionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    assignedDoctorId?: NullableStringFieldUpdateOperationsInput | string | null
+    branchId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+    surgeries?: SurgeryUncheckedUpdateManyWithoutPatientNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutPatientNestedInput
+    billings?: BillingUncheckedUpdateManyWithoutPatientNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutPatientNestedInput
+  }
+
+  export type UserUpsertWithoutCreatedOpticalPrescriptionsInput = {
+    update: XOR<UserUpdateWithoutCreatedOpticalPrescriptionsInput, UserUncheckedUpdateWithoutCreatedOpticalPrescriptionsInput>
+    create: XOR<UserCreateWithoutCreatedOpticalPrescriptionsInput, UserUncheckedCreateWithoutCreatedOpticalPrescriptionsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutCreatedOpticalPrescriptionsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutCreatedOpticalPrescriptionsInput, UserUncheckedUpdateWithoutCreatedOpticalPrescriptionsInput>
+  }
+
+  export type UserUpdateWithoutCreatedOpticalPrescriptionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    profileImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: RoleUpdateOneRequiredWithoutUsersNestedInput
+    branch?: BranchUpdateOneRequiredWithoutUsersNestedInput
+    doctor?: DoctorUpdateOneWithoutUserNestedInput
+    createdAppointments?: AppointmentUpdateManyWithoutCreatedByNestedInput
+    recordedERExams?: ERExaminationUpdateManyWithoutRecordedByNestedInput
+    pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutPerformedByNestedInput
+    opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
+    createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutCreatedOpticalPrescriptionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    profileImage?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    roleId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    doctor?: DoctorUncheckedUpdateOneWithoutUserNestedInput
+    createdAppointments?: AppointmentUncheckedUpdateManyWithoutCreatedByNestedInput
+    recordedERExams?: ERExaminationUncheckedUpdateManyWithoutRecordedByNestedInput
+    pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
+    opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
+    createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type OpticalItemUpsertWithoutFramePrescriptionsInput = {
+    update: XOR<OpticalItemUpdateWithoutFramePrescriptionsInput, OpticalItemUncheckedUpdateWithoutFramePrescriptionsInput>
+    create: XOR<OpticalItemCreateWithoutFramePrescriptionsInput, OpticalItemUncheckedCreateWithoutFramePrescriptionsInput>
+    where?: OpticalItemWhereInput
+  }
+
+  export type OpticalItemUpdateToOneWithWhereWithoutFramePrescriptionsInput = {
+    where?: OpticalItemWhereInput
+    data: XOR<OpticalItemUpdateWithoutFramePrescriptionsInput, OpticalItemUncheckedUpdateWithoutFramePrescriptionsInput>
+  }
+
+  export type OpticalItemUpdateWithoutFramePrescriptionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    itemName?: StringFieldUpdateOperationsInput | string
+    itemType?: NullableStringFieldUpdateOperationsInput | string | null
+    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    stockQuantity?: IntFieldUpdateOperationsInput | number
+    reorderLevel?: IntFieldUpdateOperationsInput | number
+    purchasePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    branch?: BranchUpdateOneRequiredWithoutOpticalItemsNestedInput
+    supplier?: SupplierUpdateOneWithoutOpticalItemsNestedInput
+    transactions?: OpticalStockTransactionUpdateManyWithoutOpticalItemNestedInput
+    lensPrescriptions?: OpticalPrescriptionUpdateManyWithoutLensItemNestedInput
+  }
+
+  export type OpticalItemUncheckedUpdateWithoutFramePrescriptionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
+    itemName?: StringFieldUpdateOperationsInput | string
+    itemType?: NullableStringFieldUpdateOperationsInput | string | null
+    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    stockQuantity?: IntFieldUpdateOperationsInput | number
+    reorderLevel?: IntFieldUpdateOperationsInput | number
+    purchasePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    transactions?: OpticalStockTransactionUncheckedUpdateManyWithoutOpticalItemNestedInput
+    lensPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutLensItemNestedInput
+  }
+
+  export type OpticalItemUpsertWithoutLensPrescriptionsInput = {
+    update: XOR<OpticalItemUpdateWithoutLensPrescriptionsInput, OpticalItemUncheckedUpdateWithoutLensPrescriptionsInput>
+    create: XOR<OpticalItemCreateWithoutLensPrescriptionsInput, OpticalItemUncheckedCreateWithoutLensPrescriptionsInput>
+    where?: OpticalItemWhereInput
+  }
+
+  export type OpticalItemUpdateToOneWithWhereWithoutLensPrescriptionsInput = {
+    where?: OpticalItemWhereInput
+    data: XOR<OpticalItemUpdateWithoutLensPrescriptionsInput, OpticalItemUncheckedUpdateWithoutLensPrescriptionsInput>
+  }
+
+  export type OpticalItemUpdateWithoutLensPrescriptionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    itemName?: StringFieldUpdateOperationsInput | string
+    itemType?: NullableStringFieldUpdateOperationsInput | string | null
+    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    stockQuantity?: IntFieldUpdateOperationsInput | number
+    reorderLevel?: IntFieldUpdateOperationsInput | number
+    purchasePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    branch?: BranchUpdateOneRequiredWithoutOpticalItemsNestedInput
+    supplier?: SupplierUpdateOneWithoutOpticalItemsNestedInput
+    transactions?: OpticalStockTransactionUpdateManyWithoutOpticalItemNestedInput
+    framePrescriptions?: OpticalPrescriptionUpdateManyWithoutFrameItemNestedInput
+  }
+
+  export type OpticalItemUncheckedUpdateWithoutLensPrescriptionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
+    itemName?: StringFieldUpdateOperationsInput | string
+    itemType?: NullableStringFieldUpdateOperationsInput | string | null
+    brand?: NullableStringFieldUpdateOperationsInput | string | null
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    stockQuantity?: IntFieldUpdateOperationsInput | number
+    reorderLevel?: IntFieldUpdateOperationsInput | number
+    purchasePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sellingPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    transactions?: OpticalStockTransactionUncheckedUpdateManyWithoutOpticalItemNestedInput
+    framePrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutFrameItemNestedInput
+  }
+
   export type BranchCreateWithoutAppointmentsInput = {
     id?: string
     branchName: string
@@ -38769,8 +47091,10 @@ export namespace Prisma {
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutBranchInput
     doctors?: DoctorCreateNestedManyWithoutBranchInput
     patients?: PatientCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
@@ -38793,8 +47117,10 @@ export namespace Prisma {
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutBranchInput
     doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
     patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
@@ -38812,30 +47138,72 @@ export namespace Prisma {
 
   export type PatientCreateWithoutAppointmentsInput = {
     id?: string
+    patientNumber?: string | null
     fullName: string
+    firstName?: string | null
+    lastName?: string | null
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
     email?: string | null
     address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    assignedDoctor?: DoctorCreateNestedOneWithoutAssignedPatientsInput
     branch: BranchCreateNestedOneWithoutPatientsInput
+    surgeries?: SurgeryCreateNestedManyWithoutPatientInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutPatientInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutPatientInput
     billings?: BillingCreateNestedManyWithoutPatientInput
     followUps?: FollowUpCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutAppointmentsInput = {
     id?: string
+    patientNumber?: string | null
     fullName: string
+    firstName?: string | null
+    lastName?: string | null
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
     email?: string | null
     address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
+    assignedDoctorId?: string | null
     branchId: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    surgeries?: SurgeryUncheckedCreateNestedManyWithoutPatientInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutPatientInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutPatientInput
     billings?: BillingUncheckedCreateNestedManyWithoutPatientInput
     followUps?: FollowUpUncheckedCreateNestedManyWithoutPatientInput
   }
@@ -38854,8 +47222,10 @@ export namespace Prisma {
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutDoctorInput
     branch: BranchCreateNestedOneWithoutDoctorsInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutDoctorInput
     examinedClinicalExams?: ClinicalExaminationCreateNestedManyWithoutExaminedByInput
     surgeries?: SurgeryCreateNestedManyWithoutSurgeonInput
+    assignedPatients?: PatientCreateNestedManyWithoutAssignedDoctorInput
   }
 
   export type DoctorUncheckedCreateWithoutAppointmentsInput = {
@@ -38867,8 +47237,10 @@ export namespace Prisma {
     branchId: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutDoctorInput
     examinedClinicalExams?: ClinicalExaminationUncheckedCreateNestedManyWithoutExaminedByInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutSurgeonInput
+    assignedPatients?: PatientUncheckedCreateNestedManyWithoutAssignedDoctorInput
   }
 
   export type DoctorCreateOrConnectWithoutAppointmentsInput = {
@@ -38898,6 +47270,7 @@ export namespace Prisma {
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
     activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserUncheckedCreateWithoutCreatedAppointmentsInput = {
@@ -38922,6 +47295,7 @@ export namespace Prisma {
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
     activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserCreateOrConnectWithoutCreatedAppointmentsInput = {
@@ -39156,8 +47530,10 @@ export namespace Prisma {
     staffAssignments?: StaffAssignmentUpdateManyWithoutBranchNestedInput
     doctors?: DoctorUpdateManyWithoutBranchNestedInput
     patients?: PatientUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
@@ -39180,8 +47556,10 @@ export namespace Prisma {
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutBranchNestedInput
     doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
     patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
@@ -39205,30 +47583,72 @@ export namespace Prisma {
 
   export type PatientUpdateWithoutAppointmentsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedDoctor?: DoctorUpdateOneWithoutAssignedPatientsNestedInput
     branch?: BranchUpdateOneRequiredWithoutPatientsNestedInput
+    surgeries?: SurgeryUpdateManyWithoutPatientNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutPatientNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutPatientNestedInput
     billings?: BillingUpdateManyWithoutPatientNestedInput
     followUps?: FollowUpUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutAppointmentsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    assignedDoctorId?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    surgeries?: SurgeryUncheckedUpdateManyWithoutPatientNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutPatientNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutPatientNestedInput
     billings?: BillingUncheckedUpdateManyWithoutPatientNestedInput
     followUps?: FollowUpUncheckedUpdateManyWithoutPatientNestedInput
   }
@@ -39253,8 +47673,10 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutDoctorNestedInput
     branch?: BranchUpdateOneRequiredWithoutDoctorsNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutDoctorNestedInput
     examinedClinicalExams?: ClinicalExaminationUpdateManyWithoutExaminedByNestedInput
     surgeries?: SurgeryUpdateManyWithoutSurgeonNestedInput
+    assignedPatients?: PatientUpdateManyWithoutAssignedDoctorNestedInput
   }
 
   export type DoctorUncheckedUpdateWithoutAppointmentsInput = {
@@ -39266,8 +47688,10 @@ export namespace Prisma {
     branchId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutDoctorNestedInput
     examinedClinicalExams?: ClinicalExaminationUncheckedUpdateManyWithoutExaminedByNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutSurgeonNestedInput
+    assignedPatients?: PatientUncheckedUpdateManyWithoutAssignedDoctorNestedInput
   }
 
   export type UserUpsertWithoutCreatedAppointmentsInput = {
@@ -39303,6 +47727,7 @@ export namespace Prisma {
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
     activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutCreatedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreatedAppointmentsInput = {
@@ -39327,6 +47752,7 @@ export namespace Prisma {
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
     activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutCreatedByNestedInput
   }
 
   export type ERExaminationUpsertWithoutAppointmentInput = {
@@ -39463,12 +47889,371 @@ export namespace Prisma {
     data: XOR<FollowUpUpdateManyMutationInput, FollowUpUncheckedUpdateManyWithoutCompletedAppointmentInput>
   }
 
+  export type BranchCreateWithoutEyeExaminationsInput = {
+    id?: string
+    branchName: string
+    address: string
+    phone: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserCreateNestedManyWithoutBranchInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutBranchInput
+    doctors?: DoctorCreateNestedManyWithoutBranchInput
+    patients?: PatientCreateNestedManyWithoutBranchInput
+    appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    surgeries?: SurgeryCreateNestedManyWithoutBranchInput
+    prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutBranchInput
+    pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
+    pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
+    opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
+    opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
+    billings?: BillingCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchUncheckedCreateWithoutEyeExaminationsInput = {
+    id?: string
+    branchName: string
+    address: string
+    phone: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    users?: UserUncheckedCreateNestedManyWithoutBranchInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutBranchInput
+    doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
+    patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
+    prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
+    pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
+    opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
+    opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
+    billings?: BillingUncheckedCreateNestedManyWithoutBranchInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutBranchInput
+    suppliers?: SupplierUncheckedCreateNestedManyWithoutBranchInput
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchCreateOrConnectWithoutEyeExaminationsInput = {
+    where: BranchWhereUniqueInput
+    create: XOR<BranchCreateWithoutEyeExaminationsInput, BranchUncheckedCreateWithoutEyeExaminationsInput>
+  }
+
+  export type PatientCreateWithoutEyeExaminationsInput = {
+    id?: string
+    patientNumber?: string | null
+    fullName: string
+    firstName?: string | null
+    lastName?: string | null
+    gender?: string | null
+    dateOfBirth: Date | string
+    phone: string
+    email?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    assignedDoctor?: DoctorCreateNestedOneWithoutAssignedPatientsInput
+    branch: BranchCreateNestedOneWithoutPatientsInput
+    appointments?: AppointmentCreateNestedManyWithoutPatientInput
+    surgeries?: SurgeryCreateNestedManyWithoutPatientInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutPatientInput
+    billings?: BillingCreateNestedManyWithoutPatientInput
+    followUps?: FollowUpCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientUncheckedCreateWithoutEyeExaminationsInput = {
+    id?: string
+    patientNumber?: string | null
+    fullName: string
+    firstName?: string | null
+    lastName?: string | null
+    gender?: string | null
+    dateOfBirth: Date | string
+    phone: string
+    email?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
+    assignedDoctorId?: string | null
+    branchId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
+    surgeries?: SurgeryUncheckedCreateNestedManyWithoutPatientInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutPatientInput
+    billings?: BillingUncheckedCreateNestedManyWithoutPatientInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientCreateOrConnectWithoutEyeExaminationsInput = {
+    where: PatientWhereUniqueInput
+    create: XOR<PatientCreateWithoutEyeExaminationsInput, PatientUncheckedCreateWithoutEyeExaminationsInput>
+  }
+
+  export type DoctorCreateWithoutEyeExaminationsInput = {
+    id?: string
+    licenseNumber: string
+    specialization: string
+    phone?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutDoctorInput
+    branch: BranchCreateNestedOneWithoutDoctorsInput
+    appointments?: AppointmentCreateNestedManyWithoutDoctorInput
+    examinedClinicalExams?: ClinicalExaminationCreateNestedManyWithoutExaminedByInput
+    surgeries?: SurgeryCreateNestedManyWithoutSurgeonInput
+    assignedPatients?: PatientCreateNestedManyWithoutAssignedDoctorInput
+  }
+
+  export type DoctorUncheckedCreateWithoutEyeExaminationsInput = {
+    id?: string
+    userId: string
+    licenseNumber: string
+    specialization: string
+    phone?: string | null
+    branchId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+    examinedClinicalExams?: ClinicalExaminationUncheckedCreateNestedManyWithoutExaminedByInput
+    surgeries?: SurgeryUncheckedCreateNestedManyWithoutSurgeonInput
+    assignedPatients?: PatientUncheckedCreateNestedManyWithoutAssignedDoctorInput
+  }
+
+  export type DoctorCreateOrConnectWithoutEyeExaminationsInput = {
+    where: DoctorWhereUniqueInput
+    create: XOR<DoctorCreateWithoutEyeExaminationsInput, DoctorUncheckedCreateWithoutEyeExaminationsInput>
+  }
+
+  export type BranchUpsertWithoutEyeExaminationsInput = {
+    update: XOR<BranchUpdateWithoutEyeExaminationsInput, BranchUncheckedUpdateWithoutEyeExaminationsInput>
+    create: XOR<BranchCreateWithoutEyeExaminationsInput, BranchUncheckedCreateWithoutEyeExaminationsInput>
+    where?: BranchWhereInput
+  }
+
+  export type BranchUpdateToOneWithWhereWithoutEyeExaminationsInput = {
+    where?: BranchWhereInput
+    data: XOR<BranchUpdateWithoutEyeExaminationsInput, BranchUncheckedUpdateWithoutEyeExaminationsInput>
+  }
+
+  export type BranchUpdateWithoutEyeExaminationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchName?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUpdateManyWithoutBranchNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutBranchNestedInput
+    doctors?: DoctorUpdateManyWithoutBranchNestedInput
+    patients?: PatientUpdateManyWithoutBranchNestedInput
+    appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
+    prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutBranchNestedInput
+    pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
+    pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
+    opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
+    opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
+    billings?: BillingUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUpdateManyWithoutBranchNestedInput
+  }
+
+  export type BranchUncheckedUpdateWithoutEyeExaminationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchName?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    users?: UserUncheckedUpdateManyWithoutBranchNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutBranchNestedInput
+    doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
+    patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
+    appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
+    prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
+    pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
+    opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
+    billings?: BillingUncheckedUpdateManyWithoutBranchNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
+    suppliers?: SupplierUncheckedUpdateManyWithoutBranchNestedInput
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutBranchNestedInput
+  }
+
+  export type PatientUpsertWithoutEyeExaminationsInput = {
+    update: XOR<PatientUpdateWithoutEyeExaminationsInput, PatientUncheckedUpdateWithoutEyeExaminationsInput>
+    create: XOR<PatientCreateWithoutEyeExaminationsInput, PatientUncheckedCreateWithoutEyeExaminationsInput>
+    where?: PatientWhereInput
+  }
+
+  export type PatientUpdateToOneWithWhereWithoutEyeExaminationsInput = {
+    where?: PatientWhereInput
+    data: XOR<PatientUpdateWithoutEyeExaminationsInput, PatientUncheckedUpdateWithoutEyeExaminationsInput>
+  }
+
+  export type PatientUpdateWithoutEyeExaminationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedDoctor?: DoctorUpdateOneWithoutAssignedPatientsNestedInput
+    branch?: BranchUpdateOneRequiredWithoutPatientsNestedInput
+    appointments?: AppointmentUpdateManyWithoutPatientNestedInput
+    surgeries?: SurgeryUpdateManyWithoutPatientNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutPatientNestedInput
+    billings?: BillingUpdateManyWithoutPatientNestedInput
+    followUps?: FollowUpUpdateManyWithoutPatientNestedInput
+  }
+
+  export type PatientUncheckedUpdateWithoutEyeExaminationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    assignedDoctorId?: NullableStringFieldUpdateOperationsInput | string | null
+    branchId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+    surgeries?: SurgeryUncheckedUpdateManyWithoutPatientNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutPatientNestedInput
+    billings?: BillingUncheckedUpdateManyWithoutPatientNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutPatientNestedInput
+  }
+
+  export type DoctorUpsertWithoutEyeExaminationsInput = {
+    update: XOR<DoctorUpdateWithoutEyeExaminationsInput, DoctorUncheckedUpdateWithoutEyeExaminationsInput>
+    create: XOR<DoctorCreateWithoutEyeExaminationsInput, DoctorUncheckedCreateWithoutEyeExaminationsInput>
+    where?: DoctorWhereInput
+  }
+
+  export type DoctorUpdateToOneWithWhereWithoutEyeExaminationsInput = {
+    where?: DoctorWhereInput
+    data: XOR<DoctorUpdateWithoutEyeExaminationsInput, DoctorUncheckedUpdateWithoutEyeExaminationsInput>
+  }
+
+  export type DoctorUpdateWithoutEyeExaminationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    licenseNumber?: StringFieldUpdateOperationsInput | string
+    specialization?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutDoctorNestedInput
+    branch?: BranchUpdateOneRequiredWithoutDoctorsNestedInput
+    appointments?: AppointmentUpdateManyWithoutDoctorNestedInput
+    examinedClinicalExams?: ClinicalExaminationUpdateManyWithoutExaminedByNestedInput
+    surgeries?: SurgeryUpdateManyWithoutSurgeonNestedInput
+    assignedPatients?: PatientUpdateManyWithoutAssignedDoctorNestedInput
+  }
+
+  export type DoctorUncheckedUpdateWithoutEyeExaminationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    licenseNumber?: StringFieldUpdateOperationsInput | string
+    specialization?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    branchId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointments?: AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+    examinedClinicalExams?: ClinicalExaminationUncheckedUpdateManyWithoutExaminedByNestedInput
+    surgeries?: SurgeryUncheckedUpdateManyWithoutSurgeonNestedInput
+    assignedPatients?: PatientUncheckedUpdateManyWithoutAssignedDoctorNestedInput
+  }
+
   export type AppointmentCreateWithoutErExaminationInput = {
     id?: string
     bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     branch: BranchCreateNestedOneWithoutAppointmentsInput
@@ -39487,6 +48272,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     branchId: string
     patientId: string
     doctorId: string
@@ -39526,6 +48314,7 @@ export namespace Prisma {
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
     activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserUncheckedCreateWithoutRecordedERExamsInput = {
@@ -39550,6 +48339,7 @@ export namespace Prisma {
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
     activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserCreateOrConnectWithoutRecordedERExamsInput = {
@@ -39574,6 +48364,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     branch?: BranchUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -39592,6 +48385,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
     doctorId?: StringFieldUpdateOperationsInput | string
@@ -39637,6 +48433,7 @@ export namespace Prisma {
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
     activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutCreatedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRecordedERExamsInput = {
@@ -39661,6 +48458,7 @@ export namespace Prisma {
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
     activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutCreatedByNestedInput
   }
 
   export type AppointmentCreateWithoutClinicalExaminationInput = {
@@ -39669,6 +48467,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     branch: BranchCreateNestedOneWithoutAppointmentsInput
@@ -39687,6 +48488,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     branchId: string
     patientId: string
     doctorId: string
@@ -39714,7 +48518,9 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutDoctorInput
     branch: BranchCreateNestedOneWithoutDoctorsInput
     appointments?: AppointmentCreateNestedManyWithoutDoctorInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutDoctorInput
     surgeries?: SurgeryCreateNestedManyWithoutSurgeonInput
+    assignedPatients?: PatientCreateNestedManyWithoutAssignedDoctorInput
   }
 
   export type DoctorUncheckedCreateWithoutExaminedClinicalExamsInput = {
@@ -39727,7 +48533,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutDoctorInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutSurgeonInput
+    assignedPatients?: PatientUncheckedCreateNestedManyWithoutAssignedDoctorInput
   }
 
   export type DoctorCreateOrConnectWithoutExaminedClinicalExamsInput = {
@@ -39737,15 +48545,21 @@ export namespace Prisma {
 
   export type SurgeryCreateWithoutClinicalExamInput = {
     id?: string
-    eyeSide: string
+    eye: string
     surgeryType: string
-    surgeryDate: Date | string
-    cost: Decimal | DecimalJsLike | number | string
+    procedure?: string | null
+    anesthesiaType?: string | null
+    date: Date | string
+    time?: string | null
+    operatingRoom?: string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
     nextFollowUpDate?: Date | string | null
     createdAt?: Date | string
     branch: BranchCreateNestedOneWithoutSurgeriesInput
+    patient: PatientCreateNestedOneWithoutSurgeriesInput
     surgeon: DoctorCreateNestedOneWithoutSurgeriesInput
     billings?: BillingCreateNestedManyWithoutSurgeryInput
     followUps?: FollowUpCreateNestedManyWithoutSurgeryInput
@@ -39754,10 +48568,16 @@ export namespace Prisma {
   export type SurgeryUncheckedCreateWithoutClinicalExamInput = {
     id?: string
     branchId: string
-    eyeSide: string
+    patientId: string
+    eye: string
     surgeryType: string
-    surgeryDate: Date | string
-    cost: Decimal | DecimalJsLike | number | string
+    procedure?: string | null
+    anesthesiaType?: string | null
+    date: Date | string
+    time?: string | null
+    operatingRoom?: string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
     nextFollowUpDate?: Date | string | null
@@ -39869,6 +48689,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     branch?: BranchUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -39887,6 +48710,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
     doctorId?: StringFieldUpdateOperationsInput | string
@@ -39920,7 +48746,9 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutDoctorNestedInput
     branch?: BranchUpdateOneRequiredWithoutDoctorsNestedInput
     appointments?: AppointmentUpdateManyWithoutDoctorNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutDoctorNestedInput
     surgeries?: SurgeryUpdateManyWithoutSurgeonNestedInput
+    assignedPatients?: PatientUpdateManyWithoutAssignedDoctorNestedInput
   }
 
   export type DoctorUncheckedUpdateWithoutExaminedClinicalExamsInput = {
@@ -39933,7 +48761,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutDoctorNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutSurgeonNestedInput
+    assignedPatients?: PatientUncheckedUpdateManyWithoutAssignedDoctorNestedInput
   }
 
   export type SurgeryUpsertWithoutClinicalExamInput = {
@@ -39949,15 +48779,21 @@ export namespace Prisma {
 
   export type SurgeryUpdateWithoutClinicalExamInput = {
     id?: StringFieldUpdateOperationsInput | string
-    eyeSide?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
     surgeryType?: StringFieldUpdateOperationsInput | string
-    surgeryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     branch?: BranchUpdateOneRequiredWithoutSurgeriesNestedInput
+    patient?: PatientUpdateOneRequiredWithoutSurgeriesNestedInput
     surgeon?: DoctorUpdateOneRequiredWithoutSurgeriesNestedInput
     billings?: BillingUpdateManyWithoutSurgeryNestedInput
     followUps?: FollowUpUpdateManyWithoutSurgeryNestedInput
@@ -39966,9 +48802,15 @@ export namespace Prisma {
   export type SurgeryUncheckedUpdateWithoutClinicalExamInput = {
     id?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
-    eyeSide?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
     surgeryType?: StringFieldUpdateOperationsInput | string
-    surgeryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40067,7 +48909,9 @@ export namespace Prisma {
     doctors?: DoctorCreateNestedManyWithoutBranchInput
     patients?: PatientCreateNestedManyWithoutBranchInput
     appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
@@ -40091,7 +48935,9 @@ export namespace Prisma {
     doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
     patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
@@ -40107,6 +48953,83 @@ export namespace Prisma {
     create: XOR<BranchCreateWithoutSurgeriesInput, BranchUncheckedCreateWithoutSurgeriesInput>
   }
 
+  export type PatientCreateWithoutSurgeriesInput = {
+    id?: string
+    patientNumber?: string | null
+    fullName: string
+    firstName?: string | null
+    lastName?: string | null
+    gender?: string | null
+    dateOfBirth: Date | string
+    phone: string
+    email?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    assignedDoctor?: DoctorCreateNestedOneWithoutAssignedPatientsInput
+    branch: BranchCreateNestedOneWithoutPatientsInput
+    appointments?: AppointmentCreateNestedManyWithoutPatientInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutPatientInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutPatientInput
+    billings?: BillingCreateNestedManyWithoutPatientInput
+    followUps?: FollowUpCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientUncheckedCreateWithoutSurgeriesInput = {
+    id?: string
+    patientNumber?: string | null
+    fullName: string
+    firstName?: string | null
+    lastName?: string | null
+    gender?: string | null
+    dateOfBirth: Date | string
+    phone: string
+    email?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
+    assignedDoctorId?: string | null
+    branchId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutPatientInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutPatientInput
+    billings?: BillingUncheckedCreateNestedManyWithoutPatientInput
+    followUps?: FollowUpUncheckedCreateNestedManyWithoutPatientInput
+  }
+
+  export type PatientCreateOrConnectWithoutSurgeriesInput = {
+    where: PatientWhereUniqueInput
+    create: XOR<PatientCreateWithoutSurgeriesInput, PatientUncheckedCreateWithoutSurgeriesInput>
+  }
+
   export type DoctorCreateWithoutSurgeriesInput = {
     id?: string
     licenseNumber: string
@@ -40117,7 +49040,9 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutDoctorInput
     branch: BranchCreateNestedOneWithoutDoctorsInput
     appointments?: AppointmentCreateNestedManyWithoutDoctorInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutDoctorInput
     examinedClinicalExams?: ClinicalExaminationCreateNestedManyWithoutExaminedByInput
+    assignedPatients?: PatientCreateNestedManyWithoutAssignedDoctorInput
   }
 
   export type DoctorUncheckedCreateWithoutSurgeriesInput = {
@@ -40130,7 +49055,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutDoctorInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutDoctorInput
     examinedClinicalExams?: ClinicalExaminationUncheckedCreateNestedManyWithoutExaminedByInput
+    assignedPatients?: PatientUncheckedCreateNestedManyWithoutAssignedDoctorInput
   }
 
   export type DoctorCreateOrConnectWithoutSurgeriesInput = {
@@ -40303,7 +49230,9 @@ export namespace Prisma {
     doctors?: DoctorUpdateManyWithoutBranchNestedInput
     patients?: PatientUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
@@ -40327,7 +49256,9 @@ export namespace Prisma {
     doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
     patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
@@ -40336,6 +49267,89 @@ export namespace Prisma {
     followUps?: FollowUpUncheckedUpdateManyWithoutBranchNestedInput
     suppliers?: SupplierUncheckedUpdateManyWithoutBranchNestedInput
     activityLogs?: ActivityLogUncheckedUpdateManyWithoutBranchNestedInput
+  }
+
+  export type PatientUpsertWithoutSurgeriesInput = {
+    update: XOR<PatientUpdateWithoutSurgeriesInput, PatientUncheckedUpdateWithoutSurgeriesInput>
+    create: XOR<PatientCreateWithoutSurgeriesInput, PatientUncheckedCreateWithoutSurgeriesInput>
+    where?: PatientWhereInput
+  }
+
+  export type PatientUpdateToOneWithWhereWithoutSurgeriesInput = {
+    where?: PatientWhereInput
+    data: XOR<PatientUpdateWithoutSurgeriesInput, PatientUncheckedUpdateWithoutSurgeriesInput>
+  }
+
+  export type PatientUpdateWithoutSurgeriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedDoctor?: DoctorUpdateOneWithoutAssignedPatientsNestedInput
+    branch?: BranchUpdateOneRequiredWithoutPatientsNestedInput
+    appointments?: AppointmentUpdateManyWithoutPatientNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutPatientNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutPatientNestedInput
+    billings?: BillingUpdateManyWithoutPatientNestedInput
+    followUps?: FollowUpUpdateManyWithoutPatientNestedInput
+  }
+
+  export type PatientUncheckedUpdateWithoutSurgeriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    assignedDoctorId?: NullableStringFieldUpdateOperationsInput | string | null
+    branchId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutPatientNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutPatientNestedInput
+    billings?: BillingUncheckedUpdateManyWithoutPatientNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type DoctorUpsertWithoutSurgeriesInput = {
@@ -40359,7 +49373,9 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutDoctorNestedInput
     branch?: BranchUpdateOneRequiredWithoutDoctorsNestedInput
     appointments?: AppointmentUpdateManyWithoutDoctorNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutDoctorNestedInput
     examinedClinicalExams?: ClinicalExaminationUpdateManyWithoutExaminedByNestedInput
+    assignedPatients?: PatientUpdateManyWithoutAssignedDoctorNestedInput
   }
 
   export type DoctorUncheckedUpdateWithoutSurgeriesInput = {
@@ -40372,7 +49388,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutDoctorNestedInput
     examinedClinicalExams?: ClinicalExaminationUncheckedUpdateManyWithoutExaminedByNestedInput
+    assignedPatients?: PatientUncheckedUpdateManyWithoutAssignedDoctorNestedInput
   }
 
   export type BillingUpsertWithWhereUniqueWithoutSurgeryInput = {
@@ -40413,6 +49431,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     branch: BranchCreateNestedOneWithoutAppointmentsInput
@@ -40431,6 +49452,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     branchId: string
     patientId: string
     doctorId: string
@@ -40504,7 +49528,9 @@ export namespace Prisma {
     doctors?: DoctorCreateNestedManyWithoutBranchInput
     patients?: PatientCreateNestedManyWithoutBranchInput
     appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
@@ -40528,7 +49554,9 @@ export namespace Prisma {
     doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
     patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
@@ -40653,6 +49681,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     branch?: BranchUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -40671,6 +49702,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
     doctorId?: StringFieldUpdateOperationsInput | string
@@ -40756,7 +49790,9 @@ export namespace Prisma {
     doctors?: DoctorUpdateManyWithoutBranchNestedInput
     patients?: PatientUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
@@ -40780,7 +49816,9 @@ export namespace Prisma {
     doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
     patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
@@ -40836,8 +49874,10 @@ export namespace Prisma {
     doctors?: DoctorCreateNestedManyWithoutBranchInput
     patients?: PatientCreateNestedManyWithoutBranchInput
     appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
@@ -40860,8 +49900,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
     patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
@@ -40961,8 +50003,10 @@ export namespace Prisma {
     doctors?: DoctorUpdateManyWithoutBranchNestedInput
     patients?: PatientUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
@@ -40985,8 +50029,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
     patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
@@ -41105,8 +50151,10 @@ export namespace Prisma {
     doctors?: DoctorCreateNestedManyWithoutBranchInput
     patients?: PatientCreateNestedManyWithoutBranchInput
     appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
@@ -41129,8 +50177,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
     patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
@@ -41212,6 +50262,7 @@ export namespace Prisma {
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
     activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserUncheckedCreateWithoutPharmacyTransactionsInput = {
@@ -41236,6 +50287,7 @@ export namespace Prisma {
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
     activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserCreateOrConnectWithoutPharmacyTransactionsInput = {
@@ -41318,8 +50370,10 @@ export namespace Prisma {
     doctors?: DoctorUpdateManyWithoutBranchNestedInput
     patients?: PatientUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
@@ -41342,8 +50396,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
     patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
@@ -41437,6 +50493,7 @@ export namespace Prisma {
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
     activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutCreatedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPharmacyTransactionsInput = {
@@ -41461,6 +50518,7 @@ export namespace Prisma {
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
     activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutCreatedByNestedInput
   }
 
   export type BranchCreateWithoutOpticalItemsInput = {
@@ -41476,8 +50534,10 @@ export namespace Prisma {
     doctors?: DoctorCreateNestedManyWithoutBranchInput
     patients?: PatientCreateNestedManyWithoutBranchInput
     appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutBranchInput
@@ -41500,8 +50560,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
     patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutBranchInput
@@ -41577,6 +50639,154 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type OpticalPrescriptionCreateWithoutFrameItemInput = {
+    id?: string
+    type?: $Enums.OpticalPrescriptionType
+    status?: $Enums.OpticalPrescriptionStatus
+    validityMonths?: number
+    expiryDate: Date | string
+    dispensedAt?: Date | string | null
+    notes?: string | null
+    odSphere?: string | null
+    odCylinder?: string | null
+    odAxis?: number | null
+    odAdd?: string | null
+    odPd?: number | null
+    odPrism?: string | null
+    osSphere?: string | null
+    osCylinder?: string | null
+    osAxis?: number | null
+    osAdd?: string | null
+    osPd?: number | null
+    osPrism?: string | null
+    lensType?: string | null
+    lensMaterial?: string | null
+    frameType?: string | null
+    coatings?: OpticalPrescriptionCreatecoatingsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutOpticalPrescriptionsInput
+    patient: PatientCreateNestedOneWithoutOpticalPrescriptionsInput
+    createdBy?: UserCreateNestedOneWithoutCreatedOpticalPrescriptionsInput
+    lensItem?: OpticalItemCreateNestedOneWithoutLensPrescriptionsInput
+  }
+
+  export type OpticalPrescriptionUncheckedCreateWithoutFrameItemInput = {
+    id?: string
+    branchId: string
+    patientId: string
+    createdById?: string | null
+    type?: $Enums.OpticalPrescriptionType
+    status?: $Enums.OpticalPrescriptionStatus
+    validityMonths?: number
+    expiryDate: Date | string
+    dispensedAt?: Date | string | null
+    notes?: string | null
+    odSphere?: string | null
+    odCylinder?: string | null
+    odAxis?: number | null
+    odAdd?: string | null
+    odPd?: number | null
+    odPrism?: string | null
+    osSphere?: string | null
+    osCylinder?: string | null
+    osAxis?: number | null
+    osAdd?: string | null
+    osPd?: number | null
+    osPrism?: string | null
+    lensType?: string | null
+    lensMaterial?: string | null
+    frameType?: string | null
+    coatings?: OpticalPrescriptionCreatecoatingsInput | string[]
+    lensItemId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OpticalPrescriptionCreateOrConnectWithoutFrameItemInput = {
+    where: OpticalPrescriptionWhereUniqueInput
+    create: XOR<OpticalPrescriptionCreateWithoutFrameItemInput, OpticalPrescriptionUncheckedCreateWithoutFrameItemInput>
+  }
+
+  export type OpticalPrescriptionCreateManyFrameItemInputEnvelope = {
+    data: OpticalPrescriptionCreateManyFrameItemInput | OpticalPrescriptionCreateManyFrameItemInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type OpticalPrescriptionCreateWithoutLensItemInput = {
+    id?: string
+    type?: $Enums.OpticalPrescriptionType
+    status?: $Enums.OpticalPrescriptionStatus
+    validityMonths?: number
+    expiryDate: Date | string
+    dispensedAt?: Date | string | null
+    notes?: string | null
+    odSphere?: string | null
+    odCylinder?: string | null
+    odAxis?: number | null
+    odAdd?: string | null
+    odPd?: number | null
+    odPrism?: string | null
+    osSphere?: string | null
+    osCylinder?: string | null
+    osAxis?: number | null
+    osAdd?: string | null
+    osPd?: number | null
+    osPrism?: string | null
+    lensType?: string | null
+    lensMaterial?: string | null
+    frameType?: string | null
+    coatings?: OpticalPrescriptionCreatecoatingsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutOpticalPrescriptionsInput
+    patient: PatientCreateNestedOneWithoutOpticalPrescriptionsInput
+    createdBy?: UserCreateNestedOneWithoutCreatedOpticalPrescriptionsInput
+    frameItem?: OpticalItemCreateNestedOneWithoutFramePrescriptionsInput
+  }
+
+  export type OpticalPrescriptionUncheckedCreateWithoutLensItemInput = {
+    id?: string
+    branchId: string
+    patientId: string
+    createdById?: string | null
+    type?: $Enums.OpticalPrescriptionType
+    status?: $Enums.OpticalPrescriptionStatus
+    validityMonths?: number
+    expiryDate: Date | string
+    dispensedAt?: Date | string | null
+    notes?: string | null
+    odSphere?: string | null
+    odCylinder?: string | null
+    odAxis?: number | null
+    odAdd?: string | null
+    odPd?: number | null
+    odPrism?: string | null
+    osSphere?: string | null
+    osCylinder?: string | null
+    osAxis?: number | null
+    osAdd?: string | null
+    osPd?: number | null
+    osPrism?: string | null
+    lensType?: string | null
+    lensMaterial?: string | null
+    frameType?: string | null
+    coatings?: OpticalPrescriptionCreatecoatingsInput | string[]
+    frameItemId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OpticalPrescriptionCreateOrConnectWithoutLensItemInput = {
+    where: OpticalPrescriptionWhereUniqueInput
+    create: XOR<OpticalPrescriptionCreateWithoutLensItemInput, OpticalPrescriptionUncheckedCreateWithoutLensItemInput>
+  }
+
+  export type OpticalPrescriptionCreateManyLensItemInputEnvelope = {
+    data: OpticalPrescriptionCreateManyLensItemInput | OpticalPrescriptionCreateManyLensItemInput[]
+    skipDuplicates?: boolean
+  }
+
   export type BranchUpsertWithoutOpticalItemsInput = {
     update: XOR<BranchUpdateWithoutOpticalItemsInput, BranchUncheckedUpdateWithoutOpticalItemsInput>
     create: XOR<BranchCreateWithoutOpticalItemsInput, BranchUncheckedCreateWithoutOpticalItemsInput>
@@ -41601,8 +50811,10 @@ export namespace Prisma {
     doctors?: DoctorUpdateManyWithoutBranchNestedInput
     patients?: PatientUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutBranchNestedInput
@@ -41625,8 +50837,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
     patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
@@ -41687,6 +50901,38 @@ export namespace Prisma {
     data: XOR<OpticalStockTransactionUpdateManyMutationInput, OpticalStockTransactionUncheckedUpdateManyWithoutOpticalItemInput>
   }
 
+  export type OpticalPrescriptionUpsertWithWhereUniqueWithoutFrameItemInput = {
+    where: OpticalPrescriptionWhereUniqueInput
+    update: XOR<OpticalPrescriptionUpdateWithoutFrameItemInput, OpticalPrescriptionUncheckedUpdateWithoutFrameItemInput>
+    create: XOR<OpticalPrescriptionCreateWithoutFrameItemInput, OpticalPrescriptionUncheckedCreateWithoutFrameItemInput>
+  }
+
+  export type OpticalPrescriptionUpdateWithWhereUniqueWithoutFrameItemInput = {
+    where: OpticalPrescriptionWhereUniqueInput
+    data: XOR<OpticalPrescriptionUpdateWithoutFrameItemInput, OpticalPrescriptionUncheckedUpdateWithoutFrameItemInput>
+  }
+
+  export type OpticalPrescriptionUpdateManyWithWhereWithoutFrameItemInput = {
+    where: OpticalPrescriptionScalarWhereInput
+    data: XOR<OpticalPrescriptionUpdateManyMutationInput, OpticalPrescriptionUncheckedUpdateManyWithoutFrameItemInput>
+  }
+
+  export type OpticalPrescriptionUpsertWithWhereUniqueWithoutLensItemInput = {
+    where: OpticalPrescriptionWhereUniqueInput
+    update: XOR<OpticalPrescriptionUpdateWithoutLensItemInput, OpticalPrescriptionUncheckedUpdateWithoutLensItemInput>
+    create: XOR<OpticalPrescriptionCreateWithoutLensItemInput, OpticalPrescriptionUncheckedCreateWithoutLensItemInput>
+  }
+
+  export type OpticalPrescriptionUpdateWithWhereUniqueWithoutLensItemInput = {
+    where: OpticalPrescriptionWhereUniqueInput
+    data: XOR<OpticalPrescriptionUpdateWithoutLensItemInput, OpticalPrescriptionUncheckedUpdateWithoutLensItemInput>
+  }
+
+  export type OpticalPrescriptionUpdateManyWithWhereWithoutLensItemInput = {
+    where: OpticalPrescriptionScalarWhereInput
+    data: XOR<OpticalPrescriptionUpdateManyMutationInput, OpticalPrescriptionUncheckedUpdateManyWithoutLensItemInput>
+  }
+
   export type OpticalItemCreateWithoutTransactionsInput = {
     id?: string
     itemName: string
@@ -41703,6 +50949,8 @@ export namespace Prisma {
     isActive?: boolean
     branch: BranchCreateNestedOneWithoutOpticalItemsInput
     supplier?: SupplierCreateNestedOneWithoutOpticalItemsInput
+    framePrescriptions?: OpticalPrescriptionCreateNestedManyWithoutFrameItemInput
+    lensPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutLensItemInput
   }
 
   export type OpticalItemUncheckedCreateWithoutTransactionsInput = {
@@ -41721,6 +50969,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     isActive?: boolean
+    framePrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutFrameItemInput
+    lensPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutLensItemInput
   }
 
   export type OpticalItemCreateOrConnectWithoutTransactionsInput = {
@@ -41741,8 +50991,10 @@ export namespace Prisma {
     doctors?: DoctorCreateNestedManyWithoutBranchInput
     patients?: PatientCreateNestedManyWithoutBranchInput
     appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
@@ -41765,8 +51017,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
     patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
@@ -41848,6 +51102,7 @@ export namespace Prisma {
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
     activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserUncheckedCreateWithoutOpticalTransactionsInput = {
@@ -41872,6 +51127,7 @@ export namespace Prisma {
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
     activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserCreateOrConnectWithoutOpticalTransactionsInput = {
@@ -41906,6 +51162,8 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     branch?: BranchUpdateOneRequiredWithoutOpticalItemsNestedInput
     supplier?: SupplierUpdateOneWithoutOpticalItemsNestedInput
+    framePrescriptions?: OpticalPrescriptionUpdateManyWithoutFrameItemNestedInput
+    lensPrescriptions?: OpticalPrescriptionUpdateManyWithoutLensItemNestedInput
   }
 
   export type OpticalItemUncheckedUpdateWithoutTransactionsInput = {
@@ -41924,6 +51182,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    framePrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutFrameItemNestedInput
+    lensPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutLensItemNestedInput
   }
 
   export type BranchUpsertWithoutOpticalTransactionsInput = {
@@ -41950,8 +51210,10 @@ export namespace Prisma {
     doctors?: DoctorUpdateManyWithoutBranchNestedInput
     patients?: PatientUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
@@ -41974,8 +51236,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
     patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
@@ -42069,6 +51333,7 @@ export namespace Prisma {
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
     activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutCreatedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOpticalTransactionsInput = {
@@ -42093,35 +51358,78 @@ export namespace Prisma {
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
     activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutCreatedByNestedInput
   }
 
   export type PatientCreateWithoutBillingsInput = {
     id?: string
+    patientNumber?: string | null
     fullName: string
+    firstName?: string | null
+    lastName?: string | null
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
     email?: string | null
     address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    assignedDoctor?: DoctorCreateNestedOneWithoutAssignedPatientsInput
     branch: BranchCreateNestedOneWithoutPatientsInput
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
+    surgeries?: SurgeryCreateNestedManyWithoutPatientInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutPatientInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutPatientInput
     followUps?: FollowUpCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutBillingsInput = {
     id?: string
+    patientNumber?: string | null
     fullName: string
+    firstName?: string | null
+    lastName?: string | null
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
     email?: string | null
     address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
+    assignedDoctorId?: string | null
     branchId: string
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
+    surgeries?: SurgeryUncheckedCreateNestedManyWithoutPatientInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutPatientInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutPatientInput
     followUps?: FollowUpUncheckedCreateNestedManyWithoutPatientInput
   }
 
@@ -42143,8 +51451,10 @@ export namespace Prisma {
     doctors?: DoctorCreateNestedManyWithoutBranchInput
     patients?: PatientCreateNestedManyWithoutBranchInput
     appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
@@ -42167,8 +51477,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
     patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
@@ -42189,6 +51501,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     branch: BranchCreateNestedOneWithoutAppointmentsInput
@@ -42207,6 +51522,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     branchId: string
     patientId: string
     doctorId: string
@@ -42226,28 +51544,40 @@ export namespace Prisma {
 
   export type SurgeryCreateWithoutBillingsInput = {
     id?: string
-    eyeSide: string
+    eye: string
     surgeryType: string
-    surgeryDate: Date | string
-    cost: Decimal | DecimalJsLike | number | string
+    procedure?: string | null
+    anesthesiaType?: string | null
+    date: Date | string
+    time?: string | null
+    operatingRoom?: string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
     nextFollowUpDate?: Date | string | null
     createdAt?: Date | string
-    clinicalExam: ClinicalExaminationCreateNestedOneWithoutSurgeryInput
+    clinicalExam?: ClinicalExaminationCreateNestedOneWithoutSurgeryInput
     branch: BranchCreateNestedOneWithoutSurgeriesInput
+    patient: PatientCreateNestedOneWithoutSurgeriesInput
     surgeon: DoctorCreateNestedOneWithoutSurgeriesInput
     followUps?: FollowUpCreateNestedManyWithoutSurgeryInput
   }
 
   export type SurgeryUncheckedCreateWithoutBillingsInput = {
     id?: string
-    examId: string
+    examId?: string | null
     branchId: string
-    eyeSide: string
+    patientId: string
+    eye: string
     surgeryType: string
-    surgeryDate: Date | string
-    cost: Decimal | DecimalJsLike | number | string
+    procedure?: string | null
+    anesthesiaType?: string | null
+    date: Date | string
+    time?: string | null
+    operatingRoom?: string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
     nextFollowUpDate?: Date | string | null
@@ -42316,6 +51646,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutUserInput
     activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserUncheckedCreateWithoutCreatedBillingsInput = {
@@ -42340,6 +51671,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutUserInput
     activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserCreateOrConnectWithoutCreatedBillingsInput = {
@@ -42424,31 +51756,73 @@ export namespace Prisma {
 
   export type PatientUpdateWithoutBillingsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedDoctor?: DoctorUpdateOneWithoutAssignedPatientsNestedInput
     branch?: BranchUpdateOneRequiredWithoutPatientsNestedInput
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
+    surgeries?: SurgeryUpdateManyWithoutPatientNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutPatientNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutPatientNestedInput
     followUps?: FollowUpUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutBillingsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    assignedDoctorId?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+    surgeries?: SurgeryUncheckedUpdateManyWithoutPatientNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutPatientNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutPatientNestedInput
     followUps?: FollowUpUncheckedUpdateManyWithoutPatientNestedInput
   }
 
@@ -42476,8 +51850,10 @@ export namespace Prisma {
     doctors?: DoctorUpdateManyWithoutBranchNestedInput
     patients?: PatientUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
@@ -42500,8 +51876,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
     patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
@@ -42528,6 +51906,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     branch?: BranchUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -42546,6 +51927,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
     doctorId?: StringFieldUpdateOperationsInput | string
@@ -42571,27 +51955,39 @@ export namespace Prisma {
 
   export type SurgeryUpdateWithoutBillingsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    eyeSide?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
     surgeryType?: StringFieldUpdateOperationsInput | string
-    surgeryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    clinicalExam?: ClinicalExaminationUpdateOneRequiredWithoutSurgeryNestedInput
+    clinicalExam?: ClinicalExaminationUpdateOneWithoutSurgeryNestedInput
     branch?: BranchUpdateOneRequiredWithoutSurgeriesNestedInput
+    patient?: PatientUpdateOneRequiredWithoutSurgeriesNestedInput
     surgeon?: DoctorUpdateOneRequiredWithoutSurgeriesNestedInput
     followUps?: FollowUpUpdateManyWithoutSurgeryNestedInput
   }
 
   export type SurgeryUncheckedUpdateWithoutBillingsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    examId?: StringFieldUpdateOperationsInput | string
+    examId?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
-    eyeSide?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
     surgeryType?: StringFieldUpdateOperationsInput | string
-    surgeryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42673,6 +52069,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
     activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutCreatedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreatedBillingsInput = {
@@ -42697,6 +52094,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
     activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutCreatedByNestedInput
   }
 
   export type PharmacyStockTransactionUpsertWithWhereUniqueWithoutBillingInput = {
@@ -42733,31 +52131,73 @@ export namespace Prisma {
 
   export type PatientCreateWithoutFollowUpsInput = {
     id?: string
+    patientNumber?: string | null
     fullName: string
+    firstName?: string | null
+    lastName?: string | null
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
     email?: string | null
     address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    assignedDoctor?: DoctorCreateNestedOneWithoutAssignedPatientsInput
     branch: BranchCreateNestedOneWithoutPatientsInput
     appointments?: AppointmentCreateNestedManyWithoutPatientInput
+    surgeries?: SurgeryCreateNestedManyWithoutPatientInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutPatientInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutPatientInput
     billings?: BillingCreateNestedManyWithoutPatientInput
   }
 
   export type PatientUncheckedCreateWithoutFollowUpsInput = {
     id?: string
+    patientNumber?: string | null
     fullName: string
+    firstName?: string | null
+    lastName?: string | null
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
     email?: string | null
     address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
+    assignedDoctorId?: string | null
     branchId: string
     createdAt?: Date | string
     updatedAt?: Date | string
     appointments?: AppointmentUncheckedCreateNestedManyWithoutPatientInput
+    surgeries?: SurgeryUncheckedCreateNestedManyWithoutPatientInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutPatientInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutPatientInput
     billings?: BillingUncheckedCreateNestedManyWithoutPatientInput
   }
 
@@ -42779,8 +52219,10 @@ export namespace Prisma {
     doctors?: DoctorCreateNestedManyWithoutBranchInput
     patients?: PatientCreateNestedManyWithoutBranchInput
     appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
@@ -42803,8 +52245,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
     patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
@@ -42825,6 +52269,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     branch: BranchCreateNestedOneWithoutAppointmentsInput
@@ -42843,6 +52290,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     branchId: string
     patientId: string
     doctorId: string
@@ -42905,28 +52355,40 @@ export namespace Prisma {
 
   export type SurgeryCreateWithoutFollowUpsInput = {
     id?: string
-    eyeSide: string
+    eye: string
     surgeryType: string
-    surgeryDate: Date | string
-    cost: Decimal | DecimalJsLike | number | string
+    procedure?: string | null
+    anesthesiaType?: string | null
+    date: Date | string
+    time?: string | null
+    operatingRoom?: string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
     nextFollowUpDate?: Date | string | null
     createdAt?: Date | string
-    clinicalExam: ClinicalExaminationCreateNestedOneWithoutSurgeryInput
+    clinicalExam?: ClinicalExaminationCreateNestedOneWithoutSurgeryInput
     branch: BranchCreateNestedOneWithoutSurgeriesInput
+    patient: PatientCreateNestedOneWithoutSurgeriesInput
     surgeon: DoctorCreateNestedOneWithoutSurgeriesInput
     billings?: BillingCreateNestedManyWithoutSurgeryInput
   }
 
   export type SurgeryUncheckedCreateWithoutFollowUpsInput = {
     id?: string
-    examId: string
+    examId?: string | null
     branchId: string
-    eyeSide: string
+    patientId: string
+    eye: string
     surgeryType: string
-    surgeryDate: Date | string
-    cost: Decimal | DecimalJsLike | number | string
+    procedure?: string | null
+    anesthesiaType?: string | null
+    date: Date | string
+    time?: string | null
+    operatingRoom?: string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
     nextFollowUpDate?: Date | string | null
@@ -42986,31 +52448,73 @@ export namespace Prisma {
 
   export type PatientUpdateWithoutFollowUpsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedDoctor?: DoctorUpdateOneWithoutAssignedPatientsNestedInput
     branch?: BranchUpdateOneRequiredWithoutPatientsNestedInput
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
+    surgeries?: SurgeryUpdateManyWithoutPatientNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutPatientNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutPatientNestedInput
     billings?: BillingUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutFollowUpsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    assignedDoctorId?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+    surgeries?: SurgeryUncheckedUpdateManyWithoutPatientNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutPatientNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutPatientNestedInput
     billings?: BillingUncheckedUpdateManyWithoutPatientNestedInput
   }
 
@@ -43038,8 +52542,10 @@ export namespace Prisma {
     doctors?: DoctorUpdateManyWithoutBranchNestedInput
     patients?: PatientUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
@@ -43062,8 +52568,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
     patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
@@ -43090,6 +52598,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     branch?: BranchUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -43108,6 +52619,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
     doctorId?: StringFieldUpdateOperationsInput | string
@@ -43182,27 +52696,39 @@ export namespace Prisma {
 
   export type SurgeryUpdateWithoutFollowUpsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    eyeSide?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
     surgeryType?: StringFieldUpdateOperationsInput | string
-    surgeryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    clinicalExam?: ClinicalExaminationUpdateOneRequiredWithoutSurgeryNestedInput
+    clinicalExam?: ClinicalExaminationUpdateOneWithoutSurgeryNestedInput
     branch?: BranchUpdateOneRequiredWithoutSurgeriesNestedInput
+    patient?: PatientUpdateOneRequiredWithoutSurgeriesNestedInput
     surgeon?: DoctorUpdateOneRequiredWithoutSurgeriesNestedInput
     billings?: BillingUpdateManyWithoutSurgeryNestedInput
   }
 
   export type SurgeryUncheckedUpdateWithoutFollowUpsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    examId?: StringFieldUpdateOperationsInput | string
+    examId?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
-    eyeSide?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
     surgeryType?: StringFieldUpdateOperationsInput | string
-    surgeryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43273,6 +52799,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingCreateNestedManyWithoutCreatedByInput
     activityLogs?: ActivityLogCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserUncheckedCreateWithoutStaffAssignmentsInput = {
@@ -43297,6 +52824,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedCreateNestedManyWithoutPerformedByInput
     createdBillings?: BillingUncheckedCreateNestedManyWithoutCreatedByInput
     activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutUserInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutCreatedByInput
   }
 
   export type UserCreateOrConnectWithoutStaffAssignmentsInput = {
@@ -43316,8 +52844,10 @@ export namespace Prisma {
     doctors?: DoctorCreateNestedManyWithoutBranchInput
     patients?: PatientCreateNestedManyWithoutBranchInput
     appointments?: AppointmentCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemCreateNestedManyWithoutBranchInput
@@ -43340,8 +52870,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedCreateNestedManyWithoutBranchInput
     patients?: PatientUncheckedCreateNestedManyWithoutBranchInput
     appointments?: AppointmentUncheckedCreateNestedManyWithoutBranchInput
+    eyeExaminations?: EyeExaminationUncheckedCreateNestedManyWithoutBranchInput
     surgeries?: SurgeryUncheckedCreateNestedManyWithoutBranchInput
     prescriptions?: PrescriptionUncheckedCreateNestedManyWithoutBranchInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedCreateNestedManyWithoutBranchInput
     pharmacyItems?: PharmacyItemUncheckedCreateNestedManyWithoutBranchInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedCreateNestedManyWithoutBranchInput
     opticalItems?: OpticalItemUncheckedCreateNestedManyWithoutBranchInput
@@ -43390,6 +52922,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
     activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutCreatedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutStaffAssignmentsInput = {
@@ -43414,6 +52947,7 @@ export namespace Prisma {
     opticalTransactions?: OpticalStockTransactionUncheckedUpdateManyWithoutPerformedByNestedInput
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
     activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutCreatedByNestedInput
   }
 
   export type BranchUpsertWithoutStaffAssignmentsInput = {
@@ -43439,8 +52973,10 @@ export namespace Prisma {
     doctors?: DoctorUpdateManyWithoutBranchNestedInput
     patients?: PatientUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUpdateManyWithoutBranchNestedInput
@@ -43463,8 +52999,10 @@ export namespace Prisma {
     doctors?: DoctorUncheckedUpdateManyWithoutBranchNestedInput
     patients?: PatientUncheckedUpdateManyWithoutBranchNestedInput
     appointments?: AppointmentUncheckedUpdateManyWithoutBranchNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutBranchNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutBranchNestedInput
     prescriptions?: PrescriptionUncheckedUpdateManyWithoutBranchNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyItems?: PharmacyItemUncheckedUpdateManyWithoutBranchNestedInput
     pharmacyTransactions?: PharmacyStockTransactionUncheckedUpdateManyWithoutBranchNestedInput
     opticalItems?: OpticalItemUncheckedUpdateManyWithoutBranchNestedInput
@@ -43513,6 +53051,7 @@ export namespace Prisma {
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
     activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutCreatedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRoleInput = {
@@ -43537,6 +53076,7 @@ export namespace Prisma {
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
     activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutCreatedByNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutRoleInput = {
@@ -43590,12 +53130,30 @@ export namespace Prisma {
 
   export type PatientCreateManyBranchInput = {
     id?: string
+    patientNumber?: string | null
     fullName: string
+    firstName?: string | null
+    lastName?: string | null
     gender?: string | null
     dateOfBirth: Date | string
     phone: string
     email?: string | null
     address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
+    assignedDoctorId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -43606,6 +53164,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     patientId: string
     doctorId: string
     createdById: string
@@ -43613,13 +53174,58 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type EyeExaminationCreateManyBranchInput = {
+    id?: string
+    patientId: string
+    doctorId: string
+    chiefComplaint: string
+    historyOfPresentIllness?: string | null
+    vaScale?: string
+    vaUnaidedOD?: string | null
+    vaUnaidedOS?: string | null
+    vaUnaidedNearOD?: string | null
+    vaUnaidedNearOS?: string | null
+    vaBcvaOD?: string | null
+    vaBcvaOS?: string | null
+    vaBcvaNearOD?: string | null
+    vaBcvaNearOS?: string | null
+    vaPinholeOD?: string | null
+    vaPinholeOS?: string | null
+    refractionSphereOD?: string | null
+    refractionSphereOS?: string | null
+    refractionCylinderOD?: string | null
+    refractionCylinderOS?: string | null
+    refractionAxisOD?: string | null
+    refractionAxisOS?: string | null
+    iopOD?: number | null
+    iopOS?: number | null
+    iopMethod?: string | null
+    iopTime?: string | null
+    targetIopOD?: number | null
+    targetIopOS?: number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: string | null
+    plan?: string | null
+    followUpDate?: Date | string | null
+    nextVisitReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type SurgeryCreateManyBranchInput = {
     id?: string
-    examId: string
-    eyeSide: string
+    examId?: string | null
+    patientId: string
+    eye: string
     surgeryType: string
-    surgeryDate: Date | string
-    cost: Decimal | DecimalJsLike | number | string
+    procedure?: string | null
+    anesthesiaType?: string | null
+    date: Date | string
+    time?: string | null
+    operatingRoom?: string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
     nextFollowUpDate?: Date | string | null
@@ -43637,6 +53243,38 @@ export namespace Prisma {
     instructions?: string | null
     reviewAfterDays?: number | null
     createdAt?: Date | string
+  }
+
+  export type OpticalPrescriptionCreateManyBranchInput = {
+    id?: string
+    patientId: string
+    createdById?: string | null
+    type?: $Enums.OpticalPrescriptionType
+    status?: $Enums.OpticalPrescriptionStatus
+    validityMonths?: number
+    expiryDate: Date | string
+    dispensedAt?: Date | string | null
+    notes?: string | null
+    odSphere?: string | null
+    odCylinder?: string | null
+    odAxis?: number | null
+    odAdd?: string | null
+    odPd?: number | null
+    odPrism?: string | null
+    osSphere?: string | null
+    osCylinder?: string | null
+    osAxis?: number | null
+    osAdd?: string | null
+    osPd?: number | null
+    osPrism?: string | null
+    lensType?: string | null
+    lensMaterial?: string | null
+    frameType?: string | null
+    coatings?: OpticalPrescriptionCreatecoatingsInput | string[]
+    frameItemId?: string | null
+    lensItemId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type PharmacyItemCreateManyBranchInput = {
@@ -43773,6 +53411,7 @@ export namespace Prisma {
     createdBillings?: BillingUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutUserNestedInput
     activityLogs?: ActivityLogUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutCreatedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBranchInput = {
@@ -43797,6 +53436,7 @@ export namespace Prisma {
     createdBillings?: BillingUncheckedUpdateManyWithoutCreatedByNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutUserNestedInput
     activityLogs?: ActivityLogUncheckedUpdateManyWithoutUserNestedInput
+    createdOpticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutCreatedByNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutBranchInput = {
@@ -43845,8 +53485,10 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutDoctorNestedInput
     appointments?: AppointmentUpdateManyWithoutDoctorNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutDoctorNestedInput
     examinedClinicalExams?: ClinicalExaminationUpdateManyWithoutExaminedByNestedInput
     surgeries?: SurgeryUpdateManyWithoutSurgeonNestedInput
+    assignedPatients?: PatientUpdateManyWithoutAssignedDoctorNestedInput
   }
 
   export type DoctorUncheckedUpdateWithoutBranchInput = {
@@ -43858,8 +53500,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutDoctorNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutDoctorNestedInput
     examinedClinicalExams?: ClinicalExaminationUncheckedUpdateManyWithoutExaminedByNestedInput
     surgeries?: SurgeryUncheckedUpdateManyWithoutSurgeonNestedInput
+    assignedPatients?: PatientUncheckedUpdateManyWithoutAssignedDoctorNestedInput
   }
 
   export type DoctorUncheckedUpdateManyWithoutBranchInput = {
@@ -43874,42 +53518,102 @@ export namespace Prisma {
 
   export type PatientUpdateWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedDoctor?: DoctorUpdateOneWithoutAssignedPatientsNestedInput
     appointments?: AppointmentUpdateManyWithoutPatientNestedInput
+    surgeries?: SurgeryUpdateManyWithoutPatientNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutPatientNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutPatientNestedInput
     billings?: BillingUpdateManyWithoutPatientNestedInput
     followUps?: FollowUpUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    assignedDoctorId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+    surgeries?: SurgeryUncheckedUpdateManyWithoutPatientNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutPatientNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutPatientNestedInput
     billings?: BillingUncheckedUpdateManyWithoutPatientNestedInput
     followUps?: FollowUpUncheckedUpdateManyWithoutPatientNestedInput
   }
 
   export type PatientUncheckedUpdateManyWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
     gender?: NullableStringFieldUpdateOperationsInput | string | null
     dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
     phone?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    assignedDoctorId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -43920,6 +53624,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     patient?: PatientUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -43938,6 +53645,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     patientId?: StringFieldUpdateOperationsInput | string
     doctorId?: StringFieldUpdateOperationsInput | string
     createdById?: StringFieldUpdateOperationsInput | string
@@ -43956,6 +53666,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     patientId?: StringFieldUpdateOperationsInput | string
     doctorId?: StringFieldUpdateOperationsInput | string
     createdById?: StringFieldUpdateOperationsInput | string
@@ -43963,17 +53676,140 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type EyeExaminationUpdateWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: StringFieldUpdateOperationsInput | string
+    historyOfPresentIllness?: NullableStringFieldUpdateOperationsInput | string | null
+    vaScale?: StringFieldUpdateOperationsInput | string
+    vaUnaidedOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOS?: NullableStringFieldUpdateOperationsInput | string | null
+    iopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    iopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    iopMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    iopTime?: NullableStringFieldUpdateOperationsInput | string | null
+    targetIopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    targetIopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    plan?: NullableStringFieldUpdateOperationsInput | string | null
+    followUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextVisitReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutEyeExaminationsNestedInput
+    doctor?: DoctorUpdateOneRequiredWithoutEyeExaminationsNestedInput
+  }
+
+  export type EyeExaminationUncheckedUpdateWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    doctorId?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: StringFieldUpdateOperationsInput | string
+    historyOfPresentIllness?: NullableStringFieldUpdateOperationsInput | string | null
+    vaScale?: StringFieldUpdateOperationsInput | string
+    vaUnaidedOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOS?: NullableStringFieldUpdateOperationsInput | string | null
+    iopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    iopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    iopMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    iopTime?: NullableStringFieldUpdateOperationsInput | string | null
+    targetIopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    targetIopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    plan?: NullableStringFieldUpdateOperationsInput | string | null
+    followUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextVisitReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EyeExaminationUncheckedUpdateManyWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    doctorId?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: StringFieldUpdateOperationsInput | string
+    historyOfPresentIllness?: NullableStringFieldUpdateOperationsInput | string | null
+    vaScale?: StringFieldUpdateOperationsInput | string
+    vaUnaidedOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOS?: NullableStringFieldUpdateOperationsInput | string | null
+    iopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    iopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    iopMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    iopTime?: NullableStringFieldUpdateOperationsInput | string | null
+    targetIopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    targetIopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    plan?: NullableStringFieldUpdateOperationsInput | string | null
+    followUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextVisitReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SurgeryUpdateWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
-    eyeSide?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
     surgeryType?: StringFieldUpdateOperationsInput | string
-    surgeryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    clinicalExam?: ClinicalExaminationUpdateOneRequiredWithoutSurgeryNestedInput
+    clinicalExam?: ClinicalExaminationUpdateOneWithoutSurgeryNestedInput
+    patient?: PatientUpdateOneRequiredWithoutSurgeriesNestedInput
     surgeon?: DoctorUpdateOneRequiredWithoutSurgeriesNestedInput
     billings?: BillingUpdateManyWithoutSurgeryNestedInput
     followUps?: FollowUpUpdateManyWithoutSurgeryNestedInput
@@ -43981,10 +53817,16 @@ export namespace Prisma {
 
   export type SurgeryUncheckedUpdateWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
-    examId?: StringFieldUpdateOperationsInput | string
-    eyeSide?: StringFieldUpdateOperationsInput | string
+    examId?: NullableStringFieldUpdateOperationsInput | string | null
+    patientId?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
     surgeryType?: StringFieldUpdateOperationsInput | string
-    surgeryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43997,10 +53839,16 @@ export namespace Prisma {
 
   export type SurgeryUncheckedUpdateManyWithoutBranchInput = {
     id?: StringFieldUpdateOperationsInput | string
-    examId?: StringFieldUpdateOperationsInput | string
-    eyeSide?: StringFieldUpdateOperationsInput | string
+    examId?: NullableStringFieldUpdateOperationsInput | string | null
+    patientId?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
     surgeryType?: StringFieldUpdateOperationsInput | string
-    surgeryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44047,6 +53895,102 @@ export namespace Prisma {
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
     reviewAfterDays?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OpticalPrescriptionUpdateWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    patient?: PatientUpdateOneRequiredWithoutOpticalPrescriptionsNestedInput
+    createdBy?: UserUpdateOneWithoutCreatedOpticalPrescriptionsNestedInput
+    frameItem?: OpticalItemUpdateOneWithoutFramePrescriptionsNestedInput
+    lensItem?: OpticalItemUpdateOneWithoutLensPrescriptionsNestedInput
+  }
+
+  export type OpticalPrescriptionUncheckedUpdateWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    createdById?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    frameItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    lensItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OpticalPrescriptionUncheckedUpdateManyWithoutBranchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    createdById?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    frameItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    lensItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PharmacyItemUpdateWithoutBranchInput = {
@@ -44157,6 +54101,8 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     supplier?: SupplierUpdateOneWithoutOpticalItemsNestedInput
     transactions?: OpticalStockTransactionUpdateManyWithoutOpticalItemNestedInput
+    framePrescriptions?: OpticalPrescriptionUpdateManyWithoutFrameItemNestedInput
+    lensPrescriptions?: OpticalPrescriptionUpdateManyWithoutLensItemNestedInput
   }
 
   export type OpticalItemUncheckedUpdateWithoutBranchInput = {
@@ -44175,6 +54121,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     transactions?: OpticalStockTransactionUncheckedUpdateManyWithoutOpticalItemNestedInput
+    framePrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutFrameItemNestedInput
+    lensPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutLensItemNestedInput
   }
 
   export type OpticalItemUncheckedUpdateManyWithoutBranchInput = {
@@ -44508,6 +54456,8 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     branch?: BranchUpdateOneRequiredWithoutOpticalItemsNestedInput
     transactions?: OpticalStockTransactionUpdateManyWithoutOpticalItemNestedInput
+    framePrescriptions?: OpticalPrescriptionUpdateManyWithoutFrameItemNestedInput
+    lensPrescriptions?: OpticalPrescriptionUpdateManyWithoutLensItemNestedInput
   }
 
   export type OpticalItemUncheckedUpdateWithoutSupplierInput = {
@@ -44526,6 +54476,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     transactions?: OpticalStockTransactionUncheckedUpdateManyWithoutOpticalItemNestedInput
+    framePrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutFrameItemNestedInput
+    lensPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutLensItemNestedInput
   }
 
   export type OpticalItemUncheckedUpdateManyWithoutSupplierInput = {
@@ -44551,6 +54503,9 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     branchId: string
     patientId: string
     doctorId: string
@@ -44628,12 +54583,47 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type OpticalPrescriptionCreateManyCreatedByInput = {
+    id?: string
+    branchId: string
+    patientId: string
+    type?: $Enums.OpticalPrescriptionType
+    status?: $Enums.OpticalPrescriptionStatus
+    validityMonths?: number
+    expiryDate: Date | string
+    dispensedAt?: Date | string | null
+    notes?: string | null
+    odSphere?: string | null
+    odCylinder?: string | null
+    odAxis?: number | null
+    odAdd?: string | null
+    odPd?: number | null
+    odPrism?: string | null
+    osSphere?: string | null
+    osCylinder?: string | null
+    osAxis?: number | null
+    osAdd?: string | null
+    osPd?: number | null
+    osPrism?: string | null
+    lensType?: string | null
+    lensMaterial?: string | null
+    frameType?: string | null
+    coatings?: OpticalPrescriptionCreatecoatingsInput | string[]
+    frameItemId?: string | null
+    lensItemId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type AppointmentUpdateWithoutCreatedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     bookingNumber?: NullableStringFieldUpdateOperationsInput | string | null
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     branch?: BranchUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -44652,6 +54642,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
     doctorId?: StringFieldUpdateOperationsInput | string
@@ -44670,6 +54663,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
     doctorId?: StringFieldUpdateOperationsInput | string
@@ -44891,15 +54887,153 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type OpticalPrescriptionUpdateWithoutCreatedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutOpticalPrescriptionsNestedInput
+    patient?: PatientUpdateOneRequiredWithoutOpticalPrescriptionsNestedInput
+    frameItem?: OpticalItemUpdateOneWithoutFramePrescriptionsNestedInput
+    lensItem?: OpticalItemUpdateOneWithoutLensPrescriptionsNestedInput
+  }
+
+  export type OpticalPrescriptionUncheckedUpdateWithoutCreatedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    frameItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    lensItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OpticalPrescriptionUncheckedUpdateManyWithoutCreatedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    frameItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    lensItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type AppointmentCreateManyDoctorInput = {
     id?: string
     bookingNumber?: string | null
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     branchId: string
     patientId: string
     createdById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type EyeExaminationCreateManyDoctorInput = {
+    id?: string
+    branchId: string
+    patientId: string
+    chiefComplaint: string
+    historyOfPresentIllness?: string | null
+    vaScale?: string
+    vaUnaidedOD?: string | null
+    vaUnaidedOS?: string | null
+    vaUnaidedNearOD?: string | null
+    vaUnaidedNearOS?: string | null
+    vaBcvaOD?: string | null
+    vaBcvaOS?: string | null
+    vaBcvaNearOD?: string | null
+    vaBcvaNearOS?: string | null
+    vaPinholeOD?: string | null
+    vaPinholeOS?: string | null
+    refractionSphereOD?: string | null
+    refractionSphereOS?: string | null
+    refractionCylinderOD?: string | null
+    refractionCylinderOS?: string | null
+    refractionAxisOD?: string | null
+    refractionAxisOS?: string | null
+    iopOD?: number | null
+    iopOS?: number | null
+    iopMethod?: string | null
+    iopTime?: string | null
+    targetIopOD?: number | null
+    targetIopOS?: number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: string | null
+    plan?: string | null
+    followUpDate?: Date | string | null
+    nextVisitReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -44922,16 +55056,52 @@ export namespace Prisma {
 
   export type SurgeryCreateManySurgeonInput = {
     id?: string
-    examId: string
+    examId?: string | null
     branchId: string
-    eyeSide: string
+    patientId: string
+    eye: string
     surgeryType: string
-    surgeryDate: Date | string
-    cost: Decimal | DecimalJsLike | number | string
+    procedure?: string | null
+    anesthesiaType?: string | null
+    date: Date | string
+    time?: string | null
+    operatingRoom?: string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: Decimal | DecimalJsLike | number | string
     status?: string
     notes?: string | null
     nextFollowUpDate?: Date | string | null
     createdAt?: Date | string
+  }
+
+  export type PatientCreateManyAssignedDoctorInput = {
+    id?: string
+    patientNumber?: string | null
+    fullName: string
+    firstName?: string | null
+    lastName?: string | null
+    gender?: string | null
+    dateOfBirth: Date | string
+    phone: string
+    email?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    zipCode?: string | null
+    bloodGroup?: string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    allergies?: string | null
+    chiefComplaint?: string | null
+    currentMedications?: string | null
+    medicalHistory?: string | null
+    familyMedicalHistory?: string | null
+    emergencyContactName?: string | null
+    emergencyContactRelationship?: string | null
+    emergencyContactPhone?: string | null
+    isActive?: boolean
+    branchId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type AppointmentUpdateWithoutDoctorInput = {
@@ -44940,6 +55110,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     branch?: BranchUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -44958,6 +55131,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
     createdById?: StringFieldUpdateOperationsInput | string
@@ -44976,9 +55152,129 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
     createdById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EyeExaminationUpdateWithoutDoctorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: StringFieldUpdateOperationsInput | string
+    historyOfPresentIllness?: NullableStringFieldUpdateOperationsInput | string | null
+    vaScale?: StringFieldUpdateOperationsInput | string
+    vaUnaidedOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOS?: NullableStringFieldUpdateOperationsInput | string | null
+    iopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    iopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    iopMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    iopTime?: NullableStringFieldUpdateOperationsInput | string | null
+    targetIopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    targetIopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    plan?: NullableStringFieldUpdateOperationsInput | string | null
+    followUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextVisitReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutEyeExaminationsNestedInput
+    patient?: PatientUpdateOneRequiredWithoutEyeExaminationsNestedInput
+  }
+
+  export type EyeExaminationUncheckedUpdateWithoutDoctorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: StringFieldUpdateOperationsInput | string
+    historyOfPresentIllness?: NullableStringFieldUpdateOperationsInput | string | null
+    vaScale?: StringFieldUpdateOperationsInput | string
+    vaUnaidedOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOS?: NullableStringFieldUpdateOperationsInput | string | null
+    iopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    iopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    iopMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    iopTime?: NullableStringFieldUpdateOperationsInput | string | null
+    targetIopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    targetIopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    plan?: NullableStringFieldUpdateOperationsInput | string | null
+    followUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextVisitReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EyeExaminationUncheckedUpdateManyWithoutDoctorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: StringFieldUpdateOperationsInput | string
+    historyOfPresentIllness?: NullableStringFieldUpdateOperationsInput | string | null
+    vaScale?: StringFieldUpdateOperationsInput | string
+    vaUnaidedOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOS?: NullableStringFieldUpdateOperationsInput | string | null
+    iopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    iopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    iopMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    iopTime?: NullableStringFieldUpdateOperationsInput | string | null
+    targetIopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    targetIopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    plan?: NullableStringFieldUpdateOperationsInput | string | null
+    followUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextVisitReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -45039,27 +55335,39 @@ export namespace Prisma {
 
   export type SurgeryUpdateWithoutSurgeonInput = {
     id?: StringFieldUpdateOperationsInput | string
-    eyeSide?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
     surgeryType?: StringFieldUpdateOperationsInput | string
-    surgeryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    clinicalExam?: ClinicalExaminationUpdateOneRequiredWithoutSurgeryNestedInput
+    clinicalExam?: ClinicalExaminationUpdateOneWithoutSurgeryNestedInput
     branch?: BranchUpdateOneRequiredWithoutSurgeriesNestedInput
+    patient?: PatientUpdateOneRequiredWithoutSurgeriesNestedInput
     billings?: BillingUpdateManyWithoutSurgeryNestedInput
     followUps?: FollowUpUpdateManyWithoutSurgeryNestedInput
   }
 
   export type SurgeryUncheckedUpdateWithoutSurgeonInput = {
     id?: StringFieldUpdateOperationsInput | string
-    examId?: StringFieldUpdateOperationsInput | string
+    examId?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
-    eyeSide?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
     surgeryType?: StringFieldUpdateOperationsInput | string
-    surgeryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -45071,16 +55379,124 @@ export namespace Prisma {
 
   export type SurgeryUncheckedUpdateManyWithoutSurgeonInput = {
     id?: StringFieldUpdateOperationsInput | string
-    examId?: StringFieldUpdateOperationsInput | string
+    examId?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
-    eyeSide?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
     surgeryType?: StringFieldUpdateOperationsInput | string
-    surgeryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
     cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PatientUpdateWithoutAssignedDoctorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutPatientsNestedInput
+    appointments?: AppointmentUpdateManyWithoutPatientNestedInput
+    surgeries?: SurgeryUpdateManyWithoutPatientNestedInput
+    eyeExaminations?: EyeExaminationUpdateManyWithoutPatientNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUpdateManyWithoutPatientNestedInput
+    billings?: BillingUpdateManyWithoutPatientNestedInput
+    followUps?: FollowUpUpdateManyWithoutPatientNestedInput
+  }
+
+  export type PatientUncheckedUpdateWithoutAssignedDoctorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    branchId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appointments?: AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+    surgeries?: SurgeryUncheckedUpdateManyWithoutPatientNestedInput
+    eyeExaminations?: EyeExaminationUncheckedUpdateManyWithoutPatientNestedInput
+    opticalPrescriptions?: OpticalPrescriptionUncheckedUpdateManyWithoutPatientNestedInput
+    billings?: BillingUncheckedUpdateManyWithoutPatientNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutPatientNestedInput
+  }
+
+  export type PatientUncheckedUpdateManyWithoutAssignedDoctorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    dateOfBirth?: DateTimeFieldUpdateOperationsInput | Date | string
+    phone?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    zipCode?: NullableStringFieldUpdateOperationsInput | string | null
+    bloodGroup?: NullableStringFieldUpdateOperationsInput | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    allergies?: NullableStringFieldUpdateOperationsInput | string | null
+    chiefComplaint?: NullableStringFieldUpdateOperationsInput | string | null
+    currentMedications?: NullableStringFieldUpdateOperationsInput | string | null
+    medicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    familyMedicalHistory?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactName?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactRelationship?: NullableStringFieldUpdateOperationsInput | string | null
+    emergencyContactPhone?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    branchId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AppointmentCreateManyPatientInput = {
@@ -45089,9 +55505,103 @@ export namespace Prisma {
     appointmentDate: Date | string
     status?: $Enums.AppointmentStatus
     amount?: Decimal | DecimalJsLike | number | string
+    type?: string | null
+    notes?: string | null
+    location?: string | null
     branchId: string
     doctorId: string
     createdById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SurgeryCreateManyPatientInput = {
+    id?: string
+    examId?: string | null
+    branchId: string
+    eye: string
+    surgeryType: string
+    procedure?: string | null
+    anesthesiaType?: string | null
+    date: Date | string
+    time?: string | null
+    operatingRoom?: string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: Decimal | DecimalJsLike | number | string
+    status?: string
+    notes?: string | null
+    nextFollowUpDate?: Date | string | null
+    surgeonId: string
+    createdAt?: Date | string
+  }
+
+  export type EyeExaminationCreateManyPatientInput = {
+    id?: string
+    branchId: string
+    doctorId: string
+    chiefComplaint: string
+    historyOfPresentIllness?: string | null
+    vaScale?: string
+    vaUnaidedOD?: string | null
+    vaUnaidedOS?: string | null
+    vaUnaidedNearOD?: string | null
+    vaUnaidedNearOS?: string | null
+    vaBcvaOD?: string | null
+    vaBcvaOS?: string | null
+    vaBcvaNearOD?: string | null
+    vaBcvaNearOS?: string | null
+    vaPinholeOD?: string | null
+    vaPinholeOS?: string | null
+    refractionSphereOD?: string | null
+    refractionSphereOS?: string | null
+    refractionCylinderOD?: string | null
+    refractionCylinderOS?: string | null
+    refractionAxisOD?: string | null
+    refractionAxisOS?: string | null
+    iopOD?: number | null
+    iopOS?: number | null
+    iopMethod?: string | null
+    iopTime?: string | null
+    targetIopOD?: number | null
+    targetIopOS?: number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: string | null
+    plan?: string | null
+    followUpDate?: Date | string | null
+    nextVisitReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OpticalPrescriptionCreateManyPatientInput = {
+    id?: string
+    branchId: string
+    createdById?: string | null
+    type?: $Enums.OpticalPrescriptionType
+    status?: $Enums.OpticalPrescriptionStatus
+    validityMonths?: number
+    expiryDate: Date | string
+    dispensedAt?: Date | string | null
+    notes?: string | null
+    odSphere?: string | null
+    odCylinder?: string | null
+    odAxis?: number | null
+    odAdd?: string | null
+    odPd?: number | null
+    odPrism?: string | null
+    osSphere?: string | null
+    osCylinder?: string | null
+    osAxis?: number | null
+    osAdd?: string | null
+    osPd?: number | null
+    osPrism?: string | null
+    lensType?: string | null
+    lensMaterial?: string | null
+    frameType?: string | null
+    coatings?: OpticalPrescriptionCreatecoatingsInput | string[]
+    frameItemId?: string | null
+    lensItemId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -45136,6 +55646,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     branch?: BranchUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -45154,6 +55667,9 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
     doctorId?: StringFieldUpdateOperationsInput | string
     createdById?: StringFieldUpdateOperationsInput | string
@@ -45172,9 +55688,289 @@ export namespace Prisma {
     appointmentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
     branchId?: StringFieldUpdateOperationsInput | string
     doctorId?: StringFieldUpdateOperationsInput | string
     createdById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SurgeryUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
+    surgeryType?: StringFieldUpdateOperationsInput | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clinicalExam?: ClinicalExaminationUpdateOneWithoutSurgeryNestedInput
+    branch?: BranchUpdateOneRequiredWithoutSurgeriesNestedInput
+    surgeon?: DoctorUpdateOneRequiredWithoutSurgeriesNestedInput
+    billings?: BillingUpdateManyWithoutSurgeryNestedInput
+    followUps?: FollowUpUpdateManyWithoutSurgeryNestedInput
+  }
+
+  export type SurgeryUncheckedUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    examId?: NullableStringFieldUpdateOperationsInput | string | null
+    branchId?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
+    surgeryType?: StringFieldUpdateOperationsInput | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    surgeonId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    billings?: BillingUncheckedUpdateManyWithoutSurgeryNestedInput
+    followUps?: FollowUpUncheckedUpdateManyWithoutSurgeryNestedInput
+  }
+
+  export type SurgeryUncheckedUpdateManyWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    examId?: NullableStringFieldUpdateOperationsInput | string | null
+    branchId?: StringFieldUpdateOperationsInput | string
+    eye?: StringFieldUpdateOperationsInput | string
+    surgeryType?: StringFieldUpdateOperationsInput | string
+    procedure?: NullableStringFieldUpdateOperationsInput | string | null
+    anesthesiaType?: NullableStringFieldUpdateOperationsInput | string | null
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    time?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingRoom?: NullableStringFieldUpdateOperationsInput | string | null
+    cataractDetails?: NullableJsonNullValueInput | InputJsonValue
+    cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    nextFollowUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    surgeonId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EyeExaminationUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: StringFieldUpdateOperationsInput | string
+    historyOfPresentIllness?: NullableStringFieldUpdateOperationsInput | string | null
+    vaScale?: StringFieldUpdateOperationsInput | string
+    vaUnaidedOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOS?: NullableStringFieldUpdateOperationsInput | string | null
+    iopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    iopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    iopMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    iopTime?: NullableStringFieldUpdateOperationsInput | string | null
+    targetIopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    targetIopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    plan?: NullableStringFieldUpdateOperationsInput | string | null
+    followUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextVisitReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutEyeExaminationsNestedInput
+    doctor?: DoctorUpdateOneRequiredWithoutEyeExaminationsNestedInput
+  }
+
+  export type EyeExaminationUncheckedUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    doctorId?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: StringFieldUpdateOperationsInput | string
+    historyOfPresentIllness?: NullableStringFieldUpdateOperationsInput | string | null
+    vaScale?: StringFieldUpdateOperationsInput | string
+    vaUnaidedOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOS?: NullableStringFieldUpdateOperationsInput | string | null
+    iopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    iopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    iopMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    iopTime?: NullableStringFieldUpdateOperationsInput | string | null
+    targetIopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    targetIopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    plan?: NullableStringFieldUpdateOperationsInput | string | null
+    followUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextVisitReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EyeExaminationUncheckedUpdateManyWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    doctorId?: StringFieldUpdateOperationsInput | string
+    chiefComplaint?: StringFieldUpdateOperationsInput | string
+    historyOfPresentIllness?: NullableStringFieldUpdateOperationsInput | string | null
+    vaScale?: StringFieldUpdateOperationsInput | string
+    vaUnaidedOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaUnaidedNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaBcvaNearOS?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOD?: NullableStringFieldUpdateOperationsInput | string | null
+    vaPinholeOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionSphereOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionCylinderOS?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOD?: NullableStringFieldUpdateOperationsInput | string | null
+    refractionAxisOS?: NullableStringFieldUpdateOperationsInput | string | null
+    iopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    iopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    iopMethod?: NullableStringFieldUpdateOperationsInput | string | null
+    iopTime?: NullableStringFieldUpdateOperationsInput | string | null
+    targetIopOD?: NullableIntFieldUpdateOperationsInput | number | null
+    targetIopOS?: NullableIntFieldUpdateOperationsInput | number | null
+    anteriorSegmentFindings?: NullableJsonNullValueInput | InputJsonValue
+    fundusFindings?: NullableJsonNullValueInput | InputJsonValue
+    diagnosis?: NullableStringFieldUpdateOperationsInput | string | null
+    plan?: NullableStringFieldUpdateOperationsInput | string | null
+    followUpDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    nextVisitReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OpticalPrescriptionUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutOpticalPrescriptionsNestedInput
+    createdBy?: UserUpdateOneWithoutCreatedOpticalPrescriptionsNestedInput
+    frameItem?: OpticalItemUpdateOneWithoutFramePrescriptionsNestedInput
+    lensItem?: OpticalItemUpdateOneWithoutLensPrescriptionsNestedInput
+  }
+
+  export type OpticalPrescriptionUncheckedUpdateWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    createdById?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    frameItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    lensItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OpticalPrescriptionUncheckedUpdateManyWithoutPatientInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    createdById?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    frameItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    lensItemId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -45928,6 +56724,70 @@ export namespace Prisma {
     transactionDate?: Date | string
   }
 
+  export type OpticalPrescriptionCreateManyFrameItemInput = {
+    id?: string
+    branchId: string
+    patientId: string
+    createdById?: string | null
+    type?: $Enums.OpticalPrescriptionType
+    status?: $Enums.OpticalPrescriptionStatus
+    validityMonths?: number
+    expiryDate: Date | string
+    dispensedAt?: Date | string | null
+    notes?: string | null
+    odSphere?: string | null
+    odCylinder?: string | null
+    odAxis?: number | null
+    odAdd?: string | null
+    odPd?: number | null
+    odPrism?: string | null
+    osSphere?: string | null
+    osCylinder?: string | null
+    osAxis?: number | null
+    osAdd?: string | null
+    osPd?: number | null
+    osPrism?: string | null
+    lensType?: string | null
+    lensMaterial?: string | null
+    frameType?: string | null
+    coatings?: OpticalPrescriptionCreatecoatingsInput | string[]
+    lensItemId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OpticalPrescriptionCreateManyLensItemInput = {
+    id?: string
+    branchId: string
+    patientId: string
+    createdById?: string | null
+    type?: $Enums.OpticalPrescriptionType
+    status?: $Enums.OpticalPrescriptionStatus
+    validityMonths?: number
+    expiryDate: Date | string
+    dispensedAt?: Date | string | null
+    notes?: string | null
+    odSphere?: string | null
+    odCylinder?: string | null
+    odAxis?: number | null
+    odAdd?: string | null
+    odPd?: number | null
+    odPrism?: string | null
+    osSphere?: string | null
+    osCylinder?: string | null
+    osAxis?: number | null
+    osAdd?: string | null
+    osPd?: number | null
+    osPrism?: string | null
+    lensType?: string | null
+    lensMaterial?: string | null
+    frameType?: string | null
+    coatings?: OpticalPrescriptionCreatecoatingsInput | string[]
+    frameItemId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type OpticalStockTransactionUpdateWithoutOpticalItemInput = {
     id?: StringFieldUpdateOperationsInput | string
     transactionType?: StringFieldUpdateOperationsInput | string
@@ -45959,6 +56819,198 @@ export namespace Prisma {
     billingId?: NullableStringFieldUpdateOperationsInput | string | null
     performedById?: StringFieldUpdateOperationsInput | string
     transactionDate?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OpticalPrescriptionUpdateWithoutFrameItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutOpticalPrescriptionsNestedInput
+    patient?: PatientUpdateOneRequiredWithoutOpticalPrescriptionsNestedInput
+    createdBy?: UserUpdateOneWithoutCreatedOpticalPrescriptionsNestedInput
+    lensItem?: OpticalItemUpdateOneWithoutLensPrescriptionsNestedInput
+  }
+
+  export type OpticalPrescriptionUncheckedUpdateWithoutFrameItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    createdById?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    lensItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OpticalPrescriptionUncheckedUpdateManyWithoutFrameItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    createdById?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    lensItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OpticalPrescriptionUpdateWithoutLensItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutOpticalPrescriptionsNestedInput
+    patient?: PatientUpdateOneRequiredWithoutOpticalPrescriptionsNestedInput
+    createdBy?: UserUpdateOneWithoutCreatedOpticalPrescriptionsNestedInput
+    frameItem?: OpticalItemUpdateOneWithoutFramePrescriptionsNestedInput
+  }
+
+  export type OpticalPrescriptionUncheckedUpdateWithoutLensItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    createdById?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    frameItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OpticalPrescriptionUncheckedUpdateManyWithoutLensItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    createdById?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumOpticalPrescriptionTypeFieldUpdateOperationsInput | $Enums.OpticalPrescriptionType
+    status?: EnumOpticalPrescriptionStatusFieldUpdateOperationsInput | $Enums.OpticalPrescriptionStatus
+    validityMonths?: IntFieldUpdateOperationsInput | number
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispensedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    odSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    odCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    odAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    odAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    odPd?: NullableIntFieldUpdateOperationsInput | number | null
+    odPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    osSphere?: NullableStringFieldUpdateOperationsInput | string | null
+    osCylinder?: NullableStringFieldUpdateOperationsInput | string | null
+    osAxis?: NullableIntFieldUpdateOperationsInput | number | null
+    osAdd?: NullableStringFieldUpdateOperationsInput | string | null
+    osPd?: NullableIntFieldUpdateOperationsInput | number | null
+    osPrism?: NullableStringFieldUpdateOperationsInput | string | null
+    lensType?: NullableStringFieldUpdateOperationsInput | string | null
+    lensMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    frameType?: NullableStringFieldUpdateOperationsInput | string | null
+    coatings?: OpticalPrescriptionUpdatecoatingsInput | string[]
+    frameItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type PharmacyStockTransactionCreateManyBillingInput = {

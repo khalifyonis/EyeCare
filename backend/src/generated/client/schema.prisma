@@ -39,8 +39,10 @@ model Branch {
   doctors              Doctor[]
   patients             Patient[]
   appointments         Appointment[]
+  eyeExaminations      EyeExamination[]
   surgeries            Surgery[]
   prescriptions        Prescription[]
+  opticalPrescriptions OpticalPrescription[]
   pharmacyItems        PharmacyItem[]
   pharmacyTransactions PharmacyStockTransaction[]
   opticalItems         OpticalItem[]
@@ -93,14 +95,15 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relationships
-  doctor               Doctor?
-  createdAppointments  Appointment[]              @relation("CreatedBy")
-  recordedERExams      ERExamination[]            @relation("RecordedBy")
-  pharmacyTransactions PharmacyStockTransaction[] @relation("PerformedBy")
-  opticalTransactions  OpticalStockTransaction[]  @relation("PerformedBy")
-  createdBillings      Billing[]                  @relation("CreatedBy")
-  staffAssignments     StaffAssignment[]
-  activityLogs         ActivityLog[]
+  doctor                      Doctor?
+  createdAppointments         Appointment[]              @relation("CreatedBy")
+  recordedERExams             ERExamination[]            @relation("RecordedBy")
+  pharmacyTransactions        PharmacyStockTransaction[] @relation("PerformedBy")
+  opticalTransactions         OpticalStockTransaction[]  @relation("PerformedBy")
+  createdBillings             Billing[]                  @relation("CreatedBy")
+  staffAssignments            StaffAssignment[]
+  activityLogs                ActivityLog[]
+  createdOpticalPrescriptions OpticalPrescription[]      @relation("OpticalPrescriptionCreatedBy")
 
   @@index([branchId])
   @@index([roleId])
@@ -142,8 +145,10 @@ model Doctor {
 
   // Relationships
   appointments          Appointment[]
+  eyeExaminations       EyeExamination[]
   examinedClinicalExams ClinicalExamination[] @relation("ExaminedBy")
   surgeries             Surgery[]             @relation("Surgeon")
+  assignedPatients      Patient[]             @relation("AssignedDoctor")
 
   @@map("doctors")
 }
@@ -151,13 +156,43 @@ model Doctor {
 // ── Patient CRM ──
 
 model Patient {
-  id          String   @id @default(uuid())
-  fullName    String   @map("full_name")
+  id            String  @id @default(uuid())
+  patientNumber String? @unique @map("patient_number") // PAT-XXXXX format
+
+  // Name (fullName kept for backward compat, firstName/lastName for new wizard)
+  fullName  String  @map("full_name")
+  firstName String? @map("first_name")
+  lastName  String? @map("last_name")
+
   gender      String?
   dateOfBirth DateTime @map("date_of_birth")
   phone       String   @unique
   email       String?
-  address     String?
+
+  // Address (address kept for backward compat, structured fields for new wizard)
+  address String?
+  city    String?
+  state   String?
+  zipCode String? @map("zip_code")
+
+  // Medical info
+  bloodGroup           String?  @map("blood_group")
+  weight               Decimal? @db.Decimal(5, 2)
+  allergies            String?
+  chiefComplaint       String?  @map("chief_complaint")
+  currentMedications   String?  @map("current_medications")
+  medicalHistory       String?  @map("medical_history")
+  familyMedicalHistory String?  @map("family_medical_history")
+
+  // Emergency contact
+  emergencyContactName         String? @map("emergency_contact_name")
+  emergencyContactRelationship String? @map("emergency_contact_relationship")
+  emergencyContactPhone        String? @map("emergency_contact_phone")
+
+  // Status & assigned doctor
+  isActive         Boolean @default(true) @map("is_active")
+  assignedDoctorId String? @map("assigned_doctor_id")
+  assignedDoctor   Doctor? @relation("AssignedDoctor", fields: [assignedDoctorId], references: [id])
 
   branchId String @map("branch_id")
   branch   Branch @relation(fields: [branchId], references: [id])
@@ -166,20 +201,99 @@ model Patient {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relationships
-  appointments Appointment[]
-  billings     Billing[]
-  followUps    FollowUp[]
+  appointments         Appointment[]
+  surgeries            Surgery[]
+  eyeExaminations      EyeExamination[]
+  opticalPrescriptions OpticalPrescription[]
+  billings             Billing[]
+  followUps            FollowUp[]
 
   @@index([branchId])
   @@index([fullName])
   @@index([phone])
+  @@index([isActive])
   @@map("patients")
+}
+
+enum OpticalPrescriptionType {
+  SPECTACLES
+  CONTACT_LENS
+  BOTH
+}
+
+enum OpticalPrescriptionStatus {
+  FILLED
+  DISPENSED
+}
+
+model OpticalPrescription {
+  id String @id @default(uuid())
+
+  branchId String @map("branch_id")
+  branch   Branch @relation(fields: [branchId], references: [id])
+
+  patientId String  @map("patient_id")
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  createdById String? @map("created_by_id")
+  createdBy   User?   @relation("OpticalPrescriptionCreatedBy", fields: [createdById], references: [id])
+
+  type   OpticalPrescriptionType   @default(SPECTACLES)
+  status OpticalPrescriptionStatus @default(FILLED)
+
+  validityMonths Int       @default(12) @map("validity_months")
+  expiryDate     DateTime  @map("expiry_date")
+  dispensedAt    DateTime? @map("dispensed_at")
+
+  notes String?
+
+  // Refraction OD
+  odSphere   String? @map("od_sphere")
+  odCylinder String? @map("od_cylinder")
+  odAxis     Int?    @map("od_axis")
+  odAdd      String? @map("od_add")
+  odPd       Int?    @map("od_pd")
+  odPrism    String? @map("od_prism")
+
+  // Refraction OS
+  osSphere   String? @map("os_sphere")
+  osCylinder String? @map("os_cylinder")
+  osAxis     Int?    @map("os_axis")
+  osAdd      String? @map("os_add")
+  osPd       Int?    @map("os_pd")
+  osPrism    String? @map("os_prism")
+
+  // Spectacle details
+  lensType     String?  @map("lens_type")
+  lensMaterial String?  @map("lens_material")
+  frameType    String?  @map("frame_type")
+  coatings     String[] @default([]) @map("coatings")
+
+  // Inventory selections (optional)
+  frameItemId String?      @map("frame_item_id")
+  frameItem   OpticalItem? @relation("OpticalPrescriptionFrameItem", fields: [frameItemId], references: [id])
+  lensItemId  String?      @map("lens_item_id")
+  lensItem    OpticalItem? @relation("OpticalPrescriptionLensItem", fields: [lensItemId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([branchId])
+  @@index([patientId])
+  @@index([type])
+  @@index([status])
+  @@index([expiryDate])
+  @@index([frameItemId])
+  @@index([lensItemId])
+  @@map("optical_prescriptions")
 }
 
 // ── Clinical Tables ──
 
 enum AppointmentStatus {
   PENDING
+  SCHEDULED
+  CONFIRMED
   COMPLETED
   CANCELLED
 }
@@ -190,6 +304,9 @@ model Appointment {
   appointmentDate DateTime          @map("appointment_date")
   status          AppointmentStatus @default(PENDING)
   amount          Decimal           @default(0) @db.Decimal(10, 2)
+  type            String?           @default("consultation")
+  notes           String?
+  location        String?
 
   branchId  String  @map("branch_id")
   branch    Branch  @relation(fields: [branchId], references: [id])
@@ -217,6 +334,72 @@ model Appointment {
   @@index([appointmentDate])
   @@index([status])
   @@map("appointments")
+}
+
+model EyeExamination {
+  id String @id @default(uuid())
+
+  // Multi-tenancy
+  branchId String @map("branch_id")
+  branch   Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  patientId String  @map("patient_id")
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  doctorId String @map("doctor_id")
+  doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Restrict)
+
+  // Basic
+  chiefComplaint          String  @map("chief_complaint")
+  historyOfPresentIllness String? @map("history_of_present_illness")
+
+  // Visual acuity
+  vaScale         String  @default("SNELLEN") @map("va_scale")
+  vaUnaidedOD     String? @map("va_unaided_od")
+  vaUnaidedOS     String? @map("va_unaided_os")
+  vaUnaidedNearOD String? @map("va_unaided_near_od")
+  vaUnaidedNearOS String? @map("va_unaided_near_os")
+  vaBcvaOD        String? @map("va_bcva_od")
+  vaBcvaOS        String? @map("va_bcva_os")
+  vaBcvaNearOD    String? @map("va_bcva_near_od")
+  vaBcvaNearOS    String? @map("va_bcva_near_os")
+  vaPinholeOD     String? @map("va_pinhole_od")
+  vaPinholeOS     String? @map("va_pinhole_os")
+
+  // Refraction
+  refractionSphereOD   String? @map("refraction_sphere_od")
+  refractionSphereOS   String? @map("refraction_sphere_os")
+  refractionCylinderOD String? @map("refraction_cylinder_od")
+  refractionCylinderOS String? @map("refraction_cylinder_os")
+  refractionAxisOD     String? @map("refraction_axis_od")
+  refractionAxisOS     String? @map("refraction_axis_os")
+
+  // IOP
+  iopOD       Int?    @map("iop_od")
+  iopOS       Int?    @map("iop_os")
+  iopMethod   String? @map("iop_method")
+  iopTime     String? @map("iop_time")
+  targetIopOD Int?    @map("target_iop_od")
+  targetIopOS Int?    @map("target_iop_os")
+
+  // Findings
+  anteriorSegmentFindings Json? @map("anterior_segment_findings")
+  fundusFindings          Json? @map("fundus_findings")
+
+  // Assessment
+  diagnosis       String?   @map("diagnosis")
+  plan            String?   @map("plan")
+  followUpDate    DateTime? @map("follow_up_date")
+  nextVisitReason String?   @map("next_visit_reason")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([branchId])
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([createdAt])
+  @@map("eye_examinations")
 }
 
 model ERExamination {
@@ -271,18 +454,28 @@ model ClinicalExamination {
 }
 
 model Surgery {
-  id           String              @id @default(uuid())
-  examId       String              @unique @map("exam_id")
-  clinicalExam ClinicalExamination @relation(fields: [examId], references: [id])
+  id           String               @id @default(uuid())
+  // Optional link to a clinical exam (legacy flow). Unique when present.
+  examId       String?              @unique @map("exam_id")
+  clinicalExam ClinicalExamination? @relation(fields: [examId], references: [id])
 
   branchId String @map("branch_id")
   branch   Branch @relation(fields: [branchId], references: [id])
 
-  eyeSide          String    @map("eye_side") // RIGHT, LEFT, BOTH
+  // Patient-based scheduling (EyeCare Pro module)
+  patientId String  @map("patient_id")
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  eye              String    @map("eye_side") // OD, OS, BOTH (legacy values RIGHT/LEFT still possible)
   surgeryType      String    @map("surgery_type")
-  surgeryDate      DateTime  @map("surgery_date")
-  cost             Decimal   @db.Decimal(10, 2)
-  status           String    @default("PENDING")
+  procedure        String?   @map("procedure")
+  anesthesiaType   String?   @map("anesthesia_type") // Topical, Local, General
+  date             DateTime  @map("surgery_date")
+  time             String?   @map("surgery_time") // HH:mm
+  operatingRoom    String?   @map("operating_room")
+  cataractDetails  Json?     @map("cataract_details") // JSONB (technique, iolModel, iolPower, targetRefraction)
+  cost             Decimal   @default(0) @db.Decimal(10, 2)
+  status           String    @default("scheduled")
   notes            String?
   nextFollowUpDate DateTime? @map("next_follow_up_date")
 
@@ -296,6 +489,7 @@ model Surgery {
   followUps FollowUp[] @relation("FollowUpFromSurgery")
 
   @@index([branchId])
+  @@index([patientId])
   @@index([surgeonId])
   @@index([status])
   @@map("surgeries")
@@ -415,7 +609,9 @@ model OpticalItem {
   isActive Boolean @default(true) @map("is_active")
 
   // Relationships
-  transactions OpticalStockTransaction[]
+  transactions       OpticalStockTransaction[]
+  framePrescriptions OpticalPrescription[]     @relation("OpticalPrescriptionFrameItem")
+  lensPrescriptions  OpticalPrescription[]     @relation("OpticalPrescriptionLensItem")
 
   @@unique([branchId, itemName, brand])
   @@index([branchId])

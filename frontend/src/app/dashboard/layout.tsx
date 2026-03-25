@@ -9,7 +9,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { useTheme } from '@/components/theme-provider'
 import api from '@/lib/axios'
 import { toast } from 'sonner'
-import { getDefaultDashboardPath, readStoredUser, resolveRoleName, type StoredUser } from '@/lib/auth'
+import { clearSession, getDefaultDashboardPath, readStoredUser, resolveRoleName, type StoredUser } from '@/lib/auth'
 import { isPathAllowedForRole } from '@/lib/permissions'
 
 const ROLE_TITLES: Record<string, string> = {
@@ -73,12 +73,26 @@ export default function DashboardLayout({
             } catch (error: unknown) {
                 const status = getHttpStatus(error)
                 if (status === 404 || status === 401) {
-                    localStorage.removeItem('token')
-                    localStorage.removeItem('user')
-                    document.cookie = 'token=; path=/; max-age=0; SameSite=Lax'
+                    clearSession()
                     router.replace('/login')
                 } else {
-                    toast.error('Session verification failed')
+                    const fallbackUser = readStoredUser()
+                    if (!fallbackUser) {
+                        clearSession()
+                        router.replace('/login')
+                        return
+                    }
+
+                    setHeaderUser(fallbackUser)
+                    const fallbackRole = resolveRoleName(fallbackUser)
+                    const currentPath = (typeof window !== 'undefined' ? window.location.pathname : '/dashboard') || '/dashboard'
+
+                    if (!isPathAllowedForRole(currentPath, fallbackRole)) {
+                        router.replace(getDefaultDashboardPath(fallbackRole))
+                    }
+
+                    toast.error('Session check failed. Recovered using stored session.')
+                    setAuthReady(true)
                 }
             }
         }

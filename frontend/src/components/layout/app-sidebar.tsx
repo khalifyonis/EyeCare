@@ -19,15 +19,20 @@ import {
     Pill,
     UserCog,
     Mail,
-    MessageSquare,
     ClipboardList,
     Activity,
+    Scissors,
     Receipt,
     BarChart3,
     UserPlus,
     Package,
     ArrowDownToLine,
     History,
+    List,
+    Plus,
+    CalendarPlus,
+    Store,
+    ShoppingCart,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useParams, usePathname } from 'next/navigation'
@@ -57,7 +62,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { clearSession, getDefaultDashboardPath, readStoredUser, resolveRoleName, type StoredUser } from '@/lib/auth'
 
-type NavSubItem = { title: string; url: string }
+type NavSubItem = { title: string; url: string; icon?: React.ElementType }
 type NavItem = {
     title: string
     icon: React.ElementType
@@ -68,6 +73,32 @@ type NavItem = {
 type NavSection = {
     section: string
     items: NavItem[]
+}
+
+function getSubItemIcon(parentTitle: string, subItem: NavSubItem): React.ElementType {
+    if (subItem.icon) return subItem.icon
+
+    const parent = parentTitle.toLowerCase()
+    const title = subItem.title.toLowerCase()
+
+    if (parent.includes('appointment')) {
+        if (title.includes('all')) return Calendar
+        if (title.includes('new')) return CalendarPlus
+        if (title.includes('calendar')) return Calendar
+    }
+
+    if (parent.includes('eye examination')) {
+        if (title.includes('all')) return Eye
+        if (title.includes('new')) return Plus
+    }
+
+    if (title.includes('all')) return List
+    if (title.includes('new')) return Plus
+    if (title.includes('calendar')) return Calendar
+    if (title.includes('purchase')) return ArrowDownToLine
+    if (title.includes('transaction') || title.includes('history')) return History
+    if (title.includes('item')) return Package
+    return ChevronRight
 }
 
 const roleNavigation: Record<string, NavSection[]> = {
@@ -85,11 +116,43 @@ const roleNavigation: Record<string, NavSection[]> = {
             section: 'CLINICAL',
             items: [
                 { title: 'Patients', icon: Users, url: '/dashboard/patients' },
-                { title: 'Appointments', icon: Calendar, url: '/dashboard/appointments' },
-                { title: 'ER Examinations', icon: Eye, url: '/dashboard/examinations/er' },
-                { title: 'Clinical Examinations', icon: Eye, url: '/dashboard/examinations/clinical' },
-                { title: 'Surgeries', icon: Activity, url: '/dashboard/surgeries' },
-                { title: 'Prescriptions', icon: FileText, url: '/dashboard/prescriptions' },
+                {
+                    title: 'Appointments',
+                    icon: Calendar,
+                    url: '/dashboard/appointments',
+                    subItems: [
+                        { title: 'All Appointments', url: '/dashboard/appointments' },
+                        { title: 'New Appointment', url: '/dashboard/appointments/new' },
+                        { title: 'Calendar', url: '/dashboard/appointments/calendar' },
+                    ],
+                },
+                {
+                    title: 'Eye Examinations',
+                    icon: Eye,
+                    url: '/dashboard/eye-examinations',
+                    subItems: [
+                        { title: 'All Examinations', url: '/dashboard/eye-examinations' },
+                        { title: 'New Eye Exam', url: '/dashboard/eye-examinations/new' },
+                    ],
+                },
+                {
+                    title: 'Eye Surgery',
+                    icon: Scissors,
+                    url: '/dashboard/surgery',
+                    subItems: [
+                        { title: 'All Surgeries', url: '/dashboard/surgery' },
+                        { title: 'Schedule Surgery', url: '/dashboard/surgery/new' },
+                    ],
+                },
+                {
+                    title: 'Optical Prescriptions',
+                    icon: FileText,
+                    url: '/dashboard/prescriptions',
+                    subItems: [
+                        { title: 'All Prescriptions', url: '/dashboard/prescriptions' },
+                        { title: 'New Prescription', url: '/dashboard/prescriptions/new' },
+                    ],
+                },
                 { title: 'Medical Reports', icon: BarChart3, url: '/dashboard/reports' },
             ],
         },
@@ -107,13 +170,13 @@ const roleNavigation: Record<string, NavSection[]> = {
                     ],
                 },
                 {
-                    title: 'Optical',
+                    title: 'Optical Shop',
                     icon: Glasses,
-                    url: '/dashboard/inventory/optical',
+                    url: '/dashboard/optical-shop',
                     subItems: [
-                        { title: 'Items', url: '/dashboard/inventory/optical' },
-                        { title: 'Purchases', url: '/dashboard/inventory/optical/purchases' },
-                        { title: 'Transaction History', url: '/dashboard/inventory/optical/transactions' },
+                        { title: 'Orders', url: '/dashboard/optical-shop', icon: ShoppingCart },
+                        { title: 'Frames', url: '/dashboard/optical-shop/frames', icon: Glasses },
+                        { title: 'Lens Inventory', url: '/dashboard/optical-shop/lenses', icon: Package },
                     ],
                 },
                 { title: 'Suppliers', icon: Package, url: '/dashboard/suppliers' },
@@ -149,11 +212,43 @@ const roleNavigation: Record<string, NavSection[]> = {
             section: 'CLINICAL',
             items: [
                 { title: 'Patients', icon: Users, url: '/dashboard/patients' },
-                { title: 'Appointments', icon: Calendar, url: '/dashboard/appointments' },
-                { title: 'ER Examinations', icon: Eye, url: '/dashboard/examinations/er' },
-                { title: 'Clinical Examinations', icon: Eye, url: '/dashboard/examinations/clinical' },
-                { title: 'Surgeries', icon: Activity, url: '/dashboard/surgeries' },
-                { title: 'Prescriptions', icon: FileText, url: '/dashboard/prescriptions' },
+                {
+                    title: 'Appointments',
+                    icon: Calendar,
+                    url: '/dashboard/appointments',
+                    subItems: [
+                        { title: 'All Appointments', url: '/dashboard/appointments' },
+                        { title: 'New Appointment', url: '/dashboard/appointments/new' },
+                        { title: 'Calendar', url: '/dashboard/appointments/calendar' },
+                    ],
+                },
+                {
+                    title: 'Eye Examinations',
+                    icon: Eye,
+                    url: '/dashboard/eye-examinations',
+                    subItems: [
+                        { title: 'All Examinations', url: '/dashboard/eye-examinations' },
+                        { title: 'New Eye Exam', url: '/dashboard/eye-examinations/new' },
+                    ],
+                },
+                {
+                    title: 'Eye Surgery',
+                    icon: Scissors,
+                    url: '/dashboard/surgery',
+                    subItems: [
+                        { title: 'All Surgeries', url: '/dashboard/surgery' },
+                        { title: 'Schedule Surgery', url: '/dashboard/surgery/new' },
+                    ],
+                },
+                {
+                    title: 'Optical Prescriptions',
+                    icon: FileText,
+                    url: '/dashboard/prescriptions',
+                    subItems: [
+                        { title: 'All Prescriptions', url: '/dashboard/prescriptions' },
+                        { title: 'New Prescription', url: '/dashboard/prescriptions/new' },
+                    ],
+                },
                 { title: 'Medical Reports', icon: BarChart3, url: '/dashboard/reports' },
             ],
         },
@@ -171,13 +266,13 @@ const roleNavigation: Record<string, NavSection[]> = {
                     ],
                 },
                 {
-                    title: 'Optical',
+                    title: 'Optical Shop',
                     icon: Glasses,
-                    url: '/dashboard/inventory/optical',
+                    url: '/dashboard/optical-shop',
                     subItems: [
-                        { title: 'Items', url: '/dashboard/inventory/optical' },
-                        { title: 'Purchases', url: '/dashboard/inventory/optical/purchases' },
-                        { title: 'Transaction History', url: '/dashboard/inventory/optical/transactions' },
+                        { title: 'Orders', url: '/dashboard/optical-shop', icon: ShoppingCart },
+                        { title: 'Frames', url: '/dashboard/optical-shop/frames', icon: Glasses },
+                        { title: 'Lens Inventory', url: '/dashboard/optical-shop/lenses', icon: Package },
                     ],
                 },
                 { title: 'Suppliers', icon: Package, url: '/dashboard/suppliers' },
@@ -214,11 +309,35 @@ const roleNavigation: Record<string, NavSection[]> = {
             section: 'CLINICAL',
             items: [
                 { title: 'Patients', icon: Users, url: '/dashboard/patients' },
-                { title: 'Appointments', icon: Calendar, url: '/dashboard/appointments' },
-                { title: 'ER Examinations', icon: Eye, url: '/dashboard/examinations/er' },
-                { title: 'Clinical Examinations', icon: Eye, url: '/dashboard/examinations/clinical' },
-                { title: 'Surgeries', icon: Activity, url: '/dashboard/surgeries' },
-                { title: 'Prescriptions', icon: FileText, url: '/dashboard/prescriptions' },
+                {
+                    title: 'Appointments',
+                    icon: Calendar,
+                    url: '/dashboard/appointments',
+                    subItems: [
+                        { title: 'All Appointments', url: '/dashboard/appointments' },
+                        { title: 'New Appointment', url: '/dashboard/appointments/new' },
+                        { title: 'Calendar', url: '/dashboard/appointments/calendar' },
+                    ],
+                },
+                {
+                    title: 'Eye Examinations',
+                    icon: Eye,
+                    url: '/dashboard/eye-examinations',
+                    subItems: [
+                        { title: 'All Examinations', url: '/dashboard/eye-examinations' },
+                        { title: 'New Eye Exam', url: '/dashboard/eye-examinations/new' },
+                    ],
+                },
+                {
+                    title: 'Eye Surgery',
+                    icon: Scissors,
+                    url: '/dashboard/surgery',
+                    subItems: [
+                        { title: 'All Surgeries', url: '/dashboard/surgery' },
+                        { title: 'Schedule Surgery', url: '/dashboard/surgery/new' },
+                    ],
+                },
+                { title: 'Clinical Prescriptions', icon: FileText, url: '/dashboard/clinical-prescriptions' },
                 { title: 'Reports', icon: BarChart3, url: '/dashboard/reports' },
             ],
         },
@@ -249,7 +368,7 @@ const roleNavigation: Record<string, NavSection[]> = {
         {
             section: 'DISPENSING',
             items: [
-                { title: 'Prescriptions', icon: FileText, url: '/dashboard/prescriptions' },
+                { title: 'Clinical Prescriptions', icon: FileText, url: '/dashboard/clinical-prescriptions' },
                 { title: 'Billing (Sales)', icon: Receipt, url: '/dashboard/billing' },
                 { title: 'Patients', icon: Users, url: '/dashboard/patients' },
             ],
@@ -272,13 +391,13 @@ const roleNavigation: Record<string, NavSection[]> = {
             section: 'INVENTORY',
             items: [
                 {
-                    title: 'Optical',
-                    icon: Glasses,
-                    url: '/dashboard/inventory/optical',
+                    title: 'Optical Shop',
+                    icon: Store,
+                    url: '/dashboard/optical-shop',
                     subItems: [
-                        { title: 'Items', url: '/dashboard/inventory/optical' },
-                        { title: 'Purchases', url: '/dashboard/inventory/optical/purchases' },
-                        { title: 'Transaction History', url: '/dashboard/inventory/optical/transactions' },
+                        { title: 'Orders', url: '/dashboard/optical-shop', icon: ShoppingCart },
+                        { title: 'Frames', url: '/dashboard/optical-shop/frames', icon: Glasses },
+                        { title: 'Lens Inventory', url: '/dashboard/optical-shop/lenses', icon: Package },
                     ],
                 },
                 { title: 'Suppliers', icon: Package, url: '/dashboard/suppliers' },
@@ -287,7 +406,15 @@ const roleNavigation: Record<string, NavSection[]> = {
         {
             section: 'DISPENSING',
             items: [
-                { title: 'Prescriptions', icon: FileText, url: '/dashboard/prescriptions' },
+                {
+                    title: 'Optical Prescriptions',
+                    icon: FileText,
+                    url: '/dashboard/prescriptions',
+                    subItems: [
+                        { title: 'All Prescriptions', url: '/dashboard/prescriptions' },
+                        { title: 'New Prescription', url: '/dashboard/prescriptions/new' },
+                    ],
+                },
                 { title: 'Billing (Sales)', icon: Receipt, url: '/dashboard/billing' },
                 { title: 'Patients', icon: Users, url: '/dashboard/patients' },
             ],
@@ -310,8 +437,25 @@ const roleNavigation: Record<string, NavSection[]> = {
             section: 'FRONT DESK',
             items: [
                 { title: 'Patients', icon: UserPlus, url: '/dashboard/patients' },
-                { title: 'Appointments', icon: Calendar, url: '/dashboard/appointments' },
-                { title: 'ER Examinations', icon: Eye, url: '/dashboard/examinations/er' },
+                {
+                    title: 'Appointments',
+                    icon: Calendar,
+                    url: '/dashboard/appointments',
+                    subItems: [
+                        { title: 'All Appointments', url: '/dashboard/appointments' },
+                        { title: 'New Appointment', url: '/dashboard/appointments/new' },
+                        { title: 'Calendar', url: '/dashboard/appointments/calendar' },
+                    ],
+                },
+                {
+                    title: 'Eye Examinations',
+                    icon: Eye,
+                    url: '/dashboard/eye-examinations',
+                    subItems: [
+                        { title: 'All Examinations', url: '/dashboard/eye-examinations' },
+                        { title: 'New Eye Exam', url: '/dashboard/eye-examinations/new' },
+                    ],
+                },
                 { title: 'Billing', icon: Receipt, url: '/dashboard/billing' },
             ],
         },
@@ -380,13 +524,13 @@ function CollapsibleNavItem({
                     setOpen(!open)
                     if (item.url && item.url !== '#') onSelect()
                 }}
-                className={`transition-all duration-300 group/item ${isActive
-                    ? 'bg-sidebar-accent text-[#0EA5E9]'
-                    : 'hover:bg-sidebar-accent text-sidebar-foreground/70 hover:text-[#0EA5E9] dark:text-sidebar-foreground/80'
+                className={`h-[42px] px-3.5 transition-all duration-300 group/item rounded-lg ${isActive
+                    ? 'bg-blue-50 dark:bg-blue-950/40 text-[#0EA5E9] font-semibold'
+                    : 'hover:bg-sidebar-accent text-sidebar-foreground hover:text-[#0EA5E9] dark:text-sidebar-foreground dark:hover:bg-sidebar-accent font-semibold'
                     }`}
             >
                 <item.icon className={`transition-colors duration-300 ${isActive ? 'text-[#0EA5E9]' : 'text-sidebar-foreground/70 group-hover/item:text-[#0EA5E9] dark:text-sidebar-foreground/60'}`} />
-                <span className={`font-semibold transition-colors duration-300 ${isActive ? 'text-[#0EA5E9]' : ''}`}>{item.title}</span>
+                <span className={`text-[15px] font-semibold tracking-tight transition-colors duration-300 truncate min-w-0 ${isActive ? 'text-[#0EA5E9]' : ''}`}>{item.title}</span>
                 <ChevronDown
                     className={`ml-auto size-4 transition-transform duration-300 ${open ? 'rotate-180' : ''} ${isActive ? 'text-[#0EA5E9]' : 'text-sidebar-foreground/60 group-hover/item:text-[#0EA5E9]'}`}
                 />
@@ -395,16 +539,18 @@ function CollapsibleNavItem({
                                 <SidebarMenuSub className="border-sidebar-border/50">
                                     {item.subItems.map((subItem) => {
                                         const isSubActive = pathname === subItem.url
+                                        const SubIcon = getSubItemIcon(item.title, subItem)
                                         return (
                                             <SidebarMenuSubItem key={subItem.title}>
                                                 <SidebarMenuSubButton asChild>
                                                     <Link
                                                         href={subItem.url}
-                                                        className={`block w-full rounded-md px-2 py-1.5 text-sm transition-colors duration-200 ${isSubActive
-                                                            ? 'text-[#0EA5E9] font-medium bg-sidebar-accent'
-                                                            : 'text-sidebar-foreground/60 hover:text-[#0EA5E9] hover:bg-sidebar-accent'
+                                                        className={`flex items-center w-full gap-2.5 rounded-lg px-3 py-2.5 text-[15px] font-semibold transition-colors duration-200 ${isSubActive
+                                                            ? 'text-[#0EA5E9] bg-sidebar-accent'
+                                                            : 'text-sidebar-foreground hover:text-[#0EA5E9] hover:bg-sidebar-accent'
                                                             }`}
                                                     >
+                                                        <SubIcon className={`h-4 w-4 shrink-0 ${isSubActive ? 'text-[#0EA5E9]' : 'text-sidebar-foreground/70'}`} />
                                                         {subItem.title}
                                                     </Link>
                                                 </SidebarMenuSubButton>

@@ -1,17 +1,13 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: `${process.env.NEXT_PUBLIC_API_URL ?? ''}/api`,
-    headers: {
-        'Content-Type': 'application/json',
-    },
+    baseURL: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api`,
 });
 
-// Add a request interceptor to attach the token (skip for public auth endpoints)
+// Add a request interceptor to attach the token
 api.interceptors.request.use(
     (config) => {
-        const isPublicAuth = typeof config.url === 'string' && /^\/auth\/(login|forgot-password|reset-password)/.test(config.url);
-        if (typeof window !== 'undefined' && !isPublicAuth) {
+        if (typeof window !== 'undefined') {
             const token = localStorage.getItem('token');
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;

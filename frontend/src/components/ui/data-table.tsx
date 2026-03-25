@@ -90,6 +90,8 @@ interface DataTableProps<TData> {
     quickActions?: QuickAction<TData>[];
     /** Change this key (e.g. after bulk delete) to clear row selection */
     selectionKey?: string | number;
+    /** Render pagination/quick-actions as a separate block (with spacing) instead of visually attached to the table card */
+    separateFooter?: boolean;
 }
 
 export function DataTable<TData>({
@@ -108,6 +110,7 @@ export function DataTable<TData>({
     onSelectionChange,
     quickActions,
     selectionKey,
+    separateFooter = false,
 }: DataTableProps<TData>) {
     const [globalFilter, setGlobalFilter] = useState('');
     const [sorting, setSorting] = useState<SortingState>([]);
@@ -199,7 +202,7 @@ export function DataTable<TData>({
                 </div>
             )}
 
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-x-auto overflow-y-hidden">
                 <Table>
                     <TableHeader className="bg-slate-50 dark:bg-slate-800/60 [&_tr]:border-slate-200 dark:[&_tr]:border-slate-700 [&_tr]:hover:bg-transparent">
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -266,112 +269,116 @@ export function DataTable<TData>({
             </div>
 
             {enableRowSelection && selectedCount > 0 && quickActions && quickActions.length > 0 && (
-                <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/40">
-                    <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
-                        <span className="font-normal">
-                            {selectedCount} {itemLabel}
-                            {selectedCount === 1 ? '' : 's'} selected
-                        </span>
-                        {quickActions
-                            .filter((a) => a.variant === 'destructive')
-                            .map((action) => (
-                                <button
-                                    key={action.id}
-                                    type="button"
-                                    onClick={() => action.onClick(table.getSelectedRowModel().rows.map((r) => r.original))}
-                                    className="font-normal text-red-600 dark:text-red-400 hover:underline"
-                                >
-                                    {action.id === 'delete' ? 'Delete Them' : action.label}
-                                </button>
-                            ))}
-                    </div>
-                    <div className="flex items-center gap-2">
-                        {quickActions
-                            .filter((a) => a.variant !== 'destructive')
-                            .map((action) => (
-                                <Button
-                                    key={action.id}
-                                    variant={action.variant === 'outline' ? 'outline' : 'default'}
-                                    size="sm"
-                                    className={action.variant !== 'outline' ? 'bg-[#0EA5E9] hover:bg-[#0c96d4] text-white' : ''}
-                                    onClick={() => action.onClick(table.getSelectedRowModel().rows.map((r) => r.original))}
-                                >
-                                    {action.id === 'download'
-                                        ? `Download ${selectedCount} item${selectedCount === 1 ? '' : 's'}`
-                                        : action.label}
-                                </Button>
-                            ))}
+                <div className={separateFooter ? 'mt-3' : undefined}>
+                    <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/40">
+                        <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
+                            <span className="font-normal">
+                                {selectedCount} {itemLabel}
+                                {selectedCount === 1 ? '' : 's'} selected
+                            </span>
+                            {quickActions
+                                .filter((a) => a.variant === 'destructive')
+                                .map((action) => (
+                                    <button
+                                        key={action.id}
+                                        type="button"
+                                        onClick={() => action.onClick(table.getSelectedRowModel().rows.map((r) => r.original))}
+                                        className="font-normal text-red-600 dark:text-red-400 hover:underline"
+                                    >
+                                        {action.id === 'delete' ? 'Delete Them' : action.label}
+                                    </button>
+                                ))}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {quickActions
+                                .filter((a) => a.variant !== 'destructive')
+                                .map((action) => (
+                                    <Button
+                                        key={action.id}
+                                        variant={action.variant === 'outline' ? 'outline' : 'default'}
+                                        size="sm"
+                                        className={action.variant !== 'outline' ? 'bg-[#0EA5E9] hover:bg-[#0c96d4] text-white' : ''}
+                                        onClick={() => action.onClick(table.getSelectedRowModel().rows.map((r) => r.original))}
+                                    >
+                                        {action.id === 'download'
+                                            ? `Download ${selectedCount} item${selectedCount === 1 ? '' : 's'}`
+                                            : action.label}
+                                    </Button>
+                                ))}
+                        </div>
                     </div>
                 </div>
             )}
 
             {!loading && !hidePagination && totalRows > 0 && (
-                <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-transparent bg-slate-50 dark:bg-slate-900/40">
-                    <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
-                        {enableRowSelection && selectedCount > 0 && !(quickActions && quickActions.length > 0) && (
-                            <span className="font-medium text-[#0EA5E9]">
-                                {selectedCount} selected
+                <div className={separateFooter ? 'mt-3' : undefined}>
+                    <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-transparent bg-slate-50 dark:bg-slate-900/40">
+                        <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
+                            {enableRowSelection && selectedCount > 0 && !(quickActions && quickActions.length > 0) && (
+                                <span className="font-medium text-[#0EA5E9]">
+                                    {selectedCount} selected
+                                </span>
+                            )}
+                            <span className="flex items-center gap-2">
+                                Rows per page
+                                <Select
+                                    value={String(currentPageSize)}
+                                    onValueChange={(v) => table.setPageSize(Number(v))}
+                                >
+                                    <SelectTrigger className="h-8 w-[68px] border-slate-200 dark:border-slate-700 text-sm font-medium">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {ROWS_PER_PAGE_OPTIONS.map((n) => (
+                                            <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </span>
-                        )}
-                        <span className="flex items-center gap-2">
-                            Rows per page
-                            <Select
-                                value={String(currentPageSize)}
-                                onValueChange={(v) => table.setPageSize(Number(v))}
+                            {/* Left side intentionally only rows-per-page, no total text to match sample footer */}
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-8 w-8 rounded-md border-slate-200 dark:border-slate-700"
+                                onClick={() => table.setPageIndex(0)}
+                                disabled={!table.getCanPreviousPage()}
                             >
-                                <SelectTrigger className="h-8 w-[68px] border-slate-200 dark:border-slate-700 text-sm font-medium">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {ROWS_PER_PAGE_OPTIONS.map((n) => (
-                                        <SelectItem key={n} value={String(n)}>{n}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </span>
-                        {/* Left side intentionally only rows-per-page, no total text to match sample footer */}
-                    </div>
-                    <div className="flex items-center gap-1">
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8 rounded-md border-slate-200 dark:border-slate-700"
-                            onClick={() => table.setPageIndex(0)}
-                            disabled={!table.getCanPreviousPage()}
-                        >
-                            <ChevronsLeft className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8 rounded-md border-slate-200 dark:border-slate-700"
-                            onClick={() => table.previousPage()}
-                            disabled={!table.getCanPreviousPage()}
-                        >
-                            <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <span className="px-3 text-sm text-slate-600 dark:text-slate-400">
-                            Page <span className="font-semibold text-slate-900 dark:text-white">{currentPage}</span> of{' '}
-                            <span className="font-semibold text-slate-900 dark:text-white">{pageCount || 1}</span>
-                        </span>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8 rounded-md border-slate-200 dark:border-slate-700"
-                            onClick={() => table.nextPage()}
-                            disabled={!table.getCanNextPage()}
-                        >
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8 rounded-md border-slate-200 dark:border-slate-700"
-                            onClick={() => table.setPageIndex(pageCount - 1)}
-                            disabled={!table.getCanNextPage()}
-                        >
-                            <ChevronsRight className="h-4 w-4" />
-                        </Button>
+                                <ChevronsLeft className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-8 w-8 rounded-md border-slate-200 dark:border-slate-700"
+                                onClick={() => table.previousPage()}
+                                disabled={!table.getCanPreviousPage()}
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <span className="px-3 text-sm text-slate-600 dark:text-slate-400">
+                                Page <span className="font-semibold text-slate-900 dark:text-white">{currentPage}</span> of{' '}
+                                <span className="font-semibold text-slate-900 dark:text-white">{pageCount || 1}</span>
+                            </span>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-8 w-8 rounded-md border-slate-200 dark:border-slate-700"
+                                onClick={() => table.nextPage()}
+                                disabled={!table.getCanNextPage()}
+                            >
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-8 w-8 rounded-md border-slate-200 dark:border-slate-700"
+                                onClick={() => table.setPageIndex(pageCount - 1)}
+                                disabled={!table.getCanNextPage()}
+                            >
+                                <ChevronsRight className="h-4 w-4" />
+                            </Button>
+                        </div>
                     </div>
                 </div>
             )}

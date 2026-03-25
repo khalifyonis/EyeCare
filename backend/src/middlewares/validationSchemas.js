@@ -75,34 +75,37 @@ export const updateUserSchema = Joi.object({
 // ── Patient Schemas ──
 const phoneRegex = /^[+]?[(]?[0-9]{1,3}[)]?[-s./0-9]*$/;
 
-export const patientSchema = Joi.object({
-    fullName: Joi.string().min(2).max(120).required().messages({
-        'string.min': 'Full name is required'
-    }),
-    gender: Joi.string().valid('MALE', 'FEMALE').required(),
-    dateOfBirth: Joi.date().iso().max('now').required().messages({
-        'date.max': 'Invalid birth date'
-    }),
-    phone: Joi.string().regex(phoneRegex).required().messages({
-        'string.pattern.base': 'Invalid phone'
-    }),
+const patientBaseFields = {
+    fullName: Joi.string().min(2).max(120).optional(),
+    firstName: Joi.string().max(80).allow('', null).optional(),
+    lastName: Joi.string().max(80).allow('', null).optional(),
+    gender: Joi.string().valid('MALE', 'FEMALE').optional(),
+    dateOfBirth: Joi.date().iso().max('now').optional().messages({ 'date.max': 'Invalid birth date' }),
+    phone: Joi.string().regex(phoneRegex).optional().messages({ 'string.pattern.base': 'Invalid phone' }),
     email: Joi.string().email().allow('', null).optional(),
     address: Joi.string().allow('', null).optional(),
-    branchId: Joi.string().allow('', null).optional()
+    city: Joi.string().max(100).allow('', null).optional(),
+    state: Joi.string().max(100).allow('', null).optional(),
+    zipCode: Joi.string().max(20).allow('', null).optional(),
+    bloodGroup: Joi.string().valid('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-').allow('', null).optional(),
+    weight: Joi.number().min(0).max(500).allow(null).optional(),
+    allergies: Joi.string().allow('', null).optional(),
+    chiefComplaint: Joi.string().allow('', null).optional(),
+    emergencyContactName: Joi.string().max(120).allow('', null).optional(),
+    emergencyContactRelationship: Joi.string().max(80).allow('', null).optional(),
+    emergencyContactPhone: Joi.string().max(30).allow('', null).optional(),
+    assignedDoctorId: Joi.string().uuid().allow('', null).optional(),
+    isActive: Joi.boolean().optional(),
+    branchId: Joi.string().allow('', null).optional(),
+};
+
+export const patientSchema = Joi.object({
+    ...patientBaseFields,
+    phone: Joi.string().regex(phoneRegex).required().messages({ 'string.pattern.base': 'Invalid phone' }),
 }).options({ stripUnknown: true });
 
 export const updatePatientSchema = Joi.object({
-    fullName: Joi.string().min(2).max(120).optional(),
-    gender: Joi.string().valid('MALE', 'FEMALE').optional(),
-    dateOfBirth: Joi.date().iso().max('now').optional().messages({
-        'date.max': 'Invalid birth date'
-    }),
-    phone: Joi.string().regex(phoneRegex).optional().messages({
-        'string.pattern.base': 'Invalid phone'
-    }),
-    email: Joi.string().email().allow('', null).optional(),
-    address: Joi.string().allow('', null).optional(),
-    branchId: Joi.string().allow('', null).optional()
+    ...patientBaseFields,
 }).options({ stripUnknown: true });
 
 // ── Branch Schemas ──
@@ -123,10 +126,15 @@ export const appointmentSchema = Joi.object({
     amount: Joi.number().min(0).optional().default(0).messages({
         'number.min': 'Invalid amount'
     }),
-    status: Joi.string().valid('PENDING', 'COMPLETED', 'CANCELLED').optional()
+    // Appointments module additions
+    type: Joi.string().valid('consultation', 'follow-up', 'checkup', 'emergency').optional().allow('', null),
+    location: Joi.string().optional().allow('', null),
+    notes: Joi.string().optional().allow('', null),
+    status: Joi.string().valid('PENDING', 'SCHEDULED', 'CONFIRMED', 'COMPLETED', 'CANCELLED').optional()
 });
 
 export const updateAppointmentSchema = Joi.object({
+    patientId: Joi.string().uuid().optional(),
     doctorId: Joi.string().uuid().optional(),
     appointmentDate: Joi.date().iso().optional().messages({
         'date.iso': 'Invalid date'
@@ -134,7 +142,10 @@ export const updateAppointmentSchema = Joi.object({
     amount: Joi.number().min(0).optional().messages({
         'number.min': 'Invalid amount'
     }),
-    status: Joi.string().valid('PENDING', 'COMPLETED', 'CANCELLED').optional()
+    type: Joi.string().valid('consultation', 'follow-up', 'checkup', 'emergency').optional().allow('', null),
+    location: Joi.string().optional().allow('', null),
+    notes: Joi.string().optional().allow('', null),
+    status: Joi.string().valid('PENDING', 'SCHEDULED', 'CONFIRMED', 'COMPLETED', 'CANCELLED').optional()
 });
 
 // ── Examination Schemas ──
@@ -186,6 +197,80 @@ export const updateClinicalExaminationSchema = Joi.object({
     nextReviewDate: Joi.date().iso().allow('', null).optional(),
     nextReviewReason: Joi.string().allow('', null).optional(),
     examinedById: Joi.string().uuid().optional()
+}).min(1).options({ stripUnknown: true });
+
+// ── Eye Examination Schemas ──
+export const createEyeExaminationSchema = Joi.object({
+    branchId: Joi.string().uuid().allow('', null).optional(),
+    patientId: Joi.string().uuid().required(),
+    doctorId: Joi.string().uuid().required(),
+    chiefComplaint: Joi.string().min(2).max(500).required(),
+    historyOfPresentIllness: Joi.string().allow('', null).optional(),
+    vaScale: Joi.string().valid('SNELLEN', 'LOGMAR').optional().allow('', null),
+    vaUnaidedOD: Joi.string().allow('', null).optional(),
+    vaUnaidedOS: Joi.string().allow('', null).optional(),
+    vaUnaidedNearOD: Joi.string().allow('', null).optional(),
+    vaUnaidedNearOS: Joi.string().allow('', null).optional(),
+    vaBcvaOD: Joi.string().allow('', null).optional(),
+    vaBcvaOS: Joi.string().allow('', null).optional(),
+    vaBcvaNearOD: Joi.string().allow('', null).optional(),
+    vaBcvaNearOS: Joi.string().allow('', null).optional(),
+    vaPinholeOD: Joi.string().allow('', null).optional(),
+    vaPinholeOS: Joi.string().allow('', null).optional(),
+    refractionSphereOD: Joi.string().allow('', null).optional(),
+    refractionSphereOS: Joi.string().allow('', null).optional(),
+    refractionCylinderOD: Joi.string().allow('', null).optional(),
+    refractionCylinderOS: Joi.string().allow('', null).optional(),
+    refractionAxisOD: Joi.string().allow('', null).optional(),
+    refractionAxisOS: Joi.string().allow('', null).optional(),
+    iopOD: Joi.number().integer().min(0).max(100).allow(null).optional(),
+    iopOS: Joi.number().integer().min(0).max(100).allow(null).optional(),
+    iopMethod: Joi.string().allow('', null).optional(),
+    iopTime: Joi.string().allow('', null).optional(),
+    targetIopOD: Joi.number().integer().min(0).max(100).allow(null).optional(),
+    targetIopOS: Joi.number().integer().min(0).max(100).allow(null).optional(),
+    anteriorSegmentFindings: Joi.object().unknown(true).allow(null).optional(),
+    fundusFindings: Joi.object().unknown(true).allow(null).optional(),
+    diagnosis: Joi.string().allow('', null).optional(),
+    plan: Joi.string().allow('', null).optional(),
+    followUpDate: Joi.date().iso().allow('', null).optional(),
+    nextVisitReason: Joi.string().allow('', null).optional(),
+}).options({ stripUnknown: true });
+
+export const updateEyeExaminationSchema = Joi.object({
+    patientId: Joi.string().uuid().optional(),
+    doctorId: Joi.string().uuid().optional(),
+    chiefComplaint: Joi.string().min(2).max(500).optional(),
+    historyOfPresentIllness: Joi.string().allow('', null).optional(),
+    vaScale: Joi.string().valid('SNELLEN', 'LOGMAR').optional().allow('', null),
+    vaUnaidedOD: Joi.string().allow('', null).optional(),
+    vaUnaidedOS: Joi.string().allow('', null).optional(),
+    vaUnaidedNearOD: Joi.string().allow('', null).optional(),
+    vaUnaidedNearOS: Joi.string().allow('', null).optional(),
+    vaBcvaOD: Joi.string().allow('', null).optional(),
+    vaBcvaOS: Joi.string().allow('', null).optional(),
+    vaBcvaNearOD: Joi.string().allow('', null).optional(),
+    vaBcvaNearOS: Joi.string().allow('', null).optional(),
+    vaPinholeOD: Joi.string().allow('', null).optional(),
+    vaPinholeOS: Joi.string().allow('', null).optional(),
+    refractionSphereOD: Joi.string().allow('', null).optional(),
+    refractionSphereOS: Joi.string().allow('', null).optional(),
+    refractionCylinderOD: Joi.string().allow('', null).optional(),
+    refractionCylinderOS: Joi.string().allow('', null).optional(),
+    refractionAxisOD: Joi.string().allow('', null).optional(),
+    refractionAxisOS: Joi.string().allow('', null).optional(),
+    iopOD: Joi.number().integer().min(0).max(100).allow(null).optional(),
+    iopOS: Joi.number().integer().min(0).max(100).allow(null).optional(),
+    iopMethod: Joi.string().allow('', null).optional(),
+    iopTime: Joi.string().allow('', null).optional(),
+    targetIopOD: Joi.number().integer().min(0).max(100).allow(null).optional(),
+    targetIopOS: Joi.number().integer().min(0).max(100).allow(null).optional(),
+    anteriorSegmentFindings: Joi.object().unknown(true).allow(null).optional(),
+    fundusFindings: Joi.object().unknown(true).allow(null).optional(),
+    diagnosis: Joi.string().allow('', null).optional(),
+    plan: Joi.string().allow('', null).optional(),
+    followUpDate: Joi.date().iso().allow('', null).optional(),
+    nextVisitReason: Joi.string().allow('', null).optional(),
 }).min(1).options({ stripUnknown: true });
 
 // ── Surgery Schemas ──
@@ -333,4 +418,60 @@ export const updateOpticalItemSchema = Joi.object({
     reorderLevel: Joi.number().integer().min(0).optional(),
     purchasePrice: Joi.number().min(0).optional(),
     sellingPrice: Joi.number().min(0).optional(),
+}).min(1).options({ stripUnknown: true });
+
+// Optical Prescription schema
+export const createOpticalPrescriptionSchema = Joi.object({
+    patientId: Joi.string().uuid().required(),
+    branchId: Joi.string().uuid().allow('', null).optional(),
+    type: Joi.string().valid('SPECTACLES', 'CONTACT_LENS', 'BOTH').required(),
+    validityMonths: Joi.number().integer().min(1).max(60).optional().default(12),
+    notes: Joi.string().allow('', null).optional(),
+
+    odSphere: Joi.string().allow('', null).optional(),
+    odCylinder: Joi.string().allow('', null).optional(),
+    odAxis: Joi.number().integer().min(0).max(180).allow('', null).optional(),
+    odAdd: Joi.string().allow('', null).optional(),
+    odPd: Joi.number().integer().min(0).max(99).allow('', null).optional(),
+    odPrism: Joi.string().allow('', null).optional(),
+
+    osSphere: Joi.string().allow('', null).optional(),
+    osCylinder: Joi.string().allow('', null).optional(),
+    osAxis: Joi.number().integer().min(0).max(180).allow('', null).optional(),
+    osAdd: Joi.string().allow('', null).optional(),
+    osPd: Joi.number().integer().min(0).max(99).allow('', null).optional(),
+    osPrism: Joi.string().allow('', null).optional(),
+
+    lensType: Joi.string().allow('', null).optional(),
+    lensMaterial: Joi.string().allow('', null).optional(),
+    frameType: Joi.string().allow('', null).optional(),
+    coatings: Joi.array().items(Joi.string()).optional().default([]),
+}).options({ stripUnknown: true });
+
+export const updateOpticalPrescriptionSchema = Joi.object({
+    patientId: Joi.string().uuid().optional(),
+    branchId: Joi.string().uuid().allow('', null).optional(),
+    type: Joi.string().valid('SPECTACLES', 'CONTACT_LENS', 'BOTH').optional(),
+    status: Joi.string().valid('FILLED', 'DISPENSED').optional(),
+    validityMonths: Joi.number().integer().min(1).max(60).optional(),
+    notes: Joi.string().allow('', null).optional(),
+
+    odSphere: Joi.string().allow('', null).optional(),
+    odCylinder: Joi.string().allow('', null).optional(),
+    odAxis: Joi.number().integer().min(0).max(180).allow('', null).optional(),
+    odAdd: Joi.string().allow('', null).optional(),
+    odPd: Joi.number().integer().min(0).max(99).allow('', null).optional(),
+    odPrism: Joi.string().allow('', null).optional(),
+
+    osSphere: Joi.string().allow('', null).optional(),
+    osCylinder: Joi.string().allow('', null).optional(),
+    osAxis: Joi.number().integer().min(0).max(180).allow('', null).optional(),
+    osAdd: Joi.string().allow('', null).optional(),
+    osPd: Joi.number().integer().min(0).max(99).allow('', null).optional(),
+    osPrism: Joi.string().allow('', null).optional(),
+
+    lensType: Joi.string().allow('', null).optional(),
+    lensMaterial: Joi.string().allow('', null).optional(),
+    frameType: Joi.string().allow('', null).optional(),
+    coatings: Joi.array().items(Joi.string()).optional(),
 }).min(1).options({ stripUnknown: true });

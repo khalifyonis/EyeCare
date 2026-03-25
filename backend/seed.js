@@ -1,8 +1,12 @@
 import 'dotenv/config';
 import pg from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from './src/generated/client/index.js';
 import bcrypt from 'bcrypt';
+
+const MAIN_BRANCH_ID = '00000000-0000-0000-0000-000000000001';
+const SEED_DEMO_USERS = String(process.env.SEED_DEMO_USERS || '').toLowerCase() === '1'
+    || String(process.env.SEED_DEMO_USERS || '').toLowerCase() === 'true';
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -29,10 +33,10 @@ async function seed() {
 
     console.log('Seeding default branch...');
     const mainBranch = await prisma.branch.upsert({
-        where: { id: 'main-branch-id' }, // Using a fixed ID for consistency in seed
+        where: { id: MAIN_BRANCH_ID }, // Using a fixed UUID for consistency in seed
         update: {},
         create: {
-            id: 'main-branch-id',
+            id: MAIN_BRANCH_ID,
             branchName: 'Main Branch',
             address: '123 Eye St, Medical District',
             phone: '123-456-7890',
@@ -103,15 +107,27 @@ async function seed() {
 
     console.log('Checking and seeding users...');
     const createdUsers = {};
-    for (const userData of usersToSeed) {
-        const existing = await prisma.user.findUnique({ where: { username: userData.username } });
-        if (existing) {
-            console.log(`User ${userData.username} already exists. Skipping.`);
-            createdUsers[userData.username] = existing;
-        } else {
-            const user = await prisma.user.create({ data: userData });
-            console.log(`User created: ${user.username}`);
-            createdUsers[user.username] = user;
+    if (SEED_DEMO_USERS) {
+        for (const userData of usersToSeed) {
+            const existing = await prisma.user.findUnique({ where: { username: userData.username } });
+            if (existing) {
+                console.log(`User ${userData.username} already exists. Skipping.`);
+                createdUsers[userData.username] = existing;
+            } else {
+                const user = await prisma.user.create({ data: userData });
+                console.log(`User created: ${user.username}`);
+                createdUsers[userData.username] = user;
+            }
+        }
+    } else {
+        console.log('Skipping demo user seeding. (Set SEED_DEMO_USERS=1 to enable)');
+        const existing = await prisma.user.findMany({
+            where: { branchId: mainBranch.id },
+            select: { id: true, username: true, roleId: true, branchId: true },
+        });
+        for (const u of existing) createdUsers[u.username] = u;
+        if (existing.length === 0) {
+            console.log('No users exist in this database. Create your real users first, or run with SEED_DEMO_USERS=1 once.');
         }
     }
 
@@ -234,7 +250,40 @@ async function seed() {
         }
     }
 
-    const createdByUser = createdUsers['reception1'] || createdUsers['admin'] || createdUsers['yonis'];
+    // Ensure Smoke Test Patient exists with complete profile fields
+    const smokePhone = '792069316';
+
+    const smokePayload = {
+        fullName: 'Smoke Test Patient',
+        gender: 'Male',
+        dateOfBirth: new Date('1989-12-31T00:00:00.000Z'),
+        phone: smokePhone,
+        email: 'smoke.patient@eyecare.com',
+        address: 'Hodan District, Road 3, Mogadishu',
+        branchId: mainBranch.id,
+    };
+
+    const existingSmoke = await prisma.patient.findUnique({ where: { phone: smokePhone } });
+    let smokePatient;
+    if (existingSmoke) {
+        smokePatient = await prisma.patient.update({
+            where: { id: existingSmoke.id },
+            data: smokePayload,
+        });
+        console.log('Smoke Test Patient updated with complete profile fields.');
+    } else {
+        smokePatient = await prisma.patient.create({ data: smokePayload });
+        console.log('Smoke Test Patient created with complete profile fields.');
+    }
+
+    if (!patients.some((p) => p.id === smokePatient.id)) {
+        patients.push(smokePatient);
+    }
+
+    const createdByUser = createdUsers['reception1']
+        || createdUsers['admin']
+        || createdUsers['yonis']
+        || (await prisma.user.findFirst({ where: { branchId: mainBranch.id } }));
 
     if (createdByUser) {
         const doctors = await prisma.doctor.findMany({ where: { branchId: mainBranch.id } });
@@ -254,11 +303,22 @@ async function seed() {
                 for (let i = 0; i < patients.length; i++) {
                     const time = new Date(today);
                     time.setHours(9 + i, 0, 0, 0);
-                    const appt = await prisma.appointment.create({
-                        data: {
-                            bookingNumber: `BK-${100 + i}-${doctor.id.slice(0, 4)}`,
+                    const bookingNumber = `BK-${100 + i}-${doctor.id.slice(0, 4)}`;
+                    const appt = await prisma.appointment.upsert({
+                        where: { bookingNumber },
+                        update: {
                             appointmentDate: time,
-                            status: statuses[i],
+                            status: statuses[i] || 'PENDING',
+                            amount: 20,
+                            branchId: mainBranch.id,
+                            patientId: patients[i].id,
+                            doctorId: doctor.id,
+                            createdById: createdByUser.id,
+                        },
+                        create: {
+                            bookingNumber,
+                            appointmentDate: time,
+                            status: statuses[i] || 'PENDING',
                             amount: 20,
                             branchId: mainBranch.id,
                             patientId: patients[i].id,
@@ -272,8 +332,15 @@ async function seed() {
                 // Create ER and Clinical exams, prescriptions, billing for completed ones
                 for (const appt of createdAppointments) {
                     if (appt.status === 'COMPLETED') {
-                        const er = await prisma.eRExamination.create({
-                            data: {
+                        await prisma.eRExamination.upsert({
+                            where: { appointmentId: appt.id },
+                            update: {
+                                vaRight: '6/9',
+                                vaLeft: '6/9',
+                                notes: 'Demo ER exam',
+                                recordedById: createdByUser.id,
+                            },
+                            create: {
                                 appointmentId: appt.id,
                                 vaRight: '6/9',
                                 vaLeft: '6/9',
@@ -282,10 +349,21 @@ async function seed() {
                             },
                         });
 
-                        const clinical = await prisma.clinicalExamination.create({
-                            data: {
+                        const clinical = await prisma.clinicalExamination.upsert({
+                            where: { appointmentId: appt.id },
+                            update: {
+                                sphRight: -1.25,
+                                cylRight: -0.50,
+                                axisRight: 90,
+                                sphLeft: -1.00,
+                                cylLeft: -0.25,
+                                axisLeft: 85,
+                                diagnosis: 'Demo diagnosis',
+                                managementPlan: 'Demo plan',
+                                examinedById: doctor.id,
+                            },
+                            create: {
                                 appointmentId: appt.id,
-                                // Simple but realistic refraction values
                                 sphRight: -1.25,
                                 cylRight: -0.50,
                                 axisRight: 90,
@@ -299,35 +377,48 @@ async function seed() {
                         });
 
                         const randItem = createdPharmaItems[Math.floor(Math.random() * createdPharmaItems.length)];
-                        const prescription = await prisma.prescription.create({
-                            data: {
-                                appointmentId: appt.id,
-                                examId: clinical.id,
-                                branchId: mainBranch.id,
-                                itemType: 'PHARMACY',
-                                itemId: randItem?.id || null,
-                                quantity: 1,
-                                instructions: 'Use as directed',
-                            },
+                        let prescription = await prisma.prescription.findFirst({
+                            where: { appointmentId: appt.id, branchId: mainBranch.id },
+                            orderBy: { createdAt: 'asc' },
                         });
 
-                        await prisma.billing.create({
-                            data: {
-                                patientId: appt.patientId,
-                                branchId: mainBranch.id,
-                                appointmentId: appt.id,
-                                surgeryId: null,
-                                prescriptionId: prescription.id,
-                                serviceType: 'APPOINTMENT',
-                                totalAmount: 20,
-                                discount: 0,
-                                finalAmount: 20,
-                                paymentMethod: 'CASH',
-                                referenceNumber: null,
-                                status: 'PAID',
-                                createdById: createdByUser.id,
-                            },
+                        if (!prescription) {
+                            prescription = await prisma.prescription.create({
+                                data: {
+                                    appointmentId: appt.id,
+                                    examId: clinical.id,
+                                    branchId: mainBranch.id,
+                                    itemType: 'PHARMACY',
+                                    itemId: randItem?.id || null,
+                                    quantity: 1,
+                                    instructions: 'Use as directed',
+                                },
+                            });
+                        }
+
+                        const existingBilling = await prisma.billing.findFirst({
+                            where: { appointmentId: appt.id, serviceType: 'APPOINTMENT' },
                         });
+
+                        if (!existingBilling) {
+                            await prisma.billing.create({
+                                data: {
+                                    patientId: appt.patientId,
+                                    branchId: mainBranch.id,
+                                    appointmentId: appt.id,
+                                    surgeryId: null,
+                                    prescriptionId: prescription.id,
+                                    serviceType: 'APPOINTMENT',
+                                    totalAmount: 20,
+                                    discount: 0,
+                                    finalAmount: 20,
+                                    paymentMethod: 'CASH',
+                                    referenceNumber: null,
+                                    status: 'PAID',
+                                    createdById: createdByUser.id,
+                                },
+                            });
+                        }
                     }
                 }
 
@@ -356,11 +447,17 @@ async function seed() {
                 data: {
                     examId: exam.id,
                     branchId: exam.appointment.branchId,
-                    eyeSide: 'RIGHT',
-                    surgeryType: 'Cataract Extraction',
-                    surgeryDate,
+                    patientId: exam.appointment.patientId,
+                    eye: 'OD',
+                    surgeryType: 'Cataract Surgery',
+                    procedure: 'Phacoemulsification + IOL',
+                    anesthesiaType: 'Topical',
+                    date: surgeryDate,
+                    time: '10:30',
+                    operatingRoom: 'OR-1',
+                    cataractDetails: { technique: 'Phacoemulsification', iolModel: 'Alcon SN60WF', iolPower: 0, targetRefraction: 0 },
                     cost: surgeryCost,
-                    status: 'COMPLETED',
+                    status: 'completed',
                     notes: 'Demo cataract surgery',
                     surgeonId: exam.examinedById,
                 },
@@ -386,6 +483,120 @@ async function seed() {
         }
     } else {
         console.log('createdBy user missing, skipping clinical data seeding.');
+    }
+
+    // Seed demo surgeries for the Eye Surgery module list page
+    const existingSurgeryCount = await prisma.surgery.count({ where: { branchId: mainBranch.id } });
+    if (existingSurgeryCount < 6 && patients.length > 0) {
+        const doctors = await prisma.doctor.findMany({ where: { branchId: mainBranch.id }, select: { id: true } });
+        const surgeonIds = doctors.map((d) => d.id);
+
+        if (surgeonIds.length > 0) {
+            const needed = Math.max(0, 6 - existingSurgeryCount);
+            if (needed === 0) {
+                // no-op
+            } else {
+
+            const base = new Date();
+            base.setHours(9, 0, 0, 0);
+
+            const types = [
+                { surgeryType: 'Cataract Surgery', procedure: 'Phacoemulsification + IOL', anesthesiaType: 'Topical' },
+                { surgeryType: 'Refractive Surgery', procedure: 'LASIK', anesthesiaType: 'Topical' },
+                { surgeryType: 'Refractive Surgery', procedure: 'PRK', anesthesiaType: 'Topical' },
+                { surgeryType: 'Retinal Surgery', procedure: 'Vitrectomy', anesthesiaType: 'General' },
+                { surgeryType: 'Retinal Surgery', procedure: 'Retinal Detachment Repair', anesthesiaType: 'General' },
+                { surgeryType: 'Cataract Surgery', procedure: 'ECCE + IOL', anesthesiaType: 'Topical' },
+            ];
+
+            const rows = types.slice(0, Math.min(needed, types.length)).map((t, idx) => {
+                const d = new Date(base);
+                d.setDate(d.getDate() + idx);
+                d.setHours(10 + (idx % 4), 0, 0, 0);
+
+                const patient = patients[idx % patients.length];
+                const surgeonId = surgeonIds[idx % surgeonIds.length];
+
+                const status = idx === 2 ? 'completed' : 'scheduled';
+                const eye = idx % 3 === 0 ? 'OD' : idx % 3 === 1 ? 'OS' : 'BOTH';
+
+                return {
+                    branchId: mainBranch.id,
+                    patientId: patient.id,
+                    eye,
+                    surgeryType: t.surgeryType,
+                    procedure: t.procedure,
+                    anesthesiaType: t.anesthesiaType,
+                    date: d,
+                    time: `${String(d.getHours()).padStart(2, '0')}:00`,
+                    operatingRoom: `OR-${(idx % 3) + 1}`,
+                    cataractDetails: t.surgeryType === 'Cataract Surgery'
+                        ? { technique: 'Phacoemulsification', iolModel: 'Alcon SN60WF', iolPower: 0, targetRefraction: 0 }
+                        : null,
+                    status,
+                    notes: 'Demo surgery',
+                    surgeonId,
+                    cost: 0,
+                };
+            });
+
+            await prisma.surgery.createMany({ data: rows });
+            console.log(`Seeded ${rows.length} surgeries.`);
+            }
+        }
+    }
+
+    // Seed demo optical prescriptions for datatable visibility
+    const existingOpticalCount = await prisma.opticalPrescription.count({
+        where: { branchId: mainBranch.id },
+    });
+
+    if (existingOpticalCount === 0 && patients.length > 0) {
+        const samplePatients = patients.slice(0, Math.min(6, patients.length));
+        const seedRows = samplePatients.map((p, idx) => {
+            const createdAt = new Date();
+            createdAt.setDate(createdAt.getDate() - (idx * 5 + 1));
+            const validityMonths = idx % 2 === 0 ? 12 : 6;
+            const expiryDate = new Date(createdAt);
+            expiryDate.setMonth(expiryDate.getMonth() + validityMonths);
+
+            const isDispensed = idx % 3 === 0;
+
+            return {
+                branchId: mainBranch.id,
+                patientId: p.id,
+                createdById: createdByUser?.id || null,
+                type: idx % 2 === 0 ? 'SPECTACLES' : 'CONTACT_LENS',
+                status: isDispensed ? 'DISPENSED' : 'FILLED',
+                createdAt,
+                validityMonths,
+                expiryDate,
+                dispensedAt: isDispensed ? new Date(createdAt.getTime() + 86400000) : null,
+                notes: 'Demo optical prescription',
+
+                odSphere: '-1.25',
+                odCylinder: '-0.50',
+                odAxis: 90,
+                odAdd: '+1.00',
+                odPd: 31,
+                odPrism: '0',
+
+                osSphere: '-1.00',
+                osCylinder: '-0.25',
+                osAxis: 85,
+                osAdd: '+1.00',
+                osPd: 31,
+                osPrism: '0',
+
+                lensType: idx % 2 === 0 ? 'Single Vision' : 'Progressive',
+                lensMaterial: idx % 2 === 0 ? 'CR-39' : 'Polycarbonate',
+                frameType: idx % 2 === 0 ? 'Full Rim' : 'Half Rim',
+                coatings: ['Anti Reflective', 'UV Protection'],
+            };
+        });
+
+        await prisma.opticalPrescription.createMany({ data: seedRows });
+        console.log(`Seeded ${seedRows.length} optical prescriptions.`);
     }
 
     // Fix any existing prescriptions that have null itemId

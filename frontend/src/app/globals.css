@@ -220,4 +220,123 @@
   .dark [data-sidebar="sidebar"] {
     background-color: hsl(var(--sidebar-background));
   }
+
+  .optical-page {
+    --optical-control-height: 2.625rem;
+  }
+
+  .optical-page h1 {
+    font-size: clamp(1.5rem, 2vw, 1.9rem) !important;
+    line-height: 1.15 !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  .optical-page p {
+    font-size: 0.95rem !important;
+    line-height: 1.45 !important;
+  }
+
+  .optical-page h3,
+  .optical-page [data-slot="card-title"] {
+    font-size: clamp(1rem, 1.5vw, 1.2rem) !important;
+    line-height: 1.25 !important;
+  }
+
+  .optical-page label {
+    font-size: 0.92rem !important;
+    font-weight: 600 !important;
+    color: rgb(71 85 105) !important;
+  }
+
+  .optical-page input,
+  .optical-page textarea,
+  .optical-page button[role="combobox"] {
+    min-height: var(--optical-control-height);
+    height: var(--optical-control-height);
+    font-size: 0.95rem;
+    line-height: 1.35;
+  }
+
+  .optical-page textarea {
+    min-height: 5.5rem;
+    height: auto;
+  }
+
+  .optical-page .h-12 {
+    height: var(--optical-control-height);
+  }
+
+  .optical-page .text-4xl {
+    font-size: 1.35rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .optical-page .text-3xl {
+    font-size: 1.2rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .optical-page .text-2xl {
+    font-size: 1.05rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .optical-page .text-xl {
+    font-size: 0.95rem !important;
+    line-height: 1.35 !important;
+  }
+
+  .optical-page .text-lg {
+    font-size: 0.9rem !important;
+    line-height: 1.35 !important;
+  }
+
+  @media (max-width: 768px) {
+    .optical-page {
+      --optical-control-height: 2.5rem;
+    }
+  }
+
+  .optical-form-page h1 {
+    font-size: 2rem !important;
+    line-height: 1.15 !important;
+  }
+
+  .optical-form-page [data-slot="card-title"] {
+    font-size: 1rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .optical-form-page .text-4xl {
+    font-size: 1rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .optical-form-page .text-3xl {
+    font-size: 0.95rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .optical-form-page .text-2xl,
+  .optical-form-page .text-xl,
+  .optical-form-page .text-lg {
+    font-size: 0.9rem !important;
+    line-height: 1.35 !important;
+  }
+
+  @media (max-width: 1024px) {
+    .optical-form-page h1 {
+      font-size: 1.75rem !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .optical-form-page h1 {
+      font-size: 1.5rem !important;
+    }
+
+    .optical-form-page [data-slot="card-title"] {
+      font-size: 0.95rem !important;
+    }
+  }
 }

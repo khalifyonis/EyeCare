@@ -12,14 +12,25 @@ import { upload } from '../middlewares/uploadMiddleware.js'; // Added upload mid
 
 const router = express.Router();
 
+router.use(authenticate);
+
+// Allow a user to update their own profile image, or admins to update anyone.
+const authorizeSelfOrAdmin = (req, res, next) => {
+    const { id } = req.params;
+    const role = req.user?.role;
+    if (role === 'SUPERADMIN' || role === 'ADMIN' || req.user?.id === id) return next();
+    return res.status(403).json({ message: 'Forbidden. Insufficient permissions.' });
+};
+
+router.post('/:id/profile-image', authorizeSelfOrAdmin, upload.single('image'), uploadProfileImage);
+
 // User management: ADMIN and SUPERADMIN only
-router.use(authenticate, authorize('ADMIN', 'SUPERADMIN'));
+router.use(authorize('ADMIN', 'SUPERADMIN'));
 
 router.get('/', getAllUsers);
 router.get('/:id', getUserById);
 router.post('/', createUser);
 router.put('/:id', updateUser);
 router.delete('/:id', deleteUser);
-router.post('/:id/profile-image', upload.single('image'), uploadProfileImage); // Added new route
 
 export default router;

@@ -42,11 +42,13 @@ export function OpticalItemDialog({
     onOpenChange,
     item,
     onSuccess,
+    defaultItemType,
 }: {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     item: OpticalRow | null;
     onSuccess: () => void;
+    defaultItemType?: string;
 }) {
     const isEdit = !!item?.id;
     const [suppliers, setSuppliers] = useState<SupplierOption[]>([]);
@@ -89,7 +91,7 @@ export function OpticalItemDialog({
             } else {
                 setFormData({
                     itemName: '',
-                    itemType: '',
+                    itemType: defaultItemType || '',
                     brand: '',
                     manufacturer: '',
                     supplierId: '',
@@ -100,7 +102,7 @@ export function OpticalItemDialog({
                 });
             }
         }
-    }, [open, item]);
+    }, [open, item, defaultItemType]);
 
     const handleSave = async () => {
         const name = formData.itemName?.trim();
