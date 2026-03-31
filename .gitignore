@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# VS Code workspace settings (local only)
+.vscode/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
