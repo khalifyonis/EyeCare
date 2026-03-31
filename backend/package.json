@@ -1,0 +1,37 @@
+{
+  "name": "eye-care",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "seed": "node seed.js",
+    "users:find-db": "node scripts/find-users-db.mjs",
+    "users:reset-password": "node scripts/reset-user-password.mjs",
+    "workflow:complete-patient": "node scripts/complete-patient-workflow.mjs",
+    "cleanup:workflow-word": "node scripts/cleanup-workflow-word.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@prisma/adapter-pg": "^6.4.0",
+    "@prisma/client": "^6.4.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.10.1",
+    "multer": "^2.0.2",
+    "nodemailer": "^8.0.1",
+    "pg": "^8.18.0",
+    "prisma": "^6.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
