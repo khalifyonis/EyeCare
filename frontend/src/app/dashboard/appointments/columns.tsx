@@ -57,7 +57,7 @@ export const getAppointmentColumns = ({
 		accessorKey: 'bookingNumber',
 		header: 'Booking #',
 		cell: ({ row }) => (
-			<span className="font-mono text-[#0EA5E9]">
+			<span className="font-mono text-slate-600 dark:text-slate-300">
 				{row.original.bookingNumber || 'N/A'}
 			</span>
 		),
@@ -70,15 +70,14 @@ export const getAppointmentColumns = ({
 			if (!patient) return <span className="text-slate-400">Unknown</span>;
 
 			const fullName = patient.fullName || 'Unknown';
-			const initial = fullName.charAt(0).toUpperCase();
 			return (
 				<Link href={`/dashboard/patients/${patient.id}`} className="flex items-center gap-3 group">
-					<div className="flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-bold bg-[#0EA5E9]/10 text-[#0EA5E9] group-hover:bg-[#0EA5E9] group-hover:text-white transition-colors">
-						{initial}
+					<div className="flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
+						{fullName.charAt(0).toUpperCase()}
 					</div>
 					<div className="flex flex-col min-w-0">
-						<span className="truncate font-semibold group-hover:text-[#0EA5E9] transition-colors">{fullName}</span>
-						{patient.phone && <span className="text-xs text-slate-500 font-medium">{patient.phone}</span>}
+						<span className="truncate font-medium text-slate-900 dark:text-slate-100">{fullName}</span>
+						{patient.phone && <span className="text-xs text-slate-500">{patient.phone}</span>}
 					</div>
 				</Link>
 			);
@@ -94,7 +93,7 @@ export const getAppointmentColumns = ({
 			const timeStr = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit' }).format(dateObj);
 			return (
 				<div className="flex flex-col">
-					<span>{dateStr}</span>
+					<span className="text-slate-700 dark:text-slate-200">{dateStr}</span>
 					<span className="text-xs text-slate-500">{timeStr}</span>
 				</div>
 			);
@@ -136,14 +135,14 @@ export const getAppointmentColumns = ({
 				<div className="flex items-center gap-4">
 					<Link
 						href={`/dashboard/appointments/${appointmentId}`}
-						className="text-sm font-semibold text-[#0EA5E9] hover:text-[#0c96d4] hover:underline transition-colors"
+						className="text-sm font-medium text-sky-600 hover:text-sky-700 hover:underline transition-colors"
 					>
 						View
 					</Link>
 					{canManage && (
 						<button
 							onClick={() => onEdit(row.original)}
-							className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:underline transition-colors"
+							className="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline transition-colors"
 						>
 							Edit
 						</button>

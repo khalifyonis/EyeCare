@@ -64,6 +64,9 @@ type DashboardStats = {
     dueFollowUps?: DueFollowUp[]
     overdueFollowUpsCount?: number
     inventoryAlerts?: InventoryAlerts
+    serviceStats?: { name: string; count: number; color: string }[]
+    topDoctors?: { name: string; specialty: string; rating: string; patients: number }[]
+    recentAppointments?: any[]
 }
 
 const initialStats: DashboardStats = {
@@ -74,6 +77,9 @@ const initialStats: DashboardStats = {
     dueFollowUps: [],
     overdueFollowUpsCount: 0,
     inventoryAlerts: undefined,
+    serviceStats: [],
+    topDoctors: [],
+    recentAppointments: [],
 }
 
 const revenueData = [
@@ -91,53 +97,20 @@ const revenueData = [
     { month: 'Dec', revenue: 8900, appointments: 690, exams: 420 },
 ]
 
-const serviceData = [
-    { name: 'Contacts', value: 35, count: 449, color: '#f59e0b' },
-    { name: 'Eye Exams', value: 25, count: 321, color: '#8b5cf6' },
-    { name: 'Follow-up', value: 20, count: 257, color: '#0EA5E9' },
-    { name: 'Glasses', value: 12, count: 154, color: '#06b6d4' },
-    { name: 'Surgery', value: 8, count: 103, color: '#10b981' },
-]
 
-const mainRecentPatients = [
-    { id: '1', name: 'Ahmed Ali', visit: 'Eye Exam', status: 'Completed', time: '10:00 AM', avatar: 'A' },
-    { id: '2', name: 'Sarah Omer', visit: 'Follow up', status: 'In Progress', time: '11:30 AM', avatar: 'S' },
-    { id: '3', name: 'Mohamed Hassan', visit: 'Consultation', status: 'Waiting', time: '2:00 PM', avatar: 'M' },
-    { id: '4', name: 'Fatima Yusuf', visit: 'Glasses Fitting', status: 'Scheduled', time: '3:30 PM', avatar: 'F' },
-]
-
-const branchRecentPatients = [
-    { id: '1', name: 'Asha Noor', visit: 'Consultation', status: 'Scheduled', time: '9:00 AM', avatar: 'A' },
-    { id: '2', name: 'Ibrahim Aden', visit: 'Eye Test', status: 'Waiting', time: '11:00 AM', avatar: 'I' },
-    { id: '3', name: 'Hodan Ali', visit: 'Follow up', status: 'In Progress', time: '1:15 PM', avatar: 'H' },
-    { id: '4', name: 'Abdirahman Yusuf', visit: 'Review', status: 'Completed', time: '4:00 PM', avatar: 'A' },
-]
-
-const mainTopDoctors = [
-    { name: 'Dr. Amina', specialty: 'Ophthalmology', rating: 4.9, patients: 142 },
-    { name: 'Dr. Yusuf', specialty: 'Optometry', rating: 4.8, patients: 128 },
-    { name: 'Dr. Hana', specialty: 'Retina', rating: 4.7, patients: 115 },
-    { name: 'Dr. Ali', specialty: 'Pediatric', rating: 4.6, patients: 98 },
-]
-
-const branchTopDoctors = [
-    { name: 'Dr. Rahma', specialty: 'General Eye Care', rating: 4.9, patients: 74 },
-    { name: 'Dr. Osman', specialty: 'Cornea', rating: 4.8, patients: 69 },
-    { name: 'Dr. Najma', specialty: 'Optometry', rating: 4.7, patients: 63 },
-    { name: 'Dr. Bashir', specialty: 'Glaucoma', rating: 4.6, patients: 58 },
-]
 
 const statusConfig: Record<string, { bg: string; text: string; dot: string }> = {
     Completed: { bg: 'bg-emerald-100 dark:bg-emerald-900/40', text: 'text-emerald-800 dark:text-emerald-300', dot: 'bg-emerald-500' },
     'In Progress': { bg: 'bg-blue-100 dark:bg-blue-900/40', text: 'text-blue-800 dark:text-blue-300', dot: 'bg-blue-500' },
     Waiting: { bg: 'bg-amber-100 dark:bg-amber-900/40', text: 'text-amber-800 dark:text-amber-300', dot: 'bg-amber-500' },
     Scheduled: { bg: 'bg-violet-100 dark:bg-violet-900/40', text: 'text-violet-800 dark:text-violet-300', dot: 'bg-violet-500' },
+    Pending: { bg: 'bg-amber-100 dark:bg-amber-900/40', text: 'text-amber-800 dark:text-amber-300', dot: 'bg-amber-500' },
 }
 
-function DonutLegend() {
+function DonutLegend({ data }: { data: { name: string; value: number; count: number; color: string }[] }) {
     return (
         <div className="pt-1 space-y-1">
-            {serviceData.map((item) => (
+            {data.map((item) => (
                 <div key={item.name} className="grid items-center gap-x-2" style={{ gridTemplateColumns: '12px 1fr 45px 45px' }}>
                     <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
                     <span className="text-[11px] font-semibold text-foreground/80 truncate">{item.name}</span>
@@ -183,6 +156,9 @@ export function DashboardHome() {
                 dueFollowUps: Array.isArray(response.data?.dueFollowUps) ? response.data.dueFollowUps : [],
                 overdueFollowUpsCount: Number(response.data?.overdueFollowUpsCount ?? 0),
                 inventoryAlerts: response.data?.inventoryAlerts,
+                serviceStats: response.data?.serviceStats || [],
+                topDoctors: response.data?.topDoctors || [],
+                recentAppointments: response.data?.recentAppointments || [],
             })
             if (showToast) toast.success('Dashboard refreshed')
         } catch (error: any) {
@@ -202,8 +178,31 @@ export function DashboardHome() {
         return branchName.includes('main') || !branchName
     }, [user])
 
-    const recentPatientsData = useMemo(() => (isMainBranch ? mainRecentPatients : branchRecentPatients), [isMainBranch])
-    const topDoctors = useMemo(() => (isMainBranch ? mainTopDoctors : branchTopDoctors), [isMainBranch])
+    const recentPatientsData = useMemo(() => {
+        return (stats.recentAppointments || []).map((app: any) => ({
+            id: app.id,
+            name: app.patient?.fullName || 'Unknown',
+            visit: app.type || 'Consultation',
+            status: app.status.charAt(0).toUpperCase() + app.status.slice(1).toLowerCase(),
+            time: new Date(app.appointmentDate).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
+            avatar: (app.patient?.fullName || ' ')[0].toUpperCase(),
+        }))
+    }, [stats.recentAppointments])
+
+    const topDoctors = useMemo(() => stats.topDoctors || [], [stats.topDoctors])
+
+    const serviceData = useMemo(() => {
+        const data = stats.serviceStats || []
+        const total = data.reduce((acc, curr) => acc + curr.count, 0)
+        return data.map(item => ({
+            ...item,
+            value: total > 0 ? Math.round((item.count / total) * 100) : 0
+        }))
+    }, [stats.serviceStats])
+
+    const totalPatientsForDonut = useMemo(() => {
+        return (stats.serviceStats || []).reduce((acc, curr) => acc + curr.count, 0)
+    }, [stats.serviceStats])
 
     const patientColumns = useMemo<ColumnDef<(typeof recentPatientsData)[number]>[]>(() => [
         {
@@ -255,7 +254,7 @@ export function DashboardHome() {
         { title: 'Clinical Exams', value: stats.totalExams, trend: '-2.1%', up: false, icon: Eye, gradient: 'from-rose-500 to-red-500' },
     ]
 
-    const totalPatientsForDonut = serviceData.reduce((sum, item) => sum + item.count, 0)
+
     const tooltipStyle = {
         backgroundColor: 'hsl(var(--card))',
         border: '1px solid hsl(var(--border))',
@@ -400,7 +399,7 @@ export function DashboardHome() {
                                             <span className="text-xl font-black text-slate-900 dark:text-white leading-none">{totalPatientsForDonut}</span>
                                         </div>
                                     </div>
-                                    <div className="w-full"><DonutLegend /></div>
+                                    <div className="w-full"><DonutLegend data={serviceData} /></div>
                                 </div>
                             </CardContent>
                         </Card>
@@ -411,13 +410,15 @@ export function DashboardHome() {
                             <CardHeader className="flex flex-row items-center justify-between py-2.5 px-4 shrink-0 border-b border-slate-100 dark:border-slate-800">
                                 <CardTitle className="text-[12px] font-black uppercase tracking-[0.1em] text-muted-foreground">Recent Patients</CardTitle>
                                 <div className="flex items-center gap-2">
-                                    <button title="Quick Register Patient" className="flex items-center gap-1 bg-[#0EA5E9] hover:bg-[#0c8cc7] text-[9px] font-bold px-2 py-1 rounded-lg transition-colors shadow-sm text-white">
-                                        <UserPlus className="h-3 w-3" />
-                                        <span className="hidden sm:inline">Register</span>
-                                    </button>
-                                    <button className="text-[9px] text-[#0EA5E9] font-bold hover:text-[#0c8cc7] transition-colors flex items-center gap-1 bg-blue-500/5 px-2 py-1 rounded-lg uppercase">
+                                    {(user?.role === 'RECEPTIONIST' || user?.role === 'SUPERADMIN') && (
+                                        <button title="Quick Register Patient" className="flex items-center gap-1 bg-[#0EA5E9] hover:bg-[#0c8cc7] text-[9px] font-bold px-2 py-1 rounded-lg transition-colors shadow-sm text-white">
+                                            <UserPlus className="h-3 w-3" />
+                                            <span className="hidden sm:inline">Register</span>
+                                        </button>
+                                    )}
+                                    <Link href="/dashboard/appointments" className="text-[9px] text-[#0EA5E9] font-bold hover:text-[#0c8cc7] transition-colors flex items-center gap-1 bg-blue-500/5 px-2 py-1 rounded-lg uppercase">
                                         VIEW ALL <ArrowUpRight className="h-2.5 w-2.5" />
-                                    </button>
+                                    </Link>
                                 </div>
                             </CardHeader>
                             <CardContent className="p-0 flex-1">
@@ -440,9 +441,9 @@ export function DashboardHome() {
                         <Card className="border-none shadow-xl bg-white dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden flex flex-col">
                             <CardHeader className="flex flex-row items-center justify-between py-2.5 px-4 shrink-0 border-b border-slate-100 dark:border-slate-800">
                                 <CardTitle className="text-[12px] font-black uppercase tracking-[0.1em] text-muted-foreground">Top Doctors</CardTitle>
-                                <button className="text-[9px] text-[#0EA5E9] font-bold hover:text-[#0c8cc7] transition-colors flex items-center gap-1 bg-blue-500/5 px-2 py-1 rounded-lg uppercase">
+                                <Link href="/dashboard/admin/doctors" className="text-[9px] text-[#0EA5E9] font-bold hover:text-[#0c8cc7] transition-colors flex items-center gap-1 bg-blue-500/5 px-2 py-1 rounded-lg uppercase">
                                     VIEW ALL <ArrowUpRight className="h-2.5 w-2.5" />
-                                </button>
+                                </Link>
                             </CardHeader>
                             <CardContent className="px-3 pb-2.5 pt-1.5 space-y-1">
                                 {topDoctors.map((doctor, index) => (

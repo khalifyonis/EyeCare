@@ -1,17 +1,25 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
-import { Pencil, Trash2 } from 'lucide-react';
+import { MoreVertical, Trash2, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export interface DoctorColumnsProps {
+    onView: (doctor: any) => void;
     onEdit: (doctor: any) => void;
     onDelete: (id: string) => void;
 }
 
-export const getDoctorColumns = ({ onEdit, onDelete }: DoctorColumnsProps): ColumnDef<any>[] => [
+export const getDoctorColumns = ({ onView, onEdit, onDelete }: DoctorColumnsProps): ColumnDef<any>[] => [
     {
         accessorKey: 'fullName',
-        header: 'Doctor Name',
+        header: () => <span className="text-[13px] font-bold uppercase tracking-[0.03em] text-slate-700">Doctor Name</span>,
         cell: ({ row }) => {
             const user = row.original;
             const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? '';
@@ -26,13 +34,13 @@ export const getDoctorColumns = ({ onEdit, onDelete }: DoctorColumnsProps): Colu
                             />
                         </div>
                     ) : (
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-[#0EA5E9] text-xs font-bold">
-                            {user.fullName.charAt(0).toUpperCase()}
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                            <User className="h-4 w-4" />
                         </div>
                     )}
                     <div className="flex flex-col min-w-0">
-                        <span className="font-semibold text-slate-900 dark:text-white truncate">{user.fullName}</span>
-                        <span className="text-xs text-muted-foreground">@{user.username?.toLowerCase()}</span>
+                        <span className="text-sm font-medium text-slate-900 dark:text-white truncate">{user.fullName}</span>
+                        <span className="text-[13px] text-slate-500">@{user.username?.toLowerCase()}</span>
                     </div>
                 </div>
             );
@@ -40,32 +48,32 @@ export const getDoctorColumns = ({ onEdit, onDelete }: DoctorColumnsProps): Colu
     },
     {
         accessorKey: 'specialization',
-        header: 'Specialization',
+        header: () => <span className="text-[13px] font-bold uppercase tracking-[0.03em] text-slate-700">Specialization</span>,
         cell: ({ row }) => (
-            <span className="text-sm text-slate-600 dark:text-slate-400">{row.original.specialization}</span>
+            <span className="text-sm text-slate-700 dark:text-slate-300">{row.original.specialization}</span>
         ),
     },
     {
         accessorKey: 'licenseNumber',
-        header: 'License No.',
+        header: () => <span className="text-[13px] font-bold uppercase tracking-[0.03em] text-slate-700">License No.</span>,
         cell: ({ row }) => (
-            <span className="text-sm font-mono text-slate-600 dark:text-slate-400">{row.original.licenseNumber}</span>
+            <span className="text-sm text-slate-700 dark:text-slate-300">{row.original.licenseNumber}</span>
         ),
     },
     {
         accessorKey: 'branchName',
-        header: 'Branch',
+        header: () => <span className="text-[13px] font-bold uppercase tracking-[0.03em] text-slate-700">Branch</span>,
         cell: ({ row }) => (
-            <span className="text-sm text-slate-600 dark:text-slate-400">{row.original.branchName}</span>
+            <span className="text-sm text-slate-700 dark:text-slate-300">{row.original.branchName}</span>
         ),
     },
     {
         accessorKey: 'isActive',
-        header: 'Status',
+        header: () => <span className="text-[13px] font-bold uppercase tracking-[0.03em] text-slate-700">Status</span>,
         cell: ({ row }) => {
             const active = row.original.isActive;
             return (
-                <Badge variant="outline" className={`text-[11px] font-semibold px-2.5 py-0.5 ${active ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 'bg-slate-500/10 text-slate-500 border-slate-500/20'}`}>
+                <Badge variant="outline" className="text-[11px] font-medium px-2.5 py-0.5 bg-slate-100 text-slate-700 border-slate-200">
                     {active ? 'Active' : 'Inactive'}
                 </Badge>
             );
@@ -73,27 +81,42 @@ export const getDoctorColumns = ({ onEdit, onDelete }: DoctorColumnsProps): Colu
     },
     {
         id: 'actions',
-        header: () => <span className="flex justify-end pr-2">Actions</span>,
+        header: () => <span className="flex justify-end pr-2 text-[13px] font-bold uppercase tracking-[0.03em] text-slate-700">Actions</span>,
         cell: ({ row }) => (
-            <div className="flex items-center justify-end gap-1 pr-1">
-                <Button
-                    variant="ghost"
-                    size="icon"
+            <div className="flex items-center justify-end gap-4 pr-1 whitespace-nowrap">
+                <button
+                    type="button"
+                    title="View Doctor"
+                    className="text-sm font-semibold text-[#0EA5E9] hover:text-[#0c96d4] transition-all hover:underline"
+                    onClick={() => onView(row.original)}
+                >
+                    View
+                </button>
+                <button
+                    type="button"
                     title="Edit Doctor"
-                    className="h-8 w-8 bg-blue-50 dark:bg-blue-950/30 text-[#0EA5E9] hover:bg-blue-100 hover:text-[#0c96d4] transition-all rounded-lg"
+                    className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-all hover:underline"
                     onClick={() => onEdit(row.original)}
                 >
-                    <Pencil className="w-4 h-4" />
-                </Button>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    title="Delete Doctor"
-                    className="h-8 w-8 bg-red-50 dark:bg-red-950/30 text-red-600 hover:bg-red-100 hover:text-red-700 transition-all rounded-lg"
-                    onClick={() => onDelete(row.original.id)}
-                >
-                    <Trash2 className="w-4 h-4" />
-                </Button>
+                    Edit
+                </button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600">
+                            <MoreVertical className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                            onClick={() => onDelete(row.original.id)}
+                            className="gap-2 text-[12px] text-red-600 focus:text-red-600"
+                        >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            Delete
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
         ),
     },

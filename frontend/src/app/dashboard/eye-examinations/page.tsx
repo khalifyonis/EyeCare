@@ -189,14 +189,14 @@ export default function EyeExaminationsPage() {
       </div>
 
       <div className="p-6 space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {statCards.map(({ label, count, grad, icon: Icon }) => (
-            <div key={label} className={`rounded-xl bg-gradient-to-br ${grad} p-4 text-white shadow-md`}>
-              <div className="flex justify-between items-start">
-                <p className="text-sm font-medium opacity-90">{label}</p>
-                <Icon className="h-5 w-5 opacity-80" />
+            <div key={label} className={`min-h-[110px] rounded-2xl bg-gradient-to-br ${grad} p-5 text-white shadow-md`}>
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-sm font-medium opacity-90 sm:text-[15px]">{label}</p>
+                <Icon className="h-5 w-5 shrink-0 opacity-80" />
               </div>
-              <p className="text-2xl font-bold mt-1">{count}</p>
+              <p className="mt-2 text-3xl font-bold leading-none sm:text-[32px]">{count}</p>
             </div>
           ))}
         </div>
@@ -302,7 +302,7 @@ export default function EyeExaminationsPage() {
                           <TableCell className="px-4 py-3">
                             <div className="flex items-center gap-2 whitespace-nowrap">
                               <button
-                                className="text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                                className="rounded-md px-2 py-1 text-sm font-medium text-sky-600 hover:bg-sky-50 hover:text-sky-700"
                                 onClick={() => {
                                   router.push(`/dashboard/eye-examinations/${e.id}`);
                                 }}
@@ -310,7 +310,7 @@ export default function EyeExaminationsPage() {
                                 View
                               </button>
                               <button
-                                className="text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                                className="rounded-md px-2 py-1 text-sm font-medium text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
                                 onClick={() => {
                                   router.push(`/dashboard/eye-examinations/${e.id}/edit`);
                                 }}
@@ -319,7 +319,7 @@ export default function EyeExaminationsPage() {
                               </button>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-7 w-7">
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-md">
                                     <MoreVertical className="h-4 w-4" />
                                   </Button>
                                 </DropdownMenuTrigger>

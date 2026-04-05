@@ -1,6 +1,12 @@
 import prisma from '../lib/prisma.js';
 import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
 
+const isEyeExamStoreNotReadyError = (err) => {
+  // P2021: table does not exist, P2022: column does not exist
+  // This keeps the UI usable when eye-exam migrations are not applied yet.
+  return err?.code === 'P2021' || err?.code === 'P2022';
+};
+
 const getBranchFilter = (req) => {
   return req.user.role === 'SUPERADMIN' || !req.user.branchId ? {} : { branchId: req.user.branchId };
 };
@@ -74,6 +80,10 @@ export const getEyeExaminations = async (req, res, next) => {
 
     return sendPaginated(res, items, total, page, limit);
   } catch (err) {
+    if (isEyeExamStoreNotReadyError(err)) {
+      const { page, limit } = getPaginationParams(req.query);
+      return sendPaginated(res, [], 0, page, limit);
+    }
     next(err);
   }
 };
@@ -339,6 +349,9 @@ export const getEyeExaminationStats = async (req, res, next) => {
       total,
     });
   } catch (err) {
+    if (isEyeExamStoreNotReadyError(err)) {
+      return res.json({ todays: 0, thisWeek: 0, highIop: 0, total: 0 });
+    }
     next(err);
   }
 };

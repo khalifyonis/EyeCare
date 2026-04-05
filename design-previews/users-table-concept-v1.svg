@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="760" viewBox="0 0 1400 760">
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .card { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1; }
+      .header { fill: #f8fafc; }
+      .title { font: 700 20px Segoe UI, Arial, sans-serif; fill: #0f172a; }
+      .meta { font: 400 13px Segoe UI, Arial, sans-serif; fill: #64748b; }
+      .th { font: 600 13px Segoe UI, Arial, sans-serif; fill: #334155; letter-spacing: .2px; }
+      .td { font: 400 15px Segoe UI, Arial, sans-serif; fill: #0f172a; }
+      .sub { font: 400 13px Segoe UI, Arial, sans-serif; fill: #64748b; }
+      .line { stroke: #e2e8f0; stroke-width: 1; }
+      .zebra { fill: #fcfdff; }
+      .chip { fill: #f1f5f9; stroke: #e2e8f0; stroke-width: 1; }
+      .chipTxt { font: 600 12px Segoe UI, Arial, sans-serif; fill: #334155; }
+      .branch { fill: #f8fafc; stroke: #e2e8f0; stroke-width: 1; }
+      .branchTxt { font: 600 12px Segoe UI, Arial, sans-serif; fill: #475569; }
+      .btnGhost { fill: #ffffff; stroke: #dbe3ee; stroke-width: 1; }
+      .btnGhostTxt { font: 600 13px Segoe UI, Arial, sans-serif; fill: #334155; }
+      .btnPrimary { fill: #0ea5e9; }
+      .btnPrimaryTxt { font: 700 14px Segoe UI, Arial, sans-serif; fill: #ffffff; }
+      .iconEdit { fill: #e0f2fe; }
+      .iconDelete { fill: #fee2e2; }
+      .iconStroke { stroke: #0ea5e9; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .trashStroke { stroke: #ef4444; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .avatarA { fill: #fee2e2; }
+      .avatarB { fill: #ffedd5; }
+      .avatarC { fill: #dbeafe; }
+      .avatarTxt { font: 700 16px Segoe UI, Arial, sans-serif; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1400" height="760" />
+
+  <text class="title" x="80" y="72">Users</text>
+  <text class="meta" x="80" y="98">Dashboard  >  Users</text>
+
+  <rect class="btnGhost" x="80" y="116" rx="10" ry="10" width="360" height="46" />
+  <text class="meta" x="96" y="145">Search by name, username or email...</text>
+
+  <rect class="btnGhost" x="458" y="116" rx="10" ry="10" width="210" height="46" />
+  <text class="btnGhostTxt" x="478" y="145">All Roles</text>
+
+  <rect class="btnGhost" x="686" y="116" rx="10" ry="10" width="210" height="46" />
+  <text class="btnGhostTxt" x="706" y="145">Name (A-Z)</text>
+
+  <rect class="btnPrimary" x="1130" y="116" rx="12" ry="12" width="190" height="46" />
+  <text class="btnPrimaryTxt" x="1186" y="145">+ New User</text>
+
+  <rect class="card" x="80" y="186" rx="14" ry="14" width="1240" height="520" />
+  <rect class="header" x="80" y="186" rx="14" ry="14" width="1240" height="54" />
+
+  <text class="th" x="110" y="219">FULL NAME</text>
+  <text class="th" x="460" y="219">USERNAME</text>
+  <text class="th" x="610" y="219">ROLE</text>
+  <text class="th" x="790" y="219">ASSIGNED BRANCHES</text>
+  <text class="th" x="1190" y="219">ACTIONS</text>
+
+  <line class="line" x1="80" y1="240" x2="1320" y2="240" />
+
+  <rect class="zebra" x="80" y="240" width="1240" height="92" />
+  <circle class="avatarA" cx="112" cy="286" r="20" />
+  <text class="avatarTxt" x="106" y="292" fill="#ef4444">A</text>
+  <text class="td" x="144" y="282">Abdikafi</text>
+  <text class="sub" x="144" y="304">cabdikafi31@gmail.com</text>
+  <text class="td" x="460" y="292">kafi</text>
+  <rect class="chip" x="610" y="272" rx="14" ry="14" width="86" height="28" />
+  <text class="chipTxt" x="638" y="291">ADMIN</text>
+  <rect class="branch" x="790" y="274" rx="12" ry="12" width="108" height="24" />
+  <text class="branchTxt" x="806" y="290">Main Branch</text>
+  <rect class="iconEdit" x="1180" y="270" rx="10" ry="10" width="36" height="36" />
+  <path class="iconStroke" d="M1192 292 L1204 280 M1206 278 L1208 280 M1190 296 L1196 294" />
+  <rect class="iconDelete" x="1226" y="270" rx="10" ry="10" width="36" height="36" />
+  <path class="trashStroke" d="M1238 283 L1250 283 M1241 283 L1241 296 M1247 283 L1247 296 M1239 280 L1249 280 M1240 280 L1241 278 M1248 280 L1247 278" />
+
+  <line class="line" x1="80" y1="332" x2="1320" y2="332" />
+
+  <circle class="avatarB" cx="112" cy="378" r="20" />
+  <text class="avatarTxt" x="106" y="384" fill="#f59e0b">A</text>
+  <text class="td" x="144" y="374">Amina Reception</text>
+  <text class="sub" x="144" y="396">reception1@eyecare.com</text>
+  <text class="td" x="460" y="384">reception1</text>
+  <rect class="chip" x="610" y="364" rx="14" ry="14" width="130" height="28" />
+  <text class="chipTxt" x="619" y="383">RECEPTIONIST</text>
+  <rect class="branch" x="790" y="366" rx="12" ry="12" width="108" height="24" />
+  <text class="branchTxt" x="806" y="382">Main Branch</text>
+  <rect class="iconEdit" x="1180" y="362" rx="10" ry="10" width="36" height="36" />
+  <path class="iconStroke" d="M1192 384 L1204 372 M1206 370 L1208 372 M1190 388 L1196 386" />
+  <rect class="iconDelete" x="1226" y="362" rx="10" ry="10" width="36" height="36" />
+  <path class="trashStroke" d="M1238 375 L1250 375 M1241 375 L1241 388 M1247 375 L1247 388 M1239 372 L1249 372 M1240 372 L1241 370 M1248 372 L1247 370" />
+
+  <line class="line" x1="80" y1="424" x2="1320" y2="424" />
+
+  <rect class="zebra" x="80" y="424" width="1240" height="92" />
+  <circle class="avatarC" cx="112" cy="470" r="20" />
+  <text class="avatarTxt" x="106" y="476" fill="#3b82f6">D</text>
+  <text class="td" x="144" y="466">Dr. Ahmed</text>
+  <text class="sub" x="144" y="488">doctor1@eyecare.com</text>
+  <text class="td" x="460" y="476">doctor1</text>
+  <rect class="chip" x="610" y="456" rx="14" ry="14" width="90" height="28" />
+  <text class="chipTxt" x="638" y="475">DOCTOR</text>
+  <rect class="branch" x="790" y="458" rx="12" ry="12" width="108" height="24" />
+  <text class="branchTxt" x="806" y="474">Main Branch</text>
+  <rect class="iconEdit" x="1180" y="454" rx="10" ry="10" width="36" height="36" />
+  <path class="iconStroke" d="M1192 476 L1204 464 M1206 462 L1208 464 M1190 480 L1196 478" />
+  <rect class="iconDelete" x="1226" y="454" rx="10" ry="10" width="36" height="36" />
+  <path class="trashStroke" d="M1238 467 L1250 467 M1241 467 L1241 480 M1247 467 L1247 480 M1239 464 L1249 464 M1240 464 L1241 462 M1248 464 L1247 462" />
+
+  <line class="line" x1="80" y1="516" x2="1320" y2="516" />
+
+  <circle class="avatarC" cx="112" cy="562" r="20" />
+  <text class="avatarTxt" x="105" y="568" fill="#3b82f6">O</text>
+  <text class="td" x="144" y="558">Omar</text>
+  <text class="sub" x="144" y="580">cumarjoorje0@gmail.com</text>
+  <text class="td" x="460" y="568">omar</text>
+  <rect class="chip" x="610" y="548" rx="14" ry="14" width="90" height="28" />
+  <text class="chipTxt" x="638" y="567">DOCTOR</text>
+  <rect class="branch" x="790" y="550" rx="12" ry="12" width="108" height="24" />
+  <text class="branchTxt" x="806" y="566">Main Branch</text>
+  <text class="sub" x="910" y="567">+1 more</text>
+  <rect class="iconEdit" x="1180" y="546" rx="10" ry="10" width="36" height="36" />
+  <path class="iconStroke" d="M1192 568 L1204 556 M1206 554 L1208 556 M1190 572 L1196 570" />
+  <rect class="iconDelete" x="1226" y="546" rx="10" ry="10" width="36" height="36" />
+  <path class="trashStroke" d="M1238 559 L1250 559 M1241 559 L1241 572 M1247 559 L1247 572 M1239 556 L1249 556 M1240 556 L1241 554 M1248 556 L1247 554" />
+</svg>

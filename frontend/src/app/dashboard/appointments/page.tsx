@@ -80,18 +80,18 @@ interface PaginationMeta {
 const STATUS_OPTIONS = ['PENDING', 'SCHEDULED', 'CONFIRMED', 'COMPLETED', 'CANCELLED'] as const;
 
 const TYPE_STYLES: Record<string, string> = {
-    consultation: 'bg-[#0EA5E9]/10 dark:bg-sky-900/30 text-[#0EA5E9] dark:text-sky-400 border-[#0EA5E9]/20 dark:border-sky-800/50',
-    'follow-up': 'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 border-violet-100 dark:border-violet-800/50',
-    checkup: 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700',
-    emergency: 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border-red-100 dark:border-red-900/50',
+    consultation: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700',
+    'follow-up': 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700',
+    checkup: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700',
+    emergency: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700',
 };
 
 const STATUS_STYLES: Record<string, string> = {
-    PENDING: 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-900/50',
-    SCHEDULED: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700',
-    CONFIRMED: 'bg-[#0EA5E9]/10 dark:bg-sky-900/30 text-[#0EA5E9] dark:text-sky-400 border-[#0EA5E9]/20 dark:border-sky-800/50',
-    COMPLETED: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50',
-    CANCELLED: 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-900/50',
+    PENDING: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
+    SCHEDULED: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
+    CONFIRMED: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
+    COMPLETED: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
+    CANCELLED: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
 };
 
 function formatDate(iso: string | null | undefined): string {
@@ -118,6 +118,13 @@ function getApiError(error: unknown, fallback: string): string {
     const e = error as { response?: { data?: { message?: unknown } } };
     const msg = e.response?.data?.message;
     return typeof msg === 'string' && msg.trim() ? msg : fallback;
+}
+
+function getLocalDateValue(date = new Date()): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 /* ── Skeleton ──────────────────────────────────────────────── */
@@ -157,10 +164,21 @@ export default function AppointmentsPage() {
         setLoading(true);
         try {
             const params: Record<string, string | number> = { page, limit: pageSize };
-            if (search) params.search = search;
+            const trimmedSearch = search.trim();
+            const hasSearch = trimmedSearch.length > 0;
+            const hasExplicitFilter = statusFilter !== 'all' || Boolean(dateFrom) || Boolean(dateTo);
+
+            if (hasSearch) params.search = trimmedSearch;
             if (statusFilter !== 'all') params.status = statusFilter;
             if (dateFrom) params.from = dateFrom;
             if (dateTo) params.to = dateTo;
+
+            // Default list behavior: show only today's appointments until user searches or filters.
+            if (!hasSearch && !hasExplicitFilter) {
+                const today = getLocalDateValue();
+                params.from = today;
+                params.to = today;
+            }
 
             const res = await api.get('/appointments', { params });
             const body = res.data as { data?: Appointment[]; pagination?: PaginationMeta };
@@ -214,15 +232,15 @@ export default function AppointmentsPage() {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
             {/* Header */}
-            <div className="px-6 pt-6 pb-4 bg-white dark:bg-[#0f172a] border-b border-slate-100 dark:border-slate-800">
+            <div className="px-6 pt-6 pb-4 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Appointments</h1>
+                        <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">Appointments</h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Manage and schedule patient appointments</p>
                     </div>
                     <Button
                         onClick={() => router.push('/dashboard/appointments/new')}
-                        className="h-11 rounded-xl bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold px-6 shadow-md transition-all active:scale-95"
+                        className="h-11 rounded-lg bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-semibold px-6 shadow-sm transition-all active:scale-95"
                     >
                         <Plus className="w-5 h-5 mr-2" />
                         Add New Appointment
@@ -231,7 +249,7 @@ export default function AppointmentsPage() {
             </div>
 
             {/* Toolbar */}
-            <div className="px-6 py-3 bg-white dark:bg-[#0f172a] border-b border-slate-100 dark:border-slate-800">
+            <div className="px-6 py-3 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                     {/* Search */}
                     <div className="relative flex-1 max-w-sm">
@@ -240,7 +258,7 @@ export default function AppointmentsPage() {
                             placeholder="Search appointments by patient or doctor..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="pl-9 h-9 text-sm border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus-visible:ring-[#0EA5E9]"
+                            className="pl-9 h-9 text-sm border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900"
                         />
                     </div>
 
@@ -248,7 +266,7 @@ export default function AppointmentsPage() {
                     <div className="flex flex-wrap items-center gap-2">
                         <Filter className="h-4 w-4 text-slate-400" />
                         <Select value={statusFilter} onValueChange={setStatusFilter}>
-                            <SelectTrigger className="h-9 w-[130px] text-sm border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+                            <SelectTrigger className="h-9 w-[130px] text-sm border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900">
                                 <SelectValue placeholder="All Status" />
                             </SelectTrigger>
                             <SelectContent className="dark:bg-[#0f172a] dark:border-slate-800">
@@ -263,7 +281,7 @@ export default function AppointmentsPage() {
                             type="date"
                             value={dateFrom}
                             onChange={(e) => setDateFrom(e.target.value)}
-                            className="h-9 w-[140px] text-sm border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50"
+                            className="h-9 w-[140px] text-sm border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900"
                             placeholder="From"
                         />
 
@@ -271,11 +289,11 @@ export default function AppointmentsPage() {
                             type="date"
                             value={dateTo}
                             onChange={(e) => setDateTo(e.target.value)}
-                            className="h-9 w-[140px] text-sm border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50"
+                            className="h-9 w-[140px] text-sm border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900"
                             placeholder="To"
                         />
 
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700 whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700 whitespace-nowrap">
                             <Calendar className="h-3 w-3" />
                             {pagination.total} appointment{pagination.total !== 1 ? 's' : ''}
                         </span>
@@ -286,7 +304,7 @@ export default function AppointmentsPage() {
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-9 w-9 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800"
+                            className="h-9 w-9 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800"
                             onClick={() => fetchAppointments()}
                             disabled={loading}
                         >
@@ -298,14 +316,14 @@ export default function AppointmentsPage() {
 
             {/* Table card */}
             <div className="px-6 py-5">
-                <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm overflow-hidden">
+                <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-sm overflow-hidden">
                     <Table>
                         <TableHeader>
-                            <TableRow className="bg-slate-50/80 dark:bg-slate-900/80 hover:bg-slate-50/80 dark:hover:bg-slate-900/80 border-slate-100 dark:border-slate-800">
+                            <TableRow className="bg-slate-50 dark:bg-slate-900/70 hover:bg-slate-50 dark:hover:bg-slate-900/70 border-slate-200 dark:border-slate-800">
                                 {['PATIENT & DOCTOR', 'DATE & TIME', 'TYPE', 'STATUS', 'LOCATION', 'ACTIONS'].map((h) => (
                                     <TableHead
                                         key={h}
-                                        className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest py-4 px-4 whitespace-nowrap"
+                                        className="text-[12px] font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide py-3 px-4 whitespace-nowrap"
                                     >
                                         {h}
                                     </TableHead>
@@ -339,22 +357,22 @@ export default function AppointmentsPage() {
                                 </TableRow>
                             ) : (
                                 appointments.map((a) => (
-                                    <TableRow key={a.id} className="group border-slate-100 dark:border-slate-800/60 hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
+                                    <TableRow key={a.id} className="group border-slate-100 dark:border-slate-800 hover:bg-slate-50/70 dark:hover:bg-slate-900/40">
                                         {/* PATIENT & DOCTOR */}
                                         <TableCell className="py-3 px-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#0EA5E9]/10 text-[#0EA5E9] font-bold">
+                                                <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
                                                     <User2 className="h-4 w-4" />
                                                 </div>
                                                 <div className="min-w-0 flex flex-col gap-0.5">
-                                                    <p className="font-semibold text-sm text-slate-900 dark:text-slate-200 truncate">
+                                                    <p className="text-sm font-medium text-slate-900 dark:text-slate-200 truncate">
                                                         {a.patient?.fullName || 'Unknown Patient'}
                                                     </p>
-                                                    <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium truncate flex items-center gap-1">
+                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate flex items-center gap-1">
                                                         <span className="text-slate-300 dark:text-slate-600">#</span>
                                                         <span className="font-mono">{a.bookingNumber || a.id.slice(0, 8)}</span>
                                                     </p>
-                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate italic leading-tight">
+                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate leading-tight">
                                                         Dr. {doctorName(a)}
                                                     </p>
                                                 </div>
@@ -364,9 +382,9 @@ export default function AppointmentsPage() {
                                         {/* DATE & TIME */}
                                         <TableCell className="py-3 px-4">
                                             <div className="flex flex-col">
-                                                <span className="text-sm font-medium text-slate-800 dark:text-slate-200">{formatDate(a.appointmentDate)}</span>
+                                                <span className="text-sm text-slate-700 dark:text-slate-200">{formatDate(a.appointmentDate)}</span>
                                                 {formatTime(a.appointmentDate) && (
-                                                    <span className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                                                    <span className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400">
                                                         <Clock className="h-3 w-3" />
                                                         {formatTime(a.appointmentDate)}
                                                     </span>
@@ -376,14 +394,14 @@ export default function AppointmentsPage() {
 
                                         {/* TYPE */}
                                         <TableCell className="py-3 px-4">
-                                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider ${TYPE_STYLES[a.type?.toLowerCase() || 'consultation']}`}>
+                                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide border ${TYPE_STYLES[a.type?.toLowerCase() || 'consultation']}`}>
                                                 {a.type || 'Consultation'}
                                             </span>
                                         </TableCell>
 
                                         {/* STATUS */}
                                         <TableCell className="py-3 px-4">
-                                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider shadow-sm ${STATUS_STYLES[a.status || 'PENDING']}`}>
+                                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide border ${STATUS_STYLES[a.status || 'PENDING']}`}>
                                                 {a.status || 'PENDING'}
                                             </span>
                                         </TableCell>
@@ -391,7 +409,7 @@ export default function AppointmentsPage() {
                                         {/* LOCATION */}
                                         <TableCell className="py-3 px-4">
                                             {a.location ? (
-                                                <span className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                                                <span className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
                                                     <MapPin className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
                                                     <span className="truncate max-w-[120px]">{a.location}</span>
                                                 </span>
@@ -407,13 +425,13 @@ export default function AppointmentsPage() {
                                             <div className="flex items-center gap-2">
                                                 <button
                                                     onClick={() => router.push(`/dashboard/appointments/${a.id}`)}
-                                                    className="text-sm font-semibold text-[#0EA5E9] hover:text-[#0c96d4] hover:underline transition-colors"
+                                                    className="text-sm font-medium text-sky-600 hover:text-sky-700 hover:underline transition-colors"
                                                 >
                                                     View
                                                 </button>
                                                 <button
                                                     onClick={() => router.push(`/dashboard/appointments/${a.id}/edit`)}
-                                                    className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:underline transition-colors"
+                                                    className="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline transition-colors"
                                                 >
                                                     Edit
                                                 </button>

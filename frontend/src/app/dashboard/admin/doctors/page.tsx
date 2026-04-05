@@ -8,7 +8,8 @@ import { UserPlus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { UserDialog } from '../users/user-dialog';
+import { UserForm } from '../users/user-form';
+import { DoctorDetails } from './doctor-details';
 import { PageBreadcrumb } from '@/components/dashboard/page-breadcrumb';
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue
@@ -18,7 +19,7 @@ export default function DoctorsPage() {
     const [doctors, setDoctors] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
-    const [dialogOpen, setDialogOpen] = useState(false);
+    const [view, setView] = useState<'list' | 'details' | 'form'>('list');
     const [search, setSearch] = useState('');
     const [specFilter, setSpecFilter] = useState('all');
     const [statusFilter, setStatusFilter] = useState('all');
@@ -69,7 +70,12 @@ export default function DoctorsPage() {
         return list;
     }, [doctors, search, specFilter, statusFilter, sortBy]);
 
-    const handleEdit = (doctor: any) => { setSelectedDoctor(doctor); setDialogOpen(true); };
+    const handleView = (doctor: any) => {
+        setSelectedDoctor(doctor);
+        setView('details');
+    };
+
+    const handleEdit = (doctor: any) => { setSelectedDoctor(doctor); setView('form'); };
     const handleDelete = async (userId: string) => {
         if (!confirm('Are you sure you want to delete this doctor?')) return;
         try {
@@ -81,82 +87,101 @@ export default function DoctorsPage() {
         }
     };
 
-    const columns = getDoctorColumns({ onEdit: handleEdit, onDelete: handleDelete });
+    // Correctly memoize columns using the same handleEdit/handleDelete
+    const columns = useMemo(
+        () => getDoctorColumns({ onView: handleView, onEdit: handleEdit, onDelete: handleDelete }),
+        [handleView, handleEdit, handleDelete]
+    );
+
+    const handleFormSuccess = () => {
+        setView('list');
+        fetchDoctors();
+    };
 
     return (
         <div className="w-full min-w-0 p-4 sm:p-5 md:p-6 lg:p-8 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Doctors</h1>
-                    <PageBreadcrumb current="Doctors" />
-                </div>
-                <Button
-                    onClick={() => { setSelectedDoctor(null); setDialogOpen(true); }}
-                    className="h-10 rounded-lg bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-semibold px-4"
-                >
-                    <UserPlus className="w-4 h-4 mr-2" />
-                    Add New Doctor
-                </Button>
-            </div>
+            {view === 'list' ? (
+                <>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Doctors</h1>
+                            <PageBreadcrumb current="Doctors" />
+                        </div>
+                        <Button
+                            onClick={() => { setSelectedDoctor(null); setView('form'); }}
+                            className="bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold shadow-lg shadow-blue-500/20 px-6 rounded-xl transition-all active:scale-[0.98]"
+                        >
+                            <UserPlus className="w-4 h-4 mr-2" />
+                            Add New Doctor
+                        </Button>
+                    </div>
 
-            <div className="flex flex-col md:flex-row md:items-center gap-3 sm:gap-4">
-                <div className="relative w-full md:w-[260px]">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-                    <Input
-                        placeholder="Search doctors..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="pl-9 h-9 w-full rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-sm shadow-sm focus-visible:ring-1 focus-visible:ring-[#0EA5E9]"
-                    />
-                </div>
-                <Select value={specFilter} onValueChange={setSpecFilter}>
-                    <SelectTrigger className="h-10 w-full md:w-[170px] rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-sm shadow-sm focus:ring-[#0EA5E9]">
-                        <SelectValue placeholder="Specialization" />
-                    </SelectTrigger>
-                    <SelectContent className="dark:bg-slate-900 dark:border-slate-800">
-                        <SelectItem value="all">All Specializations</SelectItem>
-                        {specializations.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                    </SelectContent>
-                </Select>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="h-10 w-full md:w-[150px] rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-sm shadow-sm focus:ring-[#0EA5E9]">
-                        <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="inactive">Inactive</SelectItem>
-                    </SelectContent>
-                </Select>
-                <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="h-10 w-full md:w-[150px] rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-sm shadow-sm focus:ring-[#0EA5E9]">
-                        <SelectValue placeholder="Sort" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-                        <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
+                    <div className="flex flex-col md:flex-row md:items-center gap-3 sm:gap-4">
+                        <div className="relative w-full md:w-[260px]">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                            <Input
+                                placeholder="Search doctors..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="pl-9 h-10 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-sm focus-visible:ring-1 focus-visible:ring-[#0EA5E9]"
+                            />
+                        </div>
+                        <Select value={specFilter} onValueChange={setSpecFilter}>
+                            <SelectTrigger className="h-10 w-full md:w-[170px] rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-sm focus:ring-[#0EA5E9]">
+                                <SelectValue placeholder="Specialization" />
+                            </SelectTrigger>
+                            <SelectContent className="dark:bg-slate-900 dark:border-slate-800">
+                                <SelectItem value="all">All Specializations</SelectItem>
+                                {specializations.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                        <Select value={statusFilter} onValueChange={setStatusFilter}>
+                            <SelectTrigger className="h-10 w-full md:w-[150px] rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-sm focus:ring-[#0EA5E9]">
+                                <SelectValue placeholder="Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Status</SelectItem>
+                                <SelectItem value="active">Active</SelectItem>
+                                <SelectItem value="inactive">Inactive</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <Select value={sortBy} onValueChange={setSortBy}>
+                            <SelectTrigger className="h-10 w-full md:w-[150px] rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-sm focus:ring-[#0EA5E9]">
+                                <SelectValue placeholder="Sort" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                                <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
 
-            <div className="min-w-0">
-                <DataTable
-                    columns={columns}
-                    data={filtered}
-                    loading={loading}
-                    onRefresh={fetchDoctors}
-                    itemLabel="doctors"
-                    hideSearch
-                    enableRowSelection
+                    <div className="min-w-0">
+                        <DataTable
+                            columns={columns}
+                            data={filtered}
+                            loading={loading}
+                            onRefresh={fetchDoctors}
+                            itemLabel="doctors"
+                            hideSearch
+                            enableRowSelection
+                        />
+                    </div>
+                </>
+            ) : view === 'details' && selectedDoctor ? (
+                <DoctorDetails
+                    doctor={selectedDoctor}
+                    onBack={() => setView('list')}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
                 />
-            </div>
-
-            <UserDialog
-                open={dialogOpen}
-                onOpenChange={setDialogOpen}
-                user={selectedDoctor}
-                onSuccess={fetchDoctors}
-            />
+            ) : (
+                <UserForm 
+                    user={selectedDoctor} 
+                    onSuccess={handleFormSuccess} 
+                    onCancel={() => setView('list')} 
+                />
+            )}
         </div>
     );
 }

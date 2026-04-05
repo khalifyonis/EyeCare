@@ -2,7 +2,14 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
-import { ArrowUpDown, Pencil, Trash2 } from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { MoreVertical, Trash2 } from 'lucide-react';
 
 export type Branch = {
     id: string;
@@ -14,60 +21,76 @@ export type Branch = {
 };
 
 interface BranchColumnsProps {
+    onView: (branch: Branch) => void;
     onEdit: (branch: Branch) => void;
     onDelete: (id: string) => void;
 }
 
-export const getBranchColumns = ({ onEdit, onDelete }: BranchColumnsProps): ColumnDef<Branch>[] => [
+export const getBranchColumns = ({ onView, onEdit, onDelete }: BranchColumnsProps): ColumnDef<Branch>[] => [
     {
         id: 'index',
-        header: '#',
-        cell: ({ row }) => <span className="text-muted-foreground text-sm">{row.index + 1}</span>,
+        header: () => <span className="text-[13px] font-bold uppercase tracking-[0.03em] text-slate-700">#</span>,
+        cell: ({ row }) => <span className="text-sm text-slate-500">{row.index + 1}</span>,
     },
     {
         accessorKey: 'branchName',
-        header: 'Branch Name',
+        header: () => <span className="text-[13px] font-bold uppercase tracking-[0.03em] text-slate-700">Branch Name</span>,
         cell: ({ row }) => (
-            <span className="font-semibold text-slate-900 dark:text-slate-100">{row.original.branchName}</span>
+            <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{row.original.branchName}</span>
         ),
     },
     {
         accessorKey: 'address',
-        header: 'Address',
+        header: () => <span className="text-[13px] font-bold uppercase tracking-[0.03em] text-slate-700">Address</span>,
         cell: ({ getValue }) => (
-            <span className="text-sm text-slate-500">{getValue<string>()}</span>
+            <span className="text-sm text-slate-700">{getValue<string>()}</span>
         ),
     },
     {
         accessorKey: 'phone',
-        header: 'Phone',
+        header: () => <span className="text-[13px] font-bold uppercase tracking-[0.03em] text-slate-700">Phone</span>,
         cell: ({ getValue }) => (
-            <span className="text-sm text-slate-500">{getValue<string>()}</span>
+            <span className="text-sm text-slate-700">{getValue<string>()}</span>
         ),
     },
     {
         id: 'actions',
-        header: 'Actions',
+        header: () => <span className="flex justify-end pr-2 text-[13px] font-bold uppercase tracking-[0.03em] text-slate-700">Actions</span>,
         cell: ({ row }) => (
-            <div className="flex items-center justify-end gap-1 pr-1">
-                <Button
-                    variant="ghost"
-                    size="icon"
+            <div className="flex items-center justify-end gap-4 pr-1 whitespace-nowrap">
+                <button
+                    type="button"
+                    title="View Branch"
+                    className="text-sm font-semibold text-[#0EA5E9] hover:text-[#0c96d4] transition-all hover:underline"
+                    onClick={() => onView(row.original)}
+                >
+                    View
+                </button>
+                <button
+                    type="button"
                     title="Edit Branch"
-                    className="h-8 w-8 bg-blue-50 dark:bg-blue-950/30 text-[#0EA5E9] hover:bg-blue-100 hover:text-[#0c96d4] transition-all rounded-lg"
+                    className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-all hover:underline"
                     onClick={() => onEdit(row.original)}
                 >
-                    <Pencil className="w-4 h-4" />
-                </Button>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    title="Delete Branch"
-                    className="h-8 w-8 bg-red-50 dark:bg-red-950/30 text-red-600 hover:bg-red-100 hover:text-red-700 transition-all rounded-lg"
-                    onClick={() => onDelete(row.original.id)}
-                >
-                    <Trash2 className="w-4 h-4" />
-                </Button>
+                    Edit
+                </button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600">
+                            <MoreVertical className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                            onClick={() => onDelete(row.original.id)}
+                            className="gap-2 text-[12px] text-red-600 focus:text-red-600"
+                        >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            Delete
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
         ),
     },

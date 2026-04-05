@@ -71,12 +71,38 @@ type RefractionState = {
   axisOS: string;
 };
 
+type EyeFindingsState = {
+  OD: string;
+  OS: string;
+};
+
+type AnteriorSegmentState = {
+  lidsLashes: EyeFindingsState;
+  conjunctiva: EyeFindingsState;
+  cornea: EyeFindingsState;
+  anteriorChamber: EyeFindingsState;
+  iris: EyeFindingsState;
+  lens: EyeFindingsState;
+  notes: string;
+};
+
+type FundusState = {
+  opticDisc: EyeFindingsState;
+  cupDiscRatio: EyeFindingsState;
+  macula: EyeFindingsState;
+  vessels: EyeFindingsState;
+  periphery: EyeFindingsState;
+  notes: string;
+};
+
 type ExamFormState = {
   chiefComplaint: string;
   historyOfPresentIllness: string;
   visualAcuity: VisualAcuityState;
   refraction: RefractionState;
   iop: IopState;
+  anteriorSegment: AnteriorSegmentState;
+  fundus: FundusState;
   diagnosis: DiagnosisItem[];
   plan: string;
   medications: MedicationItem[];
@@ -200,6 +226,7 @@ const FOLLOW_UP_INTERVALS = ['1 week', '2 weeks', '1 month', '3 months', '6 mont
 
 const emptyDiagnosis = (): DiagnosisItem => ({ icdCode: '', description: '', eye: 'OU' });
 const emptyMedication = (): MedicationItem => ({ name: '', dosage: '', frequency: '', duration: '', eye: 'OU' });
+const emptyEyeFindings = (): EyeFindingsState => ({ OD: '', OS: '' });
 
 const defaultFormState = (): ExamFormState => ({
   chiefComplaint: '',
@@ -223,6 +250,23 @@ const defaultFormState = (): ExamFormState => ({
     cylinderOS: '',
     axisOD: '',
     axisOS: '',
+  },
+  anteriorSegment: {
+    lidsLashes: emptyEyeFindings(),
+    conjunctiva: emptyEyeFindings(),
+    cornea: emptyEyeFindings(),
+    anteriorChamber: emptyEyeFindings(),
+    iris: emptyEyeFindings(),
+    lens: emptyEyeFindings(),
+    notes: '',
+  },
+  fundus: {
+    opticDisc: emptyEyeFindings(),
+    cupDiscRatio: emptyEyeFindings(),
+    macula: emptyEyeFindings(),
+    vessels: emptyEyeFindings(),
+    periphery: emptyEyeFindings(),
+    notes: '',
   },
   iop: {
     OD: '',
@@ -287,6 +331,60 @@ function serializeDiagnosis(items: DiagnosisItem[]): string {
 
 function isObjectLike(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function parseEyeFindings(value: unknown): EyeFindingsState {
+  if (!isObjectLike(value)) return emptyEyeFindings();
+  return {
+    OD: String(value.OD || ''),
+    OS: String(value.OS || ''),
+  };
+}
+
+function parseAnteriorSegmentState(value: unknown): AnteriorSegmentState {
+  if (!isObjectLike(value)) {
+    return {
+      lidsLashes: emptyEyeFindings(),
+      conjunctiva: emptyEyeFindings(),
+      cornea: emptyEyeFindings(),
+      anteriorChamber: emptyEyeFindings(),
+      iris: emptyEyeFindings(),
+      lens: emptyEyeFindings(),
+      notes: '',
+    };
+  }
+
+  return {
+    lidsLashes: parseEyeFindings(value.lidsLashes),
+    conjunctiva: parseEyeFindings(value.conjunctiva),
+    cornea: parseEyeFindings(value.cornea),
+    anteriorChamber: parseEyeFindings(value.anteriorChamber),
+    iris: parseEyeFindings(value.iris),
+    lens: parseEyeFindings(value.lens),
+    notes: String(value.notes || ''),
+  };
+}
+
+function parseFundusState(value: unknown): FundusState {
+  if (!isObjectLike(value)) {
+    return {
+      opticDisc: emptyEyeFindings(),
+      cupDiscRatio: emptyEyeFindings(),
+      macula: emptyEyeFindings(),
+      vessels: emptyEyeFindings(),
+      periphery: emptyEyeFindings(),
+      notes: '',
+    };
+  }
+
+  return {
+    opticDisc: parseEyeFindings(value.opticDisc),
+    cupDiscRatio: parseEyeFindings(value.cupDiscRatio),
+    macula: parseEyeFindings(value.macula),
+    vessels: parseEyeFindings(value.vessels),
+    periphery: parseEyeFindings(value.periphery),
+    notes: String(value.notes || ''),
+  };
 }
 
 function parseAssessmentMeta(findings: unknown): AssessmentMeta | null {
@@ -412,6 +510,8 @@ function buildInitialFormState(initialData?: EyeExamFormInitialData | null): Exa
       method: initialData.iopMethod || defaults.iop.method,
       time: initialData.iopTime || defaults.iop.time,
     },
+    anteriorSegment: parseAnteriorSegmentState(initialData.anteriorSegmentFindings),
+    fundus: parseFundusState(initialData.fundusFindings),
     diagnosis: parsedAssessment?.diagnosisItems || parseDiagnosisString(initialData.diagnosis),
     plan: initialData.plan ?? '',
     medications: parsedAssessment?.medications || [],
@@ -438,9 +538,6 @@ export default function EyeExamForm({ mode, initialData, submitting, onSubmit, c
   const [selectedPatientId, setSelectedPatientId] = useState(initialData?.patientId ?? '');
 
   const [doctorId, setDoctorId] = useState(initialData?.doctorId ?? '');
-
-  const [existingAnteriorFindings] = useState<unknown>(initialData?.anteriorSegmentFindings ?? null);
-  const [existingFundusFindings] = useState<unknown>(initialData?.fundusFindings ?? null);
 
   useEffect(() => {
     let cancelled = false;
@@ -592,8 +689,26 @@ export default function EyeExamForm({ mode, initialData, submitting, onSubmit, c
       plan: toOptionalString(form.plan),
       followUpDate: form.followUp.recommended ? addIntervalToNow(form.followUp.interval) : undefined,
       nextVisitReason: form.followUp.recommended ? toOptionalString(form.followUp.reason) : undefined,
-      anteriorSegmentFindings: mergeAssessmentMeta(existingAnteriorFindings, assessmentMeta),
-      fundusFindings: existingFundusFindings ?? undefined,
+      anteriorSegmentFindings: mergeAssessmentMeta(
+        {
+          lidsLashes: form.anteriorSegment.lidsLashes,
+          conjunctiva: form.anteriorSegment.conjunctiva,
+          cornea: form.anteriorSegment.cornea,
+          anteriorChamber: form.anteriorSegment.anteriorChamber,
+          iris: form.anteriorSegment.iris,
+          lens: form.anteriorSegment.lens,
+          notes: toOptionalString(form.anteriorSegment.notes) || '',
+        },
+        assessmentMeta
+      ),
+      fundusFindings: {
+        opticDisc: form.fundus.opticDisc,
+        cupDiscRatio: form.fundus.cupDiscRatio,
+        macula: form.fundus.macula,
+        vessels: form.fundus.vessels,
+        periphery: form.fundus.periphery,
+        notes: toOptionalString(form.fundus.notes) || '',
+      },
     };
 
     await onSubmit(payload);
@@ -602,6 +717,20 @@ export default function EyeExamForm({ mode, initialData, submitting, onSubmit, c
   return (
     <div className="space-y-6">
       <div>
+        <button
+          type="button"
+          onClick={() => {
+            if (cancelHref.startsWith('/')) {
+              router.push(cancelHref);
+              return;
+            }
+            router.back();
+          }}
+          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-sky-600 hover:text-sky-700"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </button>
         <h1 className="text-2xl font-black tracking-tight text-slate-900">{mode === 'edit' ? 'Edit Eye Examination' : 'New Eye Examination'}</h1>
         <p className="mt-0.5 text-sm text-slate-500">{mode === 'edit' ? 'Update comprehensive eye examination record' : 'Create comprehensive eye examination record'}</p>
       </div>
@@ -982,9 +1111,84 @@ export default function EyeExamForm({ mode, initialData, submitting, onSubmit, c
             )}
 
             {activeTab === 'refraction' && (
-              <div className="py-8 text-center text-gray-500">
-                <Glasses className="mx-auto mb-4 h-12 w-12 text-gray-300" />
-                <p>Refraction entry form - Auto-refraction and subjective refraction data</p>
+              <div className="space-y-5">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="rounded-lg bg-gray-50 p-4">
+                    <h4 className="mb-4 text-sm font-semibold text-gray-700">Right Eye (OD)</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="mb-1 block text-sm text-gray-600">Sphere</label>
+                        <input
+                          type="text"
+                          value={form.refraction.sphereOD}
+                          onChange={(event) => setForm((prev) => ({ ...prev, refraction: { ...prev.refraction, sphereOD: event.target.value } }))}
+                          className="h-11 w-full rounded-lg border border-gray-200 px-4 text-base"
+                          placeholder="e.g. -2.00"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-sm text-gray-600">Cylinder</label>
+                        <input
+                          type="text"
+                          value={form.refraction.cylinderOD}
+                          onChange={(event) => setForm((prev) => ({ ...prev, refraction: { ...prev.refraction, cylinderOD: event.target.value } }))}
+                          className="h-11 w-full rounded-lg border border-gray-200 px-4 text-base"
+                          placeholder="e.g. -0.75"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-sm text-gray-600">Axis</label>
+                        <input
+                          type="text"
+                          value={form.refraction.axisOD}
+                          onChange={(event) => setForm((prev) => ({ ...prev, refraction: { ...prev.refraction, axisOD: event.target.value } }))}
+                          className="h-11 w-full rounded-lg border border-gray-200 px-4 text-base"
+                          placeholder="e.g. 180"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg bg-blue-50 p-4">
+                    <h4 className="mb-4 text-sm font-semibold text-gray-700">Left Eye (OS)</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="mb-1 block text-sm text-gray-600">Sphere</label>
+                        <input
+                          type="text"
+                          value={form.refraction.sphereOS}
+                          onChange={(event) => setForm((prev) => ({ ...prev, refraction: { ...prev.refraction, sphereOS: event.target.value } }))}
+                          className="h-11 w-full rounded-lg border border-gray-200 px-4 text-base"
+                          placeholder="e.g. -1.50"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-sm text-gray-600">Cylinder</label>
+                        <input
+                          type="text"
+                          value={form.refraction.cylinderOS}
+                          onChange={(event) => setForm((prev) => ({ ...prev, refraction: { ...prev.refraction, cylinderOS: event.target.value } }))}
+                          className="h-11 w-full rounded-lg border border-gray-200 px-4 text-base"
+                          placeholder="e.g. -0.50"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-sm text-gray-600">Axis</label>
+                        <input
+                          type="text"
+                          value={form.refraction.axisOS}
+                          onChange={(event) => setForm((prev) => ({ ...prev, refraction: { ...prev.refraction, axisOS: event.target.value } }))}
+                          className="h-11 w-full rounded-lg border border-gray-200 px-4 text-base"
+                          placeholder="e.g. 170"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-600">
+                  Enter auto-refraction or subjective refraction values for each eye.
+                </div>
               </div>
             )}
 
@@ -1055,16 +1259,147 @@ export default function EyeExamForm({ mode, initialData, submitting, onSubmit, c
             )}
 
             {activeTab === 'anterior' && (
-              <div className="py-8 text-center text-gray-500">
-                <Target className="mx-auto mb-4 h-12 w-12 text-gray-300" />
-                <p>Anterior segment examination - Slit lamp findings</p>
+              <div className="space-y-4">
+                {[
+                  { key: 'lidsLashes', label: 'Lids & Lashes' },
+                  { key: 'conjunctiva', label: 'Conjunctiva' },
+                  { key: 'cornea', label: 'Cornea' },
+                  { key: 'anteriorChamber', label: 'Anterior Chamber' },
+                  { key: 'iris', label: 'Iris' },
+                  { key: 'lens', label: 'Lens' },
+                ].map((field) => {
+                  const value = form.anteriorSegment[field.key as keyof Omit<AnteriorSegmentState, 'notes'>] as EyeFindingsState;
+                  return (
+                    <div key={field.key} className="grid grid-cols-1 gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 md:grid-cols-5 md:items-center">
+                      <div className="text-sm font-medium text-gray-700 md:col-span-1">{field.label}</div>
+                      <div className="md:col-span-2">
+                        <label className="mb-1 block text-xs text-gray-500">OD</label>
+                        <input
+                          type="text"
+                          value={value.OD}
+                          onChange={(event) =>
+                            setForm((prev) => ({
+                              ...prev,
+                              anteriorSegment: {
+                                ...prev.anteriorSegment,
+                                [field.key]: {
+                                  ...(prev.anteriorSegment[field.key as keyof Omit<AnteriorSegmentState, 'notes'>] as EyeFindingsState),
+                                  OD: event.target.value,
+                                },
+                              },
+                            }))
+                          }
+                          className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm"
+                          placeholder="Normal / findings"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="mb-1 block text-xs text-gray-500">OS</label>
+                        <input
+                          type="text"
+                          value={value.OS}
+                          onChange={(event) =>
+                            setForm((prev) => ({
+                              ...prev,
+                              anteriorSegment: {
+                                ...prev.anteriorSegment,
+                                [field.key]: {
+                                  ...(prev.anteriorSegment[field.key as keyof Omit<AnteriorSegmentState, 'notes'>] as EyeFindingsState),
+                                  OS: event.target.value,
+                                },
+                              },
+                            }))
+                          }
+                          className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm"
+                          placeholder="Normal / findings"
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">Anterior Segment Notes</label>
+                  <textarea
+                    value={form.anteriorSegment.notes}
+                    onChange={(event) => setForm((prev) => ({ ...prev, anteriorSegment: { ...prev.anteriorSegment, notes: event.target.value } }))}
+                    rows={3}
+                    className="w-full rounded-lg border border-gray-200 px-4 py-3 text-base"
+                    placeholder="Additional slit lamp notes..."
+                  />
+                </div>
               </div>
             )}
 
             {activeTab === 'fundus' && (
-              <div className="py-8 text-center text-gray-500">
-                <Eye className="mx-auto mb-4 h-12 w-12 text-gray-300" />
-                <p>Fundus examination - Dilated fundus findings</p>
+              <div className="space-y-4">
+                {[
+                  { key: 'opticDisc', label: 'Optic Disc' },
+                  { key: 'cupDiscRatio', label: 'Cup/Disc Ratio' },
+                  { key: 'macula', label: 'Macula' },
+                  { key: 'vessels', label: 'Vessels' },
+                  { key: 'periphery', label: 'Periphery' },
+                ].map((field) => {
+                  const value = form.fundus[field.key as keyof Omit<FundusState, 'notes'>] as EyeFindingsState;
+                  return (
+                    <div key={field.key} className="grid grid-cols-1 gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 md:grid-cols-5 md:items-center">
+                      <div className="text-sm font-medium text-gray-700 md:col-span-1">{field.label}</div>
+                      <div className="md:col-span-2">
+                        <label className="mb-1 block text-xs text-gray-500">OD</label>
+                        <input
+                          type="text"
+                          value={value.OD}
+                          onChange={(event) =>
+                            setForm((prev) => ({
+                              ...prev,
+                              fundus: {
+                                ...prev.fundus,
+                                [field.key]: {
+                                  ...(prev.fundus[field.key as keyof Omit<FundusState, 'notes'>] as EyeFindingsState),
+                                  OD: event.target.value,
+                                },
+                              },
+                            }))
+                          }
+                          className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm"
+                          placeholder="Normal / findings"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="mb-1 block text-xs text-gray-500">OS</label>
+                        <input
+                          type="text"
+                          value={value.OS}
+                          onChange={(event) =>
+                            setForm((prev) => ({
+                              ...prev,
+                              fundus: {
+                                ...prev.fundus,
+                                [field.key]: {
+                                  ...(prev.fundus[field.key as keyof Omit<FundusState, 'notes'>] as EyeFindingsState),
+                                  OS: event.target.value,
+                                },
+                              },
+                            }))
+                          }
+                          className="h-10 w-full rounded-lg border border-gray-200 px-3 text-sm"
+                          placeholder="Normal / findings"
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">Fundus Notes</label>
+                  <textarea
+                    value={form.fundus.notes}
+                    onChange={(event) => setForm((prev) => ({ ...prev, fundus: { ...prev.fundus, notes: event.target.value } }))}
+                    rows={3}
+                    className="w-full rounded-lg border border-gray-200 px-4 py-3 text-base"
+                    placeholder="Additional posterior segment notes..."
+                  />
+                </div>
               </div>
             )}
 

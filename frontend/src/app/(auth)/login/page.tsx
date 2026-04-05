@@ -45,13 +45,18 @@ export default function LoginPage() {
             const activeBranch = user.branches && user.branches.length > 0 ? user.branches[0] : null;
             completeLogin(token, user, activeBranch);
         } catch (err: any) {
-            console.error('Login failed', err);
             const isNetworkError =
                 err.code === 'ERR_NETWORK' ||
                 err.message === 'Network Error' ||
                 !err.response;
             const status = err.response?.status;
             const serverMessage = err.response?.data?.message;
+
+            // Avoid logging the entire Axios error object in dev overlay for expected auth failures.
+            if (status !== 401 && !isNetworkError) {
+                console.error('Login failed unexpectedly:', status || 'unknown');
+            }
+
             let message: string;
             if (isNetworkError) {
                 message = 'Cannot connect to the server. From the project root run: npm run dev (then open http://localhost:3000).';

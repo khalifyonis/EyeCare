@@ -221,8 +221,8 @@ export const createUser = async (req, res, next) => {
             });
 
             if (roleName.toUpperCase() === 'DOCTOR') {
-                if (!licenseNumber || !specialization) {
-                    throw new Error('Doctor profile requires license number and specialization');
+                if (!specialization) {
+                    throw new Error('Doctor profile requires specialization');
                 }
                 await tx.doctor.create({
                     data: {
@@ -361,13 +361,11 @@ export const updateUser = async (req, res, next) => {
                 await tx.doctor.upsert({
                     where: { userId: id },
                     update: {
-                        licenseNumber: licenseNumber || existingUser.doctor?.licenseNumber,
                         specialization: specialization || existingUser.doctor?.specialization,
                         branch: { connect: { id: branchId || existingUser.branchId } },
                     },
                     create: {
                         user: { connect: { id: id } },
-                        licenseNumber: licenseNumber || '',
                         specialization: specialization || '',
                         branch: { connect: { id: branchId || existingUser.branchId } },
                     },

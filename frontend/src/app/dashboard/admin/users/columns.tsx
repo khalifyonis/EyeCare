@@ -3,7 +3,14 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowUpDown, Pencil, Trash2 } from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { MoreVertical, Trash2, User } from 'lucide-react';
 
 export type User = {
     id: string; // Changed to string for consistency with backend UUIDs
@@ -24,25 +31,18 @@ export type User = {
 };
 
 interface UserColumnsProps {
+    onView: (user: User) => void;
     onEdit: (user: User) => void;
     onDelete: (id: string) => void;
 }
 
-const getRoleBadgeColor = (role: string) => {
-    switch (role.toUpperCase()) {
-        case 'ADMIN': return 'bg-red-500/10 text-red-500 border-red-500/20';
-        case 'DOCTOR': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-        case 'PHARMACIST': return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
-        case 'RECEPTIONIST': return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
-        case 'OPTICIAN': return 'bg-violet-500/10 text-violet-500 border-violet-500/20';
-        default: return 'bg-slate-500/10 text-slate-500 border-slate-500/20';
-    }
-};
+const AVATAR_STYLE = 'bg-slate-100 text-slate-700 border border-slate-200';
+const ROLE_BADGE_STYLE = 'bg-slate-100 text-slate-700 border-slate-200';
 
-export const getUserColumns = ({ onEdit, onDelete }: UserColumnsProps): ColumnDef<User>[] => [
+export const getUserColumns = ({ onView, onEdit, onDelete }: UserColumnsProps): ColumnDef<User>[] => [
     {
         accessorKey: 'fullName',
-        header: 'Full Name',
+        header: () => <span className="text-[13px] font-bold uppercase tracking-[0.03em] text-slate-700">Full Name</span>,
         cell: ({ row }) => {
             const user = row.original;
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -57,13 +57,13 @@ export const getUserColumns = ({ onEdit, onDelete }: UserColumnsProps): ColumnDe
                             />
                         </div>
                     ) : (
-                        <div className={`flex size-9 items-center justify-center rounded-full text-xs font-bold ${getRoleBadgeColor(user.roleName)}`}>
-                            {user.fullName.charAt(0).toUpperCase()}
+                        <div className={`flex size-9 items-center justify-center rounded-full ${AVATAR_STYLE}`}>
+                            <User className="h-4 w-4" />
                         </div>
                     )}
-                    <div className="flex flex-col">
-                        <span className="font-semibold text-slate-900 dark:text-slate-100">{user.fullName}</span>
-                        <span className="text-xs text-muted-foreground">{user.email}</span>
+                    <div className="flex flex-col gap-0.5">
+                        <span className="text-sm font-medium text-slate-900 dark:text-slate-100 leading-tight">{user.fullName}</span>
+                        <span className="text-[13px] text-slate-500 dark:text-slate-400">{user.email}</span>
                     </div>
                 </div>
             );
@@ -71,16 +71,16 @@ export const getUserColumns = ({ onEdit, onDelete }: UserColumnsProps): ColumnDe
     },
     {
         accessorKey: 'username',
-        header: 'Username',
-        cell: ({ getValue }) => <span className="text-sm text-slate-600 dark:text-slate-400">{getValue<string>()}</span>,
+        header: () => <span className="text-[13px] font-bold uppercase tracking-[0.03em] text-slate-700">Username</span>,
+        cell: ({ getValue }) => <span className="text-sm font-normal text-slate-800 dark:text-slate-200">{getValue<string>()}</span>,
     },
     {
         accessorKey: 'roleName',
-        header: 'Role',
+        header: () => <span className="text-[13px] font-bold uppercase tracking-[0.03em] text-slate-700">Role</span>,
         cell: ({ getValue }) => {
             const role = getValue<string>();
             return (
-                <Badge variant="outline" className={`font-semibold text-[11px] uppercase px-2.5 py-0.5 border ${getRoleBadgeColor(role)}`}>
+                <Badge variant="outline" className={`font-medium text-[11px] uppercase px-2.5 py-0.5 border ${ROLE_BADGE_STYLE}`}>
                     {role}
                 </Badge>
             );
@@ -88,13 +88,13 @@ export const getUserColumns = ({ onEdit, onDelete }: UserColumnsProps): ColumnDe
     },
     {
         accessorKey: 'branchName',
-        header: 'Assigned Branches',
+        header: () => <span className="text-[13px] font-bold uppercase tracking-[0.03em] text-slate-700">Assigned Branches</span>,
         cell: ({ row }) => {
             const user = row.original;
             const branches = user.branches || [];
 
             if (branches.length === 0) {
-                return <span className="text-sm text-slate-400 italic">No branches</span>;
+                return <span className="text-sm text-slate-400">No branches</span>;
             }
 
             const firstBranch = branches[0];
@@ -104,12 +104,12 @@ export const getUserColumns = ({ onEdit, onDelete }: UserColumnsProps): ColumnDe
                 <div className="flex flex-col gap-0.5">
                     <Badge
                         variant="secondary"
-                        className="bg-slate-100 text-slate-700 hover:bg-slate-200 border-none text-[10px] font-bold px-2 py-0 w-fit"
+                        className="bg-slate-100 text-slate-700 border border-slate-200 text-[11px] font-medium px-2 py-0 w-fit"
                     >
                         {firstBranch.branchName}
                     </Badge>
                     {remaining > 0 && (
-                        <span className="text-[10px] text-slate-400 font-medium pl-0.5">
+                        <span className="text-[11px] text-slate-400 font-normal pl-0.5">
                             +{remaining} more
                         </span>
                     )}
@@ -119,27 +119,46 @@ export const getUserColumns = ({ onEdit, onDelete }: UserColumnsProps): ColumnDe
     },
     {
         id: 'actions',
-        header: () => <span className="flex justify-end pr-2 uppercase text-[11px] font-bold text-slate-500 tracking-wider">Actions</span>,
+        header: () => <span className="flex justify-end pr-2 uppercase text-[13px] font-bold text-slate-700 tracking-[0.03em]">Actions</span>,
         cell: ({ row }) => (
-            <div className="flex items-center justify-end gap-1 pr-1">
-                <Button
-                    variant="ghost"
-                    size="icon"
+            <div className="flex items-center justify-end gap-4 pr-1 whitespace-nowrap">
+                <button
+                    type="button"
+                    title="View User"
+                    className="text-sm font-semibold text-[#0EA5E9] hover:text-[#0c96d4] transition-all hover:underline"
+                    onClick={() => onView(row.original)}
+                >
+                    View
+                </button>
+                <button
+                    type="button"
                     title="Edit User"
-                    className="h-8 w-8 bg-blue-50 dark:bg-blue-950/30 text-[#0EA5E9] hover:bg-blue-100 hover:text-[#0c96d4] transition-all rounded-lg"
+                    className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-all hover:underline"
                     onClick={() => onEdit(row.original)}
                 >
-                    <Pencil className="w-4 h-4" />
-                </Button>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    title="Delete User"
-                    className="h-8 w-8 bg-red-50 dark:bg-red-950/30 text-red-600 hover:bg-red-100 hover:text-red-700 transition-all rounded-lg"
-                    onClick={() => onDelete(row.original.id)}
-                >
-                    <Trash2 className="w-4 h-4" />
-                </Button>
+                    Edit
+                </button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-slate-400 hover:text-slate-600"
+                        >
+                            <MoreVertical className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                            onClick={() => onDelete(row.original.id)}
+                            className="gap-2 text-[12px] text-red-600 focus:text-red-600"
+                        >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            Delete
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
         ),
     },

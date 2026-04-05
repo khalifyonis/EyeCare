@@ -27,7 +27,15 @@ import {
     FileText,
     CheckCircle2,
     MapPin,
+    Plus,
 } from 'lucide-react'
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+} from "@/components/ui/sheet"
 import { toast } from 'sonner'
 
 type Patient = {
@@ -145,11 +153,107 @@ function SymptomTags({
     )
 }
 
-function getApiErrorMessage(error: unknown, fallback: string): string {
-    if (!error || typeof error !== 'object') return fallback
-    const maybe = error as { response?: { data?: { message?: unknown } } }
-    const msg = maybe.response?.data?.message
-    return typeof msg === 'string' && msg.trim().length > 0 ? msg : fallback
+function QuickAddPatientForm({
+    onSuccess,
+    onCancel,
+}: {
+    onSuccess: (p: Patient) => void
+    onCancel: () => void
+}) {
+    const [saving, setSaving] = useState(false)
+    const [form, setForm] = useState({
+        firstName: '',
+        lastName: '',
+        phone: '',
+        gender: 'MALE',
+        dateOfBirth: '',
+    })
+
+    const handleSave = async () => {
+        if (!form.firstName || !form.lastName || !form.phone || !form.dateOfBirth) {
+            toast.error('Please fill in all required fields')
+            return
+        }
+        setSaving(true)
+        try {
+            const fullName = `${form.firstName} ${form.lastName}`.trim()
+            const res = await api.post('/patients', {
+                ...form,
+                fullName,
+            })
+            toast.success('Patient created successfully')
+            onSuccess(res.data)
+        } catch (error) {
+            toast.error(getApiErrorMessage(error, 'Failed to create patient'))
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    return (
+        <div className="space-y-5 py-4">
+            <div className="space-y-2">
+                <Label>First Name *</Label>
+                <Input
+                    placeholder="First Name"
+                    value={form.firstName}
+                    onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                />
+            </div>
+            <div className="space-y-2">
+                <Label>Last Name *</Label>
+                <Input
+                    placeholder="Last Name"
+                    value={form.lastName}
+                    onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                />
+            </div>
+            <div className="space-y-2">
+                <Label>Phone Number *</Label>
+                <Input
+                    placeholder="Phone Number"
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                />
+            </div>
+            <div className="space-y-2">
+                <Label>Gender *</Label>
+                <Select
+                    value={form.gender}
+                    onValueChange={(v) => setForm({ ...form, gender: v })}
+                >
+                    <SelectTrigger>
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="MALE">Male</SelectItem>
+                        <SelectItem value="FEMALE">Female</SelectItem>
+                        <SelectItem value="OTHER">Other</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+            <div className="space-y-2">
+                <Label>Date of Birth *</Label>
+                <Input
+                    type="date"
+                    value={form.dateOfBirth}
+                    onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })}
+                />
+            </div>
+            <div className="flex gap-3 pt-4">
+                <Button variant="outline" className="flex-1" onClick={onCancel}>
+                    Cancel
+                </Button>
+                <Button
+                    className="flex-1 bg-[#0EA5E9] hover:bg-[#0c96d4]"
+                    onClick={handleSave}
+                    disabled={saving}
+                >
+                    {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save Patient'}
+                </Button>
+            </div>
+        </div>
+    )
 }
 
 export default function NewAppointmentPage() {
@@ -178,6 +282,7 @@ export default function NewAppointmentPage() {
     const [diagnosis, setDiagnosis] = useState('')
     const [treatment, setTreatment] = useState('')
     const [notes, setNotes] = useState('')
+    const [quickAddOpen, setQuickAddOpen] = useState(false)
     const patientDropdownRef = useRef<HTMLDivElement | null>(null)
 
     const buildNotes = useCallback(() => {
@@ -321,7 +426,7 @@ export default function NewAppointmentPage() {
 
     return (
         <div className="min-h-screen bg-slate-50">
-        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
                 {/* Header at Top */}
                 <div className="mb-6">
                     <h1 className="text-2xl font-bold tracking-tight text-slate-900">
@@ -352,13 +457,12 @@ export default function NewAppointmentPage() {
                                     className="flex flex-col items-center gap-2 group"
                                 >
                                     <div
-                                        className={`flex h-11 w-11 items-center justify-center rounded-full border-2 transition-all duration-200 ${
-                                            completedSteps.has(i)
+                                        className={`flex h-11 w-11 items-center justify-center rounded-full border-2 transition-all duration-200 ${completedSteps.has(i)
                                                 ? 'border-emerald-500 bg-emerald-500 text-white'
                                                 : i === step
-                                                  ? 'border-[#0EA5E9] bg-[#0EA5E9] text-white shadow-lg shadow-sky-500/25'
-                                                  : 'border-slate-200 bg-white text-slate-500 group-hover:border-slate-300'
-                                        }`}
+                                                    ? 'border-[#0EA5E9] bg-[#0EA5E9] text-white shadow-lg shadow-sky-500/25'
+                                                    : 'border-slate-200 bg-white text-slate-500 group-hover:border-slate-300'
+                                            }`}
                                     >
                                         {completedSteps.has(i) ? (
                                             <CheckCircle2 className="h-5 w-5" />
@@ -367,22 +471,20 @@ export default function NewAppointmentPage() {
                                         )}
                                     </div>
                                     <span
-                                        className={`text-sm font-semibold transition-colors ${
-                                            completedSteps.has(i)
+                                        className={`text-sm font-semibold transition-colors ${completedSteps.has(i)
                                                 ? 'text-emerald-600'
                                                 : i === step
-                                                  ? 'text-[#0EA5E9]'
-                                                  : 'text-slate-600'
-                                        }`}
+                                                    ? 'text-[#0EA5E9]'
+                                                    : 'text-slate-600'
+                                            }`}
                                     >
                                         {s.label}
                                     </span>
                                 </button>
                                 {i < STEPS.length - 1 && (
                                     <div
-                                        className={`flex-1 h-1 mx-3 mt-[-26px] rounded-full transition-colors ${
-                                            completedSteps.has(i) ? 'bg-emerald-400' : 'bg-slate-200/80'
-                                        }`}
+                                        className={`flex-1 h-1 mx-3 mt-[-26px] rounded-full transition-colors ${completedSteps.has(i) ? 'bg-emerald-400' : 'bg-slate-200/80'
+                                            }`}
                                     />
                                 )}
                             </div>
@@ -400,9 +502,8 @@ export default function NewAppointmentPage() {
                                 key={s.label}
                                 type="button"
                                 onClick={() => setStep(i)}
-                                className={`inline-flex items-center gap-2 text-[15px] font-semibold transition-colors ${
-                                    active ? 'text-[#0EA5E9]' : 'text-slate-600 hover:text-slate-900'
-                                }`}
+                                className={`inline-flex items-center gap-2 text-[15px] font-semibold transition-colors ${active ? 'text-[#0EA5E9]' : 'text-slate-600 hover:text-slate-900'
+                                    }`}
                             >
                                 <Icon className={`h-[18px] w-[18px] ${active ? 'text-[#0EA5E9]' : 'text-slate-500'}`} />
                                 <span className={active ? 'border-b-2 border-[#0EA5E9] pb-3 -mb-3' : ''}>
@@ -431,9 +532,21 @@ export default function NewAppointmentPage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label className="text-sm font-semibold text-slate-800">
-                                        Select Patient <span className="text-red-500">*</span>
-                                    </Label>
+                                    <div className="flex items-center justify-between">
+                                        <Label className="text-sm font-semibold text-slate-800">
+                                            Select Patient <span className="text-red-500">*</span>
+                                        </Label>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => setQuickAddOpen(true)}
+                                            className="h-8 gap-1.5 text-xs font-bold text-[#0EA5E9] hover:bg-sky-50 hover:text-[#0EA5E9]"
+                                        >
+                                            <Plus className="h-3.5 w-3.5" />
+                                            New Patient
+                                        </Button>
+                                    </div>
                                     <div className="relative" ref={patientDropdownRef}>
                                         <div className="relative">
                                             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -454,9 +567,8 @@ export default function NewAppointmentPage() {
                                                 className="h-11 rounded-lg border-slate-200 pl-9 pr-10 text-[15px]"
                                             />
                                             <ChevronDown
-                                                className={`pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition-transform ${
-                                                    patientDropdownOpen ? 'rotate-180' : ''
-                                                }`}
+                                                className={`pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition-transform ${patientDropdownOpen ? 'rotate-180' : ''
+                                                    }`}
                                             />
                                         </div>
 
@@ -483,11 +595,10 @@ export default function NewAppointmentPage() {
                                                                         setPatientSearch('')
                                                                         setPatientDropdownOpen(false)
                                                                     }}
-                                                                    className={`w-full rounded-lg border px-3 py-2 text-left transition-colors ${
-                                                                        patientId === p.id
+                                                                    className={`w-full rounded-lg border px-3 py-2 text-left transition-colors ${patientId === p.id
                                                                             ? 'border-blue-300 bg-blue-50'
                                                                             : 'border-transparent hover:border-slate-200 hover:bg-slate-50'
-                                                                    }`}
+                                                                        }`}
                                                                 >
                                                                     <p className="truncate text-sm font-semibold text-slate-900">
                                                                         {p.fullName || 'Unknown Patient'}
@@ -566,6 +677,26 @@ export default function NewAppointmentPage() {
                                 )}
                             </div>
                         )}
+
+                        <Sheet open={quickAddOpen} onOpenChange={setQuickAddOpen}>
+                            <SheetContent className="sm:max-w-md">
+                                <SheetHeader>
+                                    <SheetTitle>Quick Add Patient</SheetTitle>
+                                    <SheetDescription>
+                                        Create a new patient record without leaving this page.
+                                    </SheetDescription>
+                                </SheetHeader>
+                                <QuickAddPatientForm
+                                    onCancel={() => setQuickAddOpen(false)}
+                                    onSuccess={(newPat) => {
+                                        setPatients((prev) => [newPat, ...prev])
+                                        setPatientId(newPat.id)
+                                        setQuickAddOpen(false)
+                                        setPatientSearch('')
+                                    }}
+                                />
+                            </SheetContent>
+                        </Sheet>
 
                         {/* Step 2 */}
                         {step === 1 && (

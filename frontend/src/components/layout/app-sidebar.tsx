@@ -328,7 +328,14 @@ const roleNavigation: Record<string, NavSection[]> = {
                         { title: 'All Surgeries', url: '/dashboard/surgery' },
                     ],
                 },
-                { title: 'Clinical Prescriptions', icon: FileText, url: '/dashboard/clinical-prescriptions' },
+                {
+                    title: 'Optical Prescriptions',
+                    icon: FileText,
+                    url: '/dashboard/prescriptions',
+                    subItems: [
+                        { title: 'All Prescriptions', url: '/dashboard/prescriptions' },
+                    ],
+                },
                 { title: 'Reports', icon: BarChart3, url: '/dashboard/reports' },
             ],
         },
@@ -360,7 +367,14 @@ const roleNavigation: Record<string, NavSection[]> = {
         {
             section: 'DISPENSING',
             items: [
-                { title: 'Clinical Prescriptions', icon: FileText, url: '/dashboard/clinical-prescriptions' },
+                {
+                    title: 'Optical Prescriptions',
+                    icon: FileText,
+                    url: '/dashboard/prescriptions',
+                    subItems: [
+                        { title: 'All Prescriptions', url: '/dashboard/prescriptions' },
+                    ],
+                },
                 { title: 'Billing (Sales)', icon: Receipt, url: '/dashboard/billing' },
                 { title: 'Patients', icon: Users, url: '/dashboard/patients' },
             ],

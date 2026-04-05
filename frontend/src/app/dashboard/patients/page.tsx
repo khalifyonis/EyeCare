@@ -140,12 +140,12 @@ export default function PatientsPage() {
 
     /* ── render ───────────────────────────────────────────── */
     return (
-        <div className="flex flex-col min-h-screen bg-slate-50/50 dark:bg-slate-950">
+        <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950">
             {/* ── Page header ── */}
-            <div className="px-6 pt-6 pb-4 bg-white dark:bg-[#0f172a] border-b border-slate-100 dark:border-slate-800">
+            <div className="px-6 pt-6 pb-4 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Patients</h1>
+                        <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">Patients</h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Manage your patient records and information</p>
                     </div>
                     {canManage && (
@@ -161,7 +161,7 @@ export default function PatientsPage() {
             </div>
 
             {/* ── Toolbar ── */}
-            <div className="px-6 py-3 bg-white dark:bg-[#0f172a] border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="px-6 py-3 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center gap-3">
                 {/* Search */}
                 <div className="relative flex-1 max-w-xl min-w-[280px] sm:min-w-[350px]">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
@@ -169,7 +169,7 @@ export default function PatientsPage() {
                         placeholder="Search patients by name or email..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="pl-10 h-10 text-sm font-medium border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus-visible:ring-[#0EA5E9]"
+                        className="pl-10 h-9 text-sm border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900"
                     />
                 </div>
 
@@ -177,7 +177,7 @@ export default function PatientsPage() {
                 <div className="flex items-center gap-2">
                     <Filter className="h-4 w-4 text-slate-400" />
                     <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
-                        <SelectTrigger className="h-9 w-[150px] text-sm font-medium text-slate-700 dark:text-slate-100 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 [&>span]:text-sm [&>span]:font-medium">
+                        <SelectTrigger className="h-9 w-[150px] text-sm text-slate-700 dark:text-slate-100 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 [&>span]:text-sm">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -188,7 +188,7 @@ export default function PatientsPage() {
                     </Select>
 
                     {/* count badge */}
-                    <span className="inline-flex h-9 items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 px-3 rounded-full border border-slate-200 dark:border-slate-700">
+                    <span className="inline-flex h-9 items-center gap-2 text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 rounded-full border border-slate-200 dark:border-slate-700">
                         <Users className="h-4 w-4" />
                         {total} patient{total !== 1 ? 's' : ''}
                     </span>
@@ -197,7 +197,7 @@ export default function PatientsPage() {
                 {/* Sort + Refresh */}
                 <div className="flex items-center gap-2 ml-auto">
                     <Select value={sortBy} onValueChange={setSortBy}>
-                        <SelectTrigger className="h-9 w-[160px] text-sm font-medium text-slate-700 dark:text-slate-100 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 [&>span]:text-sm [&>span]:font-medium">
+                        <SelectTrigger className="h-9 w-[160px] text-sm text-slate-700 dark:text-slate-100 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 [&>span]:text-sm">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -210,7 +210,7 @@ export default function PatientsPage() {
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="h-9 w-9 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100"
+                        className="h-9 w-9 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800"
                         onClick={() => fetchPatients(search, page)}
                         disabled={loading}
                     >
@@ -221,12 +221,12 @@ export default function PatientsPage() {
 
             {/* ── Table ── */}
             <div className="flex-1 px-6 py-4">
-                <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm overflow-hidden">
+                <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-sm overflow-hidden">
                     <Table className="w-full table-fixed">
                         <TableHeader>
-                            <TableRow className="bg-slate-50/80 dark:bg-slate-900/80 hover:bg-slate-50/80 dark:hover:bg-slate-900/80 border-slate-200 dark:border-slate-800">
-                                {['PATIENT', 'CONTACT', 'STATUS', 'REGISTRATION DATE', 'ASSIGNED DOCTOR', 'ACTIONS'].map((h) => (
-                                    <TableHead key={h} className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-widest py-3.5 px-4 whitespace-nowrap">
+                            <TableRow className="bg-slate-50 dark:bg-slate-900/70 hover:bg-slate-50 dark:hover:bg-slate-900/70 border-slate-200 dark:border-slate-800">
+                                {['PATIENT', 'CONTACT', 'STATUS', 'REGISTRATION DATE', 'ADDRESS', 'ACTIONS'].map((h) => (
+                                    <TableHead key={h} className="text-[12px] font-semibold uppercase text-slate-600 dark:text-slate-300 tracking-wide py-3 px-4 whitespace-nowrap">
                                         {h}
                                     </TableHead>
                                 ))}
@@ -259,7 +259,7 @@ export default function PatientsPage() {
                                     : patients.map((row) => (
                                         <TableRow
                                             key={row.id}
-                                            className="border-slate-100 dark:border-slate-800 transition-colors hover:bg-slate-50/60 dark:hover:bg-slate-800/40"
+                                            className="border-slate-100 dark:border-slate-800 transition-colors hover:bg-slate-50/70 dark:hover:bg-slate-900/40"
                                         >
                                             {columns.map((col) => (
                                                 <TableCell key={col.id} className="py-4 px-4 align-middle">
