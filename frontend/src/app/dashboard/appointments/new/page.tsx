@@ -16,6 +16,11 @@ import {
     SelectItem,
 } from '@/components/ui/select'
 import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
     ArrowLeft,
     CalendarPlus,
     ChevronDown,
@@ -64,6 +69,13 @@ function getDoctorRecordId(doctor?: Doctor | null): string {
     return doctor.doctorId || doctor.id
 }
 
+function getApiErrorMessage(error: unknown, fallback: string): string {
+    if (!error || typeof error !== 'object') return fallback
+    const maybe = error as { response?: { data?: { message?: unknown } } }
+    const msg = maybe.response?.data?.message
+    return typeof msg === 'string' && msg.trim().length > 0 ? msg : fallback
+}
+
 const APPOINTMENT_TYPES = [
     { value: 'consultation', label: 'Consultation' },
     { value: 'follow-up', label: 'Follow-up' },
@@ -77,31 +89,193 @@ const STATUS_OPTIONS = [
     { value: 'PENDING', label: 'Pending' },
 ]
 
-const TIME_SLOTS = (() => {
-    const slots: { value: string; label: string }[] = []
-    for (let h = 8; h <= 17; h++) {
-        for (const m of [0, 30]) {
-            if (h === 17 && m === 30) continue
-            const hour24 = String(h).padStart(2, '0')
-            const min = String(m).padStart(2, '0')
-            const period = h >= 12 ? 'PM' : 'AM'
-            const hour12 = h > 12 ? h - 12 : h === 0 ? 12 : h
-            slots.push({
-                value: `${hour24}:${min}`,
-                label: `${hour12}:${min} ${period}`,
-            })
-        }
-    }
-    slots.push({ value: '18:00', label: '6:00 PM' })
-    return slots
-})()
-
 const STEPS = [
     { label: 'Patient Information', icon: User },
     { label: 'Appointment Details', icon: Calendar },
     { label: 'Additional Information', icon: FileText },
     { label: 'Review', icon: CheckCircle2 },
 ]
+
+const SOMALIA_STATES = [
+    'Banaadir', 'Galmudug', 'Hirshabelle', 'Jubaland', 'Puntland', 'South West State', 'Somaliland',
+]
+
+const SOMALIA_CITIES = [
+    'Mogadishu', 'Hargeisa', 'Bosaso', 'Galkayo', 'Borama', 'Merca', 'Jamame', 'Kismayo', 'Baidoa',
+    'Jowhar', 'Las Anod', 'Dhusamareb', 'Beledweyne', 'Garowe', 'Berbera',
+].sort()
+
+const HOURS = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'))
+const MINUTES = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55']
+
+const GENERATED_TIME_SLOTS = (() => {
+    const slots: string[] = []
+    const periods = ['AM', 'PM']
+    for (const p of periods) {
+        for (let h = 1; h <= 12; h++) {
+            const hh = h.toString().padStart(2, '0')
+            for (let m = 0; m < 60; m += 15) {
+                const mm = m.toString().padStart(2, '0')
+                slots.push(`${hh}:${mm} ${p}`)
+            }
+        }
+    }
+    return slots
+})()
+
+function ScrollableColumn({
+    options,
+    value,
+    onChange,
+}: {
+    options: string[]
+    value: string
+    onChange: (v: string) => void
+}) {
+    const scrollRef = useRef<HTMLDivElement>(null)
+
+    // Ensure the selected item is centered on mount or value change
+    useEffect(() => {
+        if (scrollRef.current) {
+            const index = options.indexOf(value)
+            if (index !== -1) {
+                const itemHeight = 40 // flex h-10
+                scrollRef.current.scrollTop = index * itemHeight
+            }
+        }
+    }, [value, options])
+
+    return (
+        <div className="relative h-[200px] w-14">
+            {/* Center Highlight Bar (Shared across columns usually, but here per column for simplicity) */}
+            <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 h-10 bg-slate-100/50 rounded-lg -z-10 pointer-events-none" />
+            
+            <div 
+                ref={scrollRef}
+                className="h-full overflow-y-auto flex flex-col py-20 snap-y snap-mandatory scrollbar-hide relative"
+                onScroll={(e) => {
+                    // This could be used for real-time value updates if needed, 
+                    // but we'll stick to button clicks or 'OK' confirmation for stability.
+                }}
+            >
+                {options.map((opt) => (
+                    <button
+                        key={opt}
+                        onClick={() => onChange(opt)}
+                        className={`flex h-10 w-full shrink-0 items-center justify-center text-base font-bold transition-all snap-center select-none ${
+                            value === opt
+                                ? 'text-[#0EA5E9] scale-110'
+                                : 'text-slate-300 hover:text-slate-400'
+                        }`}
+                    >
+                        {opt}
+                    </button>
+                ))}
+            </div>
+        </div>
+    )
+}
+
+function UnifiedTimePicker({
+    hour,
+    minute,
+    period,
+    onHourChange,
+    onMinuteChange,
+    onPeriodChange,
+}: {
+    hour: string
+    minute: string
+    period: string
+    onHourChange: (v: string) => void
+    onMinuteChange: (v: string) => void
+    onPeriodChange: (v: string) => void
+}) {
+    const [tempTime, setTempTime] = useState({ hour, minute, period })
+    const [isOpen, setIsOpen] = useState(false)
+
+    // Sync temp state when opening
+    useEffect(() => {
+        if (isOpen) {
+            setTempTime({ hour, minute, period })
+        }
+    }, [isOpen, hour, minute, period])
+
+    const handleOk = () => {
+        onHourChange(tempTime.hour)
+        onMinuteChange(tempTime.minute)
+        onPeriodChange(tempTime.period)
+        setIsOpen(false)
+    }
+
+    const currentTime = `${hour}:${minute} ${period}`
+
+    return (
+        <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+            <DropdownMenuTrigger asChild>
+                <Button
+                    variant="outline"
+                    className="h-11 w-full justify-between rounded-xl border-slate-200 px-4 text-[15px] font-semibold bg-white hover:bg-slate-50 text-slate-900 shadow-sm transition-all"
+                >
+                    <div className="flex items-center gap-2.5">
+                        <Clock className="h-4 w-4 text-[#0EA5E9]" />
+                        <span>{currentTime}</span>
+                    </div>
+                    <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="p-0 rounded-2xl shadow-2xl border-slate-100 bg-white overflow-hidden w-[260px]" align="start">
+                {/* Header/Indicator Row */}
+                <div className="bg-slate-50/50 px-4 py-3 border-b border-slate-100 flex justify-between items-center">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Select Time</span>
+                    <span className="text-sm font-black text-[#0EA5E9]">{tempTime.hour}:{tempTime.minute} {tempTime.period}</span>
+                </div>
+
+                {/* The Wheel */}
+                <div className="relative flex items-center justify-center bg-white px-2 py-4">
+                    {/* Visual Fading Gradients */}
+                    <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white to-transparent pointer-events-none z-10" />
+                    <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none z-10" />
+                    
+                    <ScrollableColumn 
+                        options={HOURS} 
+                        value={tempTime.hour} 
+                        onChange={(v) => setTempTime(t => ({ ...t, hour: v }))} 
+                    />
+                    <div className="text-2xl font-black text-slate-200 pt-1 mx-1 select-none">:</div>
+                    <ScrollableColumn 
+                        options={MINUTES} 
+                        value={tempTime.minute} 
+                        onChange={(v) => setTempTime(t => ({ ...t, minute: v }))} 
+                    />
+                    <div className="w-px h-12 bg-slate-100 mx-3" />
+                    <ScrollableColumn 
+                        options={['AM', 'PM']} 
+                        value={tempTime.period} 
+                        onChange={(v) => setTempTime(t => ({ ...t, period: v }))} 
+                    />
+                </div>
+
+                {/* Actions */}
+                <div className="p-2 border-t border-slate-50 flex gap-2 bg-slate-50/30">
+                    <Button 
+                        variant="ghost" 
+                        className="flex-1 text-slate-500 font-bold h-9 hover:bg-slate-100 rounded-lg text-xs"
+                        onClick={() => setIsOpen(false)}
+                    >
+                        CANCEL
+                    </Button>
+                    <Button 
+                        className="flex-1 bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold h-9 rounded-lg text-xs shadow-md shadow-blue-100"
+                        onClick={handleOk}
+                    >
+                        OK
+                    </Button>
+                </div>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
+}
 
 function SymptomTags({
     value,
@@ -165,8 +339,12 @@ function QuickAddPatientForm({
         firstName: '',
         lastName: '',
         phone: '',
+        email: '',
         gender: 'MALE',
         dateOfBirth: '',
+        address: '',
+        city: '',
+        state: '',
     })
 
     const handleSave = async () => {
@@ -191,65 +369,132 @@ function QuickAddPatientForm({
     }
 
     return (
-        <div className="space-y-5 py-4">
-            <div className="space-y-2">
-                <Label>First Name *</Label>
+        <div className="space-y-4 py-4 overflow-y-auto max-h-[calc(100vh-140px)] px-1 scrollbar-hide">
+            <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">First Name *</Label>
+                    <Input
+                        className="h-9 text-sm"
+                        placeholder="First Name"
+                        value={form.firstName}
+                        onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                    />
+                </div>
+                <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Last Name *</Label>
+                    <Input
+                        className="h-9 text-sm"
+                        placeholder="Last Name"
+                        value={form.lastName}
+                        onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                    />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Phone *</Label>
+                    <Input
+                        className="h-9 text-sm"
+                        placeholder="Phone"
+                        value={form.phone}
+                        onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    />
+                </div>
+                <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Gender *</Label>
+                    <Select
+                        value={form.gender}
+                        onValueChange={(v) => setForm({ ...form, gender: v })}
+                    >
+                        <SelectTrigger className="h-9 text-sm">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="MALE">Male</SelectItem>
+                            <SelectItem value="FEMALE">Female</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Date of Birth *</Label>
+                    <Input
+                        className="h-9 text-sm"
+                        type="date"
+                        value={form.dateOfBirth}
+                        max={new Date().toISOString().split('T')[0]}
+                        onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })}
+                    />
+                </div>
+                <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Email</Label>
+                    <Input
+                        className="h-9 text-sm"
+                        type="email"
+                        placeholder="Email"
+                        value={form.email}
+                        onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    />
+                </div>
+            </div>
+
+            <div className="space-y-1.5">
+                <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Address</Label>
                 <Input
-                    placeholder="First Name"
-                    value={form.firstName}
-                    onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                    className="h-9 text-sm"
+                    placeholder="Physical Address"
+                    value={form.address}
+                    onChange={(e) => setForm({ ...form, address: e.target.value })}
                 />
             </div>
-            <div className="space-y-2">
-                <Label>Last Name *</Label>
-                <Input
-                    placeholder="Last Name"
-                    value={form.lastName}
-                    onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-                />
+
+            <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">City</Label>
+                    <Select
+                        value={form.city}
+                        onValueChange={(v) => setForm({ ...form, city: v })}
+                    >
+                        <SelectTrigger className="h-9 text-sm">
+                            <SelectValue placeholder="City" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {SOMALIA_CITIES.map((c) => (
+                                <SelectItem key={c} value={c}>{c}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">State</Label>
+                    <Select
+                        value={form.state}
+                        onValueChange={(v) => setForm({ ...form, state: v })}
+                    >
+                        <SelectTrigger className="h-9 text-sm">
+                            <SelectValue placeholder="State" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {SOMALIA_STATES.map((s) => (
+                                <SelectItem key={s} value={s}>{s}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
-            <div className="space-y-2">
-                <Label>Phone Number *</Label>
-                <Input
-                    placeholder="Phone Number"
-                    value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                />
-            </div>
-            <div className="space-y-2">
-                <Label>Gender *</Label>
-                <Select
-                    value={form.gender}
-                    onValueChange={(v) => setForm({ ...form, gender: v })}
-                >
-                    <SelectTrigger>
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="MALE">Male</SelectItem>
-                        <SelectItem value="FEMALE">Female</SelectItem>
-                        <SelectItem value="OTHER">Other</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
-            <div className="space-y-2">
-                <Label>Date of Birth *</Label>
-                <Input
-                    type="date"
-                    value={form.dateOfBirth}
-                    onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })}
-                />
-            </div>
-            <div className="flex gap-3 pt-4">
-                <Button variant="outline" className="flex-1" onClick={onCancel}>
+            <div className="flex gap-3 pt-6 sticky bottom-0 bg-white border-t mt-4 pb-2">
+                <Button variant="outline" className="flex-1 rounded-xl font-bold" onClick={onCancel}>
                     Cancel
                 </Button>
                 <Button
-                    className="flex-1 bg-[#0EA5E9] hover:bg-[#0c96d4]"
+                    className="flex-1 bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold rounded-xl"
                     onClick={handleSave}
                     disabled={saving}
                 >
-                    {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save Patient'}
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Create Patient'}
                 </Button>
             </div>
         </div>
@@ -272,11 +517,11 @@ export default function NewAppointmentPage() {
     const [doctorId, setDoctorId] = useState('')
     const [appointmentType, setAppointmentType] = useState('')
     const [appointmentDate, setAppointmentDate] = useState('')
-    const [appointmentTime, setAppointmentTime] = useState('')
+    const [timeHour, setTimeHour] = useState('09')
+    const [timeMinute, setTimeMinute] = useState('00')
+    const [timePeriod, setTimePeriod] = useState('AM')
     const [status, setStatus] = useState('SCHEDULED')
     const [location, setLocation] = useState('')
-    const [manualEmail, setManualEmail] = useState('')
-    const [manualPhone, setManualPhone] = useState('')
     const [reason, setReason] = useState('')
     const [symptoms, setSymptoms] = useState<string[]>([])
     const [diagnosis, setDiagnosis] = useState('')
@@ -284,6 +529,9 @@ export default function NewAppointmentPage() {
     const [notes, setNotes] = useState('')
     const [quickAddOpen, setQuickAddOpen] = useState(false)
     const patientDropdownRef = useRef<HTMLDivElement | null>(null)
+
+    // Today's date string for min attribute on date picker
+    const todayStr = new Date().toISOString().split('T')[0]
 
     const buildNotes = useCallback(() => {
         const parts: string[] = []
@@ -335,13 +583,6 @@ export default function NewAppointmentPage() {
     const selectedDoctor = doctors.find((d) => getDoctorRecordId(d) === doctorId)
 
     useEffect(() => {
-        if (selectedPatient) {
-            setManualEmail(selectedPatient.email || '')
-            setManualPhone(selectedPatient.phone || '')
-        }
-    }, [selectedPatient])
-
-    useEffect(() => {
         const handlePointerDown = (event: MouseEvent) => {
             if (
                 patientDropdownRef.current &&
@@ -368,12 +609,20 @@ export default function NewAppointmentPage() {
         )
     })
 
+    const isDateInPast = (dateStr: string): boolean => {
+        if (!dateStr) return false
+        const selected = new Date(dateStr + 'T00:00:00')
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        return selected < today
+    }
+
     const canProceedStep = (s: number): boolean => {
         switch (s) {
             case 0:
                 return !!patientId
             case 1:
-                return !!doctorId && !!appointmentType && !!appointmentDate && !!appointmentTime
+                return !!doctorId && !!appointmentType && !!appointmentDate && !!timeHour && !!timeMinute && !!timePeriod && !isDateInPast(appointmentDate)
             case 2:
                 return !!reason.trim()
             default:
@@ -382,6 +631,10 @@ export default function NewAppointmentPage() {
     }
 
     const handleNext = () => {
+        if (step === 1 && isDateInPast(appointmentDate)) {
+            toast.error('Appointment date cannot be in the past. Please select today or a future date.')
+            return
+        }
         if (!canProceedStep(step)) {
             toast.error('Please fill in all required fields before continuing.')
             return
@@ -397,8 +650,19 @@ export default function NewAppointmentPage() {
             return
         }
 
+        if (isDateInPast(appointmentDate)) {
+            toast.error('Appointment date cannot be in the past. Please go back and select a valid date.')
+            return
+        }
+
         setSubmitting(true)
         try {
+            // Convert to 24h format for the API
+            let hour = parseInt(timeHour)
+            if (timePeriod === 'PM' && hour < 12) hour += 12
+            if (timePeriod === 'AM' && hour === 12) hour = 0
+            const appointmentTime = `${hour.toString().padStart(2, '0')}:${timeMinute}`
+
             const dateTime = new Date(`${appointmentDate}T${appointmentTime}:00`)
             await api.post('/appointments', {
                 patientId,
@@ -563,7 +827,7 @@ export default function NewAppointmentPage() {
                                                     setPatientDropdownOpen(true)
                                                     setPatientSearch(e.target.value)
                                                 }}
-                                                placeholder="Search and select a patient..."
+                                                placeholder="Search by name, phone, or ID..."
                                                 className="h-11 rounded-lg border-slate-200 pl-9 pr-10 text-[15px]"
                                             />
                                             <ChevronDown
@@ -617,37 +881,6 @@ export default function NewAppointmentPage() {
                                     </div>
                                 </div>
 
-                                <div className="border-t border-slate-200 pt-5">
-                                    <h3 className="text-left text-lg font-bold text-slate-900">
-                                        Manual Entry <span className="text-slate-400 font-normal">(or)</span>
-                                    </h3>
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label className="text-sm font-semibold text-slate-800">
-                                            Patient Email <span className="text-red-500">*</span>
-                                        </Label>
-                                        <Input
-                                            placeholder="Enter patient's email address"
-                                            value={manualEmail}
-                                            onChange={(e) => setManualEmail(e.target.value)}
-                                            className="h-11 text-[15px] rounded-lg border-slate-200"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-sm font-semibold text-slate-800">
-                                            Patient Phone <span className="text-red-500">*</span>
-                                        </Label>
-                                        <Input
-                                            placeholder="Enter patient's phone number"
-                                            value={manualPhone}
-                                            onChange={(e) => setManualPhone(e.target.value)}
-                                            className="h-11 text-[15px] rounded-lg border-slate-200"
-                                        />
-                                    </div>
-                                </div>
-
                                 {selectedPatient && (
                                     <div className="rounded-xl border border-blue-100 bg-blue-50/40 p-5 mt-4">
                                         <h3 className="text-sm font-bold text-slate-800 mb-3">
@@ -661,15 +894,15 @@ export default function NewAppointmentPage() {
                                                 </p>
                                             </div>
                                             <div>
-                                                <p className="text-xs text-slate-500">Email</p>
-                                                <p className="text-sm font-semibold text-slate-900">
-                                                    {selectedPatient.email || '—'}
-                                                </p>
-                                            </div>
-                                            <div>
                                                 <p className="text-xs text-slate-500">Phone</p>
                                                 <p className="text-sm font-semibold text-slate-900">
                                                     {selectedPatient.phone || '—'}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-slate-500">Patient ID</p>
+                                                <p className="text-sm font-semibold text-slate-900">
+                                                    {selectedPatient.patientNumber || '—'}
                                                 </p>
                                             </div>
                                         </div>
@@ -679,7 +912,7 @@ export default function NewAppointmentPage() {
                         )}
 
                         <Sheet open={quickAddOpen} onOpenChange={setQuickAddOpen}>
-                            <SheetContent className="sm:max-w-md">
+                            <SheetContent className="sm:max-w-md overflow-y-auto scrollbar-hide">
                                 <SheetHeader>
                                     <SheetTitle>Quick Add Patient</SheetTitle>
                                     <SheetDescription>
@@ -764,27 +997,27 @@ export default function NewAppointmentPage() {
                                         <Input
                                             type="date"
                                             value={appointmentDate}
+                                            min={todayStr}
                                             onChange={(e) => setAppointmentDate(e.target.value)}
-                                            className="h-11 text-[15px] rounded-lg border-slate-200"
+                                            className={`h-11 text-[15px] rounded-lg ${appointmentDate && isDateInPast(appointmentDate) ? 'border-red-400 ring-1 ring-red-300' : 'border-slate-200'}`}
                                         />
+                                        {appointmentDate && isDateInPast(appointmentDate) && (
+                                            <p className="text-xs text-red-500 mt-1 font-medium">Appointment date cannot be in the past</p>
+                                        )}
                                     </div>
 
                                     <div className="space-y-2">
                                         <Label className="text-sm font-semibold text-slate-800">
                                             Appointment Time <span className="text-red-500">*</span>
                                         </Label>
-                                        <Select value={appointmentTime} onValueChange={setAppointmentTime}>
-                                            <SelectTrigger className="h-11 text-[15px] rounded-lg border-slate-200">
-                                                <SelectValue placeholder="Select time slot" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {TIME_SLOTS.map((t) => (
-                                                    <SelectItem key={t.value} value={t.value}>
-                                                        {t.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                        <UnifiedTimePicker
+                                            hour={timeHour}
+                                            minute={timeMinute}
+                                            period={timePeriod}
+                                            onHourChange={setTimeHour}
+                                            onMinuteChange={setTimeMinute}
+                                            onPeriodChange={setTimePeriod}
+                                        />
                                     </div>
 
                                     <div className="space-y-2">
@@ -917,12 +1150,12 @@ export default function NewAppointmentPage() {
                                                     <span className="font-medium text-slate-900">{selectedPatient?.fullName || 'Not provided'}</span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="w-28 text-slate-500">Email:</span>
-                                                    <span className="font-medium text-slate-900">{manualEmail || selectedPatient?.email || 'Not provided'}</span>
+                                                    <span className="w-28 text-slate-500">Phone:</span>
+                                                    <span className="font-medium text-slate-900">{selectedPatient?.phone || 'Not provided'}</span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="w-28 text-slate-500">Phone:</span>
-                                                    <span className="font-medium text-slate-900">{manualPhone || selectedPatient?.phone || 'Not provided'}</span>
+                                                    <span className="w-28 text-slate-500">Patient ID:</span>
+                                                    <span className="font-medium text-slate-900">{selectedPatient?.patientNumber || 'Not provided'}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -947,7 +1180,7 @@ export default function NewAppointmentPage() {
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <span className="w-28 text-slate-500">Time:</span>
-                                                    <span className="font-medium text-slate-900">{TIME_SLOTS.find((t) => t.value === appointmentTime)?.label || 'Not selected'}</span>
+                                                    <span className="font-medium text-slate-900">{timeHour}:{timeMinute} {timePeriod}</span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <span className="w-28 text-slate-500">Status:</span>

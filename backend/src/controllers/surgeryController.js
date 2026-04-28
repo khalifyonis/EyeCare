@@ -32,16 +32,6 @@ const surgeryInclude = {
     },
 };
 
-function withLegacyFields(row) {
-    if (!row || typeof row !== 'object') return row;
-    // Keep older clients working (pre EyeCare Pro surgery module)
-    return {
-        ...row,
-        eyeSide: row.eye,
-        surgeryDate: row.date,
-    };
-}
-
 function normalizeStatus(input) {
     const raw = (typeof input === 'string' ? input : '')?.trim();
     if (!raw) return 'scheduled';
@@ -178,7 +168,7 @@ export const listSurgeries = async (req, res, next) => {
 
         const totalPages = Math.ceil(total / limit) || 1;
         res.status(200).json({
-            data: rows.map(withLegacyFields),
+            data: rows,
             total,
             page,
             limit,
@@ -206,7 +196,7 @@ export const getSurgeryById = async (req, res, next) => {
         });
 
         if (!row) return res.status(404).json({ message: 'Surgery not found' });
-        res.status(200).json(withLegacyFields(row));
+        res.status(200).json(row);
     } catch (error) {
         next(error);
     }
@@ -219,12 +209,10 @@ export const createSurgery = async (req, res, next) => {
             branchId,
             patientId,
             eye,
-            eyeSide,
             surgeryType,
             procedure,
             anesthesiaType,
             date,
-            surgeryDate,
             time,
             operatingRoom,
             cataractDetails,
@@ -288,11 +276,11 @@ export const createSurgery = async (req, res, next) => {
                 examId: examId || null,
                 branchId: activeBranchId,
                 patientId,
-                eye: normalizeEye(eye ?? eyeSide),
+                eye: normalizeEye(eye),
                 surgeryType: canonicalSurgeryType,
                 procedure: canonicalProcedure,
                 anesthesiaType: typeof canonicalAnesthesia === 'string' && canonicalAnesthesia.trim() ? canonicalAnesthesia.trim() : null,
-                date: new Date(date || surgeryDate),
+                date: new Date(date),
                 time: typeof time === 'string' && time.trim() ? time.trim() : null,
                 operatingRoom: typeof operatingRoom === 'string' && operatingRoom.trim() ? operatingRoom.trim() : null,
                 cataractDetails: cataractDetails ?? null,
@@ -320,7 +308,7 @@ export const createSurgery = async (req, res, next) => {
             });
         }
 
-        res.status(201).json(withLegacyFields(row));
+        res.status(201).json(row);
     } catch (error) {
         if (error?.code === 'P2002') {
             return res.status(409).json({ message: 'A surgery already exists for this clinical examination' });
@@ -341,12 +329,10 @@ export const updateSurgery = async (req, res, next) => {
 
         const {
             eye,
-            eyeSide,
             surgeryType,
             procedure,
             anesthesiaType,
             date,
-            surgeryDate,
             time,
             operatingRoom,
             cataractDetails,
@@ -376,13 +362,13 @@ export const updateSurgery = async (req, res, next) => {
         const row = await prisma.surgery.update({
             where: { id: req.params.id },
             data: {
-                ...(eye !== undefined || eyeSide !== undefined ? { eye: normalizeEye(eye ?? eyeSide) } : {}),
+                ...(eye !== undefined ? { eye: normalizeEye(eye) } : {}),
                 ...(canonicalSurgeryType !== undefined ? { surgeryType: canonicalSurgeryType } : {}),
                 ...(canonicalProcedure !== undefined ? { procedure: canonicalProcedure } : {}),
                 ...(canonicalAnesthesia !== undefined
                     ? { anesthesiaType: typeof canonicalAnesthesia === 'string' && canonicalAnesthesia.trim() ? canonicalAnesthesia.trim() : null }
                     : {}),
-                ...(date !== undefined || surgeryDate !== undefined ? { date: new Date(date || surgeryDate) } : {}),
+                ...(date !== undefined ? { date: new Date(date) } : {}),
                 ...(time !== undefined ? { time: typeof time === 'string' && time.trim() ? time.trim() : null } : {}),
                 ...(operatingRoom !== undefined ? { operatingRoom: typeof operatingRoom === 'string' && operatingRoom.trim() ? operatingRoom.trim() : null } : {}),
                 ...(cataractDetails !== undefined ? { cataractDetails: cataractDetails ?? null } : {}),
@@ -434,7 +420,7 @@ export const updateSurgery = async (req, res, next) => {
             }
         }
 
-        res.status(200).json(withLegacyFields(row));
+        res.status(200).json(row);
     } catch (error) {
         next(error);
     }

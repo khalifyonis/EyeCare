@@ -95,7 +95,7 @@ export default function ReportsPage() {
     const [tableSearch, setTableSearch] = useState('');
     const [tableStatusFilter, setTableStatusFilter] = useState<'all' | 'PENDING' | 'COMPLETED' | 'CANCELLED'>('all');
     const [followUpStatusFilter, setFollowUpStatusFilter] = useState<'all' | 'PENDING' | 'OVERDUE' | 'DONE' | 'CANCELLED'>('all');
-    const [examTypeFilter, setExamTypeFilter] = useState<'all' | 'ER Examination' | 'Clinical Examination' | 'Surgery'>('all');
+    const [examTypeFilter, setExamTypeFilter] = useState<'all' | 'Eye Examination' | 'Surgery'>('all');
     const [inventoryTypeFilter, setInventoryTypeFilter] =
         useState<'all' | 'pharmacy' | 'optical' | 'expiring'>('all');
     const [followUpKpis, setFollowUpKpis] = useState({ totalCount: 0, overdueCount: 0, doneCount: 0, completionRate: 0 });
@@ -165,13 +165,11 @@ export default function ReportsPage() {
                         })),
                     );
                 } else if (reportType === 'examinations') {
-                    const [erRes, clinicalRes, surgeryRes] = await Promise.all([
-                        api.get(`/examinations/er?from=${fromDate}&to=${toDate}&limit=200`),
-                        api.get(`/examinations/clinical?from=${fromDate}&to=${toDate}&limit=200`),
+                    const [eyeRes, surgeryRes] = await Promise.all([
+                        api.get(`/eye-examinations?from=${fromDate}&to=${toDate}&limit=200`),
                         api.get(`/surgeries?from=${fromDate}&to=${toDate}&limit=200`),
                     ]);
-                    const erRows = (erRes.data?.data ?? erRes.data) as any[];
-                    const clinicalRowsApi = (clinicalRes.data?.data ?? clinicalRes.data) as any[];
+                    const eyeRows = (eyeRes.data?.data ?? eyeRes.data) as any[];
                     const surgeryRows = (surgeryRes.data?.data ?? surgeryRes.data) as any[];
                     const rows: Array<{
                         id: string;
@@ -183,35 +181,23 @@ export default function ReportsPage() {
                         status: string;
                     }> = [];
 
-                    (Array.isArray(erRows) ? erRows : []).forEach((r: any, idx: number) => {
+                    (Array.isArray(eyeRows) ? eyeRows : []).forEach((r: any, idx: number) => {
                         rows.push({
-                            id: String(r.id ?? `er-${idx}`),
-                            date: r.appointmentDate ? new Date(r.appointmentDate).toLocaleDateString() : '',
-                            patient: r.appointment?.patient?.fullName || 'Unknown',
-                            doctor: r.appointment?.doctor?.user?.fullName || '—',
-                            service: 'ER Examination',
+                            id: String(r.id ?? `eye-${idx}`),
+                            date: r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '',
+                            patient: r.patient?.fullName || 'Unknown',
+                            doctor: r.doctor?.user?.fullName || '—',
+                            service: 'Eye Examination',
                             amount: '$0.00',
-                            status: r.appointment?.status || '—',
-                        });
-                    });
-
-                    (Array.isArray(clinicalRowsApi) ? clinicalRowsApi : []).forEach((r: any, idx: number) => {
-                        rows.push({
-                            id: String(r.id ?? `cl-${idx}`),
-                            date: r.appointmentDate ? new Date(r.appointmentDate).toLocaleDateString() : '',
-                            patient: r.appointment?.patient?.fullName || 'Unknown',
-                            doctor: r.appointment?.doctor?.user?.fullName || '—',
-                            service: 'Clinical Examination',
-                            amount: '$0.00',
-                            status: r.appointment?.status || '—',
+                            status: r.diagnosis || r.branch?.branchName || '—',
                         });
                     });
 
                     (Array.isArray(surgeryRows) ? surgeryRows : []).forEach((r: any, idx: number) => {
                         rows.push({
                             id: String(r.id ?? `sx-${idx}`),
-                            date: r.surgeryDate ? new Date(r.surgeryDate).toLocaleDateString() : '',
-                            patient: r.appointment?.patient?.fullName || 'Unknown',
+                            date: r.date ? new Date(r.date).toLocaleDateString() : '',
+                            patient: r.patient?.fullName || r.appointment?.patient?.fullName || 'Unknown',
                             doctor: r.surgeon?.user?.fullName || '—',
                             service: r.surgeryType || 'Surgery',
                             amount: `$${toNum(r.cost).toFixed(2)}`,
@@ -599,18 +585,16 @@ export default function ReportsPage() {
                     y += 5.5;
                 }
             } else if (reportType === 'examinations') {
-                let y = drawHeader(doc, 'Examinations Report', `${from} to ${to}`);
-                const [erRes, clinicalRes, surgeryRes] = await Promise.all([
-                    api.get(`/examinations/er?from=${from}&to=${to}&limit=2000`),
-                    api.get(`/examinations/clinical?from=${from}&to=${to}&limit=2000`),
+                let y = drawHeader(doc, 'Eye Examinations Report', `${from} to ${to}`);
+                const [eyeRes, surgeryRes] = await Promise.all([
+                    api.get(`/eye-examinations?from=${from}&to=${to}&limit=2000`),
                     api.get(`/surgeries?from=${from}&to=${to}&limit=2000`),
                 ]);
-                const erData = (erRes.data?.data ?? erRes.data) as any[];
-                const clinicalData = (clinicalRes.data?.data ?? clinicalRes.data) as any[];
+                const eyeData = (eyeRes.data?.data ?? eyeRes.data) as any[];
                 const surgeryData = (surgeryRes.data?.data ?? surgeryRes.data) as any[];
 
                 doc.text(
-                    `ER: ${erData.length} · Clinical: ${clinicalData.length} · Surgeries: ${surgeryData.length}`,
+                    `Eye exams: ${eyeData.length} · Surgeries: ${surgeryData.length}`,
                     14,
                     y - 2,
                 );
@@ -631,7 +615,7 @@ export default function ReportsPage() {
                 const pushRows = (rows: any[], typeLabel: string) => {
                     for (const row of rows) {
                         y = checkPage(doc, y);
-                        const date = row.appointmentDate || row.surgeryDate || row.createdAt;
+                        const date = row.appointmentDate || row.date || row.createdAt;
                         const dStr = date ? new Date(date).toLocaleDateString() : '';
                         const patient = row.appointment?.patient?.fullName || row.patient?.fullName || '';
                         const doctor =
@@ -650,8 +634,7 @@ export default function ReportsPage() {
                     }
                 };
 
-                pushRows(erData, 'ER Exam');
-                pushRows(clinicalData, 'Clinical');
+                pushRows(eyeData, 'Eye Exam');
                 pushRows(surgeryData, 'Surgery');
             } else if (reportType === 'follow-ups') {
                 let y = drawHeader(doc, 'Follow-ups Report', from && to ? `${from} to ${to}` : 'All time');
@@ -1047,7 +1030,7 @@ export default function ReportsPage() {
                             {reportType === 'billing'
                                 ? 'Billing Report'
                                 : reportType === 'examinations'
-                                ? 'Examinations Report'
+                                ? 'Eye Examinations Report'
                                 : reportType === 'patients'
                                 ? 'Patients Report'
                                 : reportType === 'inventory'
@@ -1064,7 +1047,7 @@ export default function ReportsPage() {
                             {reportType === 'daily-summary' &&
                                 'Appointments in the selected date range (same as Appointments) for quick overview.'}
                             {reportType === 'examinations' &&
-                                'ER examinations, clinical examinations and surgeries combined in one list.'}
+                                'Eye examinations and surgeries combined in one list.'}
                             {reportType === 'patients' &&
                                 'Registered patients with contact details and dates.'}
                             {reportType === 'inventory' &&
@@ -1121,19 +1104,14 @@ export default function ReportsPage() {
                         {reportType === 'examinations' && (
                             <Select
                                 value={examTypeFilter}
-                                onValueChange={(v) =>
-                                    setExamTypeFilter(
-                                        v as 'all' | 'ER Examination' | 'Clinical Examination' | 'Surgery',
-                                    )
-                                }
+                                onValueChange={(v) => setExamTypeFilter(v as 'all' | 'Eye Examination' | 'Surgery')}
                             >
                                 <SelectTrigger className="h-8 w-[150px] rounded-lg text-xs">
                                     <SelectValue placeholder="All Types" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Types</SelectItem>
-                                    <SelectItem value="ER Examination">ER Examination</SelectItem>
-                                    <SelectItem value="Clinical Examination">Clinical Examination</SelectItem>
+                                    <SelectItem value="Eye Examination">Eye Examination</SelectItem>
                                     <SelectItem value="Surgery">Surgery</SelectItem>
                                 </SelectContent>
                             </Select>

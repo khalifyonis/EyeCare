@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { OpticalShopTabs } from './_components/optical-shop-tabs'
 import { OpticalKpiCard } from './_components/optical-kpi-card'
-import { CircleCheck, Clock3, Package, Search, TriangleAlert, Glasses, ChevronRight } from 'lucide-react'
+import { CircleCheck, Clock3, Package, Search, TriangleAlert, Glasses, ChevronRight, Truck } from 'lucide-react'
 
 type OpticalOrder = {
   id: string
@@ -180,7 +180,7 @@ export default function OpticalShopPage() {
         <OpticalKpiCard title="Pending Orders" value={counts.ordered} icon={Clock3} tone="blue" />
         <OpticalKpiCard title="In Production" value={counts.inProduction} icon={Package} tone="orange" />
         <OpticalKpiCard title="Ready for Pickup" value={counts.qualityCheck} icon={CircleCheck} tone="green" />
-        <OpticalKpiCard title="Delivered" value={backendStats.dispensed} icon={Package} tone="teal" />
+        <OpticalKpiCard title="Delivered" value={backendStats.dispensed} icon={Truck} tone="teal" />
         <OpticalKpiCard title="Low Stock" value={lowStock} icon={TriangleAlert} tone="slate" />
       </div>
 

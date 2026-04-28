@@ -1,0 +1,503 @@
+'use client';
+
+// Medicine prescriptions module (pharmacy medication prescriptions)
+
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import api from '@/lib/axios';
+import { toast } from 'sonner';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { ServerPagination } from '@/components/dashboard/server-pagination';
+import { OpticalKpiCard } from '../../optical-shop/_components/optical-kpi-card';
+import { Search, Plus, MoreVertical, Trash2, FileText, CheckCircle2, Clock3, CalendarDays } from 'lucide-react';
+import { readStoredUser, resolveRoleName } from '@/lib/auth';
+
+type MedicinePrescription = {
+  id: string;
+  itemType: 'PHARMACY' | string;
+  itemId?: string | null;
+  quantity?: number | null;
+  instructions?: string | null;
+  createdAt?: string;
+  appointmentId?: string | null;
+  appointment?: {
+    bookingNumber?: string | null;
+    patient?: { id: string; fullName?: string | null; phone?: string | null } | null;
+  } | null;
+  clinicalExam?: {
+    id: string;
+    diagnosis?: string | null;
+  } | null;
+  eyeExam?: {
+    id: string;
+    diagnosis?: string | null;
+    patient?: { id: string; fullName?: string | null; phone?: string | null } | null;
+  } | null;
+};
+
+type PharmacyItem = {
+  id: string;
+  itemName: string;
+  genericName?: string | null;
+  itemType?: string | null;
+  strength?: string | null;
+};
+
+function formatDate(iso?: string) {
+  if (!iso) return 'N/A';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return 'N/A';
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(d);
+}
+
+function isToday(iso?: string) {
+  if (!iso) return false;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return false;
+  const now = new Date();
+  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+}
+
+function medicineLabel(item?: PharmacyItem | null) {
+  if (!item) return 'Unknown Medicine';
+  return item.genericName || item.itemName;
+}
+
+type ParsedInstruction = {
+  dosage: string;
+  frequency: string;
+  duration: string;
+  eye: string;
+  notes: string;
+};
+
+type DerivedStatus = 'ACTIVE' | 'COMPLETED';
+
+function cleanValue(value?: string | null) {
+  const text = (value || '').trim();
+  if (!text || text.toLowerCase() === 'n/a') return '—';
+  return text;
+}
+
+function extractInstructionField(pattern: RegExp, raw: string) {
+  const match = raw.match(pattern);
+  return cleanValue(match?.[1] || '');
+}
+
+function parseInstruction(raw?: string | null, fallbackStrength?: string | null): ParsedInstruction {
+  const text = (raw || '').trim();
+
+  if (!text) {
+    return {
+      dosage: cleanValue(fallbackStrength),
+      frequency: '—',
+      duration: '—',
+      eye: '—',
+      notes: '—',
+    };
+  }
+
+  const dosage = extractInstructionField(/(?:^|\||;)\s*Dosage\s*[:=-]\s*([^|;]+)/i, text);
+  const frequency = extractInstructionField(/(?:^|\||;)\s*Frequency\s*[:=-]\s*([^|;]+)/i, text);
+  const duration = extractInstructionField(/(?:^|\||;)\s*Duration\s*[:=-]\s*([^|;]+)/i, text);
+  const eye = extractInstructionField(/(?:^|\||;)\s*Eye\s*[:=-]\s*([^|;]+)/i, text);
+  const notes = extractInstructionField(/(?:^|\||;)\s*(?:Notes?|Instructions?)\s*[:=-]\s*(.+)$/i, text);
+
+  const inferredFrequency = cleanValue(text.match(/(once daily|twice daily|thrice daily|daily|every\s+\d+\s*hours?|bid|tid|qid)/i)?.[1] || '');
+  const inferredDuration = cleanValue(text.match(/(\d+\s*(?:day|days|week|weeks|month|months))/i)?.[1] || '');
+  const inferredEye = cleanValue(text.match(/\b(OD|OS|OU|right eye|left eye|both eyes?)\b/i)?.[1] || '');
+
+  return {
+    dosage: dosage !== '—' ? dosage : cleanValue(fallbackStrength),
+    frequency: frequency !== '—' ? frequency : inferredFrequency,
+    duration: duration !== '—' ? duration : inferredDuration,
+    eye: eye !== '—' ? eye.toUpperCase() : inferredEye.toUpperCase() || '—',
+    notes,
+  };
+}
+
+function parseDurationDays(durationText: string): number | null {
+  const text = durationText.trim().toLowerCase();
+  if (!text || text === '—') return null;
+
+  const match = text.match(/(\d+)\s*(day|days|week|weeks|month|months)/i);
+  if (!match) return null;
+
+  const amount = Number(match[1]);
+  if (!Number.isFinite(amount) || amount <= 0) return null;
+
+  const unit = match[2].toLowerCase();
+  if (unit.startsWith('day')) return amount;
+  if (unit.startsWith('week')) return amount * 7;
+  if (unit.startsWith('month')) return amount * 30;
+  return null;
+}
+
+export default function MedicinePrescriptionsPage() {
+  const role = useMemo(() => resolveRoleName(readStoredUser()), []);
+  const canManage = useMemo(() => ['ADMIN', 'SUPERADMIN', 'DOCTOR', 'PHARMACIST'].includes(role), [role]);
+
+  const [rows, setRows] = useState<MedicinePrescription[]>([]);
+  const [items, setItems] = useState<PharmacyItem[]>([]);
+  const [itemMap, setItemMap] = useState<Record<string, PharmacyItem>>({});
+
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [date, setDate] = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+
+  const fetchRows = useCallback(async (searchTerm = '', dateTerm = '') => {
+    setLoading(true);
+    try {
+      const params: Record<string, string> = {};
+      if (searchTerm.trim()) params.search = searchTerm.trim();
+      if (dateTerm) params.date = dateTerm;
+      const res = await api.get('/prescription-items', { params });
+      setRows(Array.isArray(res.data) ? (res.data as MedicinePrescription[]) : []);
+    } catch {
+      toast.error('Failed to load medicine prescriptions');
+      setRows([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchItems = useCallback(async () => {
+    try {
+      const res = await api.get('/inventory/pharmacy', { params: { page: 1, limit: 1000 } });
+      const body = res.data as { data?: PharmacyItem[] } | PharmacyItem[];
+      const list = Array.isArray(body) ? body : Array.isArray(body?.data) ? body.data : [];
+      setItems(list);
+      const map: Record<string, PharmacyItem> = {};
+      for (const item of list) {
+        map[item.id] = item;
+      }
+      setItemMap(map);
+    } catch {
+      setItems([]);
+      setItemMap({});
+    }
+  }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      void fetchRows(search, date);
+    }, 250);
+    return () => clearTimeout(t);
+  }, [search, date, fetchRows]);
+
+  useEffect(() => {
+    void fetchItems();
+  }, [fetchItems]);
+
+  const handleDelete = useCallback(async (id: string) => {
+    if (!confirm('Delete this medicine prescription?')) return;
+    try {
+      await api.delete(`/prescription-items/${id}`);
+      toast.success('Medicine prescription deleted');
+      await fetchRows(search, date);
+    } catch {
+      toast.error('Failed to delete medicine prescription');
+    }
+  }, [fetchRows, search, date]);
+
+  const medicineTypes = useMemo(() => {
+    const values = new Set<string>();
+    for (const item of items) {
+      const t = (item.itemType || '').trim();
+      if (t) values.add(t);
+    }
+    return Array.from(values).sort((a, b) => a.localeCompare(b));
+  }, [items]);
+
+  const normalizedRows = useMemo(() => {
+    return rows.map((row) => {
+      const item = row.itemId ? itemMap[row.itemId] : undefined;
+      const structured = parseInstruction(row.instructions, item?.strength);
+      const hasRequiredFields = [structured.dosage, structured.frequency, structured.duration, structured.eye].every((v) => v !== '—');
+      const durationDays = parseDurationDays(structured.duration);
+
+      let status: DerivedStatus = 'ACTIVE';
+      if (hasRequiredFields && durationDays != null) {
+        const createdAtMs = new Date(row.createdAt || 0).getTime();
+        if (Number.isFinite(createdAtMs) && createdAtMs > 0) {
+          const endAtMs = createdAtMs + durationDays * 24 * 60 * 60 * 1000;
+          status = endAtMs < Date.now() ? 'COMPLETED' : 'ACTIVE';
+        }
+      }
+
+      return {
+        row,
+        item,
+        structured,
+        status,
+        patientId: row.appointment?.patient?.id || row.eyeExam?.patient?.id,
+        patientName: row.appointment?.patient?.fullName || row.eyeExam?.patient?.fullName || 'Unknown',
+      };
+    });
+  }, [rows, itemMap]);
+
+  const filteredRows = useMemo(() => {
+    const byType = typeFilter === 'all'
+      ? normalizedRows
+      : normalizedRows.filter(({ item }) => {
+          const t = (item?.itemType || '').trim();
+          return t === typeFilter;
+        });
+
+    const byStatus = statusFilter === 'all'
+      ? byType
+      : byType.filter(({ status }) => status === statusFilter);
+
+    return [...byStatus].sort((a, b) => {
+      const ad = new Date(a.row.createdAt || 0).getTime();
+      const bd = new Date(b.row.createdAt || 0).getTime();
+      return bd - ad;
+    });
+  }, [normalizedRows, typeFilter, statusFilter]);
+
+  const total = filteredRows.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, date, typeFilter, statusFilter, pageSize]);
+
+  const pagedRows = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filteredRows.slice(start, start + pageSize);
+  }, [filteredRows, page, pageSize]);
+
+  const stats = useMemo(() => {
+    const active = filteredRows.filter(({ status }) => status === 'ACTIVE').length;
+    const completed = filteredRows.filter(({ status }) => status === 'COMPLETED').length;
+    const issuedToday = filteredRows.filter(({ row }) => isToday(row.createdAt)).length;
+    return { active, completed, issuedToday };
+  }, [filteredRows]);
+
+  const statCards = useMemo(() => ([
+    { title: 'Total Prescriptions', value: total, icon: FileText, tone: 'blue' as const },
+    { title: 'Active', value: stats.active, icon: Clock3, tone: 'emerald' as const },
+    { title: 'Completed', value: stats.completed, icon: CheckCircle2, tone: 'blue' as const },
+    { title: 'Issued', value: stats.issuedToday, icon: CalendarDays, tone: 'rose' as const },
+  ]), [total, stats]);
+
+  const content = useMemo(() => {
+    if (loading) {
+      return (
+        <TableRow>
+          <TableCell colSpan={9} className="h-24 text-center text-sm text-slate-500">Loading medicine prescriptions...</TableCell>
+        </TableRow>
+      );
+    }
+
+    if (pagedRows.length === 0) {
+      return (
+        <TableRow>
+          <TableCell colSpan={9} className="h-24 text-center text-sm text-slate-500">No medicine prescriptions found</TableCell>
+        </TableRow>
+      );
+    }
+
+    return pagedRows.map(({ row, item, structured, patientId, patientName, status }) => {
+      const statusText = status === 'COMPLETED' ? 'completed' : 'active';
+      return (
+      <TableRow key={row.id} className="border-slate-100 dark:border-slate-800 hover:bg-slate-50/70 dark:hover:bg-slate-900/40">
+        <TableCell className="px-4 py-3">
+          {patientId ? (
+            <Link href={`/dashboard/patients?view=${patientId}`} className="text-sm font-normal text-slate-900 hover:text-[#0284C7] dark:text-slate-100">
+              {patientName}
+            </Link>
+          ) : (
+            <span className="text-sm text-slate-500">Unknown</span>
+          )}
+        </TableCell>
+        <TableCell className="px-4 py-3">
+          <div className="text-sm font-normal text-slate-900 dark:text-slate-100">{medicineLabel(item)}</div>
+          <div className="text-xs text-slate-500">{item?.strength || item?.itemType || 'General'}</div>
+        </TableCell>
+        <TableCell className="px-4 py-3 text-sm font-normal text-slate-700 dark:text-slate-200">{structured.dosage}</TableCell>
+        <TableCell className="px-4 py-3 text-sm font-normal text-slate-700 dark:text-slate-200">{structured.frequency}</TableCell>
+        <TableCell className="px-4 py-3 text-sm font-normal text-slate-700 dark:text-slate-200">{structured.duration}</TableCell>
+        <TableCell className="px-4 py-3 text-sm font-normal text-slate-700 dark:text-slate-200">{structured.eye}</TableCell>
+        <TableCell className="px-4 py-3">
+            <span className={`inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ${
+            status === 'ACTIVE'
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+              : 'border-blue-200 bg-blue-50 text-blue-700'
+          }`}>
+            {statusText}
+          </span>
+        </TableCell>
+        <TableCell className="px-4 py-3 text-sm font-normal text-slate-700 dark:text-slate-200">{row.quantity ?? 0}</TableCell>
+        <TableCell className="px-4 py-3 text-right">
+          {canManage ? (
+            <div className="flex items-center justify-end gap-2">
+              {patientId ? (
+                <Link href={`/dashboard/prescription/medicine/${row.id}`} className="text-sm font-normal text-[#0EA5E9] hover:text-[#0c96d4] hover:underline transition-all">
+                  View
+                </Link>
+              ) : (
+                <span className="text-sm font-normal text-slate-400">View</span>
+              )}
+
+              <Link href={`/dashboard/prescription/medicine/${row.id}/edit`} className="text-sm font-normal text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 transition-all hover:underline">
+                Edit
+              </Link>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-36">
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => void handleDelete(row.id)} className="gap-2 text-[12px]">
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          ) : (
+            row.id ? (
+              <Link href={`/dashboard/prescription/medicine/${row.id}`} className="text-sm font-normal text-[#0EA5E9] hover:text-[#0c96d4] hover:underline transition-all">
+                View
+              </Link>
+            ) : (
+              <span className="text-xs text-slate-400">—</span>
+            )
+          )}
+        </TableCell>
+      </TableRow>
+    );
+    });
+  }, [loading, pagedRows, canManage, handleDelete]);
+
+  return (
+    <div className="w-full min-w-0 p-4 sm:p-5 md:p-6 lg:p-8 space-y-6 animate-in fade-in duration-300">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Medicine Prescriptions</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Manage medicine prescriptions with clear treatment details</p>
+        </div>
+        {canManage && (
+          <Button asChild className="bg-[#0EA5E9] hover:bg-[#0284C7] text-white h-10 rounded-lg px-5">
+            <Link href="/dashboard/prescription/medicine/new">
+              <Plus className="h-4 w-4" />
+              New Medicine Prescription
+            </Link>
+          </Button>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative w-full sm:max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by patient, medicine..."
+            className="h-10 pl-9 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50"
+          />
+        </div>
+
+        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+          <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <SelectTrigger className="h-10 w-full sm:w-[160px] border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+              <SelectValue placeholder="All types" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All types</SelectItem>
+              {medicineTypes.map((type) => (
+                <SelectItem key={type} value={type}>{type}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="h-10 w-full sm:w-[160px] border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+              <SelectValue placeholder="All status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All status</SelectItem>
+              <SelectItem value="ACTIVE">Active</SelectItem>
+              <SelectItem value="COMPLETED">Completed</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="h-10 w-full sm:w-[160px] border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {statCards.map(({ title, value, icon, tone }) => (
+          <OpticalKpiCard key={title} title={title} value={value} icon={icon} tone={tone} />
+        ))}
+      </div>
+
+      <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+        <Table className="min-w-[1080px]">
+          <TableHeader>
+            <TableRow className="bg-slate-50/80 dark:bg-slate-900/80 hover:bg-slate-50/80 dark:hover:bg-slate-900/80 border-slate-200 dark:border-slate-800">
+              <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">PATIENT</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">MEDICINE</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">DOSAGE</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">FREQUENCY</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">DURATION</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">EYE</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">STATUS</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">QTY</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 text-right whitespace-nowrap">ACTIONS</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>{content}</TableBody>
+        </Table>
+        </div>
+      </div>
+
+      <div className="mt-3">
+        <ServerPagination
+          page={page}
+          limit={pageSize}
+          total={total}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          onLimitChange={(limit) => {
+            setPageSize(limit);
+            setPage(1);
+          }}
+          disabled={loading}
+          itemLabel="prescriptions"
+        />
+      </div>
+    </div>
+  );
+}

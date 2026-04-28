@@ -15,7 +15,14 @@ export const listPharmacyItems = async (req, res, next) => {
 
         const whereClause = {
             ...branchFilter,
-            ...(category ? { category: { contains: category, mode: 'insensitive' } } : {}),
+            ...(category
+                ? {
+                    OR: [
+                        { itemType: { contains: category, mode: 'insensitive' } },
+                        { category: { contains: category, mode: 'insensitive' } },
+                    ],
+                }
+                : {}),
             ...(search ? {
                 OR: [
                     { itemName: { contains: search, mode: 'insensitive' } },

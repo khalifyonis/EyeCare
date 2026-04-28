@@ -34,15 +34,16 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ServerPagination } from '@/components/dashboard/server-pagination';
-import { Checkbox } from '@/components/ui/checkbox';
 
 interface Exam {
   id: string;
+  examId?: string;
   chiefComplaint?: string | null;
   vaBcvaOD?: string | null;
   vaBcvaOS?: string | null;
   iopOD?: number | null;
   iopOS?: number | null;
+  amount?: number | string | null;
   createdAt?: string | null;
   patient?: { id: string; fullName?: string | null; patientNumber?: string | null } | null;
   doctor?: { user?: { fullName?: string | null } | null } | null;
@@ -78,6 +79,13 @@ function formatDoctorName(raw: string | null | undefined): string {
   return `Dr. ${value}`;
 }
 
+function resolveExamId(exam: Exam): string {
+  const primary = typeof exam.id === 'string' ? exam.id.trim() : '';
+  if (primary) return primary;
+  const fallback = typeof exam.examId === 'string' ? exam.examId.trim() : '';
+  return fallback;
+}
+
 export default function EyeExaminationsPage() {
   const router = useRouter();
   const [exams, setExams] = useState<Exam[]>([]);
@@ -90,24 +98,6 @@ export default function EyeExaminationsPage() {
   const [pageSize, setPageSize] = useState(20);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-
-  const [selected, setSelected] = useState<Record<string, boolean>>({});
-
-  const pageIds = exams.map((e) => e.id);
-  const allSelected = pageIds.length > 0 && pageIds.every((examId) => selected[examId]);
-  const someSelected = pageIds.some((examId) => selected[examId]) && !allSelected;
-
-  const toggleAll = (checked: boolean) => {
-    setSelected((prev) => {
-      const next = { ...prev };
-      for (const examId of pageIds) next[examId] = checked;
-      return next;
-    });
-  };
-
-  const toggleOne = (id: string, checked: boolean) => {
-    setSelected((prev) => ({ ...prev, [id]: checked }));
-  };
 
   const fetchStats = useCallback(async () => {
     try {
@@ -152,10 +142,6 @@ export default function EyeExaminationsPage() {
     setPage(1);
   }, [search, dateFilter, pageSize]);
 
-  useEffect(() => {
-    setSelected({});
-  }, [page, pageSize, search, dateFilter]);
-
   const handleDelete = async (id: string) => {
     const ok = window.confirm('Delete this examination? This cannot be undone.');
     if (!ok) return;
@@ -183,9 +169,9 @@ export default function EyeExaminationsPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <div className="border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-[#0f172a] px-6 py-4">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Eye Examinations</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Manage comprehensive eye examination records</p>
+      <div className="border-b border-slate-100 px-6 py-5 dark:border-slate-800">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Eye Examinations</h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Manage comprehensive eye examination records</p>
       </div>
 
       <div className="p-6 space-y-6">
@@ -201,7 +187,7 @@ export default function EyeExaminationsPage() {
           ))}
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
@@ -211,31 +197,21 @@ export default function EyeExaminationsPage() {
               className="pl-9 bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800"
             />
           </div>
-          <Input type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className="w-full sm:w-40 bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800" />
-          <Link href="/dashboard/eye-examinations/new">
-            <Button className="bg-[#0EA5E9] hover:bg-[#0284C7] text-white w-full sm:w-auto">
-              <Plus className="h-4 w-4 mr-2" />
+          <Input type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className="w-full lg:w-44 bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800" />
+          <Link href="/dashboard/eye-examinations/new" className="w-full lg:w-auto">
+            <Button className="w-full bg-[#0EA5E9] text-white hover:bg-[#0284C7] lg:w-auto">
+              <Plus className="mr-2 h-4 w-4" />
               New Eye Exam
             </Button>
           </Link>
         </div>
 
         <div>
-          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <Table>
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <Table className="table-fixed">
                 <TableHeader>
                   <TableRow className="bg-slate-50/80 dark:bg-slate-900/80 hover:bg-slate-50/80 dark:hover:bg-slate-900/80 border-slate-200 dark:border-slate-800">
-                    <TableHead className="w-10 px-3 py-3">
-                      <Checkbox
-                        aria-label="Select all"
-                        checked={allSelected}
-                        indeterminate={someSelected}
-                        onChange={(e) => toggleAll(e.target.checked)}
-                        className="dark:border-slate-700"
-                      />
-                    </TableHead>
-                    {['PATIENT & ID', 'CHIEF COMPLAINT', 'VA (BCVA)', 'IOP', 'DATE', 'EXAMINER', 'ACTIONS'].map((head) => (
+                    {['PATIENT & ID', 'CHIEF COMPLAINT', 'VA (BCVA)', 'IOP', 'AMOUNT', 'DATE / EXAMINER', 'ACTIONS'].map((head) => (
                       <TableHead key={head} className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">
                         {head}
                       </TableHead>
@@ -245,7 +221,7 @@ export default function EyeExaminationsPage() {
                 <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="py-16 text-center">
+                      <TableCell colSpan={7} className="py-16 text-center">
                         <div className="inline-flex items-center gap-2 text-slate-500">
                           <Loader2 className="h-5 w-5 animate-spin" /> Loading examinations...
                         </div>
@@ -253,25 +229,17 @@ export default function EyeExaminationsPage() {
                     </TableRow>
                   ) : exams.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="py-16 text-center text-slate-500">
+                      <TableCell colSpan={7} className="py-16 text-center text-slate-500">
                         No examinations found.
                       </TableCell>
                     </TableRow>
                   ) : (
                     exams.map((e) => {
+                      const examId = resolveExamId(e);
                       const patientLabel = e.patient?.patientNumber ?? e.patient?.id ?? '—';
                       const patientName = e.patient?.fullName?.trim() || 'Unknown Patient';
                       return (
-                        <TableRow key={e.id} className="border-slate-100 dark:border-slate-800/60 hover:bg-slate-50/40 dark:hover:bg-slate-800/40">
-                          <TableCell className="w-10 px-3 py-3 align-middle">
-                            <Checkbox
-                              aria-label={`Select exam ${e.id}`}
-                              checked={!!selected[e.id]}
-                              onChange={(ev) => toggleOne(e.id, (ev.target as HTMLInputElement).checked)}
-                              className="dark:border-slate-700"
-                            />
-                          </TableCell>
-
+                        <TableRow key={examId || `${patientName}-${formatDate(e.createdAt)}`} className="border-slate-100 dark:border-slate-800/60 hover:bg-slate-50/40 dark:hover:bg-slate-800/40">
                           <TableCell className="px-4 py-3">
                             <div className="min-w-[180px]">
                               <p className="text-sm font-semibold text-slate-900 dark:text-slate-200 truncate">{patientName}</p>
@@ -280,7 +248,7 @@ export default function EyeExaminationsPage() {
                           </TableCell>
 
                           <TableCell className="px-4 py-3">
-                            <p className="min-w-[180px] text-sm text-slate-700 dark:text-slate-300 truncate">{e.chiefComplaint ?? '—'}</p>
+                            <p className="min-w-0 text-sm text-slate-700 dark:text-slate-300 truncate">{e.chiefComplaint ?? '—'}</p>
                           </TableCell>
 
                           <TableCell className="px-4 py-3 text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap">
@@ -291,12 +259,17 @@ export default function EyeExaminationsPage() {
                             OD {e.iopOD ?? '—'} | OS {e.iopOS ?? '—'}
                           </TableCell>
 
-                          <TableCell className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-200 whitespace-nowrap">
-                            {formatDate(e.createdAt)}
+                          <TableCell className="px-4 py-3 text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                            <span className="font-semibold text-slate-900 dark:text-slate-200 tabular-nums">
+                                ${Number(e.amount || 0).toFixed(2)}
+                            </span>
                           </TableCell>
 
                           <TableCell className="px-4 py-3 text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap">
-                            {formatDoctorName(e.doctor?.user?.fullName)}
+                            <div className="space-y-1">
+                              <p>{formatDate(e.createdAt)}</p>
+                              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{formatDoctorName(e.doctor?.user?.fullName)}</p>
+                            </div>
                           </TableCell>
 
                           <TableCell className="px-4 py-3">
@@ -304,7 +277,11 @@ export default function EyeExaminationsPage() {
                               <button
                                 className="rounded-md px-2 py-1 text-sm font-medium text-sky-600 hover:bg-sky-50 hover:text-sky-700"
                                 onClick={() => {
-                                  router.push(`/dashboard/eye-examinations/${e.id}`);
+                                  if (!examId) {
+                                    toast.error('Invalid examination record');
+                                    return;
+                                  }
+                                  router.push(`/dashboard/eye-examinations/${examId}`);
                                 }}
                               >
                                 View
@@ -312,7 +289,11 @@ export default function EyeExaminationsPage() {
                               <button
                                 className="rounded-md px-2 py-1 text-sm font-medium text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
                                 onClick={() => {
-                                  router.push(`/dashboard/eye-examinations/${e.id}/edit`);
+                                  if (!examId) {
+                                    toast.error('Cannot edit: examination id is missing');
+                                    return;
+                                  }
+                                  router.push(`/dashboard/eye-examinations/${examId}/edit`);
                                 }}
                               >
                                 Edit
@@ -325,21 +306,27 @@ export default function EyeExaminationsPage() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem asChild>
-                                    <Link href={`/dashboard/eye-examinations/${e.id}`}>View Details</Link>
+                                    <Link href={examId ? `/dashboard/eye-examinations/${examId}` : '/dashboard/eye-examinations'}>View Details</Link>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem asChild>
-                                    <Link href={`/dashboard/eye-examinations/${e.id}/edit`} className="flex items-center gap-2">
+                                    <Link href={examId ? `/dashboard/eye-examinations/${examId}/edit` : '/dashboard/eye-examinations'} className="flex items-center gap-2">
                                       <Pencil className="h-4 w-4" />
                                       Edit Examination
                                     </Link>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     className="text-red-600 focus:text-red-700"
-                                    onClick={() => void handleDelete(e.id)}
-                                    disabled={deletingId === e.id}
+                                    onClick={() => {
+                                      if (!examId) {
+                                        toast.error('Cannot delete: examination id is missing');
+                                        return;
+                                      }
+                                      void handleDelete(examId);
+                                    }}
+                                    disabled={!examId || deletingId === examId}
                                   >
                                     <Trash2 className="mr-2 h-4 w-4" />
-                                    {deletingId === e.id ? 'Deleting...' : 'Delete'}
+                                    {deletingId === examId ? 'Deleting...' : 'Delete'}
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -351,7 +338,6 @@ export default function EyeExaminationsPage() {
                   )}
                 </TableBody>
               </Table>
-            </div>
           </div>
 
           <div className="mt-3 overflow-hidden">

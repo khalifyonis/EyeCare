@@ -140,7 +140,7 @@ export default function PharmacyDashboardPage() {
           <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50">Pharmacy</h1>
           <p className="mt-1 text-xl text-slate-600 dark:text-slate-400">Sales and inventory management</p>
         </div>
-        <Button asChild className="h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 px-6 text-base font-semibold">
+        <Button asChild className="h-11 rounded-xl bg-[#0EA5E9] hover:bg-[#0c96d4] px-6 text-base font-semibold">
           <Link href="/dashboard/pharmacy/sales/new">+ New Sale</Link>
         </Button>
       </div>

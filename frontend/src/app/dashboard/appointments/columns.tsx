@@ -71,7 +71,7 @@ export const getAppointmentColumns = ({
 
 			const fullName = patient.fullName || 'Unknown';
 			return (
-				<Link href={`/dashboard/patients/${patient.id}`} className="flex items-center gap-3 group">
+				<Link href={`/dashboard/patients?view=${patient.id}`} className="flex items-center gap-3 group">
 					<div className="flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
 						{fullName.charAt(0).toUpperCase()}
 					</div>

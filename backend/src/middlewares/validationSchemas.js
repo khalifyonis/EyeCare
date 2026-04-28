@@ -148,57 +148,6 @@ export const updateAppointmentSchema = Joi.object({
     status: Joi.string().valid('PENDING', 'SCHEDULED', 'CONFIRMED', 'COMPLETED', 'CANCELLED').optional()
 });
 
-// ── Examination Schemas ──
-export const erExaminationSchema = Joi.object({
-    appointmentId: Joi.string().uuid().required(),
-    vaRight: Joi.string().allow('', null).optional(),
-    vaLeft: Joi.string().allow('', null).optional(),
-    phRight: Joi.string().allow('', null).optional(),
-    phLeft: Joi.string().allow('', null).optional(),
-    iopRight: Joi.number().optional(),
-    iopLeft: Joi.number().optional(),
-    notes: Joi.string().allow('', null).optional()
-}).options({ stripUnknown: true });
-
-export const clinicalExaminationSchema = Joi.object({
-    appointmentId: Joi.string().uuid().required(),
-    sphRight: Joi.number().optional(),
-    cylRight: Joi.number().optional(),
-    axisRight: Joi.number().integer().min(0).max(180).optional(),
-    sphLeft: Joi.number().optional(),
-    cylLeft: Joi.number().optional(),
-    axisLeft: Joi.number().integer().min(0).max(180).optional(),
-    diagnosis: Joi.string().allow('', null).optional(),
-    managementPlan: Joi.string().allow('', null).optional(),
-    nextReviewDate: Joi.date().iso().allow('', null).optional(),
-    nextReviewReason: Joi.string().allow('', null).optional(),
-    examinedById: Joi.string().uuid().allow('', null).optional()
-}).options({ stripUnknown: true });
-
-export const updateERExaminationSchema = Joi.object({
-    vaRight: Joi.string().allow('', null).optional(),
-    vaLeft: Joi.string().allow('', null).optional(),
-    phRight: Joi.string().allow('', null).optional(),
-    phLeft: Joi.string().allow('', null).optional(),
-    iopRight: Joi.number().optional(),
-    iopLeft: Joi.number().optional(),
-    notes: Joi.string().allow('', null).optional()
-}).min(1).options({ stripUnknown: true });
-
-export const updateClinicalExaminationSchema = Joi.object({
-    sphRight: Joi.number().optional(),
-    cylRight: Joi.number().optional(),
-    axisRight: Joi.number().integer().min(0).max(180).optional(),
-    sphLeft: Joi.number().optional(),
-    cylLeft: Joi.number().optional(),
-    axisLeft: Joi.number().integer().min(0).max(180).optional(),
-    diagnosis: Joi.string().allow('', null).optional(),
-    managementPlan: Joi.string().allow('', null).optional(),
-    nextReviewDate: Joi.date().iso().allow('', null).optional(),
-    nextReviewReason: Joi.string().allow('', null).optional(),
-    examinedById: Joi.string().uuid().optional()
-}).min(1).options({ stripUnknown: true });
-
 // ── Eye Examination Schemas ──
 export const createEyeExaminationSchema = Joi.object({
     branchId: Joi.string().uuid().allow('', null).optional(),
@@ -275,32 +224,43 @@ export const updateEyeExaminationSchema = Joi.object({
 
 // ── Surgery Schemas ──
 export const createSurgerySchema = Joi.object({
-    examId: Joi.string().uuid().required(),
+    examId: Joi.string().uuid().allow('', null).optional(),
     branchId: Joi.string().uuid().allow('', null).optional(),
-    eyeSide: Joi.string().valid('RIGHT', 'LEFT', 'BOTH').required(),
+    patientId: Joi.string().uuid().required(),
+    eye: Joi.string().valid('OD', 'OS', 'BOTH', 'RIGHT', 'LEFT').required(),
     surgeryType: Joi.string().min(2).max(200).required(),
-    surgeryDate: Joi.date().iso().required().messages({
+    procedure: Joi.string().allow('', null).optional(),
+    anesthesiaType: Joi.string().allow('', null).optional(),
+    date: Joi.date().iso().required().messages({
         'date.iso': 'Invalid date'
     }),
-    cost: Joi.number().min(0).required().messages({
+    time: Joi.string().allow('', null).optional(),
+    operatingRoom: Joi.string().allow('', null).optional(),
+    cataractDetails: Joi.object().unknown(true).allow(null).optional(),
+    cost: Joi.number().min(0).optional().messages({
         'number.min': 'Invalid cost'
     }),
-    status: Joi.string().valid('PENDING', 'COMPLETED', 'CANCELLED').optional(),
+    status: Joi.string().valid('scheduled', 'completed', 'cancelled', 'pending', 'canceled').optional(),
     notes: Joi.string().allow('', null).optional(),
     nextFollowUpDate: Joi.date().iso().allow('', null).optional(),
     surgeonId: Joi.string().uuid().required(),
 }).options({ stripUnknown: true });
 
 export const updateSurgerySchema = Joi.object({
-    eyeSide: Joi.string().valid('RIGHT', 'LEFT', 'BOTH').optional(),
+    eye: Joi.string().valid('OD', 'OS', 'BOTH', 'RIGHT', 'LEFT').optional(),
     surgeryType: Joi.string().min(2).max(200).optional(),
-    surgeryDate: Joi.date().iso().optional().messages({
+    procedure: Joi.string().allow('', null).optional(),
+    anesthesiaType: Joi.string().allow('', null).optional(),
+    date: Joi.date().iso().optional().messages({
         'date.iso': 'Invalid date'
     }),
+    time: Joi.string().allow('', null).optional(),
+    operatingRoom: Joi.string().allow('', null).optional(),
+    cataractDetails: Joi.object().unknown(true).allow(null).optional(),
     cost: Joi.number().min(0).optional().messages({
         'number.min': 'Invalid cost'
     }),
-    status: Joi.string().valid('PENDING', 'COMPLETED', 'CANCELLED').optional(),
+    status: Joi.string().valid('scheduled', 'completed', 'cancelled', 'pending', 'canceled').optional(),
     notes: Joi.string().allow('', null).optional(),
     nextFollowUpDate: Joi.date().iso().allow('', null).optional(),
     surgeonId: Joi.string().uuid().optional(),
@@ -309,7 +269,7 @@ export const updateSurgerySchema = Joi.object({
 // ── Prescription Schemas ──
 export const createPrescriptionSchema = Joi.object({
     examId: Joi.string().uuid().required(),
-    itemType: Joi.string().valid('PHARMACY', 'OPTICAL').required(),
+    itemType: Joi.string().valid('PHARMACY').required(),
     itemId: Joi.string().allow('', null).optional(),
     quantity: Joi.number().integer().min(1).required().messages({
         'number.base': 'Quantity must be a number',
@@ -322,7 +282,7 @@ export const createPrescriptionSchema = Joi.object({
 
 export const updatePrescriptionSchema = Joi.object({
     examId: Joi.string().uuid().optional(),
-    itemType: Joi.string().valid('PHARMACY', 'OPTICAL').optional(),
+    itemType: Joi.string().valid('PHARMACY').optional(),
     itemId: Joi.string().allow('', null).optional(),
     quantity: Joi.number().integer().min(1).optional().messages({
         'number.base': 'Quantity must be a number',
@@ -349,10 +309,24 @@ export const createBillingSchema = Joi.object({
     }),
     paymentMethod: Joi.string().allow('', null).optional(),
     referenceNumber: Joi.string().allow('', null).optional(),
-    status: Joi.string().valid('PAID', 'UNPAID', 'PARTIAL').optional().default('UNPAID'),
+    status: Joi.string().valid('PAID', 'UNPAID', 'PARTIAL', 'PARTIALLY_PAID', 'DRAFT').optional().default('UNPAID'),
+    dueDate: Joi.date().iso().allow('', null).optional(),
+    notes: Joi.string().allow('', null).optional(),
+    lineItems: Joi.array().items(
+        Joi.object({
+            itemType: Joi.string().valid('PHARMACY', 'OPTICAL', 'APPOINTMENT', 'SURGERY').allow('', null).optional(),
+            itemId: Joi.string().allow('', null).optional(),
+            description: Joi.string().allow('', null).optional(),
+            quantity: Joi.number().integer().min(1).required(),
+            unitPrice: Joi.number().min(0).required(),
+            lineTotal: Joi.number().min(0).optional(),
+        }).options({ stripUnknown: true })
+    ).optional(),
 }).options({ stripUnknown: true });
 
 export const updateBillingSchema = Joi.object({
+    patientId: Joi.string().uuid().optional(),
+    serviceType: Joi.string().valid('APPOINTMENT', 'PHARMACY', 'OPTICAL', 'SURGERY').optional(),
     totalAmount: Joi.number().min(0).optional().messages({
         'number.min': 'Total amount must be 0 or more',
     }),
@@ -361,7 +335,19 @@ export const updateBillingSchema = Joi.object({
     }),
     paymentMethod: Joi.string().allow('', null).optional(),
     referenceNumber: Joi.string().allow('', null).optional(),
-    status: Joi.string().valid('PAID', 'UNPAID', 'PARTIAL').optional(),
+    status: Joi.string().valid('PAID', 'UNPAID', 'PARTIAL', 'PARTIALLY_PAID', 'DRAFT').optional(),
+    dueDate: Joi.date().iso().allow('', null).optional(),
+    notes: Joi.string().allow('', null).optional(),
+    lineItems: Joi.array().items(
+        Joi.object({
+            itemType: Joi.string().valid('PHARMACY', 'OPTICAL', 'APPOINTMENT', 'SURGERY').allow('', null).optional(),
+            itemId: Joi.string().allow('', null).optional(),
+            description: Joi.string().allow('', null).optional(),
+            quantity: Joi.number().integer().min(1).required(),
+            unitPrice: Joi.number().min(0).required(),
+            lineTotal: Joi.number().min(0).optional(),
+        }).options({ stripUnknown: true })
+    ).optional(),
 }).min(1).options({ stripUnknown: true });
 
 // ── Pharmacy Item Schemas ──

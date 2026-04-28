@@ -5,6 +5,7 @@ import api from '@/lib/axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2, Check, ShieldCheck, Eye, EyeOff, Lock, ArrowLeft, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -241,32 +242,26 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
                         <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Branch</label>
                         <div className="grid grid-cols-2 gap-2.5">
                             {branches.map((b) => (
-                                <label
+                                <div
                                     key={b.id}
+                                    onClick={() => {
+                                        const isSelected = formData.branchIds.includes(b.id);
+                                        const newIds = isSelected
+                                            ? formData.branchIds.filter(id => id !== b.id)
+                                            : [...formData.branchIds, b.id];
+                                        setFormData({ ...formData, branchIds: newIds });
+                                    }}
                                     className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg border cursor-pointer transition-all text-sm ${formData.branchIds.includes(b.id)
                                         ? 'bg-[#0EA5E9]/5 border-[#0EA5E9] text-slate-900 dark:text-slate-100'
                                         : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300'
                                         }`}
                                 >
-                                    <div className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-all ${formData.branchIds.includes(b.id)
-                                        ? 'bg-[#0EA5E9] border-[#0EA5E9] text-white'
-                                        : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600'
-                                        }`}>
-                                        {formData.branchIds.includes(b.id) && <Check className="h-3 w-3 stroke-[3]" />}
-                                    </div>
-                                    <input
-                                        type="checkbox"
-                                        className="hidden"
+                                    <Checkbox
                                         checked={formData.branchIds.includes(b.id)}
-                                        onChange={() => {
-                                            const newIds = formData.branchIds.includes(b.id)
-                                                ? formData.branchIds.filter(id => id !== b.id)
-                                                : [...formData.branchIds, b.id];
-                                            setFormData({ ...formData, branchIds: newIds });
-                                        }}
+                                        onChange={() => {}} // Controlled by div onClick
                                     />
                                     <span className="font-medium">{b.branchName}</span>
-                                </label>
+                                </div>
                             ))}
                         </div>
                     </div>

@@ -156,10 +156,14 @@ async function seed() {
 
     // Pharmacy items (so prescriptions can link to real items)
     const pharmaItems = [
-        { itemName: 'Eye Drops (Timolol)',    itemType: 'Drops',   category: 'Glaucoma',       purchasePrice: 3, sellingPrice: 5 },
-        { itemName: 'Lubricant Eye Drops',    itemType: 'Drops',   category: 'Dry Eye',        purchasePrice: 2, sellingPrice: 4 },
-        { itemName: 'Ciprofloxacin Drops',    itemType: 'Drops',   category: 'Antibiotic',     purchasePrice: 4, sellingPrice: 7 },
-        { itemName: 'Prednisolone Acetate',   itemType: 'Drops',   category: 'Anti-inflammatory', purchasePrice: 5, sellingPrice: 9 },
+        { itemName: 'Eye Drops (Timolol)',    itemType: 'Drops',    category: 'Glaucoma',          purchasePrice: 3, sellingPrice: 5 },
+        { itemName: 'Lubricant Eye Drops',    itemType: 'Drops',    category: 'Dry Eye',           purchasePrice: 2, sellingPrice: 4 },
+        { itemName: 'Ciprofloxacin Drops',    itemType: 'Drops',    category: 'Antibiotic',        purchasePrice: 4, sellingPrice: 7 },
+        { itemName: 'Prednisolone Acetate',   itemType: 'Drops',    category: 'Anti-inflammatory', purchasePrice: 5, sellingPrice: 9 },
+        { itemName: 'Erythromycin Ointment',  itemType: 'Ointment', category: 'Antibiotic',        purchasePrice: 3, sellingPrice: 6 },
+        { itemName: 'Acetazolamide 250mg',    itemType: 'Tablet',   category: 'Glaucoma',          purchasePrice: 1, sellingPrice: 3 },
+        { itemName: 'Omega-3 Softgel',        itemType: 'Capsule',  category: 'Dry Eye Support',   purchasePrice: 2, sellingPrice: 5 },
+        { itemName: 'Cetirizine Syrup',       itemType: 'Syrup',    category: 'Allergy',           purchasePrice: 2, sellingPrice: 4 },
     ];
     const createdPharmaItems = [];
     for (const pi of pharmaItems) {
@@ -185,6 +189,73 @@ async function seed() {
         }
     }
     console.log(`${createdPharmaItems.length} pharmacy items ensured.`);
+
+    // Ensure medicine prescriptions include multiple item types (not only Drops)
+    const instructionByType = {
+        Drops: 'Dosage: 1 drop | Frequency: twice daily | Duration: 14 day | Eye: OU | Notes: Continue as advised',
+        Ointment: 'Dosage: thin strip | Frequency: nightly | Duration: 10 day | Eye: OD | Notes: Apply before sleep',
+        Tablet: 'Dosage: 250 mg | Frequency: twice daily | Duration: 7 day | Eye: N/A | Notes: Take after food',
+        Capsule: 'Dosage: 1 capsule | Frequency: daily | Duration: 30 day | Eye: N/A | Notes: Supportive therapy',
+        Syrup: 'Dosage: 10 ml | Frequency: daily | Duration: 5 day | Eye: N/A | Notes: Shake well before use',
+    };
+
+    const representativeItemsByType = new Map();
+    for (const item of createdPharmaItems) {
+        const t = (item.itemType || 'Other').trim();
+        if (!representativeItemsByType.has(t)) {
+            representativeItemsByType.set(t, item);
+        }
+    }
+
+    const completedWithClinical = await prisma.appointment.findMany({
+        where: {
+            branchId: mainBranch.id,
+            status: 'COMPLETED',
+            clinicalExamination: { isNot: null },
+        },
+        include: {
+            clinicalExamination: { select: { id: true } },
+        },
+        orderBy: { appointmentDate: 'desc' },
+        take: 20,
+    });
+
+    const representativeItems = Array.from(representativeItemsByType.values());
+    if (representativeItems.length > 0) {
+        let ensuredMixedRows = 0;
+        for (let i = 0; i < completedWithClinical.length; i++) {
+            const appt = completedWithClinical[i];
+            const examId = appt.clinicalExamination?.id;
+            if (!examId) continue;
+
+            const chosen = representativeItems[i % representativeItems.length];
+            const chosenType = (chosen.itemType || 'Other').trim();
+            const existing = await prisma.prescription.findFirst({
+                where: {
+                    appointmentId: appt.id,
+                    itemType: 'PHARMACY',
+                    itemId: chosen.id,
+                },
+            });
+
+            if (!existing) {
+                await prisma.prescription.create({
+                    data: {
+                        appointmentId: appt.id,
+                        examId,
+                        branchId: mainBranch.id,
+                        itemType: 'PHARMACY',
+                        itemId: chosen.id,
+                        quantity: 1,
+                        instructions: instructionByType[chosenType] || 'Dosage: N/A | Frequency: daily | Duration: 7 day | Eye: N/A',
+                        reviewAfterDays: 14,
+                    },
+                });
+                ensuredMixedRows += 1;
+            }
+        }
+        console.log(`Mixed medicine prescription rows ensured: ${ensuredMixedRows}`);
+    }
 
     // Optical items (eyewear, lenses, solutions)
     const opticalItems = [

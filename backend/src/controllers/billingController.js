@@ -8,6 +8,28 @@ const getBranchFilter = (req) => {
         : { branchId: req.user.branchId };
 };
 
+// Generate INV-YYYYMM-XXXXXX style invoice number
+async function generateInvoiceNumber() {
+    const now = new Date();
+    const yearMonth = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const prefix = `INV-${yearMonth}-`;
+
+    const lastBilling = await prisma.billing.findFirst({
+        where: { invoiceNumber: { startsWith: prefix } },
+        orderBy: { invoiceNumber: 'desc' },
+        select: { invoiceNumber: true }
+    });
+
+    let nextNumber = 1;
+    if (lastBilling?.invoiceNumber) {
+        const parts = lastBilling.invoiceNumber.split('-');
+        const currentNum = parseInt(parts[2], 10);
+        if (!isNaN(currentNum)) nextNumber = currentNum + 1;
+    }
+
+    return `${prefix}${nextNumber.toString().padStart(6, '0')}`;
+}
+
 export const listBillings = async (req, res, next) => {
     try {
         const { search, status = 'all', serviceType = 'all', date, from, to } = req.query;
@@ -30,13 +52,24 @@ export const listBillings = async (req, res, next) => {
             };
         }
 
+        let statusFilterObj = {};
+        if (status === 'OVERDUE') {
+            statusFilterObj = {
+                status: { not: 'PAID' },
+                dueDate: { lt: new Date() }
+            };
+        } else if (status !== 'all') {
+            statusFilterObj = { status };
+        }
+
         const whereClause = {
             ...branchFilter,
-            ...(status !== 'all' ? { status } : {}),
+            ...statusFilterObj,
             ...(serviceType !== 'all' ? { serviceType } : {}),
             ...dateFilter,
             ...(search ? {
                 OR: [
+                    { invoiceNumber: { contains: search, mode: 'insensitive' } },
                     { referenceNumber: { contains: search, mode: 'insensitive' } },
                     { patient: { fullName: { contains: search, mode: 'insensitive' } } },
                     { patient: { phone: { contains: search, mode: 'insensitive' } } },
@@ -76,11 +109,12 @@ export const getBillingStats = async (req, res, next) => {
         const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
         const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 
-        const [total, unpaid, paid, partial, revenueToday] = await Promise.all([
+        const [total, unpaid, paid, partiallyPaid, draft, revenueToday] = await Promise.all([
             prisma.billing.count({ where: branchFilter }),
             prisma.billing.count({ where: { ...branchFilter, status: 'UNPAID' } }),
             prisma.billing.count({ where: { ...branchFilter, status: 'PAID' } }),
-            prisma.billing.count({ where: { ...branchFilter, status: 'PARTIAL' } }),
+            prisma.billing.count({ where: { ...branchFilter, status: 'PARTIALLY_PAID' } }),
+            prisma.billing.count({ where: { ...branchFilter, status: 'DRAFT' } }),
             prisma.billing.aggregate({
                 where: {
                     ...branchFilter,
@@ -95,7 +129,8 @@ export const getBillingStats = async (req, res, next) => {
             total,
             unpaid,
             paid,
-            partial,
+            partiallyPaid,
+            draft,
             revenueToday: revenueToday._sum.finalAmount || 0,
         });
     } catch (error) {
@@ -241,6 +276,8 @@ export const createBilling = async (req, res, next) => {
             paymentMethod,
             referenceNumber,
             status = 'UNPAID',
+            dueDate,
+            notes,
             lineItems,
         } = req.body;
 
@@ -270,6 +307,14 @@ export const createBilling = async (req, res, next) => {
 
         const total = computedTotal;
         const finalAmount = Math.max(0, total - disc);
+        const parsedDueDate = dueDate ? new Date(dueDate) : null;
+        const resolvedDueDate = parsedDueDate && !Number.isNaN(parsedDueDate.getTime())
+            ? parsedDueDate
+            : (() => {
+                const d = new Date();
+                d.setDate(d.getDate() + 30);
+                return d;
+            })();
 
         if (!hasLineItems && (serviceType === 'PHARMACY' || serviceType === 'OPTICAL') && prescriptionId) {
             const prescription = await prisma.prescription.findFirst({
@@ -301,6 +346,9 @@ export const createBilling = async (req, res, next) => {
         }
 
         const billing = await prisma.$transaction(async (tx) => {
+            const invoiceNumber = await generateInvoiceNumber();
+            const normalizedStatus = status === 'PARTIAL' ? 'PARTIALLY_PAID' : status;
+
             const created = await tx.billing.create({
                 data: {
                     patientId,
@@ -313,21 +361,27 @@ export const createBilling = async (req, res, next) => {
                     discount: disc,
                     finalAmount,
                     paymentMethod: paymentMethod || null,
+                    invoiceNumber,
                     referenceNumber: referenceNumber || null,
-                    status: status || 'UNPAID',
+                    status: normalizedStatus || 'UNPAID',
+                    dueDate: resolvedDueDate,
+                    notes: notes || null,
                     createdById: req.user.id,
                 },
             });
 
-            if (hasLineItems && (serviceType === 'PHARMACY' || serviceType === 'OPTICAL')) {
-                for (const li of lineItems) {
-                    const itemType = String(li?.itemType || serviceType);
-                    const itemId = String(li?.itemId || '');
+            if (hasLineItems) {
+                for (let idx = 0; idx < lineItems.length; idx += 1) {
+                    const li = lineItems[idx] || {};
+                    const lineType = String(li?.itemType || serviceType).toUpperCase();
                     const quantity = Number(li?.quantity) || 0;
-                    if (!itemId || quantity <= 0) continue;
+                    if (quantity <= 0) continue;
 
-                    if (itemType === 'PHARMACY') {
-                        const item = await tx.pharmacyItem.findUnique({ where: { id: itemId } });
+                    const rawItemId = li?.itemId ? String(li.itemId).trim() : '';
+                    const manualId = `MANUAL-${idx + 1}`;
+
+                    if (lineType === 'PHARMACY' && rawItemId) {
+                        const item = await tx.pharmacyItem.findUnique({ where: { id: rawItemId } });
                         if (!item) {
                             const err = new Error('Pharmacy item not found');
                             err.statusCode = 400;
@@ -338,37 +392,105 @@ export const createBilling = async (req, res, next) => {
                             err.statusCode = 400;
                             throw err;
                         }
-                        const unit = li?.unitPrice !== undefined && li?.unitPrice !== null && li?.unitPrice !== '' ? Number(li.unitPrice) : Number(item.sellingPrice);
-                        const lineTotal = Math.max(0, quantity * (Number(unit) || 0));
+
+                        const unit = li?.unitPrice !== undefined && li?.unitPrice !== null && li?.unitPrice !== ''
+                            ? Number(li.unitPrice)
+                            : Number(item.sellingPrice);
+                        const safeUnit = Number.isFinite(unit) ? unit : 0;
+                        const lineTotal = Math.max(0, quantity * safeUnit);
 
                         await tx.billingLineItem.create({
                             data: {
                                 billingId: created.id,
                                 itemType: 'PHARMACY',
-                                itemId,
-                                description: item.itemName,
+                                itemId: rawItemId,
+                                description: li?.description || item.itemName,
                                 quantity,
-                                unitPrice: unit,
+                                unitPrice: safeUnit,
                                 lineTotal,
                             },
                         });
 
                         await tx.pharmacyStockTransaction.create({
                             data: {
-                                pharmacyItemId: itemId,
+                                pharmacyItemId: rawItemId,
                                 branchId: activeBranchId,
                                 transactionType: 'OUT',
                                 quantity,
-                                unitPrice: unit,
+                                unitPrice: safeUnit,
                                 billingId: created.id,
                                 performedById: req.user.id,
                             },
                         });
                         await tx.pharmacyItem.update({
-                            where: { id: itemId },
+                            where: { id: rawItemId },
                             data: { stockQuantity: { decrement: quantity } },
                         });
+                        continue;
                     }
+
+                    if (lineType === 'OPTICAL' && rawItemId) {
+                        const item = await tx.opticalItem.findUnique({ where: { id: rawItemId } });
+                        if (!item) {
+                            const err = new Error('Optical item not found');
+                            err.statusCode = 400;
+                            throw err;
+                        }
+                        if (item.stockQuantity < quantity) {
+                            const err = new Error(`Insufficient stock: only ${item.stockQuantity} available`);
+                            err.statusCode = 400;
+                            throw err;
+                        }
+
+                        const unit = li?.unitPrice !== undefined && li?.unitPrice !== null && li?.unitPrice !== ''
+                            ? Number(li.unitPrice)
+                            : Number(item.sellingPrice);
+                        const safeUnit = Number.isFinite(unit) ? unit : 0;
+                        const lineTotal = Math.max(0, quantity * safeUnit);
+
+                        await tx.billingLineItem.create({
+                            data: {
+                                billingId: created.id,
+                                itemType: 'OPTICAL',
+                                itemId: rawItemId,
+                                description: li?.description || item.itemName,
+                                quantity,
+                                unitPrice: safeUnit,
+                                lineTotal,
+                            },
+                        });
+
+                        await tx.opticalStockTransaction.create({
+                            data: {
+                                opticalItemId: rawItemId,
+                                branchId: activeBranchId,
+                                transactionType: 'OUT',
+                                quantity,
+                                unitPrice: safeUnit,
+                                billingId: created.id,
+                                performedById: req.user.id,
+                            },
+                        });
+                        await tx.opticalItem.update({
+                            where: { id: rawItemId },
+                            data: { stockQuantity: { decrement: quantity } },
+                        });
+                        continue;
+                    }
+
+                    const unit = Number(li?.unitPrice) || 0;
+                    const lineTotal = Math.max(0, quantity * unit);
+                    await tx.billingLineItem.create({
+                        data: {
+                            billingId: created.id,
+                            itemType: lineType || serviceType,
+                            itemId: rawItemId || manualId,
+                            description: li?.description || null,
+                            quantity,
+                            unitPrice: unit,
+                            lineTotal,
+                        },
+                    });
                 }
             }
 
@@ -422,43 +544,235 @@ export const createBilling = async (req, res, next) => {
 
 export const updateBilling = async (req, res, next) => {
     try {
-        const existing = await prisma.billing.findUnique({ where: { id: req.params.id } });
+        const existing = await prisma.billing.findUnique({
+            where: { id: req.params.id },
+            include: { lineItems: true },
+        });
         if (!existing) return res.status(404).json({ message: 'Billing not found' });
         if (req.user.role !== 'SUPERADMIN' && existing.branchId !== req.user.branchId) {
             return res.status(403).json({ message: 'Forbidden' });
         }
 
         const {
+            patientId,
+            serviceType,
             totalAmount,
             discount,
             paymentMethod,
             referenceNumber,
             status,
+            dueDate,
+            notes,
+            lineItems,
         } = req.body;
 
-        const data = {};
-        if (totalAmount !== undefined) data.totalAmount = Number(totalAmount);
-        if (discount !== undefined) data.discount = Number(discount);
-        if (paymentMethod !== undefined) data.paymentMethod = paymentMethod || null;
-        if (referenceNumber !== undefined) data.referenceNumber = referenceNumber || null;
-        if (status !== undefined) data.status = status;
-        if (data.totalAmount !== undefined || data.discount !== undefined) {
-            const total = data.totalAmount ?? Number(existing.totalAmount);
-            const disc = data.discount ?? Number(existing.discount);
-            data.finalAmount = Math.max(0, total - disc);
-        }
+        const hasLineItems = Array.isArray(lineItems);
+        const billing = await prisma.$transaction(async (tx) => {
+            const data = {};
+            if (serviceType !== undefined) data.serviceType = serviceType;
+            if (patientId !== undefined) data.patientId = patientId;
+            if (totalAmount !== undefined) data.totalAmount = Number(totalAmount);
+            if (discount !== undefined) data.discount = Number(discount);
+            if (paymentMethod !== undefined) data.paymentMethod = paymentMethod || null;
+            if (referenceNumber !== undefined) data.referenceNumber = referenceNumber || null;
+            if (status !== undefined) data.status = status === 'PARTIAL' ? 'PARTIALLY_PAID' : status;
+            if (dueDate !== undefined) data.dueDate = dueDate ? new Date(dueDate) : null;
+            if (notes !== undefined) data.notes = notes || null;
 
-        const billing = await prisma.billing.update({
-            where: { id: req.params.id },
-            data,
-            include: {
-                patient: { select: { id: true, fullName: true, phone: true } },
-                branch: { select: { id: true, branchName: true } },
-                appointment: { select: { id: true, bookingNumber: true } },
-                surgery: { select: { id: true, surgeryType: true } },
-                prescription: { select: { id: true, itemType: true } },
-                createdBy: { select: { id: true, fullName: true } },
-            },
+            if (hasLineItems) {
+                for (const li of existing.lineItems || []) {
+                    const type = String(li.itemType || '').toUpperCase();
+                    const itemId = String(li.itemId || '');
+                    if (!itemId || itemId.startsWith('MANUAL-')) continue;
+                    if (type === 'PHARMACY') {
+                        const item = await tx.pharmacyItem.findUnique({ where: { id: itemId } });
+                        if (item) {
+                            await tx.pharmacyStockTransaction.create({
+                                data: {
+                                    pharmacyItemId: itemId,
+                                    branchId: existing.branchId,
+                                    transactionType: 'IN',
+                                    quantity: li.quantity,
+                                    unitPrice: 0,
+                                    performedById: req.user.id,
+                                },
+                            });
+                            await tx.pharmacyItem.update({
+                                where: { id: itemId },
+                                data: { stockQuantity: { increment: li.quantity } },
+                            });
+                        }
+                    } else if (type === 'OPTICAL') {
+                        const item = await tx.opticalItem.findUnique({ where: { id: itemId } });
+                        if (item) {
+                            await tx.opticalStockTransaction.create({
+                                data: {
+                                    opticalItemId: itemId,
+                                    branchId: existing.branchId,
+                                    transactionType: 'IN',
+                                    quantity: li.quantity,
+                                    unitPrice: 0,
+                                    performedById: req.user.id,
+                                },
+                            });
+                            await tx.opticalItem.update({
+                                where: { id: itemId },
+                                data: { stockQuantity: { increment: li.quantity } },
+                            });
+                        }
+                    }
+                }
+
+                await tx.billingLineItem.deleteMany({ where: { billingId: existing.id } });
+
+                let computedTotal = 0;
+                for (let idx = 0; idx < lineItems.length; idx += 1) {
+                    const li = lineItems[idx] || {};
+                    const lineType = String(li?.itemType || serviceType || existing.serviceType).toUpperCase();
+                    const quantity = Number(li?.quantity) || 0;
+                    if (quantity <= 0) continue;
+
+                    const rawItemId = li?.itemId ? String(li.itemId).trim() : '';
+                    const manualId = `MANUAL-${idx + 1}`;
+
+                    if (lineType === 'PHARMACY' && rawItemId) {
+                        const item = await tx.pharmacyItem.findUnique({ where: { id: rawItemId } });
+                        if (!item) {
+                            const err = new Error('Pharmacy item not found');
+                            err.statusCode = 400;
+                            throw err;
+                        }
+                        if (item.stockQuantity < quantity) {
+                            const err = new Error(`Insufficient stock: only ${item.stockQuantity} available`);
+                            err.statusCode = 400;
+                            throw err;
+                        }
+
+                        const unit = li?.unitPrice !== undefined && li?.unitPrice !== null && li?.unitPrice !== ''
+                            ? Number(li.unitPrice)
+                            : Number(item.sellingPrice);
+                        const safeUnit = Number.isFinite(unit) ? unit : 0;
+                        const lineTotal = Math.max(0, quantity * safeUnit);
+                        computedTotal += lineTotal;
+
+                        await tx.billingLineItem.create({
+                            data: {
+                                billingId: existing.id,
+                                itemType: 'PHARMACY',
+                                itemId: rawItemId,
+                                description: li?.description || item.itemName,
+                                quantity,
+                                unitPrice: safeUnit,
+                                lineTotal,
+                            },
+                        });
+
+                        await tx.pharmacyStockTransaction.create({
+                            data: {
+                                pharmacyItemId: rawItemId,
+                                branchId: existing.branchId,
+                                transactionType: 'OUT',
+                                quantity,
+                                unitPrice: safeUnit,
+                                billingId: existing.id,
+                                performedById: req.user.id,
+                            },
+                        });
+                        await tx.pharmacyItem.update({
+                            where: { id: rawItemId },
+                            data: { stockQuantity: { decrement: quantity } },
+                        });
+                        continue;
+                    }
+
+                    if (lineType === 'OPTICAL' && rawItemId) {
+                        const item = await tx.opticalItem.findUnique({ where: { id: rawItemId } });
+                        if (!item) {
+                            const err = new Error('Optical item not found');
+                            err.statusCode = 400;
+                            throw err;
+                        }
+                        if (item.stockQuantity < quantity) {
+                            const err = new Error(`Insufficient stock: only ${item.stockQuantity} available`);
+                            err.statusCode = 400;
+                            throw err;
+                        }
+
+                        const unit = li?.unitPrice !== undefined && li?.unitPrice !== null && li?.unitPrice !== ''
+                            ? Number(li.unitPrice)
+                            : Number(item.sellingPrice);
+                        const safeUnit = Number.isFinite(unit) ? unit : 0;
+                        const lineTotal = Math.max(0, quantity * safeUnit);
+                        computedTotal += lineTotal;
+
+                        await tx.billingLineItem.create({
+                            data: {
+                                billingId: existing.id,
+                                itemType: 'OPTICAL',
+                                itemId: rawItemId,
+                                description: li?.description || item.itemName,
+                                quantity,
+                                unitPrice: safeUnit,
+                                lineTotal,
+                            },
+                        });
+
+                        await tx.opticalStockTransaction.create({
+                            data: {
+                                opticalItemId: rawItemId,
+                                branchId: existing.branchId,
+                                transactionType: 'OUT',
+                                quantity,
+                                unitPrice: safeUnit,
+                                billingId: existing.id,
+                                performedById: req.user.id,
+                            },
+                        });
+                        await tx.opticalItem.update({
+                            where: { id: rawItemId },
+                            data: { stockQuantity: { decrement: quantity } },
+                        });
+                        continue;
+                    }
+
+                    const unit = Number(li?.unitPrice) || 0;
+                    const lineTotal = Math.max(0, quantity * unit);
+                    computedTotal += lineTotal;
+                    await tx.billingLineItem.create({
+                        data: {
+                            billingId: existing.id,
+                            itemType: lineType || String(serviceType || existing.serviceType),
+                            itemId: rawItemId || manualId,
+                            description: li?.description || null,
+                            quantity,
+                            unitPrice: unit,
+                            lineTotal,
+                        },
+                    });
+                }
+
+                data.totalAmount = computedTotal;
+            }
+
+            if (data.totalAmount !== undefined || data.discount !== undefined) {
+                const total = data.totalAmount ?? Number(existing.totalAmount);
+                const disc = data.discount ?? Number(existing.discount);
+                data.finalAmount = Math.max(0, total - disc);
+            }
+
+            return tx.billing.update({
+                where: { id: req.params.id },
+                data,
+                include: {
+                    patient: { select: { id: true, fullName: true, phone: true } },
+                    branch: { select: { id: true, branchName: true } },
+                    appointment: { select: { id: true, bookingNumber: true } },
+                    surgery: { select: { id: true, surgeryType: true } },
+                    prescription: { select: { id: true, itemType: true } },
+                    lineItems: true,
+                    createdBy: { select: { id: true, fullName: true } },
+                },
+            });
         });
         res.status(200).json(billing);
     } catch (error) {

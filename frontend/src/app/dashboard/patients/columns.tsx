@@ -11,7 +11,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import Link from 'next/link';
 
 export interface PatientRow {
     id: string;
@@ -39,6 +38,7 @@ export interface PatientRow {
 }
 
 export interface PatientColumnsProps {
+    onView: (patient: PatientRow) => void;
     onEdit: (patient: PatientRow) => void;
     onDelete: (id: string) => void;
     onBook: (patient: PatientRow) => void;
@@ -48,6 +48,7 @@ export interface PatientColumnsProps {
 const AVATAR_STYLE = 'bg-slate-100 text-slate-600 border border-slate-200';
 
 export const getPatientColumns = ({
+    onView,
     onEdit,
     onDelete,
     onBook,
@@ -62,17 +63,17 @@ export const getPatientColumns = ({
                 const name = p.fullName || [p.firstName, p.lastName].filter(Boolean).join(' ') || 'Unknown';
                 const pid = p.patientNumber || `PAT-${p.id.slice(0, 5).toUpperCase()}`;
                 return (
-                    <Link href={`/dashboard/patients/${p.id}`} className="flex items-center gap-3 group">
+                    <button type="button" onClick={() => onView(p)} className="flex items-center gap-3 group text-left">
                         <div className={`flex size-9 shrink-0 items-center justify-center rounded-full ${AVATAR_STYLE}`}>
                             <User className="h-4 w-4" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-sm font-medium text-slate-900 dark:text-white leading-tight">
+                            <span className="text-sm font-medium text-slate-900 dark:text-white leading-tight group-hover:text-[#0EA5E9] transition-colors">
                                 {name}
                             </span>
                             <span className="text-[12px] text-slate-500 mt-0.5 tracking-tight">ID: {pid}</span>
                         </div>
-                    </Link>
+                    </button>
                 );
             },
         },
@@ -141,12 +142,13 @@ export const getPatientColumns = ({
             const p = row.original;
             return (
                 <div className="flex items-center gap-4">
-                    <Link
-                        href={`/dashboard/patients/${p.id}`}
+                    <button
+                        type="button"
+                        onClick={() => onView(p)}
                         className="text-sm font-semibold text-[#0EA5E9] hover:text-[#0c96d4] hover:underline transition-all"
                     >
                         View
-                    </Link>
+                    </button>
                     {canManage && (
                         <>
                             <button

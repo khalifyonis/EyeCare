@@ -31,8 +31,8 @@ const DEMO_SCHEDULE = [
 
 const DEMO_RX = [
     { id:'p1', patient:'Sara Khalid',  item:'Eye Drops', date:'Today' },
-    { id:'p2', patient:'Omar Hassan',  item:'Glasses',   date:'Yesterday' },
-    { id:'p3', patient:'Fatima Ali',   item:'Eye Lens',  date:'2 days ago' },
+    { id:'p2', patient:'Omar Hassan',  item:'Antibiotic',   date:'Yesterday' },
+    { id:'p3', patient:'Fatima Ali',   item:'Pain Relief',  date:'2 days ago' },
 ]
 
 const DEMO_SUMMARY = [
@@ -152,7 +152,7 @@ export function DoctorDashboard() {
             return data.recentPrescriptions.map((rx: any) => ({
                 id: rx.id,
                 patient: rx.appointment?.patient?.fullName ?? '—',
-                item: rx.itemType === 'OPTICAL' ? 'Optical Item' : 'Eye Drops',
+                item: 'Medicine',
                 date: new Date(rx.createdAt).toLocaleDateString(),
             }))
         return DEMO_RX
@@ -275,7 +275,7 @@ export function DoctorDashboard() {
                     <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
                         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
                             <h2 className="text-sm font-bold text-slate-700 dark:text-slate-200">Recent Prescriptions</h2>
-                                <button type="button" onClick={() => router.push('/dashboard/clinical-prescriptions')}
+                                <button type="button" onClick={() => router.push('/dashboard/prescription/medicine')}
                                 className="flex items-center gap-0.5 text-[11px] font-semibold text-sky-500 hover:text-sky-600 transition-colors">
                                 View All <ArrowUpRight className="h-3 w-3" />
                             </button>

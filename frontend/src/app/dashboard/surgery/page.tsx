@@ -124,6 +124,7 @@ type SurgeryRow = {
   status?: string | null;
   date: string;
   time?: string | null;
+  cost?: number | string | null;
   surgeon?: { user?: { fullName?: string | null } | null } | null;
   patient?: { id: string; fullName?: string | null; patientNumber?: string | null } | null;
 };
@@ -413,7 +414,7 @@ export default function SurgeryListPage() {
         <Table>
           <TableHeader>
             <TableRow className="bg-slate-50/80 dark:bg-slate-900/80 hover:bg-slate-50/80 dark:hover:bg-slate-900/80 border-slate-200 dark:border-slate-800">
-              {['PATIENT', 'SURGERY TYPE', 'EYE', 'STATUS', 'SCHEDULED', 'ACTIONS'].map((h) => (
+              {['PATIENT', 'SURGERY TYPE', 'EYE', 'STATUS', 'AMOUNT', 'SCHEDULED', 'ACTIONS'].map((h) => (
                 <TableHead
                   key={h}
                   className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap"
@@ -426,11 +427,11 @@ export default function SurgeryListPage() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-56 text-center text-slate-500">Loading…</TableCell>
+                <TableCell colSpan={7} className="h-56 text-center text-slate-500">Loading…</TableCell>
               </TableRow>
             ) : pagedRows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-56 text-center text-slate-500">No surgeries found.</TableCell>
+                <TableCell colSpan={7} className="h-56 text-center text-slate-500">No surgeries found.</TableCell>
               </TableRow>
             ) : (
               pagedRows.map((r) => {
@@ -439,6 +440,7 @@ export default function SurgeryListPage() {
                 const srg = surgeryCodeFromId(r.id);
                 const surgeonName = r.surgeon?.user?.fullName?.trim() || '—';
                 const status = toStatusLabel(r.status);
+                const cost = r.cost ?? 0;
 
                 return (
                   <TableRow key={r.id} className="border-slate-100 dark:border-slate-800/60 hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
@@ -474,6 +476,12 @@ export default function SurgeryListPage() {
                       >
                         {status}
                       </Badge>
+                    </TableCell>
+
+                    <TableCell className="py-4 px-4 whitespace-nowrap">
+                        <span className="text-sm font-bold text-slate-900 dark:text-slate-200 tabular-nums">
+                            ${Number(cost).toFixed(2)}
+                        </span>
                     </TableCell>
 
                     <TableCell className="py-4 px-4 whitespace-nowrap">

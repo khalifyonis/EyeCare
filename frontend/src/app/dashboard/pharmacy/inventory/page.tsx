@@ -94,7 +94,7 @@ export default function PharmacyInventoryPremiumPage() {
           <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">Pharmacy Inventory</h1>
           <p className="mt-1 text-xl text-slate-600">Add, update, and track medicines</p>
         </div>
-        <Button asChild className="h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 px-6 text-base font-semibold">
+        <Button asChild className="h-11 rounded-xl bg-[#0EA5E9] hover:bg-[#0c96d4] px-6 text-base font-semibold">
           <Link href="/dashboard/pharmacy/inventory/new">+ Add Medicine</Link>
         </Button>
       </div>
@@ -200,11 +200,11 @@ export default function PharmacyInventoryPremiumPage() {
           <div className="mt-3">
             <ServerPagination
               page={page}
+              limit={pageSize}
               totalPages={totalPages}
               total={total}
-              pageSize={pageSize}
-              setPage={setPage}
-              setPageSize={setPageSize}
+              onPageChange={setPage}
+              onLimitChange={setPageSize}
             />
           </div>
         </div>

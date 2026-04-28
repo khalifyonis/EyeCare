@@ -18,11 +18,11 @@ import { createPharmacyItemSchema, updatePharmacyItemSchema } from '../middlewar
 
 const router = express.Router();
 
-router.get('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'PHARMACIST'), listPharmacyItems);
+router.get('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'PHARMACIST', 'DOCTOR', 'RECEPTIONIST'), listPharmacyItems);
 router.get('/stats', authenticate, authorize('ADMIN', 'SUPERADMIN', 'PHARMACIST'), getPharmacyStats);
 router.get('/transactions', authenticate, authorize('ADMIN', 'SUPERADMIN', 'PHARMACIST'), listAllPharmacyTransactions);
 router.get('/:id/transactions', authenticate, authorize('ADMIN', 'SUPERADMIN', 'PHARMACIST'), getPharmacyItemTransactions);
-router.get('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'PHARMACIST'), getPharmacyItemById);
+router.get('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'PHARMACIST', 'DOCTOR', 'RECEPTIONIST'), getPharmacyItemById);
 
 router.post('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'PHARMACIST'), validate(createPharmacyItemSchema), createPharmacyItem);
 router.post('/sync-expired', authenticate, authorize('ADMIN', 'SUPERADMIN', 'PHARMACIST'), syncExpiredPharmacyItems);

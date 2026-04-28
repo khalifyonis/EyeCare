@@ -71,14 +71,36 @@ export default function LoginPage() {
     };
 
     const completeLogin = (token: string, user: StoredUser, branch: BranchSummary | null) => {
-        const storedUser = persistSession(token, user, branch);
-        router.push(getDefaultDashboardPath(resolveRoleName(storedUser)));
+        try {
+            const storedUser = persistSession(token, user, branch);
+            const targetPath = getDefaultDashboardPath(resolveRoleName(storedUser));
+
+            setShowBranchSelector(false);
+            setTempAuthData(null);
+
+            router.replace(targetPath);
+
+            // Fallback for rare cases where client routing can stall under modal overlays.
+            if (typeof window !== 'undefined') {
+                window.setTimeout(() => {
+                    if (window.location.pathname.startsWith('/login')) {
+                        window.location.assign(targetPath);
+                    }
+                }, 200);
+            }
+        } catch {
+            setError('Unable to complete login session. Please try again.');
+            setLoading(false);
+        }
     };
 
     const handleBranchSelect = (branch: BranchSummary) => {
-        if (tempAuthData) {
-            completeLogin(tempAuthData.token, tempAuthData.user, branch);
+        if (!tempAuthData) {
+            setError('Session expired. Please login again.');
+            setShowBranchSelector(false);
+            return;
         }
+        completeLogin(tempAuthData.token, tempAuthData.user, branch);
     };
 
     return (

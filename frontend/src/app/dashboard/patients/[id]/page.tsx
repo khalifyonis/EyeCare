@@ -1,340 +1,163 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import api from '@/lib/axios';
 import { toast } from 'sonner';
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-
 import {
-  ArrowLeft,
-  CalendarPlus,
-  ChevronRight,
-  Eye,
-  Loader2,
-  Receipt,
-  Scissors,
-  Calendar,
-  Wallet,
-  RotateCcw,
-  User,
+  ArrowLeft, CalendarPlus, Edit, Loader2, Trash2,
+  User, Phone, Mail, MapPin, FileText,
+  Eye, Stethoscope, CalendarDays, AlertTriangle, Pill,
+  Activity, Scissors,
 } from 'lucide-react';
+import { readStoredUser, resolveRoleName } from '@/lib/auth';
 
-type Paginated<T> = {
-  data?: T[];
-  total?: number;
-};
-
-type PatientDetail = {
+/* ── types ── */
+type Appointment = {
   id: string;
-  fullName?: string | null;
-  patientNumber?: string | null;
-  gender?: string | null;
-  dateOfBirth?: string | null;
-  phone?: string | null;
-  email?: string | null;
-  address?: string | null;
-  allergies?: string | null;
-  currentMedications?: string | null;
-  medicalHistory?: string | null;
-  familyMedicalHistory?: string | null;
-  appointments?: AppointmentRecord[];
+  appointmentDate?: string;
+  type?: string;
+  status?: string;
+  notes?: string;
+  amount?: number;
+  bookingNumber?: string;
+  doctor?: { user?: { fullName?: string } };
+  clinicalExamination?: {
+    diagnosis?: string;
+    sphRight?: number; cylRight?: number; axisRight?: number;
+    sphLeft?: number; cylLeft?: number; axisLeft?: number;
+    examinedBy?: { user?: { fullName?: string } };
+    surgery?: {
+      date?: string; eye?: string; surgeryType?: string;
+      status?: string; surgeon?: { user?: { fullName?: string } };
+    };
+    prescriptions?: { id: string; itemType?: string; quantity?: number; instructions?: string }[];
+  };
+  erExamination?: {
+    vaRight?: string; vaLeft?: string;
+    iopRight?: number; iopLeft?: number;
+    recordedBy?: { fullName?: string };
+  };
 };
 
-type DoctorRef = { user?: { fullName?: string | null } | null };
-
-type SurgeryRef = {
+type PatientData = {
   id: string;
-  surgeryType?: string | null;
-  surgeryDate?: string | null;
-  status?: string | null;
+  patientNumber?: string;
+  fullName?: string;
+  firstName?: string; lastName?: string;
+  gender?: string;
+  dateOfBirth?: string;
+  phone?: string; email?: string;
+  address?: string; city?: string; state?: string;
+  bloodGroup?: string;
+  allergies?: string;
+  currentMedications?: string;
+  medicalHistory?: string;
+  familyMedicalHistory?: string;
+  emergencyContactName?: string;
+  emergencyContactRelationship?: string;
+  emergencyContactPhone?: string;
+  appointments?: Appointment[];
+  branch?: { branchName?: string };
 };
 
-type ClinicalRef = {
-  id: string;
-  diagnosis?: string | null;
-  surgery?: SurgeryRef | null;
+type EyeHistory = {
+  refractionHistory: {
+    date?: string; doctorName?: string; diagnosis?: string;
+    sphRight?: number; cylRight?: number; axisRight?: number;
+    sphLeft?: number; cylLeft?: number; axisLeft?: number;
+  }[];
+  iopHistory: {
+    date?: string; recordedBy?: string;
+    vaRight?: string; vaLeft?: string;
+    iopRight?: number; iopLeft?: number;
+  }[];
+  surgeries: {
+    date?: string; eye?: string; surgeryType?: string;
+    status?: string; surgeonName?: string; notes?: string;
+  }[];
 };
 
-type AppointmentRecord = {
-  id: string;
-  appointmentDate?: string | null;
-  status?: string | null;
-  amount?: number | string | null;
-  doctor?: DoctorRef | null;
-  clinicalExamination?: ClinicalRef | null;
-};
-
-type EyeExam = {
-  id: string;
-  chiefComplaint?: string | null;
-  createdAt?: string | null;
-  vaUnaidedOD?: string | null;
-  vaUnaidedOS?: string | null;
-  vaBcvaOD?: string | null;
-  vaBcvaOS?: string | null;
-  iopOD?: number | null;
-  iopOS?: number | null;
-  refractionSphereOD?: string | null;
-  refractionSphereOS?: string | null;
-  doctor?: DoctorRef | null;
-  patient?: { id?: string | null } | null;
-};
-
-type OpticalPrescription = {
-  id: string;
-  createdAt?: string | null;
-  status?: string | null;
-  type?: string | null;
-  odSphere?: string | null;
-  odCylinder?: string | null;
-  odAxis?: number | null;
-  odAdd?: string | null;
-  odPd?: number | null;
-  osSphere?: string | null;
-  osCylinder?: string | null;
-  osAxis?: number | null;
-  osAdd?: string | null;
-  osPd?: number | null;
-};
-
-type FollowUpRecord = {
-  id: string;
-  dueDate?: string | null;
-  sourceType?: 'EXAMINATION' | 'PRESCRIPTION' | 'SURGERY' | 'OPTICAL' | string;
-  status?: 'PENDING' | 'DONE' | 'CANCELLED' | 'OVERDUE' | string;
-  notes?: string | null;
-};
-
-type SectionKey = 'patient-info' | 'eye-exams' | 'prescriptions' | 'surgeries' | 'appointments' | 'billing' | 'followups';
-type EyeHistoryTabKey = 'refraction' | 'iop-va' | 'surgeries' | 'sph-trend';
-
-function formatDate(input?: string | null): string {
-  if (!input) return 'N/A';
-  const d = new Date(input);
-  if (Number.isNaN(d.getTime())) return 'N/A';
-  return new Intl.DateTimeFormat('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }).format(d);
+/* ── helpers ── */
+function fmtDate(v?: string | null) {
+  if (!v) return 'N/A';
+  const d = new Date(v);
+  if (isNaN(d.getTime())) return 'N/A';
+  return new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).format(d);
+}
+function fmtTime(v?: string | null) {
+  if (!v) return '';
+  const d = new Date(v);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+}
+function lv(v?: string | null) { return (v || '').trim() || 'N/A'; }
+function statusColor(s?: string) {
+  const st = (s || '').toUpperCase();
+  if (st === 'COMPLETED') return 'bg-emerald-100 text-emerald-700';
+  if (st === 'PENDING' || st === 'SCHEDULED') return 'bg-amber-100 text-amber-700';
+  if (st === 'CANCELLED') return 'bg-red-100 text-red-600';
+  if (st === 'CONFIRMED') return 'bg-blue-100 text-blue-700';
+  return 'bg-slate-100 text-slate-600';
 }
 
-function formatTime(input?: string | null): string {
-  if (!input) return '--:--';
-  const d = new Date(input);
-  if (Number.isNaN(d.getTime())) return '--:--';
-  return new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit' }).format(d);
-}
+const SIDEBAR_TABS = [
+  { id: 'info', label: 'Patient Info', icon: User },
+  { id: 'appointments', label: 'Appointments', icon: CalendarDays },
+  { id: 'eye-history', label: 'Eye History', icon: Eye },
+];
 
-function formatVA(exam: EyeExam): string {
-  const od = exam.vaBcvaOD || exam.vaUnaidedOD || '-';
-  const os = exam.vaBcvaOS || exam.vaUnaidedOS || '-';
-  return `VA: OD ${od} | OS ${os}`;
-}
+const EYE_TABS = [
+  { id: 'refraction', label: 'Refraction' },
+  { id: 'iop-va', label: 'IOP / VA' },
+  { id: 'surgeries', label: 'Surgeries' },
+];
 
-function formatGender(value?: string | null): string {
-  const g = String(value || '').toUpperCase();
-  if (g === 'MALE') return 'Male';
-  if (g === 'FEMALE') return 'Female';
-  return 'N/A';
-}
-
-function formatPatientIdentifier(patient: PatientDetail): string {
-  const pn = (patient.patientNumber || '').trim();
-  if (pn) return pn;
-
-  return 'N/A';
-}
-
-function formatSystemId(value?: string | null): string {
-  const raw = String(value || '').trim();
-  if (!raw) return 'N/A';
-  if (raw.length <= 16) return raw;
-  return `${raw.slice(0, 8)}…${raw.slice(-4)}`;
-}
-
-function toTypeLabel(type?: string | null): string {
-  const v = String(type || '').toUpperCase();
-  if (v === 'SPECTACLES') return 'Spectacles';
-  if (v === 'CONTACT_LENS') return 'Contact Lens';
-  if (v === 'BOTH') return 'Both';
-  return type || 'N/A';
-}
-
-function hasAnyRefraction(prefix: 'od' | 'os', row: OpticalPrescription): boolean {
-  const sphere = prefix === 'od' ? row.odSphere : row.osSphere;
-  const cylinder = prefix === 'od' ? row.odCylinder : row.osCylinder;
-  const axis = prefix === 'od' ? row.odAxis : row.osAxis;
-  const add = prefix === 'od' ? row.odAdd : row.osAdd;
-  const pd = prefix === 'od' ? row.odPd : row.osPd;
-  return !!(
-    (sphere && String(sphere).trim()) ||
-    (cylinder && String(cylinder).trim()) ||
-    (add && String(add).trim()) ||
-    (typeof axis === 'number' && !Number.isNaN(axis)) ||
-    (typeof pd === 'number' && !Number.isNaN(pd))
-  );
-}
-
-function formatEyeSummary(prefix: 'od' | 'os', row: OpticalPrescription): string {
-  if (!hasAnyRefraction(prefix, row)) return '-';
-  const sphere = prefix === 'od' ? row.odSphere : row.osSphere;
-  const cylinder = prefix === 'od' ? row.odCylinder : row.osCylinder;
-  const axis = prefix === 'od' ? row.odAxis : row.osAxis;
-  const add = prefix === 'od' ? row.odAdd : row.osAdd;
-  const pd = prefix === 'od' ? row.odPd : row.osPd;
-
-  const parts: string[] = [];
-  if (sphere) parts.push(`${sphere}`);
-  if (cylinder) parts.push(`${cylinder}`);
-  if (typeof axis === 'number' && !Number.isNaN(axis)) parts.push(`x ${axis}deg`);
-  if (add) parts.push(`Add ${add}`);
-  if (typeof pd === 'number' && !Number.isNaN(pd)) parts.push(`PD ${pd}`);
-  return parts.join(' ');
-}
-
-export default function PatientDetailPage() {
-  const params = useParams();
+export default function PatientProfilePage() {
+  const { id } = useParams() as { id: string };
   const router = useRouter();
-  const id = params.id as string;
 
+  const [patient, setPatient] = useState<PatientData | null>(null);
+  const [eyeHistory, setEyeHistory] = useState<EyeHistory | null>(null);
   const [loading, setLoading] = useState(true);
-  const [patient, setPatient] = useState<PatientDetail | null>(null);
-  const [activeSection, setActiveSection] = useState<SectionKey>('patient-info');
-  const [eyeHistoryTab, setEyeHistoryTab] = useState<EyeHistoryTabKey>('refraction');
+  const [sideTab, setSideTab] = useState('info');
+  const [eyeTab, setEyeTab] = useState('refraction');
 
-  const [eyeExams, setEyeExams] = useState<EyeExam[]>([]);
-  const [rxRows, setRxRows] = useState<OpticalPrescription[]>([]);
-  const [followUps, setFollowUps] = useState<FollowUpRecord[]>([]);
-
-  const fetchPatient = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await api.get(`/patients/${id}`);
-      setPatient(res.data as PatientDetail);
-    } catch {
-      toast.error('Failed to load patient');
-      router.push('/dashboard/patients');
-    } finally {
-      setLoading(false);
-    }
-  }, [id, router]);
-
-  const fetchEyeExams = useCallback(async () => {
-    try {
-      const res = await api.get('/eye-examinations', { params: { patientId: id, page: 1, limit: 50 } });
-      const body = res.data as Paginated<EyeExam> | EyeExam[];
-      const rows = Array.isArray(body) ? body : Array.isArray(body?.data) ? body.data : [];
-      const filtered = rows.filter((row) => !row.patient?.id || row.patient.id === id);
-      setEyeExams(filtered);
-    } catch {
-      setEyeExams([]);
-    }
-  }, [id]);
-
-  const fetchPrescriptions = useCallback(async () => {
-    try {
-      const res = await api.get('/prescriptions', { params: { patientId: id, page: 1, limit: 50 } });
-      const body = res.data as Paginated<OpticalPrescription> | OpticalPrescription[];
-      const rows = Array.isArray(body) ? body : Array.isArray(body?.data) ? body.data : [];
-      setRxRows(rows);
-    } catch {
-      setRxRows([]);
-    }
-  }, [id]);
-
-  const fetchFollowUps = useCallback(async () => {
-    try {
-      const res = await api.get(`/follow-ups/patient/${id}`);
-      const body = res.data as FollowUpRecord[];
-      const rows = Array.isArray(body) ? body : [];
-      const unique = new Map<string, FollowUpRecord>();
-      for (const row of rows) {
-        const key = `${row.dueDate || ''}|${row.sourceType || ''}|${(row.notes || '').trim()}`;
-        if (!unique.has(key)) unique.set(key, row);
-      }
-      setFollowUps(Array.from(unique.values()));
-    } catch {
-      setFollowUps([]);
-    }
-  }, [id]);
+  const role = resolveRoleName(readStoredUser());
+  const canManage = ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST'].includes(role);
 
   useEffect(() => {
     if (!id) return;
-    void fetchPatient();
-    void fetchEyeExams();
-    void fetchPrescriptions();
-    void fetchFollowUps();
-  }, [id, fetchPatient, fetchEyeExams, fetchPrescriptions, fetchFollowUps]);
+    const load = async () => {
+      setLoading(true);
+      try {
+        const [patRes, ehRes] = await Promise.all([
+          api.get(`/patients/${id}`),
+          api.get(`/patients/${id}/eye-history`).catch(() => ({ data: null })),
+        ]);
+        setPatient(patRes.data);
+        if (ehRes.data) setEyeHistory(ehRes.data);
+      } catch {
+        toast.error('Failed to load patient');
+      } finally {
+        setLoading(false);
+      }
+    };
+    void load();
+  }, [id]);
 
-  const surgeries = useMemo(() => {
-    if (!patient?.appointments) return [] as SurgeryRef[];
-    return patient.appointments
-      .map((a) => a.clinicalExamination?.surgery)
-      .filter((s): s is SurgeryRef => Boolean(s && s.id));
-  }, [patient]);
-
-  const billRows = useMemo(() => {
-    if (!patient?.appointments) return [] as AppointmentRecord[];
-    return patient.appointments.filter((a) => Number(a.amount ?? 0) > 0);
-  }, [patient]);
-
-  const patientHistoryRows = useMemo(() => {
-    const rows = (patient?.appointments || []).map((a) => ({
-      id: a.id,
-      date: a.appointmentDate,
-      doctor: a.doctor?.user?.fullName || 'Unknown',
-      diagnosis: a.clinicalExamination?.diagnosis || 'N/A',
-      status: a.status || 'PENDING',
-    }));
-    return rows.slice(0, 8);
-  }, [patient?.appointments]);
-
-  const medicalHistoryItems = useMemo(() => {
-    const all = (patient?.appointments || [])
-      .map((a) => (a.clinicalExamination?.diagnosis || '').trim())
-      .filter(Boolean);
-    const unique = Array.from(new Set(all));
-    return unique.slice(0, 6);
-  }, [patient?.appointments]);
-
-  const pendingFollowUps = useMemo(
-    () => followUps.filter((f) => String(f.status || '').toUpperCase() === 'PENDING' || String(f.status || '').toUpperCase() === 'OVERDUE'),
-    [followUps]
-  );
-
-  const eyeHistoryTabs = useMemo(
-    () => [
-      { key: 'refraction' as const, label: 'Refraction', count: eyeExams.length },
-      { key: 'iop-va' as const, label: 'IOP / VA', count: eyeExams.length },
-      { key: 'surgeries' as const, label: 'Surgeries', count: surgeries.length },
-      { key: 'sph-trend' as const, label: 'SPH Trend', count: eyeExams.length },
-    ],
-    [eyeExams.length, surgeries.length]
-  );
-
-  const latestExam = useMemo(() => {
-    if (eyeExams.length === 0) return null;
-    return [...eyeExams].sort((a, b) => {
-      const ad = new Date(a.createdAt || 0).getTime();
-      const bd = new Date(b.createdAt || 0).getTime();
-      return bd - ad;
-    })[0];
-  }, [eyeExams]);
-
-  const sectionItems = useMemo(
-    () => [
-      { key: 'patient-info' as const, label: 'Patient Info', icon: User },
-      { key: 'eye-exams' as const, label: 'Eye Exams', icon: Eye, count: eyeExams.length },
-      { key: 'prescriptions' as const, label: 'Prescriptions', icon: Receipt, count: rxRows.length },
-      { key: 'surgeries' as const, label: 'Surgeries', icon: Scissors, count: surgeries.length },
-      { key: 'appointments' as const, label: 'Appointments', icon: Calendar, count: patient?.appointments?.length || 0 },
-      { key: 'billing' as const, label: 'Billing', icon: Wallet, count: billRows.length },
-      { key: 'followups' as const, label: 'Follow-ups', icon: RotateCcw, count: pendingFollowUps.length },
-    ],
-    [eyeExams.length, rxRows.length, surgeries.length, patient?.appointments?.length, billRows.length, pendingFollowUps.length]
-  );
+  const handleDelete = async () => {
+    if (!confirm('Delete this patient? This cannot be undone.')) return;
+    try {
+      await api.delete(`/patients/${id}`);
+      toast.success('Patient deleted');
+      router.push('/dashboard/patients');
+    } catch {
+      toast.error('Delete failed');
+    }
+  };
 
   if (loading) {
     return (
@@ -344,659 +167,412 @@ export default function PatientDetailPage() {
     );
   }
 
-  if (!patient) return null;
+  if (!patient) {
+    return (
+      <div className="p-8 text-center text-sm text-slate-500">
+        Patient not found.{' '}
+        <button onClick={() => router.push('/dashboard/patients')} className="text-[#0EA5E9] underline">
+          Back to patients
+        </button>
+      </div>
+    );
+  }
+
+  const appointments = patient.appointments || [];
+  const exams = appointments.filter(a => a.clinicalExamination);
+  const surgeries = appointments.filter(a => a.clinicalExamination?.surgery);
+  const latestER = appointments.find(a => a.erExamination)?.erExamination;
 
   return (
-    <div className="w-full min-w-0 p-4 sm:p-5 md:p-6 lg:p-8 space-y-6">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Patient Details</h1>
-        <p className="text-base text-slate-600">View and manage patient information</p>
-      </div>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 space-y-6">
 
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <Button variant="ghost" className="px-0 text-[#0EA5E9] hover:text-[#0284C7]" onClick={() => router.push('/dashboard/patients')}>
-            <ArrowLeft className="h-4 w-4" />
-            Back to Patients
-          </Button>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{patient.fullName || 'Patient'}</h1>
-          <p className="text-base text-slate-500">ID: {formatPatientIdentifier(patient)}</p>
-          <p className="text-sm text-slate-400">System ID: {formatSystemId(patient.id)}</p>
+        {/* ── Top Header ── */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <button
+              onClick={() => router.push('/dashboard/patients')}
+              className="mb-2 inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" /> Back to Patients
+            </button>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+              {lv(patient.fullName)}
+            </h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Patient ID: {lv(patient.patientNumber)}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              onClick={() => router.push(`/dashboard/appointments/new?patientId=${id}`)}
+              className="gap-2"
+            >
+              <CalendarPlus className="h-4 w-4" /> Book
+            </Button>
+            {canManage && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => router.push(`/dashboard/patients?edit=${id}`)}
+                  className="gap-2"
+                >
+                  <Edit className="h-4 w-4" /> Edit
+                </Button>
+                <Button variant="destructive" onClick={handleDelete} className="gap-2">
+                  <Trash2 className="h-4 w-4" /> Delete
+                </Button>
+              </>
+            )}
+          </div>
         </div>
 
-        <Button
-          className="bg-[#0EA5E9] hover:bg-[#0284C7] text-white h-11 px-5"
-          onClick={() => {
-            router.push(`/dashboard/appointments/new?patientId=${encodeURIComponent(id)}`);
-          }}
-        >
-          <CalendarPlus className="h-4 w-4" />
-          Book Appointment
-        </Button>
-      </div>
+        {/* ── Summary Stats ── */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {[
+            { icon: Eye, label: 'Eye Exams', count: exams.length, color: 'text-emerald-500' },
+            { icon: FileText, label: 'Prescriptions', count: exams.reduce((n, a) => n + (a.clinicalExamination?.prescriptions?.length || 0), 0), color: 'text-blue-500' },
+            { icon: Scissors, label: 'Surgeries', count: surgeries.length, color: 'text-orange-500' },
+            { icon: CalendarDays, label: 'Appointments', count: appointments.length, color: 'text-indigo-500' },
+          ].map(s => (
+            <Card key={s.label} className="border-slate-200 dark:border-slate-800">
+              <CardContent className="flex items-center gap-4 p-4">
+                <div className={`rounded-lg bg-slate-50 dark:bg-slate-900 p-2.5 ${s.color}`}>
+                  <s.icon className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-white">{s.count}</p>
+                  <p className="text-xs text-slate-500">{s.label}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <Card className="lg:col-span-3 border-slate-200">
-          <CardContent className="p-4">
-            <div className="space-y-2">
-              {sectionItems.map((item) => {
-                const Icon = item.icon;
-                const active = activeSection === item.key;
-                return (
-                  <button
-                    key={item.key}
-                    type="button"
-                    onClick={() => setActiveSection(item.key)}
-                    className={`w-full flex items-center justify-between rounded-xl border px-3 py-2.5 transition-colors ${
-                      active ? 'bg-sky-50 border-sky-200 text-[#0284C7]' : 'bg-white border-transparent hover:bg-slate-50 text-slate-700'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <Icon className="h-4 w-4" />
-                      <span className="text-base font-medium">{item.label}</span>
-                    </span>
-                    {typeof item.count === 'number' && <span className="rounded-full bg-slate-100 px-2 text-sm text-slate-600">{item.count}</span>}
-                  </button>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+        {/* ── Main Content ── */}
+        <div className="flex flex-col lg:flex-row gap-6">
 
-        <Card className="lg:col-span-9 border-slate-200">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-xl font-semibold tracking-tight text-slate-900">
-              {activeSection === 'patient-info' && 'Personal Information'}
-              {activeSection === 'eye-exams' && 'Eye Examinations'}
-              {activeSection === 'prescriptions' && 'Optical Prescriptions'}
-              {activeSection === 'surgeries' && 'Surgeries'}
-              {activeSection === 'appointments' && 'Appointments'}
-              {activeSection === 'billing' && 'Billing'}
-              {activeSection === 'followups' && 'Follow-ups'}
-            </CardTitle>
+          {/* Sidebar Tabs */}
+          <div className="w-full lg:w-52 shrink-0">
+            <nav className="flex flex-row lg:flex-col gap-1 rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-2">
+              {SIDEBAR_TABS.map(t => (
+                <button
+                  key={t.id}
+                  onClick={() => setSideTab(t.id)}
+                  className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-all w-full text-left ${
+                    sideTab === t.id
+                      ? 'bg-blue-50 text-[#0EA5E9] dark:bg-blue-900/30'
+                      : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <t.icon className="h-4 w-4" />
+                  {t.label}
+                </button>
+              ))}
+            </nav>
+          </div>
 
-            {activeSection === 'eye-exams' && (
-              <Button variant="ghost" className="text-[#0EA5E9]" onClick={() => router.push('/dashboard/eye-examinations/new')}>
-                + New Exam
-              </Button>
-            )}
+          {/* Content Area */}
+          <div className="flex-1 min-w-0 space-y-6">
 
-            {activeSection === 'appointments' && (
-              <Button
-                variant="ghost"
-                className="text-[#0EA5E9]"
-                onClick={() => {
-                  router.push(`/dashboard/appointments/new?patientId=${encodeURIComponent(id)}`);
-                }}
-              >
-                + New Appointment
-              </Button>
-            )}
-          </CardHeader>
+            {/* ── Patient Info Tab ── */}
+            {sideTab === 'info' && (
+              <>
+                {/* Personal + Medical cards */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <User className="h-4 w-4 text-[#0EA5E9]" /> Personal Information
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2.5 text-sm">
+                      <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
+                        <User className="h-4 w-4 text-slate-400" /> {lv(patient.fullName)}
+                      </div>
+                      <div className="text-slate-600 dark:text-slate-300">Gender: {patient.gender === 'FEMALE' ? 'Female' : patient.gender === 'MALE' ? 'Male' : lv(patient.gender)}</div>
+                      <div className="text-slate-600 dark:text-slate-300">Date of Birth: {fmtDate(patient.dateOfBirth)}</div>
+                      <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                        <Phone className="h-4 w-4 text-slate-400" /> {lv(patient.phone)}
+                      </div>
+                      <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                        <Mail className="h-4 w-4 text-slate-400" /> {lv(patient.email)}
+                      </div>
+                      <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                        <MapPin className="h-4 w-4 text-slate-400" /> {lv([patient.address, patient.city, patient.state].filter(Boolean).join(', '))}
+                      </div>
+                    </CardContent>
+                  </Card>
 
-          <CardContent>
-            {activeSection === 'patient-info' && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="rounded-xl border border-slate-200 p-4">
-                    <p className="text-sm text-slate-500">Name</p>
-                    <p className="text-lg font-semibold text-slate-900">{patient.fullName || 'N/A'}</p>
-                  </div>
-                  <div className="rounded-xl border border-slate-200 p-4">
-                    <p className="text-sm text-slate-500">Patient ID</p>
-                    <p className="text-lg font-semibold text-slate-900">{formatPatientIdentifier(patient)}</p>
-                  </div>
-                  <div className="rounded-xl border border-slate-200 p-4">
-                    <p className="text-sm text-slate-500">Gender</p>
-                    <p className="text-base font-medium text-slate-800">{formatGender(patient.gender)}</p>
-                  </div>
-                  <div className="rounded-xl border border-slate-200 p-4">
-                    <p className="text-sm text-slate-500">Date of Birth</p>
-                    <p className="text-base font-medium text-slate-800">{formatDate(patient.dateOfBirth)}</p>
-                  </div>
-                  <div className="rounded-xl border border-slate-200 p-4">
-                    <p className="text-sm text-slate-500">Phone</p>
-                    <p className="text-base font-medium text-slate-800">{patient.phone || 'N/A'}</p>
-                  </div>
-                  <div className="rounded-xl border border-slate-200 p-4">
-                    <p className="text-sm text-slate-500">Email</p>
-                    <p className="text-base font-medium text-slate-800">{patient.email || 'N/A'}</p>
-                  </div>
-                  <div className="rounded-xl border border-slate-200 p-4 md:col-span-2">
-                    <p className="text-sm text-slate-500">Address</p>
-                    <p className="text-base font-medium text-slate-800">{patient.address || 'N/A'}</p>
-                  </div>
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Stethoscope className="h-4 w-4 text-[#0EA5E9]" /> Medical History
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3 text-sm">
+                      <div className="flex items-start gap-3">
+                        <AlertTriangle className="h-4 w-4 mt-0.5 text-amber-500 shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Allergies</p>
+                          <p className="text-slate-700 dark:text-slate-200">{lv(patient.allergies)}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Pill className="h-4 w-4 mt-0.5 text-blue-500 shrink-0" />
+                        <div>
+                          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Current Medications</p>
+                          <p className="text-slate-700 dark:text-slate-200">{lv(patient.currentMedications)}</p>
+                        </div>
+                      </div>
+                      <div className="text-slate-600 dark:text-slate-300">
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Blood Group</p>
+                        {lv(patient.bloodGroup)}
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
 
-                <div className="rounded-xl border border-slate-200 p-4">
-                  <p className="text-lg font-semibold text-slate-900 mb-3">Ocular History Summary</p>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <div className="rounded-xl bg-emerald-50 border border-emerald-100 p-3">
-                      <p className="text-sm text-emerald-700">Eye Exams</p>
-                      <p className="text-xl font-semibold text-emerald-800">{eyeExams.length}</p>
-                    </div>
-                    <div className="rounded-xl bg-sky-50 border border-sky-100 p-3">
-                      <p className="text-sm text-sky-700">Prescriptions</p>
-                      <p className="text-xl font-semibold text-sky-800">{rxRows.length}</p>
-                    </div>
-                    <div className="rounded-xl bg-violet-50 border border-violet-100 p-3">
-                      <p className="text-sm text-violet-700">Surgeries</p>
-                      <p className="text-xl font-semibold text-violet-800">{surgeries.length}</p>
-                    </div>
-                    <div className="rounded-xl bg-amber-50 border border-amber-100 p-3">
-                      <p className="text-sm text-amber-700">Follow-ups</p>
-                      <p className="text-xl font-semibold text-amber-800">{pendingFollowUps.length}</p>
-                    </div>
-                  </div>
-                </div>
+                {/* Current Vitals (latest IOP/VA) */}
+                {latestER && (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Activity className="h-4 w-4 text-[#0EA5E9]" /> Patient Current Vitals
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div className="text-center p-3 rounded-lg bg-slate-50 dark:bg-slate-900">
+                          <p className="text-xs font-semibold text-slate-500 uppercase">IOP Right</p>
+                          <p className="text-xl font-bold text-slate-900 dark:text-white">{latestER.iopRight ?? 'N/A'} <span className="text-xs font-normal text-slate-400">mmHg</span></p>
+                        </div>
+                        <div className="text-center p-3 rounded-lg bg-slate-50 dark:bg-slate-900">
+                          <p className="text-xs font-semibold text-slate-500 uppercase">IOP Left</p>
+                          <p className="text-xl font-bold text-slate-900 dark:text-white">{latestER.iopLeft ?? 'N/A'} <span className="text-xs font-normal text-slate-400">mmHg</span></p>
+                        </div>
+                        <div className="text-center p-3 rounded-lg bg-slate-50 dark:bg-slate-900">
+                          <p className="text-xs font-semibold text-slate-500 uppercase">VA Right</p>
+                          <p className="text-xl font-bold text-slate-900 dark:text-white">{latestER.vaRight ?? 'N/A'}</p>
+                        </div>
+                        <div className="text-center p-3 rounded-lg bg-slate-50 dark:bg-slate-900">
+                          <p className="text-xs font-semibold text-slate-500 uppercase">VA Left</p>
+                          <p className="text-xl font-bold text-slate-900 dark:text-white">{latestER.vaLeft ?? 'N/A'}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
 
-                <div className="rounded-xl border border-slate-200 p-4">
-                  <p className="text-lg font-semibold text-slate-900 mb-3">Medical History</p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="rounded-lg border border-slate-200 p-3">
-                      <p className="text-xs uppercase tracking-wide text-slate-500">Allergies</p>
-                      <p className="text-sm text-slate-800 mt-1">{patient.allergies || 'No known allergies'}</p>
-                    </div>
-                    <div className="rounded-lg border border-slate-200 p-3">
-                      <p className="text-xs uppercase tracking-wide text-slate-500">Current Medications</p>
-                      <p className="text-sm text-slate-800 mt-1">{patient.currentMedications || 'None documented'}</p>
-                    </div>
+                {/* Emergency Contact */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Emergency Contact</CardTitle>
+                  </CardHeader>
+                  <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-slate-600 dark:text-slate-300">
+                    <div>Name: {lv(patient.emergencyContactName)}</div>
+                    <div>Relationship: {lv(patient.emergencyContactRelationship)}</div>
+                    <div>Phone: {lv(patient.emergencyContactPhone)}</div>
+                  </CardContent>
+                </Card>
+              </>
+            )}
+
+            {/* ── Appointments Tab ── */}
+            {sideTab === 'appointments' && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <CalendarDays className="h-4 w-4 text-[#0EA5E9]" /> Patient History
+                    </CardTitle>
+                    <span className="text-xs font-semibold text-slate-500">Total {appointments.length} Visits</span>
                   </div>
-                  {(patient.medicalHistory || patient.familyMedicalHistory || medicalHistoryItems.length > 0) && (
-                    <div className="mt-3 rounded-lg border border-slate-200 p-3">
-                      <p className="text-xs uppercase tracking-wide text-slate-500">Notes</p>
-                      <p className="text-sm text-slate-700 mt-1">
-                        {patient.medicalHistory || patient.familyMedicalHistory || medicalHistoryItems.join(', ') || 'N/A'}
-                      </p>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {appointments.length === 0 ? (
+                    <p className="p-6 text-center text-sm text-slate-400">No appointments found.</p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-y border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/50">
+                            {['DATE AND TIME', 'VISIT NO', 'DIAGNOSIS', 'DOCTOR', 'STATUS', 'FEE'].map(h => (
+                              <th key={h} className="px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                          {appointments.map(apt => (
+                            <tr key={apt.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors">
+                              <td className="px-4 py-3 whitespace-nowrap">
+                                <p className="font-medium text-slate-800 dark:text-slate-200">{fmtDate(apt.appointmentDate)}</p>
+                                <p className="text-xs text-slate-400">{fmtTime(apt.appointmentDate)}</p>
+                              </td>
+                              <td className="px-4 py-3 text-slate-600 dark:text-slate-300 font-mono text-xs">{apt.bookingNumber || '—'}</td>
+                              <td className="px-4 py-3 max-w-[200px] truncate text-slate-600 dark:text-slate-300">
+                                {apt.clinicalExamination?.diagnosis || apt.notes?.slice(0, 50) || '—'}
+                              </td>
+                              <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                                Dr. {apt.doctor?.user?.fullName || 'Unknown'}
+                              </td>
+                              <td className="px-4 py-3">
+                                <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-bold ${statusColor(apt.status)}`}>
+                                  {(apt.status || 'N/A').toUpperCase()}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 font-medium text-slate-700 dark:text-slate-300">
+                                ${(apt.amount ?? 0).toFixed(2)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   )}
-                </div>
-
-                <div className="rounded-xl border border-slate-200 p-4">
-                  <p className="text-lg font-semibold text-slate-900 mb-3">Patient Current Vitals</p>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <div className="rounded-lg border border-slate-200 p-3">
-                      <p className="text-xs uppercase tracking-wide text-slate-500">IOP Right</p>
-                      <p className="text-xl font-semibold text-slate-900 mt-1">{latestExam?.iopOD ?? '-'}</p>
-                      <p className="text-xs text-emerald-600 mt-0.5">mmHg</p>
-                    </div>
-                    <div className="rounded-lg border border-slate-200 p-3">
-                      <p className="text-xs uppercase tracking-wide text-slate-500">IOP Left</p>
-                      <p className="text-xl font-semibold text-slate-900 mt-1">{latestExam?.iopOS ?? '-'}</p>
-                      <p className="text-xs text-emerald-600 mt-0.5">mmHg</p>
-                    </div>
-                    <div className="rounded-lg border border-slate-200 p-3">
-                      <p className="text-xs uppercase tracking-wide text-slate-500">VA Right</p>
-                      <p className="text-xl font-semibold text-slate-900 mt-1">{latestExam?.vaBcvaOD || latestExam?.vaUnaidedOD || '-'}</p>
-                      <p className="text-xs text-emerald-600 mt-0.5">latest</p>
-                    </div>
-                    <div className="rounded-lg border border-slate-200 p-3">
-                      <p className="text-xs uppercase tracking-wide text-slate-500">VA Left</p>
-                      <p className="text-xl font-semibold text-slate-900 mt-1">{latestExam?.vaBcvaOS || latestExam?.vaUnaidedOS || '-'}</p>
-                      <p className="text-xs text-emerald-600 mt-0.5">latest</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-xl border border-slate-200 overflow-hidden">
-                  <div className="px-4 py-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-                    <p className="text-lg font-semibold text-slate-900">Patient History</p>
-                    <span className="text-sm text-slate-500">Total {patientHistoryRows.length} Visits</span>
-                  </div>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="text-xs uppercase tracking-wide">Date and Time</TableHead>
-                        <TableHead className="text-xs uppercase tracking-wide">Diagnosis</TableHead>
-                        <TableHead className="text-xs uppercase tracking-wide">Doctor</TableHead>
-                        <TableHead className="text-xs uppercase tracking-wide">Status</TableHead>
-                        <TableHead className="text-xs uppercase tracking-wide text-right">Fee</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {patientHistoryRows.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={5} className="text-center text-slate-500 py-8">No history records found.</TableCell>
-                        </TableRow>
-                      ) : (
-                        patientHistoryRows.map((row) => {
-                          const apt = (patient.appointments || []).find((x) => x.id === row.id);
-                          const fee = Number(apt?.amount || 0);
-                          const st = String(row.status || '').toUpperCase();
-                          return (
-                            <TableRow key={row.id}>
-                              <TableCell>
-                                <div className="text-sm font-medium text-slate-700">{formatDate(row.date)}</div>
-                                <div className="text-xs text-slate-500 mt-0.5">{formatTime(row.date)}</div>
-                              </TableCell>
-                              <TableCell className="text-sm text-slate-700">{row.diagnosis}</TableCell>
-                              <TableCell className="text-sm text-slate-700">{row.doctor}</TableCell>
-                              <TableCell>
-                                <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                                  st === 'COMPLETED'
-                                    ? 'bg-emerald-100 text-emerald-700'
-                                    : st === 'PENDING'
-                                      ? 'bg-amber-100 text-amber-700'
-                                      : 'bg-slate-100 text-slate-600'
-                                }`}>
-                                  {st || 'PENDING'}
-                                </span>
-                              </TableCell>
-                              <TableCell className="text-sm text-slate-700 text-right">${fee.toFixed(2)}</TableCell>
-                            </TableRow>
-                          );
-                        })
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-                  <div className="xl:col-span-2 rounded-xl border border-slate-200 overflow-hidden">
-                    <div className="px-4 py-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-                      <p className="text-lg font-semibold text-slate-900">Eye History</p>
-                      <div className="flex items-center gap-2 text-xs">
-                        {eyeHistoryTabs.map((tab) => {
-                          const active = eyeHistoryTab === tab.key;
-                          return (
-                            <button
-                              key={tab.key}
-                              type="button"
-                              onClick={() => setEyeHistoryTab(tab.key)}
-                              className={`rounded-md px-2 py-1 transition-colors ${
-                                active ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                              }`}
-                            >
-                              {tab.label} ({tab.count})
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                    {eyeHistoryTab === 'refraction' && (
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="text-xs uppercase tracking-wide">Date</TableHead>
-                            <TableHead className="text-xs uppercase tracking-wide">Doctor</TableHead>
-                            <TableHead className="text-xs uppercase tracking-wide">Right Eye</TableHead>
-                            <TableHead className="text-xs uppercase tracking-wide">Left Eye</TableHead>
-                            <TableHead className="text-xs uppercase tracking-wide">Diagnosis</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {eyeExams.length === 0 ? (
-                            <TableRow>
-                              <TableCell colSpan={5} className="text-center text-slate-500 py-8">No refraction records found.</TableCell>
-                            </TableRow>
-                          ) : (
-                            eyeExams.slice(0, 6).map((exam) => (
-                              <TableRow key={exam.id}>
-                                <TableCell>
-                                  <div className="text-sm font-medium text-slate-700">{formatDate(exam.createdAt)}</div>
-                                  <div className="text-xs text-slate-500 mt-0.5">{formatTime(exam.createdAt)}</div>
-                                </TableCell>
-                                <TableCell className="text-sm">{exam.doctor?.user?.fullName || 'Unknown'}</TableCell>
-                                <TableCell className="text-sm">{exam.vaBcvaOD || exam.vaUnaidedOD || '-'}</TableCell>
-                                <TableCell className="text-sm">{exam.vaBcvaOS || exam.vaUnaidedOS || '-'}</TableCell>
-                                <TableCell className="text-sm">{exam.chiefComplaint || '-'}</TableCell>
-                              </TableRow>
-                            ))
-                          )}
-                        </TableBody>
-                      </Table>
-                    )}
-
-                    {eyeHistoryTab === 'iop-va' && (
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="text-xs uppercase tracking-wide">Date</TableHead>
-                            <TableHead className="text-xs uppercase tracking-wide">Doctor</TableHead>
-                            <TableHead className="text-xs uppercase tracking-wide">IOP OD</TableHead>
-                            <TableHead className="text-xs uppercase tracking-wide">IOP OS</TableHead>
-                            <TableHead className="text-xs uppercase tracking-wide">VA</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {eyeExams.length === 0 ? (
-                            <TableRow>
-                              <TableCell colSpan={5} className="text-center text-slate-500 py-8">No IOP/VA records found.</TableCell>
-                            </TableRow>
-                          ) : (
-                            eyeExams.slice(0, 6).map((exam) => (
-                              <TableRow key={exam.id}>
-                                <TableCell className="text-sm">{formatDate(exam.createdAt)}</TableCell>
-                                <TableCell className="text-sm">{exam.doctor?.user?.fullName || 'Unknown'}</TableCell>
-                                <TableCell className="text-sm">{exam.iopOD ?? '-'}</TableCell>
-                                <TableCell className="text-sm">{exam.iopOS ?? '-'}</TableCell>
-                                <TableCell className="text-sm">OD {exam.vaBcvaOD || exam.vaUnaidedOD || '-'} | OS {exam.vaBcvaOS || exam.vaUnaidedOS || '-'}</TableCell>
-                              </TableRow>
-                            ))
-                          )}
-                        </TableBody>
-                      </Table>
-                    )}
-
-                    {eyeHistoryTab === 'surgeries' && (
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="text-xs uppercase tracking-wide">Date</TableHead>
-                            <TableHead className="text-xs uppercase tracking-wide">Type</TableHead>
-                            <TableHead className="text-xs uppercase tracking-wide">Status</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {surgeries.length === 0 ? (
-                            <TableRow>
-                              <TableCell colSpan={3} className="text-center text-slate-500 py-8">No surgery records found.</TableCell>
-                            </TableRow>
-                          ) : (
-                            surgeries.slice(0, 6).map((row) => (
-                              <TableRow key={row.id}>
-                                <TableCell className="text-sm">{formatDate(row.surgeryDate)}</TableCell>
-                                <TableCell className="text-sm">{row.surgeryType || 'N/A'}</TableCell>
-                                <TableCell className="text-sm">{row.status || 'PENDING'}</TableCell>
-                              </TableRow>
-                            ))
-                          )}
-                        </TableBody>
-                      </Table>
-                    )}
-
-                    {eyeHistoryTab === 'sph-trend' && (
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="text-xs uppercase tracking-wide">Date</TableHead>
-                            <TableHead className="text-xs uppercase tracking-wide">Doctor</TableHead>
-                            <TableHead className="text-xs uppercase tracking-wide">SPH OD</TableHead>
-                            <TableHead className="text-xs uppercase tracking-wide">SPH OS</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {eyeExams.length === 0 ? (
-                            <TableRow>
-                              <TableCell colSpan={4} className="text-center text-slate-500 py-8">No SPH trend records found.</TableCell>
-                            </TableRow>
-                          ) : (
-                            eyeExams.slice(0, 6).map((exam) => (
-                              <TableRow key={exam.id}>
-                                <TableCell className="text-sm">{formatDate(exam.createdAt)}</TableCell>
-                                <TableCell className="text-sm">{exam.doctor?.user?.fullName || 'Unknown'}</TableCell>
-                                <TableCell className="text-sm">{exam.refractionSphereOD || '-'}</TableCell>
-                                <TableCell className="text-sm">{exam.refractionSphereOS || '-'}</TableCell>
-                              </TableRow>
-                            ))
-                          )}
-                        </TableBody>
-                      </Table>
-                    )}
-                  </div>
-
-                  <div className="rounded-xl border border-slate-200 p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <p className="text-lg font-semibold text-slate-900">Follow-ups</p>
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{pendingFollowUps.length}</span>
-                    </div>
-                    {pendingFollowUps.length === 0 ? (
-                      <p className="text-sm text-slate-500">No pending follow-ups.</p>
-                    ) : (
-                      <div className="space-y-3">
-                        {pendingFollowUps.slice(0, 3).map((fu) => (
-                          <div key={fu.id} className="rounded-lg border border-slate-200 p-3">
-                            <p className="text-sm font-semibold text-slate-900">{formatDate(fu.dueDate)}</p>
-                            <p className="text-xs uppercase tracking-wide text-blue-700 mt-1">{String(fu.sourceType || 'follow-up').toLowerCase()}</p>
-                            <p className="text-sm text-slate-600 mt-1">{fu.notes || 'Follow-up note'}</p>
-                            <div className="mt-2 flex justify-end">
-                              <Button
-                                size="sm"
-                                className="bg-[#0EA5E9] hover:bg-[#0284C7] text-white"
-                                onClick={() => {
-                                  router.push(`/dashboard/appointments/new?patientId=${encodeURIComponent(id)}`);
-                                }}
-                              >
-                                Book
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             )}
 
-            {activeSection === 'eye-exams' && (
-              <div className="space-y-3">
-                {eyeExams.length === 0 ? (
-                  <div className="rounded-xl border border-slate-200 p-6 text-slate-500">No eye examinations found.</div>
-                ) : (
-                  eyeExams.map((exam) => (
+            {/* ── Eye History Tab ── */}
+            {sideTab === 'eye-history' && (
+              <>
+                {/* Sub-tabs */}
+                <div className="flex gap-2 flex-wrap">
+                  {EYE_TABS.map(t => (
                     <button
-                      key={exam.id}
-                      type="button"
-                      onClick={() => router.push(`/dashboard/eye-examinations/${exam.id}`)}
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3 text-left hover:bg-slate-50"
+                      key={t.id}
+                      onClick={() => setEyeTab(t.id)}
+                      className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                        eyeTab === t.id
+                          ? 'bg-[#0EA5E9] text-white shadow-sm'
+                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300'
+                      }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-lg font-semibold text-slate-900">{exam.chiefComplaint || 'Eye examination'}</p>
-                          <p className="text-base text-slate-500">{formatDate(exam.createdAt)}</p>
-                          <p className="text-base text-slate-600">{formatVA(exam)}</p>
-                        </div>
-                        <ChevronRight className="h-5 w-5 text-slate-400" />
-                      </div>
-                    </button>
-                  ))
-                )}
-              </div>
-            )}
-
-            {activeSection === 'prescriptions' && (
-              <div className="rounded-xl border border-slate-200 overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-slate-50">
-                      <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-600">Date</TableHead>
-                      <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-600">Type</TableHead>
-                      <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-600">OD</TableHead>
-                      <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-600">OS</TableHead>
-                      <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-600">Status</TableHead>
-                      <TableHead className="text-right text-xs font-semibold uppercase tracking-wide text-slate-600">View</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {rxRows.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={6} className="text-center text-slate-500 py-8">No prescriptions found.</TableCell>
-                      </TableRow>
-                    ) : (
-                      rxRows.map((row) => (
-                        <TableRow key={row.id}>
-                          <TableCell className="text-sm">{formatDate(row.createdAt)}</TableCell>
-                          <TableCell className="text-sm">{toTypeLabel(row.type)}</TableCell>
-                          <TableCell className="text-sm text-slate-700">{formatEyeSummary('od', row)}</TableCell>
-                          <TableCell className="text-sm text-slate-700">{formatEyeSummary('os', row)}</TableCell>
-                          <TableCell>
-                            <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
-                              {String(row.status || 'filled').toLowerCase()}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Link href={`/dashboard/prescriptions/${row.id}`} className="text-sm text-[#0EA5E9] hover:text-[#0284C7] font-medium">
-                              View
-                            </Link>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-
-            {activeSection === 'surgeries' && (
-              <div className="rounded-xl border border-slate-200 overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-slate-50">
-                      <TableHead>Date</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right" />
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {surgeries.length === 0 ? (
-                      <TableRow><TableCell colSpan={4} className="text-center text-slate-500 py-8">No surgeries found.</TableCell></TableRow>
-                    ) : (
-                      surgeries.map((row) => (
-                        <TableRow key={row.id}>
-                          <TableCell>{formatDate(row.surgeryDate)}</TableCell>
-                          <TableCell>{row.surgeryType || 'N/A'}</TableCell>
-                          <TableCell>{row.status || 'PENDING'}</TableCell>
-                          <TableCell className="text-right">
-                            <Link href={`/dashboard/surgery/${row.id}`} className="text-[#0EA5E9] hover:text-[#0284C7] font-medium">View</Link>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-
-            {activeSection === 'appointments' && (
-              <div className="rounded-xl border border-slate-200 overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-slate-50">
-                      <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-600">Date</TableHead>
-                      <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-600">Time</TableHead>
-                      <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-600">Doctor</TableHead>
-                      <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-600">Type</TableHead>
-                      <TableHead className="text-xs font-semibold uppercase tracking-wide text-slate-600">Status</TableHead>
-                      <TableHead className="text-right" />
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {(patient.appointments || []).length === 0 ? (
-                      <TableRow><TableCell colSpan={6} className="text-center text-slate-500 py-8">No appointments found.</TableCell></TableRow>
-                    ) : (
-                      (patient.appointments || []).map((row) => {
-                        const status = String(row.status || 'PENDING').toUpperCase();
-                        const typeLabel = row.clinicalExamination?.surgery
-                          ? 'surgery'
-                          : 'consultation';
-                        return (
-                        <TableRow key={row.id}>
-                          <TableCell className="text-sm text-slate-700">{formatDate(row.appointmentDate)}</TableCell>
-                          <TableCell className="text-sm text-slate-700">{formatTime(row.appointmentDate)}</TableCell>
-                          <TableCell className="text-sm text-slate-700">{row.doctor?.user?.fullName || 'Unknown'}</TableCell>
-                          <TableCell className="text-sm text-slate-700">{typeLabel}</TableCell>
-                          <TableCell>
-                            <span
-                              className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                                status === 'COMPLETED'
-                                  ? 'bg-emerald-100 text-emerald-700'
-                                  : status === 'CONFIRMED'
-                                    ? 'bg-emerald-100 text-emerald-700'
-                                    : status === 'PENDING'
-                                      ? 'bg-amber-100 text-amber-700'
-                                      : status === 'CANCELLED'
-                                        ? 'bg-red-100 text-red-700'
-                                        : 'bg-slate-100 text-slate-600'
-                              }`}
-                            >
-                              {status.toLowerCase()}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Link href={`/dashboard/appointments/${row.id}`} className="text-[#0EA5E9] hover:text-[#0284C7] font-medium">View</Link>
-                          </TableCell>
-                        </TableRow>
-                        );
+                      {t.label} ({
+                        t.id === 'refraction' ? (eyeHistory?.refractionHistory?.length ?? 0)
+                        : t.id === 'iop-va' ? (eyeHistory?.iopHistory?.length ?? 0)
+                        : (eyeHistory?.surgeries?.length ?? 0)
                       })
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
+                    </button>
+                  ))}
+                </div>
 
-            {activeSection === 'billing' && (
-              <div className="rounded-xl border border-slate-200 overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-slate-50">
-                      <TableHead>Date</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {billRows.length === 0 ? (
-                      <TableRow><TableCell colSpan={3} className="text-center text-slate-500 py-8">No billing records found.</TableCell></TableRow>
-                    ) : (
-                      billRows.map((row) => (
-                        <TableRow key={row.id}>
-                          <TableCell>{formatDate(row.appointmentDate)}</TableCell>
-                          <TableCell>{Number(row.amount || 0).toFixed(2)}</TableCell>
-                          <TableCell>{row.status || 'PENDING'}</TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
+                {/* Refraction */}
+                {eyeTab === 'refraction' && (
+                  <Card>
+                    <CardContent className="p-0">
+                      {!eyeHistory?.refractionHistory?.length ? (
+                        <p className="p-6 text-center text-sm text-slate-400">No refraction records found.</p>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/50">
+                                {['DATE', 'DOCTOR', 'RIGHT EYE', 'LEFT EYE', 'DIAGNOSIS'].map(h => (
+                                  <th key={h} className="px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">{h}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                              {eyeHistory.refractionHistory.map((r, i) => (
+                                <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                                  <td className="px-4 py-3 whitespace-nowrap font-medium text-slate-800 dark:text-slate-200">{fmtDate(r.date)}</td>
+                                  <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{r.doctorName}</td>
+                                  <td className="px-4 py-3 font-mono text-xs text-slate-700 dark:text-slate-300">
+                                    SPH {r.sphRight ?? '—'} / CYL {r.cylRight ?? '—'} / AX {r.axisRight ?? '—'}
+                                  </td>
+                                  <td className="px-4 py-3 font-mono text-xs text-slate-700 dark:text-slate-300">
+                                    SPH {r.sphLeft ?? '—'} / CYL {r.cylLeft ?? '—'} / AX {r.axisLeft ?? '—'}
+                                  </td>
+                                  <td className="px-4 py-3 max-w-[200px] truncate text-slate-600 dark:text-slate-300">{r.diagnosis || '—'}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
 
-            {activeSection === 'followups' && (
-              <div className="rounded-xl border border-slate-200 overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-slate-50">
-                      <TableHead>Due Date</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Notes</TableHead>
-                      <TableHead className="text-right" />
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {followUps.length === 0 ? (
-                      <TableRow><TableCell colSpan={5} className="text-center text-slate-500 py-8">No follow-ups found.</TableCell></TableRow>
-                    ) : (
-                      followUps.map((row) => (
-                        <TableRow key={row.id}>
-                          <TableCell>{formatDate(row.dueDate)}</TableCell>
-                          <TableCell>{String(row.sourceType || '').toLowerCase() || 'follow-up'}</TableCell>
-                          <TableCell>{String(row.status || '').toLowerCase() || 'pending'}</TableCell>
-                          <TableCell>{row.notes || '-'}</TableCell>
-                          <TableCell className="text-right">
-                            {(String(row.status || '').toUpperCase() === 'PENDING' || String(row.status || '').toUpperCase() === 'OVERDUE') && (
-                              <Button
-                                size="sm"
-                                className="bg-[#0EA5E9] hover:bg-[#0284C7] text-white"
-                                onClick={() => {
-                                  router.push(`/dashboard/appointments/new?patientId=${encodeURIComponent(id)}`);
-                                }}
-                              >
-                                Book
-                              </Button>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
+                {/* IOP / VA */}
+                {eyeTab === 'iop-va' && (
+                  <Card>
+                    <CardContent className="p-0">
+                      {!eyeHistory?.iopHistory?.length ? (
+                        <p className="p-6 text-center text-sm text-slate-400">No IOP / VA records found.</p>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/50">
+                                {['DATE', 'RECORDED BY', 'IOP RIGHT', 'IOP LEFT', 'VA RIGHT', 'VA LEFT'].map(h => (
+                                  <th key={h} className="px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">{h}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                              {eyeHistory.iopHistory.map((r, i) => (
+                                <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                                  <td className="px-4 py-3 whitespace-nowrap font-medium text-slate-800 dark:text-slate-200">{fmtDate(r.date)}</td>
+                                  <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{r.recordedBy || '—'}</td>
+                                  <td className="px-4 py-3 font-bold text-slate-800 dark:text-white">{r.iopRight ?? '—'} <span className="text-xs font-normal text-slate-400">mmHg</span></td>
+                                  <td className="px-4 py-3 font-bold text-slate-800 dark:text-white">{r.iopLeft ?? '—'} <span className="text-xs font-normal text-slate-400">mmHg</span></td>
+                                  <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{r.vaRight || '—'}</td>
+                                  <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{r.vaLeft || '—'}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Surgeries */}
+                {eyeTab === 'surgeries' && (
+                  <Card>
+                    <CardContent className="p-0">
+                      {!eyeHistory?.surgeries?.length ? (
+                        <p className="p-6 text-center text-sm text-slate-400">No surgery records found.</p>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/50">
+                                {['DATE', 'EYE SIDE', 'TYPE', 'SURGEON', 'STATUS'].map(h => (
+                                  <th key={h} className="px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">{h}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                              {eyeHistory.surgeries.map((s, i) => (
+                                <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                                  <td className="px-4 py-3 whitespace-nowrap font-medium text-slate-800 dark:text-slate-200">{fmtDate(s.date)}</td>
+                                  <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{s.eye || '—'}</td>
+                                  <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{s.surgeryType || '—'}</td>
+                                  <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{s.surgeonName || '—'}</td>
+                                  <td className="px-4 py-3">
+                                    <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-bold ${statusColor(s.status)}`}>
+                                      {(s.status || 'N/A').toUpperCase()}
+                                    </span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+              </>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -13,7 +13,6 @@ import {
     MapPin,
     MoreVertical,
     Plus,
-    Calendar,
     Filter,
     RefreshCcw,
 } from 'lucide-react';
@@ -132,7 +131,7 @@ function getLocalDateValue(date = new Date()): string {
 function SkeletonRow() {
     return (
         <TableRow className="animate-pulse border-slate-100 dark:border-slate-800">
-            {[200, 130, 90, 100, 120, 110].map((w, i) => (
+            {[200, 130, 90, 100, 120, 110, 80].map((w, i) => (
                 <TableCell key={i}>
                     <div className="h-4 rounded bg-slate-100 dark:bg-slate-800" style={{ width: w }} />
                     {i === 0 && <div className="h-3 rounded bg-slate-100 dark:bg-slate-800 mt-1.5 w-24" />}
@@ -293,10 +292,6 @@ export default function AppointmentsPage() {
                             placeholder="To"
                         />
 
-                        <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700 whitespace-nowrap">
-                            <Calendar className="h-3 w-3" />
-                            {pagination.total} appointment{pagination.total !== 1 ? 's' : ''}
-                        </span>
                     </div>
 
                     {/* Refresh */}
@@ -320,7 +315,7 @@ export default function AppointmentsPage() {
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-slate-50 dark:bg-slate-900/70 hover:bg-slate-50 dark:hover:bg-slate-900/70 border-slate-200 dark:border-slate-800">
-                                {['PATIENT & DOCTOR', 'DATE & TIME', 'TYPE', 'STATUS', 'LOCATION', 'ACTIONS'].map((h) => (
+                                {['PATIENT & DOCTOR', 'DATE & TIME', 'TYPE', 'STATUS', 'AMOUNT', 'LOCATION', 'ACTIONS'].map((h) => (
                                     <TableHead
                                         key={h}
                                         className="text-[12px] font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide py-3 px-4 whitespace-nowrap"
@@ -335,7 +330,7 @@ export default function AppointmentsPage() {
                                 Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)
                             ) : appointments.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-60 text-center">
+                                    <TableCell colSpan={7} className="h-60 text-center">
                                         <div className="flex flex-col items-center gap-3 text-slate-400">
                                             <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center">
                                                 <CalendarPlus className="h-7 w-7 opacity-40" />
@@ -403,6 +398,13 @@ export default function AppointmentsPage() {
                                         <TableCell className="py-3 px-4">
                                             <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide border ${STATUS_STYLES[a.status || 'PENDING']}`}>
                                                 {a.status || 'PENDING'}
+                                            </span>
+                                        </TableCell>
+
+                                        {/* AMOUNT */}
+                                        <TableCell className="py-3 px-4">
+                                            <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 tabular-nums">
+                                                ${typeof a.amount === 'number' ? a.amount.toFixed(2) : Number(a.amount || 0).toFixed(2)}
                                             </span>
                                         </TableCell>
 

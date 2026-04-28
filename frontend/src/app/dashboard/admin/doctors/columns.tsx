@@ -54,13 +54,6 @@ export const getDoctorColumns = ({ onView, onEdit, onDelete }: DoctorColumnsProp
         ),
     },
     {
-        accessorKey: 'licenseNumber',
-        header: () => <span className="text-[13px] font-bold uppercase tracking-[0.03em] text-slate-700">License No.</span>,
-        cell: ({ row }) => (
-            <span className="text-sm text-slate-700 dark:text-slate-300">{row.original.licenseNumber}</span>
-        ),
-    },
-    {
         accessorKey: 'branchName',
         header: () => <span className="text-[13px] font-bold uppercase tracking-[0.03em] text-slate-700">Branch</span>,
         cell: ({ row }) => (

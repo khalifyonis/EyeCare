@@ -31,8 +31,6 @@ import {
     List,
     Plus,
     CalendarPlus,
-    Store,
-    ShoppingCart,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useParams, usePathname } from 'next/navigation'
@@ -142,11 +140,12 @@ const roleNavigation: Record<string, NavSection[]> = {
                     ],
                 },
                 {
-                    title: 'Optical Prescriptions',
+                    title: 'Prescriptions',
                     icon: FileText,
-                    url: '/dashboard/prescriptions',
+                    url: '/dashboard/prescription/optical',
                     subItems: [
-                        { title: 'All Prescriptions', url: '/dashboard/prescriptions' },
+                        { title: 'Optical Prescriptions', url: '/dashboard/prescription/optical' },
+                        { title: 'Medicine Prescriptions', url: '/dashboard/prescription/medicine' },
                     ],
                 },
                 { title: 'Medical Reports', icon: BarChart3, url: '/dashboard/reports' },
@@ -160,23 +159,20 @@ const roleNavigation: Record<string, NavSection[]> = {
                     icon: Pill,
                     url: '/dashboard/pharmacy',
                     subItems: [
-                        { title: 'Sales Dashboard', url: '/dashboard/pharmacy' },
-                        { title: 'Inventory', url: '/dashboard/pharmacy/inventory' },
-                        { title: 'Expiry Alerts', url: '/dashboard/pharmacy/expiry' },
-                        { title: 'Reports', url: '/dashboard/pharmacy/reports' },
+                        { title: 'Sales', url: '/dashboard/pharmacy' },
+                        { title: 'Medicines', url: '/dashboard/pharmacy/inventory' },
                     ],
                 },
                 {
                     title: 'Optical Shop',
                     icon: Glasses,
-                    url: '/dashboard/optical-shop',
+                    url: '/dashboard/optical-shop/orders',
                     subItems: [
-                        { title: 'Orders', url: '/dashboard/optical-shop' },
+                        { title: 'Orders', url: '/dashboard/optical-shop/orders' },
                         { title: 'Frames', url: '/dashboard/optical-shop/frames' },
                         { title: 'Lens Inventory', url: '/dashboard/optical-shop/lenses' },
                     ],
                 },
-                { title: 'Suppliers', icon: Package, url: '/dashboard/suppliers' },
             ],
         },
         {
@@ -235,11 +231,12 @@ const roleNavigation: Record<string, NavSection[]> = {
                     ],
                 },
                 {
-                    title: 'Optical Prescriptions',
+                    title: 'Prescriptions',
                     icon: FileText,
-                    url: '/dashboard/prescriptions',
+                    url: '/dashboard/prescription/optical',
                     subItems: [
-                        { title: 'All Prescriptions', url: '/dashboard/prescriptions' },
+                        { title: 'Optical Prescriptions', url: '/dashboard/prescription/optical' },
+                        { title: 'Medicine Prescriptions', url: '/dashboard/prescription/medicine' },
                     ],
                 },
                 { title: 'Medical Reports', icon: BarChart3, url: '/dashboard/reports' },
@@ -253,23 +250,20 @@ const roleNavigation: Record<string, NavSection[]> = {
                     icon: Pill,
                     url: '/dashboard/pharmacy',
                     subItems: [
-                        { title: 'Sales Dashboard', url: '/dashboard/pharmacy' },
-                        { title: 'Inventory', url: '/dashboard/pharmacy/inventory' },
-                        { title: 'Expiry Alerts', url: '/dashboard/pharmacy/expiry' },
-                        { title: 'Reports', url: '/dashboard/pharmacy/reports' },
+                        { title: 'Sales', url: '/dashboard/pharmacy' },
+                        { title: 'Medicines', url: '/dashboard/pharmacy/inventory' },
                     ],
                 },
                 {
                     title: 'Optical Shop',
                     icon: Glasses,
-                    url: '/dashboard/optical-shop',
+                    url: '/dashboard/optical-shop/orders',
                     subItems: [
-                        { title: 'Orders', url: '/dashboard/optical-shop' },
+                        { title: 'Orders', url: '/dashboard/optical-shop/orders' },
                         { title: 'Frames', url: '/dashboard/optical-shop/frames' },
                         { title: 'Lens Inventory', url: '/dashboard/optical-shop/lenses' },
                     ],
                 },
-                { title: 'Suppliers', icon: Package, url: '/dashboard/suppliers' },
             ],
         },
         {
@@ -329,11 +323,12 @@ const roleNavigation: Record<string, NavSection[]> = {
                     ],
                 },
                 {
-                    title: 'Optical Prescriptions',
+                    title: 'Prescriptions',
                     icon: FileText,
-                    url: '/dashboard/prescriptions',
+                    url: '/dashboard/prescription/optical',
                     subItems: [
-                        { title: 'All Prescriptions', url: '/dashboard/prescriptions' },
+                        { title: 'Optical Prescriptions', url: '/dashboard/prescription/optical' },
+                        { title: 'Medicine Prescriptions', url: '/dashboard/prescription/medicine' },
                     ],
                 },
                 { title: 'Reports', icon: BarChart3, url: '/dashboard/reports' },
@@ -355,24 +350,22 @@ const roleNavigation: Record<string, NavSection[]> = {
                     icon: Pill,
                     url: '/dashboard/pharmacy',
                     subItems: [
-                        { title: 'Sales Dashboard', url: '/dashboard/pharmacy' },
-                        { title: 'Inventory', url: '/dashboard/pharmacy/inventory' },
-                        { title: 'Expiry Alerts', url: '/dashboard/pharmacy/expiry' },
-                        { title: 'Reports', url: '/dashboard/pharmacy/reports' },
+                        { title: 'Sales', url: '/dashboard/pharmacy' },
+                        { title: 'Medicines', url: '/dashboard/pharmacy/inventory' },
                     ],
                 },
-                { title: 'Suppliers', icon: Package, url: '/dashboard/suppliers' },
             ],
         },
         {
             section: 'DISPENSING',
             items: [
                 {
-                    title: 'Optical Prescriptions',
+                    title: 'Prescriptions',
                     icon: FileText,
-                    url: '/dashboard/prescriptions',
+                    url: '/dashboard/prescription/optical',
                     subItems: [
-                        { title: 'All Prescriptions', url: '/dashboard/prescriptions' },
+                        { title: 'Optical Prescriptions', url: '/dashboard/prescription/optical' },
+                        { title: 'Medicine Prescriptions', url: '/dashboard/prescription/medicine' },
                     ],
                 },
                 { title: 'Billing (Sales)', icon: Receipt, url: '/dashboard/billing' },
@@ -398,26 +391,25 @@ const roleNavigation: Record<string, NavSection[]> = {
             items: [
                 {
                     title: 'Optical Shop',
-                    icon: Store,
-                    url: '/dashboard/optical-shop',
+                    icon: Glasses,
+                    url: '/dashboard/optical-shop/orders',
                     subItems: [
-                        { title: 'Orders', url: '/dashboard/optical-shop' },
+                        { title: 'Orders', url: '/dashboard/optical-shop/orders' },
                         { title: 'Frames', url: '/dashboard/optical-shop/frames' },
                         { title: 'Lens Inventory', url: '/dashboard/optical-shop/lenses' },
                     ],
                 },
-                { title: 'Suppliers', icon: Package, url: '/dashboard/suppliers' },
             ],
         },
         {
             section: 'DISPENSING',
             items: [
                 {
-                    title: 'Optical Prescriptions',
+                    title: 'Prescriptions',
                     icon: FileText,
-                    url: '/dashboard/prescriptions',
+                    url: '/dashboard/prescription/optical',
                     subItems: [
-                        { title: 'All Prescriptions', url: '/dashboard/prescriptions' },
+                        { title: 'Optical Prescriptions', url: '/dashboard/prescription/optical' },
                     ],
                 },
                 { title: 'Billing (Sales)', icon: Receipt, url: '/dashboard/billing' },
@@ -497,23 +489,36 @@ function CollapsibleNavItem({
     if (!item.subItems) {
         const isComingSoon = item.comingSoon === true
         const canNavigate = item.url !== '#' && !isComingSoon
+
         return (
             <SidebarMenuItem>
-                <SidebarMenuButton
-                    tooltip={isComingSoon ? `${item.title} (Coming soon)` : item.title}
-                    isActive={isActive}
-                    onClick={() => { if (canNavigate) onSelect() }}
-                    className={`h-[42px] px-3.5 transition-all duration-200 group/item rounded-lg ${isActive
-                        ? '!bg-[#0EA5E9] !text-white shadow-[0_4px_12px_rgba(14,165,233,0.3)]'
-                        : 'hover:bg-sidebar-accent text-sidebar-foreground hover:text-[#0EA5E9] dark:text-sidebar-foreground dark:hover:bg-sidebar-accent dark:hover:text-[#0EA5E9]'
-                        } ${isComingSoon ? 'cursor-default' : ''}`}
-                >
-                    <item.icon className={`h-[21px] w-[21px] shrink-0 transition-colors duration-200 ${isActive ? '!text-white' : 'text-sidebar-foreground/70 group-hover/item:text-[#0EA5E9] dark:text-sidebar-foreground/80'}`} />
-                    <span className={`text-[15px] font-semibold tracking-tight transition-colors duration-200 ml-1 ${isActive ? '!text-white' : ''}`}>{item.title}</span>
-                    {isComingSoon && (
-                        <span className="ml-auto text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-950/50 px-1.5 py-0.5 rounded">Coming soon</span>
-                    )}
-                </SidebarMenuButton>
+                {canNavigate ? (
+                    <Link
+                        href={item.url}
+                        className={`flex w-full items-center h-[42px] px-3.5 transition-all duration-200 group/item rounded-lg ${isActive
+                            ? '!bg-[#0EA5E9] !text-white shadow-[0_4px_12px_rgba(14,165,233,0.3)]'
+                            : 'hover:bg-sidebar-accent text-sidebar-foreground hover:text-[#0EA5E9] dark:text-sidebar-foreground dark:hover:bg-sidebar-accent dark:hover:text-[#0EA5E9]'
+                            }`}
+                    >
+                        <item.icon className={`h-[21px] w-[21px] shrink-0 transition-colors duration-200 ${isActive ? '!text-white' : 'text-sidebar-foreground/70 group-hover/item:text-[#0EA5E9] dark:text-sidebar-foreground/80'}`} />
+                        <span className={`text-[15px] font-semibold tracking-tight transition-colors duration-200 ml-1 ${isActive ? '!text-white' : ''}`}>{item.title}</span>
+                    </Link>
+                ) : (
+                    <SidebarMenuButton
+                        tooltip={isComingSoon ? `${item.title} (Coming soon)` : item.title}
+                        isActive={isActive}
+                        className={`h-[42px] px-3.5 transition-all duration-200 group/item rounded-lg ${isActive
+                            ? '!bg-[#0EA5E9] !text-white shadow-[0_4px_12px_rgba(14,165,233,0.3)]'
+                            : 'hover:bg-sidebar-accent text-sidebar-foreground hover:text-[#0EA5E9] dark:text-sidebar-foreground dark:hover:bg-sidebar-accent dark:hover:text-[#0EA5E9]'
+                            } ${isComingSoon ? 'cursor-default' : ''}`}
+                    >
+                        <item.icon className={`h-[21px] w-[21px] shrink-0 transition-colors duration-200 ${isActive ? '!text-white' : 'text-sidebar-foreground/70 group-hover/item:text-[#0EA5E9] dark:text-sidebar-foreground/80'}`} />
+                        <span className={`text-[15px] font-semibold tracking-tight transition-colors duration-200 ml-1 ${isActive ? '!text-white' : ''}`}>{item.title}</span>
+                        {isComingSoon && (
+                            <span className="ml-auto text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-950/50 px-1.5 py-0.5 rounded">Coming soon</span>
+                        )}
+                    </SidebarMenuButton>
+                )}
             </SidebarMenuItem>
         )
     }
@@ -526,39 +531,37 @@ function CollapsibleNavItem({
                 onClick={() => {
                     setOpen(!open)
                 }}
-                className={`h-[42px] px-3.5 transition-all duration-300 group/item rounded-lg ${isActive
+                className={`h-[42px] px-3.5 transition-all duration-200 group/item rounded-lg ${isActive
                     ? 'bg-blue-50 dark:bg-blue-950/40 text-[#0EA5E9] font-semibold'
-                    : 'hover:bg-sidebar-accent text-sidebar-foreground hover:text-[#0EA5E9] dark:text-sidebar-foreground dark:hover:bg-sidebar-accent font-semibold'
+                    : 'hover:bg-sidebar-accent text-sidebar-foreground hover:text-[#0EA5E9] dark:text-sidebar-foreground dark:hover:bg-sidebar-accent dark:hover:text-[#0EA5E9]'
                     }`}
             >
-                <item.icon className={`transition-colors duration-300 ${isActive ? 'text-[#0EA5E9]' : 'text-sidebar-foreground/70 group-hover/item:text-[#0EA5E9] dark:text-sidebar-foreground/60'}`} />
-                <span className={`text-[15px] font-semibold tracking-tight transition-colors duration-300 truncate min-w-0 ${isActive ? 'text-[#0EA5E9]' : ''}`}>{item.title}</span>
+                <item.icon className={`h-[21px] w-[21px] shrink-0 transition-colors duration-200 ${isActive ? 'text-[#0EA5E9]' : 'text-sidebar-foreground/70 group-hover/item:text-[#0EA5E9] dark:text-sidebar-foreground/80'}`} />
+                <span className={`text-[15px] font-semibold tracking-tight transition-colors duration-200 ml-1 truncate min-w-0 ${isActive ? 'text-[#0EA5E9]' : ''}`}>{item.title}</span>
                 <ChevronDown
-                    className={`ml-auto size-4 transition-transform duration-300 ${open ? 'rotate-180' : ''} ${isActive ? 'text-[#0EA5E9]' : 'text-sidebar-foreground/60 group-hover/item:text-[#0EA5E9]'}`}
+                    className={`ml-auto size-4 transition-transform duration-200 ${open ? 'rotate-180' : ''} ${isActive ? 'text-[#0EA5E9]' : 'text-sidebar-foreground/60 group-hover/item:text-[#0EA5E9]'}`}
                 />
             </SidebarMenuButton>
-                            {open && (
-                                <SidebarMenuSub className="border-none ml-1">
-                                    {item.subItems.map((subItem) => {
-                                        const isSubActive = pathname === subItem.url
-                                        return (
-                                            <SidebarMenuSubItem key={subItem.title}>
-                                                <SidebarMenuSubButton asChild>
-                                                    <Link
-                                                        href={subItem.url}
-                                                        className={`flex items-center w-full rounded-lg px-4 py-2.5 text-[15px] font-semibold transition-colors duration-200 ${isSubActive
-                                                            ? 'text-[#0EA5E9] bg-sidebar-accent'
-                                                            : 'text-sidebar-foreground hover:text-[#0EA5E9] hover:bg-sidebar-accent'
-                                                            }`}
-                                                    >
-                                                        {subItem.title}
-                                                    </Link>
-                                                </SidebarMenuSubButton>
-                                            </SidebarMenuSubItem>
-                                        )
-                                    })}
-                                </SidebarMenuSub>
-                            )}
+            {open && (
+                <SidebarMenuSub className="border-none ml-0 p-0 gap-0">
+                    {item.subItems.map((subItem) => {
+                        const isSubActive = pathname === subItem.url
+                        return (
+                            <SidebarMenuSubItem key={subItem.title}>
+                                <Link
+                                    href={subItem.url}
+                                    className={`flex items-center w-full h-[42px] rounded-lg px-3.5 text-[14px] font-semibold transition-all duration-200 ${isSubActive
+                                        ? '!bg-[#0EA5E9] !text-white shadow-[0_4px_12px_rgba(14,165,233,0.3)]'
+                                        : 'text-sidebar-foreground/80 hover:text-[#0EA5E9] hover:bg-sidebar-accent'
+                                        }`}
+                                >
+                                    <span className="ml-7">{subItem.title}</span>
+                                </Link>
+                            </SidebarMenuSubItem>
+                        )
+                    })}
+                </SidebarMenuSub>
+            )}
         </SidebarMenuItem>
     )
 }
@@ -596,7 +599,7 @@ function CollapsibleSection({
         <SidebarGroup className="p-0">
             <button
                 onClick={() => setOpen(!open)}
-                className="flex w-full items-center justify-between px-5 mt-5 mb-1.5 group/section outline-none rounded-md hover:bg-sidebar-accent/50 transition-colors"
+                className="flex w-full items-center justify-between px-5 mt-5 mb-0.5 group/section outline-none rounded-md hover:bg-sidebar-accent/50 transition-colors"
             >
                 <span className="text-[12px] font-black tracking-[0.15em] uppercase text-sidebar-foreground/70 group-hover/section:text-[#0EA5E9] transition-all dark:text-sidebar-foreground/60">
                     {label}
@@ -605,7 +608,7 @@ function CollapsibleSection({
                     className={`h-3.5 w-3.5 transition-transform duration-300 ${open ? 'rotate-90' : ''} ${open || isSectionActive ? 'text-[#0EA5E9]' : 'text-sidebar-foreground/50 group-hover/section:text-[#0EA5E9]'}`}
                 />
             </button>
-            {open && <SidebarGroupContent>{children}</SidebarGroupContent>}
+            {open && <SidebarGroupContent className="p-0"><SidebarMenu className="gap-0">{children}</SidebarMenu></SidebarGroupContent>}
         </SidebarGroup>
     )
 }
@@ -639,6 +642,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     const sections = roleNavigation[role] ?? roleNavigation['ADMIN'] ?? []
 
+    const navigateTo = React.useCallback((url: string) => {
+        if (!url || url === '#') return
+
+        router.push(url)
+    }, [router])
+
     return (
         <Sidebar collapsible="icon" className="border-sidebar-border shrink-0" {...props}>
             <SidebarHeader className="bg-sidebar border-b border-sidebar-border px-4 sm:px-5 py-4 shrink-0">
@@ -666,23 +675,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         defaultOpen={sectionIndex === 0}
                         sectionItems={section.items}
                     >
-                        <SidebarMenu>
-                            {section.items.map((item) => (
-                                <React.Fragment key={item.title}>
-                                    {section.section === 'INVENTORY' && item.title === 'Suppliers' && (
-                                        <SidebarSeparator className="my-2 bg-sidebar-border/60" />
-                                    )}
-                                    <CollapsibleNavItem
-                                        item={item}
-                                        onSelect={() => {
-                                            if (item.url && item.url !== '#' && !item.comingSoon) {
-                                                router.push(item.url)
-                                            }
-                                        }}
-                                    />
-                                </React.Fragment>
-                            ))}
-                        </SidebarMenu>
+                        {section.items.map((item) => (
+                            <React.Fragment key={item.title}>
+                                {section.section === 'INVENTORY' && item.title === 'Suppliers' && (
+                                    <SidebarSeparator className="my-2 bg-sidebar-border/60" />
+                                )}
+                                <CollapsibleNavItem
+                                    item={item}
+                                    onSelect={() => {
+                                        if (item.url && item.url !== '#' && !item.comingSoon) {
+                                            navigateTo(item.url)
+                                        }
+                                    }}
+                                />
+                            </React.Fragment>
+                        ))}
                     </CollapsibleSection>
                 ))}
             </SidebarContent>
@@ -690,7 +697,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarSeparator className="bg-sidebar-border/50" />
 
             <SidebarFooter className="bg-sidebar border-t border-sidebar-border relative z-50 shrink-0">
-                <SidebarMenu>
+                <SidebarMenu className="gap-0">
                     <SidebarMenuItem>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

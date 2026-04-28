@@ -14,9 +14,9 @@ import { Search, UserRound, ShoppingCart, CreditCard, ReceiptText, Plus, Minus }
 
 type Patient = { id: string; fullName?: string | null; patientNumber?: string | null; phone?: string | null }
 
-type ClinicalPrescription = {
+type MedicinePrescription = {
   id: string
-  itemType: 'PHARMACY' | 'OPTICAL'
+  itemType: 'PHARMACY'
   itemId?: string | null
   quantity?: number | null
   appointment?: { patient?: { id: string; fullName?: string | null } | null } | null
@@ -175,7 +175,7 @@ export default function PharmacySalesWizardPage() {
   const [patient, setPatient] = useState<Patient | null>(null)
 
   const [prescriptionLoading, setPrescriptionLoading] = useState(false)
-  const [prescriptions, setPrescriptions] = useState<ClinicalPrescription[]>([])
+  const [prescriptions, setPrescriptions] = useState<MedicinePrescription[]>([])
   const [linkedPrescriptionId, setLinkedPrescriptionId] = useState<string>('none')
 
   // Step 2: meds
@@ -209,8 +209,8 @@ export default function PharmacySalesWizardPage() {
   const loadPatientPrescriptions = useCallback(async (patientId: string) => {
     setPrescriptionLoading(true)
     try {
-      const res = await api.get('/clinical-prescriptions', { params: { itemType: 'PHARMACY', patientId } })
-      const rows = Array.isArray(res.data) ? (res.data as ClinicalPrescription[]) : []
+      const res = await api.get('/prescription-items', { params: { itemType: 'PHARMACY', patientId } })
+      const rows = Array.isArray(res.data) ? (res.data as MedicinePrescription[]) : []
       setPrescriptions(rows)
     } catch {
       setPrescriptions([])
@@ -471,7 +471,7 @@ export default function PharmacySalesWizardPage() {
                 <Button
                   onClick={linkPrescriptionToCart}
                   disabled={!patient?.id || linkedPrescriptionId === 'none' || prescriptionLoading}
-                  className="h-11 w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 font-semibold"
+                  className="h-11 w-full rounded-xl bg-[#0EA5E9] hover:bg-[#0c96d4] font-semibold"
                 >
                   Add Rx Item to Cart
                 </Button>
@@ -482,7 +482,7 @@ export default function PharmacySalesWizardPage() {
               <Button
                 onClick={() => setStep(2)}
                 disabled={!canNext1}
-                className="h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 px-6 text-base font-semibold"
+                className="h-11 rounded-xl bg-[#0EA5E9] hover:bg-[#0c96d4] px-6 text-base font-semibold"
               >
                 Next: Select Meds
               </Button>
@@ -634,7 +634,7 @@ export default function PharmacySalesWizardPage() {
                 <Button
                   onClick={() => setStep(3)}
                   disabled={!canNext2}
-                  className="h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 px-6 text-base font-semibold"
+                  className="h-11 rounded-xl bg-[#0EA5E9] hover:bg-[#0c96d4] px-6 text-base font-semibold"
                 >
                   Next: Payment
                 </Button>
@@ -685,7 +685,7 @@ export default function PharmacySalesWizardPage() {
               <Button
                 onClick={submitSale}
                 disabled={!canFinish}
-                className="h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 px-6 text-base font-semibold"
+                className="h-11 rounded-xl bg-[#0EA5E9] hover:bg-[#0c96d4] px-6 text-base font-semibold"
               >
                 {submitting ? 'Processing...' : 'Complete Sale & Print'}
               </Button>

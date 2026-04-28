@@ -180,8 +180,8 @@ export const getDoctorDashboard = async (req, res, next) => {
                 include: { appointment: { include: { patient: { select: { fullName: true } } } } },
             }),
             prisma.surgery.findMany({
-                where: { surgeonId: doctor.id, status: 'PENDING', surgeryDate: { gte: new Date() } },
-                orderBy: { surgeryDate: 'asc' },
+                where: { surgeonId: doctor.id, status: 'scheduled', date: { gte: new Date() } },
+                orderBy: { date: 'asc' },
                 take: 5,
                 include: { clinicalExam: { include: { appointment: { include: { patient: { select: { fullName: true } } } } } } },
             }),
@@ -313,19 +313,31 @@ export const getOpticianDashboard = async (req, res, next) => {
         const allItems = await prisma.opticalItem.findMany({ where: { ...branchFilter, isActive: true } });
         const lowStockList = allItems.filter(i => i.stockQuantity <= i.reorderLevel);
 
-        const [prescriptionsToday, revenueToday, recentPrescriptions] = await Promise.all([
-            prisma.prescription.count({ where: { ...branchFilter, itemType: 'OPTICAL', createdAt: today } }),
+        const [prescriptionsToday, revenueToday, recentOpticalPrescriptions] = await Promise.all([
+            prisma.opticalPrescription.count({ where: { ...branchFilter, createdAt: today } }),
             prisma.billing.aggregate({
                 where: { ...branchFilter, serviceType: 'OPTICAL', createdAt: today },
                 _sum: { finalAmount: true },
             }),
-            prisma.prescription.findMany({
-                where: { ...branchFilter, itemType: 'OPTICAL' },
+            prisma.opticalPrescription.findMany({
+                where: { ...branchFilter },
                 orderBy: { createdAt: 'desc' },
                 take: 8,
-                include: { appointment: { include: { patient: { select: { fullName: true } } } } },
+                include: { patient: { select: { fullName: true } } },
             }),
         ]);
+
+        const recentPrescriptions = recentOpticalPrescriptions.map((rx) => ({
+            id: rx.id,
+            quantity: 1,
+            instructions: rx.notes || null,
+            createdAt: rx.createdAt,
+            appointment: {
+                patient: {
+                    fullName: rx.patient?.fullName || null,
+                },
+            },
+        }));
 
         const typeCounts = allItems.reduce((acc, item) => {
             const t = item.itemType || 'Other';

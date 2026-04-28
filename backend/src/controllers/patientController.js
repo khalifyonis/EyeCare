@@ -43,6 +43,21 @@ export const createPatient = async (req, res, next) => {
             return res.status(400).json({ message: 'Patient name is required' });
         }
 
+        // Check if phone number already exists
+        if (phone) {
+            const existingPatient = await prisma.patient.findUnique({
+                where: { phone }
+            });
+            if (existingPatient) {
+                return res.status(400).json({ message: 'A patient with this phone number already exists' });
+            }
+        }
+
+        // Date of birth validation
+        if (dateOfBirth && moment(dateOfBirth).isAfter(moment().startOf('day'))) {
+            return res.status(400).json({ message: 'Date of birth cannot be in the future' });
+        }
+
         let patient;
         let attempts = 0;
         const maxAttempts = 5;
@@ -283,6 +298,11 @@ export const updatePatient = async (req, res, next) => {
             assignedDoctorId, isActive,
         } = req.body;
 
+        // Date of birth validation
+        if (dateOfBirth && moment(dateOfBirth).isAfter(moment().startOf('day'))) {
+            return res.status(400).json({ message: 'Date of birth cannot be in the future' });
+        }
+
         const data = {};
         if (fullName !== undefined) data.fullName = fullName.trim();
         if (firstName !== undefined) data.firstName = firstName || null;
@@ -386,8 +406,8 @@ export const getPatientEyeHistory = async (req, res, next) => {
                 if (ce.surgery) {
                     const s = ce.surgery;
                     surgeries.push({
-                        date: s.surgeryDate,
-                        eyeSide: s.eyeSide,
+                        date: s.date,
+                        eye: s.eye,
                         surgeryType: s.surgeryType,
                         status: s.status,
                         surgeonName: s.surgeon?.user?.fullName || 'Unknown',

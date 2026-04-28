@@ -42,9 +42,42 @@ export default function DashboardLayout({
 
     // ── 1) Verify session and load user (once); then enforce role for current path ──
     useEffect(() => {
+        let cancelled = false
+        const setReady = () => {
+            if (!cancelled) setAuthReady(true)
+        }
+
+        const resolveCurrentPath = () => ((typeof window !== 'undefined' ? window.location.pathname : '/dashboard') || '/dashboard')
+
+        const safetyTimer = window.setTimeout(() => {
+            if (cancelled) return
+
+            const fallbackUser = readStoredUser()
+            if (fallbackUser) {
+                setHeaderUser(fallbackUser)
+                const fallbackRole = resolveRoleName(fallbackUser)
+                const currentPath = resolveCurrentPath()
+
+                if (fallbackRole && !isPathAllowedForRole(currentPath, fallbackRole)) {
+                    router.replace(getDefaultDashboardPath(fallbackRole))
+                }
+
+                toast.error('Session check timed out. Loaded using local session.')
+                setReady()
+                return
+            }
+
+            clearSession()
+            router.replace('/login')
+            setReady()
+        }, 8000)
+
         const token = localStorage.getItem('token')
         if (!token) {
+            window.clearTimeout(safetyTimer)
+            clearSession()
             router.replace('/login')
+            setReady()
             return
         }
         if (!document.cookie.includes('token=')) {
@@ -53,7 +86,7 @@ export default function DashboardLayout({
 
         const verifyAndGuard = async () => {
             try {
-                const response = await api.get('/auth/me')
+                const response = await api.get('/auth/me', { timeout: 7000 })
                 const userData = {
                     ...response.data,
                     role: response.data.role?.name || response.data.role
@@ -66,20 +99,22 @@ export default function DashboardLayout({
                 if (!isPathAllowedForRole(currentPath, role)) {
                     toast.error('You do not have permission to view this page.')
                     router.replace(getDefaultDashboardPath(role))
-                    setAuthReady(true)
+                    setReady()
                     return
                 }
-                setAuthReady(true)
+                setReady()
             } catch (error: unknown) {
                 const status = getHttpStatus(error)
                 if (status === 404 || status === 401) {
                     clearSession()
                     router.replace('/login')
+                    setReady()
                 } else {
                     const fallbackUser = readStoredUser()
                     if (!fallbackUser) {
                         clearSession()
                         router.replace('/login')
+                        setReady()
                         return
                     }
 
@@ -92,12 +127,19 @@ export default function DashboardLayout({
                     }
 
                     toast.error('Session check failed. Recovered using stored session.')
-                    setAuthReady(true)
+                    setReady()
                 }
+            } finally {
+                window.clearTimeout(safetyTimer)
             }
         }
 
         verifyAndGuard()
+
+        return () => {
+            cancelled = true
+            window.clearTimeout(safetyTimer)
+        }
     }, [router])
 
     // ── 2) On pathname change: re-check role access (user already in localStorage) ──

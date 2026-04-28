@@ -86,7 +86,7 @@ export function PharmacistDashboard() {
                             <h2 className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
                                 <Pill className="h-3.5 w-3.5 text-sky-500" /> Recent Prescriptions
                             </h2>
-                                <button onClick={() => router.push('/dashboard/clinical-prescriptions')}
+                                <button onClick={() => router.push('/dashboard/prescription/medicine')}
                                 className="flex items-center gap-0.5 text-[11px] font-semibold text-sky-500 hover:text-sky-600 transition-colors">
                                 View All <ArrowUpRight className="h-3 w-3" />
                             </button>

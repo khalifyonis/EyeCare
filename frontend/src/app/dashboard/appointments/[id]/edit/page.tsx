@@ -9,8 +9,13 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { toast } from 'sonner'
-import { ArrowLeft, Calendar, CheckCircle2, FileText, Loader2, MapPin, Stethoscope, User } from 'lucide-react'
+import { ArrowLeft, Calendar, CheckCircle2, FileText, Loader2, MapPin, Stethoscope, User, Clock, ChevronDown } from 'lucide-react'
 
 type Appointment = {
     id: string
@@ -48,19 +53,21 @@ const STATUS_OPTIONS = [
     { value: 'CANCELLED', label: 'Cancelled' },
 ]
 
-const TIME_SLOTS = (() => {
-    const slots: { value: string; label: string }[] = []
-    for (let h = 8; h <= 17; h++) {
-        for (const m of [0, 30]) {
-            if (h === 17 && m === 30) continue
-            const hour24 = String(h).padStart(2, '0')
-            const min = String(m).padStart(2, '0')
-            const period = h >= 12 ? 'PM' : 'AM'
-            const hour12 = h > 12 ? h - 12 : h === 0 ? 12 : h
-            slots.push({ value: `${hour24}:${min}`, label: `${hour12}:${min} ${period}` })
+const HOURS = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'))
+const MINUTES = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55']
+
+const GENERATED_TIME_SLOTS = (() => {
+    const slots: string[] = []
+    const periods = ['AM', 'PM']
+    for (const p of periods) {
+        for (let h = 1; h <= 12; h++) {
+            const hh = h.toString().padStart(2, '0')
+            for (let m = 0; m < 60; m += 15) {
+                const mm = m.toString().padStart(2, '0')
+                slots.push(`${hh}:${mm} ${p}`)
+            }
         }
     }
-    slots.push({ value: '18:00', label: '6:00 PM' })
     return slots
 })()
 
@@ -98,6 +105,121 @@ function buildNotes(payload: { symptoms: string[]; diagnosis: string; treatment:
     if (payload.treatment.trim()) parts.push(`Treatment: ${payload.treatment.trim()}`)
     if (payload.notes.trim()) parts.push(`Notes: ${payload.notes.trim()}`)
     return parts.join('\n')
+}
+
+function ScrollableColumn({
+    options,
+    value,
+    onChange,
+}: {
+    options: string[]
+    value: string
+    onChange: (v: string) => void
+}) {
+    const scrollRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        if (scrollRef.current) {
+            const index = options.indexOf(value)
+            if (index !== -1) {
+                const itemHeight = 40
+                scrollRef.current.scrollTop = index * itemHeight
+            }
+        }
+    }, [value, options])
+
+    return (
+        <div className="relative h-[200px] w-14">
+            <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 h-10 bg-slate-100/50 rounded-lg -z-10 pointer-events-none" />
+            <div 
+                ref={scrollRef}
+                className="h-full overflow-y-auto flex flex-col py-20 snap-y snap-mandatory scrollbar-hide relative"
+            >
+                {options.map((opt) => (
+                    <button
+                        key={opt}
+                        onClick={() => onChange(opt)}
+                        className={`flex h-10 w-full shrink-0 items-center justify-center text-base font-bold transition-all snap-center select-none ${
+                            value === opt
+                                ? 'text-[#0EA5E9] scale-110'
+                                : 'text-slate-300 hover:text-slate-400'
+                        }`}
+                    >
+                        {opt}
+                    </button>
+                ))}
+            </div>
+        </div>
+    )
+}
+
+function UnifiedTimePicker({
+    hour,
+    minute,
+    period,
+    onHourChange,
+    onMinuteChange,
+    onPeriodChange,
+}: {
+    hour: string
+    minute: string
+    period: string
+    onHourChange: (v: string) => void
+    onMinuteChange: (v: string) => void
+    onPeriodChange: (v: string) => void
+}) {
+    const [tempTime, setTempTime] = useState({ hour, minute, period })
+    const [isOpen, setIsOpen] = useState(false)
+
+    useEffect(() => {
+        if (isOpen) setTempTime({ hour, minute, period })
+    }, [isOpen, hour, minute, period])
+
+    const handleOk = () => {
+        onHourChange(tempTime.hour)
+        onMinuteChange(tempTime.minute)
+        onPeriodChange(tempTime.period)
+        setIsOpen(false)
+    }
+
+    const currentTime = `${hour}:${minute} ${period}`
+
+    return (
+        <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+            <DropdownMenuTrigger asChild>
+                <Button
+                    variant="outline"
+                    className="h-11 w-full justify-between rounded-xl border-slate-200 px-4 text-[15px] font-semibold bg-white hover:bg-slate-50 text-slate-900 shadow-sm"
+                >
+                    <div className="flex items-center gap-2.5">
+                        <Clock className="h-4 w-4 text-[#0EA5E9]" />
+                        <span>{currentTime}</span>
+                    </div>
+                    <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="p-0 rounded-2xl shadow-2xl border-slate-100 bg-white overflow-hidden w-[260px]" align="start">
+                <div className="bg-slate-50/50 px-4 py-3 border-b border-slate-100 flex justify-between items-center">
+                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Select Time</span>
+                    <span className="text-sm font-black text-[#0EA5E9]">{tempTime.hour}:{tempTime.minute} {tempTime.period}</span>
+                </div>
+                <div className="relative flex items-center justify-center bg-white px-2 py-4">
+                    <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white to-transparent pointer-events-none z-10" />
+                    <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none z-10" />
+                    
+                    <ScrollableColumn options={HOURS} value={tempTime.hour} onChange={(v) => setTempTime(t => ({ ...t, hour: v }))} />
+                    <div className="text-2xl font-black text-slate-200 pt-1 mx-1 select-none">:</div>
+                    <ScrollableColumn options={MINUTES} value={tempTime.minute} onChange={(v) => setTempTime(t => ({ ...t, minute: v }))} />
+                    <div className="w-px h-12 bg-slate-100 mx-3" />
+                    <ScrollableColumn options={['AM', 'PM']} value={tempTime.period} onChange={(v) => setTempTime(t => ({ ...t, period: v }))} />
+                </div>
+                <div className="p-2 border-t border-slate-50 flex gap-2 bg-slate-50/30">
+                    <Button variant="ghost" className="flex-1 text-slate-500 font-bold h-9 hover:bg-slate-100 rounded-lg text-xs" onClick={() => setIsOpen(false)}>CANCEL</Button>
+                    <Button className="flex-1 bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold h-9 rounded-lg text-xs shadow-md shadow-blue-100" onClick={handleOk}>OK</Button>
+                </div>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
 }
 
 function SymptomTags({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
@@ -163,7 +285,9 @@ export default function EditAppointmentPage() {
     const [doctorId, setDoctorId] = useState('')
     const [appointmentType, setAppointmentType] = useState('')
     const [appointmentDate, setAppointmentDate] = useState('')
-    const [appointmentTime, setAppointmentTime] = useState('')
+    const [timeHour, setTimeHour] = useState('09')
+    const [timeMinute, setTimeMinute] = useState('00')
+    const [timePeriod, setTimePeriod] = useState('AM')
     const [status, setStatus] = useState('SCHEDULED')
     const [location, setLocation] = useState('')
     const [symptoms, setSymptoms] = useState<string[]>([])
@@ -195,15 +319,32 @@ export default function EditAppointmentPage() {
 
                 const dt = a?.appointmentDate ? new Date(a.appointmentDate) : null
                 const dateStr = dt && !Number.isNaN(dt.getTime()) ? dt.toISOString().slice(0, 10) : ''
-                const timeStr = dt && !Number.isNaN(dt.getTime())
-                    ? `${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`
-                    : ''
+                
+                let h = '09'
+                let m = '00'
+                let p = 'AM'
+                if (dt && !Number.isNaN(dt.getTime())) {
+                    let hour = dt.getHours()
+                    m = dt.getMinutes().toString().padStart(2, '0')
+                    // Round minutes to nearest 5 for the selector
+                    const minVal = parseInt(m)
+                    const roundedMin = Math.round(minVal / 5) * 5
+                    const finalMin = Math.min(roundedMin, 55)
+                    m = finalMin.toString().padStart(2, '0')
+                    
+                    p = hour >= 12 ? 'PM' : 'AM'
+                    hour = hour % 12
+                    if (hour === 0) hour = 12
+                    h = hour.toString().padStart(2, '0')
+                }
 
                 setPatientId(a?.patientId || a?.patient?.id || '')
                 setDoctorId(a?.doctorId || a?.doctor?.id || a?.doctor?.userId || '')
                 setAppointmentType(a?.type || '')
                 setAppointmentDate(dateStr)
-                setAppointmentTime(timeStr)
+                setTimeHour(h)
+                setTimeMinute(m)
+                setTimePeriod(p)
                 setStatus(a?.status || 'SCHEDULED')
                 setLocation(a?.location || '')
 
@@ -235,6 +376,12 @@ export default function EditAppointmentPage() {
         }
         setSaving(true)
         try {
+            // Convert to 24h for API
+            let hour = parseInt(timeHour)
+            if (timePeriod === 'PM' && hour < 12) hour += 12
+            if (timePeriod === 'AM' && hour === 12) hour = 0
+            const appointmentTime = `${hour.toString().padStart(2, '0')}:${timeMinute}`
+
             const dateTime = new Date(`${appointmentDate}T${appointmentTime}:00`)
             await api.put(`/appointments/${id}`, {
                 patientId,
@@ -308,14 +455,14 @@ export default function EditAppointmentPage() {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div className="grid grid-cols-1 gap-4">
-                                    <div className="space-y-2">
-                                        <Label className="text-sm font-semibold text-slate-800">Patient Email *</Label>
-                                        <Input value={selectedPatient?.email || appt.patient?.email || ''} readOnly className="h-11 rounded-xl border-slate-200 bg-slate-50" />
-                                    </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label className="text-sm font-semibold text-slate-800">Patient Phone *</Label>
                                         <Input value={selectedPatient?.phone || appt.patient?.phone || ''} readOnly className="h-11 rounded-xl border-slate-200 bg-slate-50" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-sm font-semibold text-slate-800">Patient ID</Label>
+                                        <Input value={selectedPatient?.patientNumber || ''} readOnly className="h-11 rounded-xl border-slate-200 bg-slate-50" />
                                     </div>
                                 </div>
                             </div>
@@ -361,18 +508,14 @@ export default function EditAppointmentPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-sm font-semibold text-slate-800">Time *</Label>
-                                    <Select value={appointmentTime} onValueChange={setAppointmentTime}>
-                                        <SelectTrigger className="h-11 rounded-xl border-slate-200 font-semibold">
-                                            <SelectValue placeholder="Select Time" />
-                                        </SelectTrigger>
-                                        <SelectContent className="rounded-xl max-h-[280px]">
-                                            {TIME_SLOTS.map((t) => (
-                                                <SelectItem key={t.value} value={t.value} className="cursor-pointer">
-                                                    {t.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <UnifiedTimePicker
+                                        hour={timeHour}
+                                        minute={timeMinute}
+                                        period={timePeriod}
+                                        onHourChange={setTimeHour}
+                                        onMinuteChange={setTimeMinute}
+                                        onPeriodChange={setTimePeriod}
+                                    />
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-sm font-semibold text-slate-800">Type *</Label>

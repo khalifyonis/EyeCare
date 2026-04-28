@@ -52,7 +52,8 @@ type EyeExamApiResponse = {
 export default function EditEyeExamPage() {
   const params = useParams();
   const router = useRouter();
-  const id = params?.id as string;
+  const rawId = params?.id;
+  const id = Array.isArray(rawId) ? rawId[0] : rawId;
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);

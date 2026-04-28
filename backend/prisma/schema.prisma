@@ -295,6 +295,7 @@ model EyeExamination {
   plan                    String?   @map("plan")
   followUpDate            DateTime? @map("follow_up_date")
   nextVisitReason         String?   @map("next_visit_reason")
+  prescriptions           Prescription[] @relation("EyeExamToPrescription")
   createdAt               DateTime  @default(now()) @map("created_at")
   updatedAt               DateTime  @updatedAt @map("updated_at")
   branch                  Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
@@ -385,8 +386,9 @@ model Surgery {
 
 model Prescription {
   id              String              @id @default(uuid())
-  appointmentId   String              @map("appointment_id")
-  examId          String              @map("exam_id")
+  appointmentId   String?             @map("appointment_id")
+  clinicalExamId  String?             @map("clinical_exam_id")
+  eyeExamId       String?             @map("eye_exam_id")
   branchId        String              @map("branch_id")
   itemType        String              @map("item_type")
   itemId          String?             @map("item_id")
@@ -396,13 +398,15 @@ model Prescription {
   reviewAfterDays Int?                @map("review_after_days")
   billings        Billing[]
   followUps       FollowUp[]          @relation("FollowUpFromPrescription")
-  appointment     Appointment         @relation(fields: [appointmentId], references: [id])
+  appointment     Appointment?        @relation(fields: [appointmentId], references: [id])
   branch          Branch              @relation(fields: [branchId], references: [id])
-  clinicalExam    ClinicalExamination @relation(fields: [examId], references: [id])
+  clinicalExam    ClinicalExamination? @relation(fields: [clinicalExamId], references: [id])
+  eyeExam         EyeExamination?     @relation("EyeExamToPrescription", fields: [eyeExamId], references: [id])
 
   @@index([branchId])
   @@index([appointmentId])
-  @@index([examId])
+  @@index([clinicalExamId])
+  @@index([eyeExamId])
   @@index([itemType])
   @@map("prescriptions")
 }
@@ -525,10 +529,13 @@ model Billing {
   serviceType          ServiceType                @map("service_type")
   totalAmount          Decimal                    @map("total_amount") @db.Decimal(10, 2)
   discount             Decimal                    @default(0) @db.Decimal(10, 2)
+  invoiceNumber        String?                    @unique @map("invoice_number")
   finalAmount          Decimal                    @map("final_amount") @db.Decimal(10, 2)
   paymentMethod        String?                    @map("payment_method")
   referenceNumber      String?                    @map("reference_number")
   status               BillingStatus              @default(UNPAID)
+  dueDate              DateTime?                  @map("due_date")
+  notes                String?
   createdById          String                     @map("created_by")
   createdAt            DateTime                   @default(now()) @map("created_at")
   updatedAt            DateTime                   @updatedAt @map("updated_at")
@@ -547,6 +554,7 @@ model Billing {
   @@index([status])
   @@index([serviceType])
   @@index([createdAt])
+  @@index([dueDate])
   @@map("billing")
 }
 
@@ -640,6 +648,8 @@ enum BillingStatus {
   PAID
   UNPAID
   PARTIAL
+  PARTIALLY_PAID
+  DRAFT
 }
 
 enum FollowUpSourceType {

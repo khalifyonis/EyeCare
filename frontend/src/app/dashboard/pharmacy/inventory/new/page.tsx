@@ -277,7 +277,7 @@ export default function PharmacyInventoryNewPage() {
             <Button
               onClick={onSave}
               disabled={!canSave}
-              className="h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 px-6 text-base font-semibold"
+              className="h-11 rounded-xl bg-[#0EA5E9] hover:bg-[#0c96d4] px-6 text-base font-semibold"
             >
               {saving ? 'Saving...' : editing ? 'Update Medicine' : 'Create Medicine'}
             </Button>

@@ -3,28 +3,29 @@ import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
 
 // Generate professional, sequential booking number (e.g., BK-10001)
 const generateBookingNumber = async () => {
-    // Find the current highest booking number
-    // We look for anything that looks like a booking to ensure absolute uniqueness
-    const lastAppointment = await prisma.appointment.findFirst({
-        orderBy: { bookingNumber: 'desc' },
+    // Fetch ALL booking numbers and find the true numeric max to avoid string-sort issues
+    // (e.g., "BK-9999" lexicographically > "BK-10001")
+    const allBookings = await prisma.appointment.findMany({
+        where: { bookingNumber: { not: null } },
         select: { bookingNumber: true }
     });
 
-    let nextNumber = 10001; // Start at 10001 for a mature look
+    let maxNumber = 10000; // Will start at 10001
 
-    if (lastAppointment?.bookingNumber) {
-        // Extract numeric part using regex (handles BK-101-3010, APT-0002, BK-10001)
-        const matches = lastAppointment.bookingNumber.match(/\d+/g);
-        if (matches && matches.length > 0) {
-            // Take the first numeric sequence found as the primary counter
-            const lastNum = parseInt(matches[0], 10);
-            if (!isNaN(lastNum)) {
-                nextNumber = lastNum + 1;
+    for (const row of allBookings) {
+        if (!row.bookingNumber) continue;
+        const matches = row.bookingNumber.match(/\d+/g);
+        if (matches) {
+            for (const m of matches) {
+                const num = parseInt(m, 10);
+                if (!isNaN(num) && num > maxNumber) {
+                    maxNumber = num;
+                }
             }
         }
     }
 
-    return `BK-${nextNumber}`;
+    return `BK-${maxNumber + 1}`;
 };
 
 export const createAppointment = async (req, res, next) => {
@@ -35,6 +36,18 @@ export const createAppointment = async (req, res, next) => {
 
         if (!activeBranchId) {
             return res.status(400).json({ message: 'Branch assignment is required' });
+        }
+
+        // Validate appointment date is not in the past
+        const parsedDate = new Date(appointmentDate);
+        if (isNaN(parsedDate.getTime())) {
+            return res.status(400).json({ message: 'Invalid appointment date' });
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (parsedDate < today) {
+            return res.status(400).json({ message: 'Appointment date cannot be in the past' });
         }
 
         let appointment;
@@ -50,7 +63,7 @@ export const createAppointment = async (req, res, next) => {
                         patientId,
                         doctorId,
                         branchId: activeBranchId,
-                        appointmentDate: new Date(appointmentDate),
+                        appointmentDate: parsedDate,
                         status: status || 'PENDING',
                         amount: amount || 0,
                         type: type || 'consultation',
@@ -71,7 +84,7 @@ export const createAppointment = async (req, res, next) => {
                     attempts++;
                     if (attempts >= maxAttempts) throw error;
                     // Wait a small random amount before retry to reduce further collisions
-                    await new Promise(resolve => setTimeout(resolve, Math.random() * 100));
+                    await new Promise(resolve => setTimeout(resolve, 50 + Math.random() * 150));
                     continue;
                 }
                 throw error;
@@ -228,7 +241,18 @@ export const updateAppointment = async (req, res, next) => {
 
         const data = {};
         if (doctorId !== undefined) data.doctorId = doctorId;
-        if (appointmentDate !== undefined) data.appointmentDate = new Date(appointmentDate);
+        if (appointmentDate !== undefined) {
+            const parsedDate = new Date(appointmentDate);
+            if (isNaN(parsedDate.getTime())) {
+                return res.status(400).json({ message: 'Invalid appointment date' });
+            }
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (parsedDate < today) {
+                return res.status(400).json({ message: 'Appointment date cannot be in the past' });
+            }
+            data.appointmentDate = parsedDate;
+        }
         if (status !== undefined) data.status = status;
         if (amount !== undefined) data.amount = amount;
         if (type !== undefined) data.type = type;
