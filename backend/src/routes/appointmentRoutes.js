@@ -5,7 +5,8 @@ import {
     getAppointmentById,
     updateAppointment,
     deleteAppointment,
-    getAppointmentStats
+    getAppointmentStats,
+    markAsArrived
 } from '../controllers/appointmentController.js';
 import { authenticate, authorize } from '../middlewares/authMiddleware.js';
 import validate from '../middlewares/validate.js';
@@ -20,6 +21,7 @@ router.get('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST'
 
 router.post('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST'), validate(appointmentSchema), createAppointment);
 router.put('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST'), validate(updateAppointmentSchema), updateAppointment);
+router.put('/:id/arrival', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST'), markAsArrived);
 router.delete('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST'), deleteAppointment);
 
 export default router;

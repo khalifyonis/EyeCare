@@ -6,6 +6,7 @@ import { Separator } from '@/components/ui/separator'
 import { Bell, Search, Moon, Sun, Maximize } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
+import { useSocket } from '@/contexts/socket-context'
 import { useTheme } from '@/components/theme-provider'
 import api from '@/lib/axios'
 import { toast } from 'sonner'
@@ -39,6 +40,7 @@ export default function DashboardLayout({
     const [authReady, setAuthReady] = useState(false)
     const [headerUser, setHeaderUser] = useState<StoredUser | null>(null)
     const { theme, toggleTheme } = useTheme()
+    const { socket } = useSocket()
 
     // ── 1) Verify session and load user (once); then enforce role for current path ──
     useEffect(() => {
@@ -141,6 +143,32 @@ export default function DashboardLayout({
             window.clearTimeout(safetyTimer)
         }
     }, [router])
+
+    // ── 1.5) Real-time: Join branch and role rooms ──
+    useEffect(() => {
+        if (!socket || !headerUser) return
+
+        const joinRooms = () => {
+            const branchId = headerUser.branchId || (headerUser.activeBranch?.id)
+            if (branchId) {
+                socket.emit('join', branchId)
+                console.log('Joined branch room:', branchId)
+            }
+
+            const role = resolveRoleName(headerUser)
+            if (role === 'SUPERADMIN' || role === 'ADMIN') {
+                socket.emit('join', 'superadmin')
+                console.log('Joined superadmin room')
+            }
+        }
+
+        joinRooms()
+        socket.on('connect', joinRooms)
+
+        return () => {
+            socket.off('connect', joinRooms)
+        }
+    }, [socket, headerUser])
 
     // ── 2) On pathname change: re-check role access (user already in localStorage) ──
     useEffect(() => {

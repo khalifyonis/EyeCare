@@ -1,5 +1,6 @@
 import prisma from '../lib/prisma.js';
 import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
+import { emitEvent } from '../lib/socket.js';
 
 const getBranchFilter = (req) => {
     return (req.user.role === 'SUPERADMIN' || !req.user.branchId)
@@ -91,6 +92,8 @@ export const createOpticalItem = async (req, res, next) => {
             data,
             include: { branch: { select: { id: true, branchName: true } }, supplier: { select: { id: true, name: true } } },
         });
+
+        emitEvent('inventory:updated', item, branchId);
         res.status(201).json(item);
     } catch (error) {
         next(error);
@@ -131,6 +134,8 @@ export const updateOpticalItem = async (req, res, next) => {
             data,
             include: { branch: { select: { id: true, branchName: true } }, supplier: { select: { id: true, name: true } } },
         });
+
+        emitEvent('inventory:updated', item, item.branchId);
         res.status(200).json(item);
     } catch (error) {
         next(error);
@@ -145,6 +150,7 @@ export const deleteOpticalItem = async (req, res, next) => {
             return res.status(403).json({ message: 'Forbidden' });
         }
         await prisma.opticalItem.delete({ where: { id: req.params.id } });
+        emitEvent('inventory:updated', { id: req.params.id }, existing.branchId);
         res.status(200).json({ message: 'Optical item deleted successfully' });
     } catch (error) {
         next(error);
@@ -186,6 +192,7 @@ export const receiveOpticalStock = async (req, res, next) => {
             }),
         ]);
 
+        emitEvent('optical:updated', updated, item.branchId);
         res.status(200).json({ item: updated, transaction });
     } catch (error) {
         next(error);
@@ -232,6 +239,7 @@ export const adjustOpticalStock = async (req, res, next) => {
             }),
         ]);
 
+        emitEvent('optical:updated', updated, item.branchId);
         res.status(200).json({ item: updated, transaction });
     } catch (error) {
         next(error);

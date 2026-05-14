@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSocket } from '@/contexts/socket-context';
 import api from '@/lib/axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,6 +42,7 @@ import {
 import Link from 'next/link';
 import { Pencil, Calendar as CalendarIcon, Ban, Trash2 } from 'lucide-react';
 import { ServerPagination } from '@/components/dashboard/server-pagination';
+import { Badge } from '@/components/ui/badge';
 
 /* ── Types ─────────────────────────────────────────────────── */
 
@@ -64,6 +66,18 @@ interface Appointment {
         fullName?: string | null;
         user?: { fullName?: string | null } | null;
     } | null;
+    clinicalExamination?: {
+        surgery?: {
+            date: string;
+            operatingRoom?: string | null;
+            time?: string | null;
+        } | null;
+    } | null;
+    billings?: {
+        id: string;
+        finalAmount?: number | string | null;
+        status?: string | null;
+    }[];
 }
 
 interface PaginationMeta {
@@ -76,21 +90,24 @@ interface PaginationMeta {
 
 /* ── Helpers ───────────────────────────────────────────────── */
 
-const STATUS_OPTIONS = ['PENDING', 'SCHEDULED', 'CONFIRMED', 'COMPLETED', 'CANCELLED'] as const;
+const STATUS_OPTIONS = ['all', 'SCHEDULED', 'RECEIVED', 'EXAMINING', 'COMPLETED', 'CANCELLED'] as const;
 
 const TYPE_STYLES: Record<string, string> = {
     consultation: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700',
     'follow-up': 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700',
     checkup: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700',
     emergency: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700',
+    surgery: 'bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-900 dark:text-violet-200 dark:border-violet-700',
 };
 
 const STATUS_STYLES: Record<string, string> = {
-    PENDING: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
-    SCHEDULED: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
-    CONFIRMED: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
-    COMPLETED: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
-    CANCELLED: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
+    SCHEDULED: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800',
+    RECEIVED: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800',
+    EXAMINING: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-800',
+    COMPLETED: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
+    CANCELLED: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 border-rose-200 dark:border-rose-800',
+    IN_SURGERY: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 border-rose-200 dark:border-rose-800',
+    PENDING: 'bg-slate-100 text-slate-700 dark:bg-slate-800/50 dark:text-slate-400 border-slate-200 dark:border-slate-700',
 };
 
 function formatDate(iso: string | null | undefined): string {
@@ -131,7 +148,7 @@ function getLocalDateValue(date = new Date()): string {
 function SkeletonRow() {
     return (
         <TableRow className="animate-pulse border-slate-100 dark:border-slate-800">
-            {[200, 130, 90, 100, 120, 110, 80].map((w, i) => (
+            {[200, 130, 90, 100, 90, 110, 90, 80].map((w, i) => (
                 <TableCell key={i}>
                     <div className="h-4 rounded bg-slate-100 dark:bg-slate-800" style={{ width: w }} />
                     {i === 0 && <div className="h-3 rounded bg-slate-100 dark:bg-slate-800 mt-1.5 w-24" />}
@@ -151,56 +168,114 @@ export default function AppointmentsPage() {
     const [loading, setLoading] = useState(true);
 
     const [search, setSearch] = useState('');
+    const [doctors, setDoctors] = useState<any[]>([]);
     const [statusFilter, setStatusFilter] = useState('all');
+    const [doctorFilter, setDoctorFilter] = useState('all');
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(20);
+    const { socket } = useSocket();
 
     /* ── Fetch ─────────────────────────────────────────────── */
 
+    useEffect(() => {
+        api.get('/doctors').then(res => setDoctors(res.data)).catch(() => {});
+    }, []);
+
+    const buildParams = useCallback(() => {
+        const params: Record<string, string | number> = { page, limit: pageSize };
+        const trimmedSearch = search.trim();
+        const hasSearch = trimmedSearch.length > 0;
+        const hasExplicitFilter = statusFilter !== 'all' || doctorFilter !== 'all' || Boolean(dateFrom) || Boolean(dateTo);
+
+        if (hasSearch) params.search = trimmedSearch;
+        if (statusFilter !== 'all') params.status = statusFilter;
+        if (doctorFilter !== 'all') params.doctorId = doctorFilter;
+        if (dateFrom) params.from = dateFrom;
+        if (dateTo) params.to = dateTo;
+
+        // Default list behavior: show only today's appointments until user searches or filters.
+        if (!hasSearch && !hasExplicitFilter) {
+            const today = getLocalDateValue();
+            params.from = today;
+            params.to = today;
+        }
+        return params;
+    }, [search, statusFilter, doctorFilter, dateFrom, dateTo, page, pageSize]);
+
+    const applyResponse = useCallback((body: { data?: Appointment[]; pagination?: PaginationMeta }) => {
+        setAppointments(Array.isArray(body.data) ? body.data : []);
+        if (body.pagination) {
+            const p = body.pagination;
+            setPagination({
+                total: p.total ?? 0,
+                page: p.page ?? page,
+                limit: p.limit ?? pageSize,
+                pages: p.pages ?? p.totalPages ?? 1,
+                totalPages: p.totalPages ?? p.pages ?? 1,
+            });
+        }
+    }, [page, pageSize]);
+
+    // Full fetch with loading skeleton (only for initial load and manual refresh)
     const fetchAppointments = useCallback(async () => {
         setLoading(true);
         try {
-            const params: Record<string, string | number> = { page, limit: pageSize };
-            const trimmedSearch = search.trim();
-            const hasSearch = trimmedSearch.length > 0;
-            const hasExplicitFilter = statusFilter !== 'all' || Boolean(dateFrom) || Boolean(dateTo);
-
-            if (hasSearch) params.search = trimmedSearch;
-            if (statusFilter !== 'all') params.status = statusFilter;
-            if (dateFrom) params.from = dateFrom;
-            if (dateTo) params.to = dateTo;
-
-            // Default list behavior: show only today's appointments until user searches or filters.
-            if (!hasSearch && !hasExplicitFilter) {
-                const today = getLocalDateValue();
-                params.from = today;
-                params.to = today;
-            }
-
-            const res = await api.get('/appointments', { params });
-            const body = res.data as { data?: Appointment[]; pagination?: PaginationMeta };
-            setAppointments(Array.isArray(body.data) ? body.data : []);
-            if (body.pagination) {
-                const p = body.pagination;
-                setPagination({
-                    total: p.total ?? 0,
-                    page: p.page ?? page,
-                    limit: p.limit ?? pageSize,
-                    pages: p.pages ?? p.totalPages ?? 1,
-                    totalPages: p.totalPages ?? p.pages ?? 1,
-                });
-            }
+            const res = await api.get('/appointments', { params: buildParams() });
+            applyResponse(res.data);
         } catch {
             toast.error('Failed to load appointments');
         } finally {
             setLoading(false);
         }
-    }, [search, statusFilter, dateFrom, dateTo, page, pageSize]);
+    }, [buildParams, applyResponse]);
+
+    // Silent fetch — no loading skeleton, no flickering (for polling & socket events)
+    const silentFetch = useCallback(async () => {
+        try {
+            const res = await api.get('/appointments', { params: buildParams() });
+            applyResponse(res.data);
+        } catch {
+            // Silently ignore errors during background refresh
+        }
+    }, [buildParams, applyResponse]);
+
+    /* ── Real-time ─────────────────────────────────────────── */
+
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleCreate = (data: any) => {
+            toast.info(`New appointment created for ${data.patient?.fullName || 'a patient'}`);
+            silentFetch();
+        };
+
+        const handleUpdate = () => {
+            silentFetch();
+        };
+
+        socket.on('appointment:created', handleCreate);
+        socket.on('appointment:updated', handleUpdate);
+        socket.on('appointment:deleted', handleUpdate);
+
+        return () => {
+            socket.off('appointment:created', handleCreate);
+            socket.off('appointment:updated', handleUpdate);
+            socket.off('appointment:deleted', handleUpdate);
+        };
+    }, [socket, silentFetch]);
 
     useEffect(() => { setPage(1); }, [search, statusFilter, dateFrom, dateTo, pageSize]);
     useEffect(() => { fetchAppointments(); }, [fetchAppointments]);
+
+    /* ── Polling fallback: silent refresh every 10s for cross-device sync ── */
+    useEffect(() => {
+        const interval = setInterval(() => {
+            silentFetch();
+        }, 10000);
+        return () => clearInterval(interval);
+    }, [silentFetch]);
 
     /* ── Actions ───────────────────────────────────────────── */
 
@@ -220,11 +295,13 @@ export default function AppointmentsPage() {
         try {
             await api.delete(`/appointments/${id}`);
             toast.success('Appointment deleted');
+            // Real-time listener will refresh the list, but we refresh anyway for safety
             fetchAppointments();
         } catch (error) {
-            toast.error(getApiError(error, 'Delete failed'));
+            toast.error('Failed to delete appointment');
         }
     };
+
 
     /* ── Render ─────────────────────────────────────────────── */
 
@@ -311,11 +388,11 @@ export default function AppointmentsPage() {
 
             {/* Table card */}
             <div className="px-6 py-5">
-                <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-sm overflow-hidden">
+                <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-sm overflow-x-auto">
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-slate-50 dark:bg-slate-900/70 hover:bg-slate-50 dark:hover:bg-slate-900/70 border-slate-200 dark:border-slate-800">
-                                {['PATIENT & DOCTOR', 'DATE & TIME', 'TYPE', 'STATUS', 'AMOUNT', 'LOCATION', 'ACTIONS'].map((h) => (
+                                {['PATIENT & ID', 'DOCTOR', 'DATE & TIME', 'TYPE', 'STATUS', 'PAYMENT', 'ACTIONS'].map((h) => (
                                     <TableHead
                                         key={h}
                                         className="text-[12px] font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide py-3 px-4 whitespace-nowrap"
@@ -330,7 +407,7 @@ export default function AppointmentsPage() {
                                 Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)
                             ) : appointments.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="h-60 text-center">
+                                    <TableCell colSpan={8} className="h-60 text-center">
                                         <div className="flex flex-col items-center gap-3 text-slate-400">
                                             <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center">
                                                 <CalendarPlus className="h-7 w-7 opacity-40" />
@@ -353,25 +430,23 @@ export default function AppointmentsPage() {
                             ) : (
                                 appointments.map((a) => (
                                     <TableRow key={a.id} className="group border-slate-100 dark:border-slate-800 hover:bg-slate-50/70 dark:hover:bg-slate-900/40">
-                                        {/* PATIENT & DOCTOR */}
+                                        {/* PATIENT */}
                                         <TableCell className="py-3 px-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
-                                                    <User2 className="h-4 w-4" />
-                                                </div>
-                                                <div className="min-w-0 flex flex-col gap-0.5">
-                                                    <p className="text-sm font-medium text-slate-900 dark:text-slate-200 truncate">
-                                                        {a.patient?.fullName || 'Unknown Patient'}
-                                                    </p>
-                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate flex items-center gap-1">
-                                                        <span className="text-slate-300 dark:text-slate-600">#</span>
-                                                        <span className="font-mono">{a.bookingNumber || a.id.slice(0, 8)}</span>
-                                                    </p>
-                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate leading-tight">
-                                                        Dr. {doctorName(a)}
-                                                    </p>
-                                                </div>
+                                            <div className="flex flex-col gap-1">
+                                                <p className="text-sm font-medium text-slate-900 dark:text-slate-200 truncate">
+                                                    {a.patient?.fullName || 'Unknown Patient'}
+                                                </p>
+                                                <Badge variant="outline" className="w-fit font-mono text-[9px] text-slate-500 border-slate-200 bg-slate-50/50 dark:bg-slate-900/50 dark:border-slate-800">
+                                                    {a.patient?.patientNumber || 'PAT-PENDING'}
+                                                </Badge>
                                             </div>
+                                        </TableCell>
+
+                                        {/* DOCTOR */}
+                                        <TableCell className="py-3 px-4">
+                                            <p className="text-xs text-slate-600 dark:text-slate-400">
+                                                Dr. {doctorName(a)}
+                                            </p>
                                         </TableCell>
 
                                         {/* DATE & TIME */}
@@ -396,29 +471,29 @@ export default function AppointmentsPage() {
 
                                         {/* STATUS */}
                                         <TableCell className="py-3 px-4">
-                                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide border ${STATUS_STYLES[a.status || 'PENDING']}`}>
-                                                {a.status || 'PENDING'}
-                                            </span>
+                                            {(() => {
+                                                const rawStatus = a.status || 'PENDING';
+                                                const isSurgery = a.type?.toLowerCase() === 'surgery';
+                                                const displayStatus = (isSurgery && rawStatus === 'EXAMINING') ? 'IN_SURGERY' : rawStatus;
+                                                const label = displayStatus === 'IN_SURGERY' ? 'In Surgery' : displayStatus;
+
+                                                return (
+                                                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide border ${STATUS_STYLES[displayStatus] || STATUS_STYLES.PENDING}`}>
+                                                        {label}
+                                                    </span>
+                                                );
+                                            })()}
                                         </TableCell>
 
-                                        {/* AMOUNT */}
+                                        {/* PAYMENT */}
                                         <TableCell className="py-3 px-4">
-                                            <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 tabular-nums">
-                                                ${typeof a.amount === 'number' ? a.amount.toFixed(2) : Number(a.amount || 0).toFixed(2)}
-                                            </span>
-                                        </TableCell>
-
-                                        {/* LOCATION */}
-                                        <TableCell className="py-3 px-4">
-                                            {a.location ? (
-                                                <span className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
-                                                    <MapPin className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
-                                                    <span className="truncate max-w-[120px]">{a.location}</span>
-                                                </span>
-                                            ) : (
-                                                <div className="flex justify-center w-5">
-                                                    <span className="text-slate-300 dark:text-slate-700 font-bold">—</span>
+                                            {a.billings && a.billings.length > 0 ? (
+                                                <div className="text-sm">
+                                                    <div className="font-medium">{a.billings[0].status}</div>
+                                                    <div className="text-xs text-slate-500">{a.billings[0].finalAmount != null ? `$${Number(a.billings[0].finalAmount).toFixed(2)}` : '$0.00'}</div>
                                                 </div>
+                                            ) : (
+                                                <span className="text-xs text-slate-500">No Billing</span>
                                             )}
                                         </TableCell>
 

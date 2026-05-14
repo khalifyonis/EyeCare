@@ -19,6 +19,8 @@ type MedicinePrescription = {
   itemId?: string | null;
   quantity?: number | null;
   instructions?: string | null;
+  eyeExam?: { patient?: { id: string; fullName: string } };
+  appointment?: { patient?: { id: string; fullName: string } };
 };
 
 type EyeExamOption = {
@@ -30,6 +32,7 @@ type EyeExamOption = {
     patient?: { id: string; fullName?: string | null } | null;
   } | null;
   patient?: { id: string; fullName?: string | null } | null;
+  createdAt?: string;
 };
 
 type PharmacyItem = {
@@ -61,6 +64,7 @@ const EYE_OPTIONS = [
   { value: 'OD', label: 'OD (Right Eye)' },
   { value: 'OS', label: 'OS (Left Eye)' },
   { value: 'OU', label: 'OU (Both Eyes)' },
+  { value: 'NA', label: 'N/A (Oral/General)' },
 ] as const;
 
 function medicineLabel(item: PharmacyItem) {
@@ -103,6 +107,7 @@ function normalizeEyeValue(raw?: string | null): string {
   if (value === 'OD' || value === 'RIGHT EYE') return 'OD';
   if (value === 'OS' || value === 'LEFT EYE') return 'OS';
   if (value === 'OU' || value === 'BOTH EYES' || value === 'BOTH EYE') return 'OU';
+  if (value === 'NA' || value === 'N/A' || value === 'NONE') return 'NA';
   return value;
 }
 
@@ -114,6 +119,12 @@ export default function MedicinePrescriptionForm({ mode, id, preselectedExamId }
 
   const [eyeExams, setEyeExams] = useState<EyeExamOption[]>([]);
   const [items, setItems] = useState<PharmacyItem[]>([]);
+
+  const [patientQuery, setPatientQuery] = useState('');
+  const [patientResults, setPatientResults] = useState<any[]>([]);
+  const [patientLoading, setPatientLoading] = useState(false);
+  const [patientOpen, setPatientOpen] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
 
   const [examId, setExamId] = useState(preselectedExamId || '');
   const [itemId, setItemId] = useState('');
@@ -164,6 +175,11 @@ export default function MedicinePrescriptionForm({ mode, id, preselectedExamId }
       setDuration(parsed.duration);
       setEye(normalizeEyeValue(parsed.eye));
       setNotes(parsed.notes);
+
+      const p = row.eyeExam?.patient || row.appointment?.patient;
+      if (p) {
+        setSelectedPatient({ id: p.id, fullName: p.fullName });
+      }
     } catch {
       toast.error('Failed to load prescription');
       router.push('/dashboard/prescription/medicine');
@@ -171,6 +187,29 @@ export default function MedicinePrescriptionForm({ mode, id, preselectedExamId }
       setLoading(false);
     }
   }, [mode, id, preselectedExamId, router]);
+
+  const fetchPatients = useCallback(async (q: string) => {
+    if (!q.trim()) {
+      setPatientResults([]);
+      return;
+    }
+    setPatientLoading(true);
+    try {
+      const res = await api.get('/patients', { params: { search: q } });
+      setPatientResults(res.data?.data || res.data || []);
+    } catch {
+      setPatientResults([]);
+    } finally {
+      setPatientLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (patientOpen) {
+      const t = setTimeout(() => void fetchPatients(patientQuery), 300);
+      return () => clearTimeout(t);
+    }
+  }, [patientQuery, patientOpen, fetchPatients]);
 
   useEffect(() => {
     void fetchEyeExams();
@@ -240,23 +279,62 @@ export default function MedicinePrescriptionForm({ mode, id, preselectedExamId }
         Back to Medicine Prescriptions
       </Link>
 
-      <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 sm:p-6 space-y-5 shadow-sm">
+      <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 sm:p-6 space-y-6 shadow-sm">
+        {/* Patient Selection */}
+        <div className="space-y-4">
+           <label className={LABEL_CN}>Patient Information</label>
+           <div className="relative">
+              <Input
+                placeholder="Search patient by name or ID..."
+                value={patientOpen ? patientQuery : selectedPatient ? selectedPatient.fullName : ''}
+                onChange={(e) => {
+                  setPatientQuery(e.target.value);
+                  setPatientOpen(true);
+                }}
+                onFocus={() => setPatientOpen(true)}
+                className="h-11 rounded-lg border-slate-200 dark:border-slate-800"
+              />
+              {patientOpen && patientResults.length > 0 && (
+                <div className="absolute z-50 mt-1 w-full rounded-lg border border-slate-200 bg-white shadow-lg dark:bg-slate-900 dark:border-slate-800 max-h-60 overflow-auto">
+                  {patientResults.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      className="w-full px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border-b last:border-0 border-slate-100 dark:border-slate-800"
+                      onClick={() => {
+                        setSelectedPatient(p);
+                        setPatientOpen(false);
+                        setPatientQuery('');
+                      }}
+                    >
+                      <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">{p.fullName}</div>
+                      <div className="text-[10px] text-slate-500 uppercase">{p.patientNumber || p.id}</div>
+                    </button>
+                  ))}
+                </div>
+              )}
+           </div>
+        </div>
+
         <div>
           <label className={LABEL_CN}>Eye Examination</label>
           <Select value={examId} onValueChange={setExamId}>
             <SelectTrigger className="mt-1 h-11 rounded-lg border-slate-200 dark:border-slate-800 text-sm font-normal text-slate-600 dark:text-slate-300">
-              <SelectValue placeholder="Select eye examination" />
+              <SelectValue placeholder={selectedPatient ? "Select eye examination for this patient" : "Select patient first"} />
             </SelectTrigger>
             <SelectContent>
-              {eyeExams.map((exam) => {
-                const patient = exam.patient?.fullName || exam.appointment?.patient?.fullName || 'Unknown';
-                const doctor = exam.doctor?.user?.fullName || 'Unknown doctor';
-                return (
-                  <SelectItem key={exam.id} value={exam.id}>
-                    {patient} - {doctor}
-                  </SelectItem>
-                );
-              })}
+              {eyeExams
+                .filter(exam => !selectedPatient || (exam.patient?.id === selectedPatient.id || exam.appointment?.patient?.id === selectedPatient.id))
+                .map((exam) => {
+                  const patientName = exam.patient?.fullName || exam.appointment?.patient?.fullName || 'Unknown';
+                  const doctorName = exam.doctor?.user?.fullName || 'Unknown doctor';
+                  const date = exam.createdAt ? new Date(exam.createdAt).toLocaleDateString() : '';
+                  return (
+                    <SelectItem key={exam.id} value={exam.id}>
+                      {patientName} - {doctorName} ({date})
+                    </SelectItem>
+                  );
+                })}
             </SelectContent>
           </Select>
         </div>
@@ -311,23 +389,25 @@ export default function MedicinePrescriptionForm({ mode, id, preselectedExamId }
             <label className={LABEL_CN}>Duration</label>
             <Input value={duration} onChange={(e) => setDuration(e.target.value)} className="mt-1 h-11 rounded-lg border-slate-200 dark:border-slate-800 text-sm font-normal text-slate-600 dark:text-slate-300" placeholder="10 days" />
           </div>
-          <div>
-            <label className={LABEL_CN}>Eye</label>
-            <Select value={eye || '__none__'} onValueChange={(v) => setEye(v === '__none__' ? '' : v)}>
-              <SelectTrigger className="mt-1 h-11 rounded-lg border-slate-200 dark:border-slate-800 text-sm font-normal text-slate-600 dark:text-slate-300">
-                <SelectValue placeholder="Select eye" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="__none__">Select eye</SelectItem>
-                {EYE_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                ))}
-                {eye && !EYE_OPTIONS.some((option) => option.value === eye.toUpperCase()) && (
-                  <SelectItem value={eye}>{eye}</SelectItem>
-                )}
-              </SelectContent>
-            </Select>
-          </div>
+          {(!selectedItem || !['tablet', 'syrup', 'capsule', 'injection'].includes((selectedItem.itemType || '').toLowerCase())) && (
+            <div>
+              <label className={LABEL_CN}>Affected Eye (if applicable)</label>
+              <Select value={eye || '__none__'} onValueChange={(v) => setEye(v === '__none__' ? '' : v)}>
+                <SelectTrigger className="mt-1 h-11 rounded-lg border-slate-200 dark:border-slate-800 text-sm font-normal text-slate-600 dark:text-slate-300">
+                  <SelectValue placeholder="Select eye" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">Select eye</SelectItem>
+                  {EYE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                  ))}
+                  {eye && !EYE_OPTIONS.some((option) => option.value === eye.toUpperCase()) && (
+                    <SelectItem value={eye}>{eye}</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
 
         <div>

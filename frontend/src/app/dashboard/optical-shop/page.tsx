@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useSocket } from '@/contexts/socket-context'
 import api from '@/lib/axios'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -69,6 +70,7 @@ export default function OpticalShopPage() {
   const [search, setSearch] = useState('')
   const [backendStats, setBackendStats] = useState<StatsResponse>({ total: 0, active: 0, dispensed: 0 })
   const [lowStock, setLowStock] = useState(0)
+  const { socket } = useSocket()
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -142,6 +144,24 @@ export default function OpticalShopPage() {
   useEffect(() => {
     load()
   }, [load])
+
+  useEffect(() => {
+      if (!socket) return
+
+      const handleUpdate = () => {
+          load()
+      }
+
+      socket.on('prescription:created', handleUpdate)
+      socket.on('prescription:updated', handleUpdate)
+      socket.on('inventory:updated', handleUpdate)
+
+      return () => {
+          socket.off('prescription:created', handleUpdate)
+          socket.off('prescription:updated', handleUpdate)
+          socket.off('inventory:updated', handleUpdate)
+      }
+  }, [socket, load])
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()

@@ -1,6 +1,7 @@
 import prisma from '../lib/prisma.js';
 import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
 import { createActivityLog } from '../lib/activityLog.js';
+import { emitEvent } from '../lib/socket.js';
 
 const getBranchFilter = (req) => {
     return (req.user.role === 'SUPERADMIN' || !req.user.branchId)
@@ -270,6 +271,7 @@ export const createBilling = async (req, res, next) => {
             appointmentId,
             surgeryId,
             prescriptionId,
+            opticalPrescriptionId,
             serviceType,
             totalAmount,
             discount = 0,
@@ -356,6 +358,7 @@ export const createBilling = async (req, res, next) => {
                     appointmentId: appointmentId || undefined,
                     surgeryId: surgeryId || undefined,
                     prescriptionId: prescriptionId || undefined,
+                    opticalPrescriptionId: opticalPrescriptionId || undefined,
                     serviceType,
                     totalAmount: total,
                     discount: disc,
@@ -507,6 +510,20 @@ export const createBilling = async (req, res, next) => {
                 },
             });
 
+            // Update prescription status if linked
+            if (prescriptionId) {
+                await tx.prescription.update({
+                    where: { id: prescriptionId },
+                    data: { status: 'DISPENSED', dispensedAt: new Date() }
+                }).catch(() => {}); // Fallback if record doesn't exist or already updated
+            }
+            if (opticalPrescriptionId) {
+                await tx.opticalPrescription.update({
+                    where: { id: opticalPrescriptionId },
+                    data: { status: 'DISPENSED', dispensedAt: new Date() }
+                }).catch(() => {});
+            }
+
             return hydrated;
         });
 
@@ -535,6 +552,10 @@ export const createBilling = async (req, res, next) => {
             entityId: billing.id,
             details: `${serviceType} - ${String(billing.finalAmount)}`,
         }).catch(() => {});
+
+        emitEvent('billing:created', billing, activeBranchId);
+        // Also notify inventory because billing often deducts stock
+        emitEvent('inventory:updated', null, activeBranchId);
 
         res.status(201).json(billing);
     } catch (error) {
@@ -774,6 +795,10 @@ export const updateBilling = async (req, res, next) => {
                 },
             });
         });
+
+        emitEvent('billing:updated', billing, billing.branchId);
+        emitEvent('inventory:updated', null, billing.branchId);
+
         res.status(200).json(billing);
     } catch (error) {
         next(error);
@@ -841,6 +866,42 @@ export const deleteBilling = async (req, res, next) => {
 
         await prisma.billing.delete({ where: { id: req.params.id } });
         res.status(200).json({ message: 'Billing deleted successfully' });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getUnbilledItems = async (req, res, next) => {
+    try {
+        const { patientId } = req.params;
+        const branchFilter = getBranchFilter(req);
+
+        const [prescriptions, surgeries] = await Promise.all([
+            prisma.prescription.findMany({
+                where: {
+                    patientId,
+                    ...branchFilter,
+                    billings: { none: {} }
+                },
+                include: {
+                    appointment: { select: { id: true, bookingNumber: true, appointmentDate: true } }
+                },
+                orderBy: { createdAt: 'desc' }
+            }),
+            prisma.surgery.findMany({
+                where: {
+                    patientId,
+                    ...branchFilter,
+                    billings: { none: {} }
+                },
+                include: {
+                    surgeon: { include: { user: { select: { fullName: true } } } }
+                },
+                orderBy: { date: 'desc' }
+            })
+        ]);
+
+        res.status(200).json({ prescriptions, surgeries });
     } catch (error) {
         next(error);
     }

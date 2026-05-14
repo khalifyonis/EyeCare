@@ -5,14 +5,6 @@ import { cn } from '@/lib/utils'
 
 type Tone = 'indigo' | 'orange' | 'red' | 'amber' | 'green'
 
-const toneIconWrap: Record<Tone, string> = {
-  indigo: 'bg-indigo-50 text-indigo-600',
-  orange: 'bg-orange-50 text-orange-600',
-  red: 'bg-red-50 text-red-600',
-  amber: 'bg-amber-50 text-amber-700',
-  green: 'bg-emerald-50 text-emerald-600',
-}
-
 export function PharmacyKpiCard({
   title,
   value,
@@ -24,15 +16,34 @@ export function PharmacyKpiCard({
   icon: LucideIcon
   tone: Tone
 }) {
+  const colors: Record<string, string> = {
+    indigo: "bg-[#4F46E5] text-white border-none",
+    green: "bg-[#10B981] text-white border-none",
+    red: "bg-[#EF4444] text-white border-none",
+    orange: "bg-[#F97316] text-white border-none",
+    amber: "bg-[#F59E0B] text-white border-none",
+    blue: "bg-[#3B82F6] text-white border-none",
+    pink: "bg-[#EC4899] text-white border-none",
+  }
+
+  const selectedColor = colors[tone] || colors.indigo
+
   return (
-    <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-[#0f172a] p-4 shadow-sm min-w-0 transition-all duration-200">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="text-2xl md:text-3xl font-extrabold leading-none tabular-nums text-slate-900 dark:text-slate-50">{value}</div>
-          <div className="mt-1 text-sm md:text-base font-semibold text-slate-600 dark:text-slate-400 leading-tight">{title}</div>
+    <div className={cn(
+      "relative group overflow-hidden rounded-xl p-6 shadow-md border border-white/10 transition-all duration-300 hover:shadow-lg",
+      selectedColor
+    )}>
+      <div className="flex items-center justify-between relative z-10">
+        <div className="space-y-2">
+          <p className="text-[11px] font-bold text-white/90 uppercase tracking-widest">
+            {title}
+          </p>
+          <h3 className="text-3xl font-bold text-white tracking-tight tabular-nums">
+            {value}
+          </h3>
         </div>
-        <div className={cn('grid h-11 w-11 place-items-center rounded-xl shrink-0 transition-opacity', toneIconWrap[tone], 'dark:bg-opacity-20')}>
-          <Icon className="h-6 w-6" strokeWidth={1.9} />
+        <div className="flex shrink-0 items-center justify-center transition-transform duration-300 group-hover:scale-110">
+          <Icon className="h-10 w-10 text-white/40 group-hover:text-white/60 transition-colors" strokeWidth={2} />
         </div>
       </div>
     </div>

@@ -37,7 +37,15 @@ type SurgeryDetail = {
   notes?: string | null;
   createdAt?: string | null;
   surgeon?: { user?: { fullName?: string | null; email?: string | null } | null } | null;
-  patient?: { id: string; fullName?: string | null; phone?: string | null; patientNumber?: string | null } | null;
+  patient?: { 
+    id: string; 
+    fullName?: string | null; 
+    phone?: string | null; 
+    patientNumber?: string | null;
+    emergencyContactName?: string | null;
+    emergencyContactPhone?: string | null;
+    emergencyContactRelationship?: string | null;
+  } | null;
 };
 
 const LABEL_CN = 'text-xs font-semibold uppercase tracking-wide text-slate-500';
@@ -170,6 +178,26 @@ export default function SurgeryDetailPage() {
             <div className="mt-1 font-semibold text-slate-900">{row.patient?.phone?.trim() || '—'}</div>
           </div>
         </div>
+
+        {(row.patient?.emergencyContactName || row.patient?.emergencyContactPhone) && (
+          <div className="mt-6 pt-6 border-t border-slate-100">
+            <div className={LABEL_CN + ' mb-3 text-[#0EA5E9]'}>Emergency Contact</div>
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+              <div>
+                <div className={LABEL_CN}>Contact Name</div>
+                <div className="mt-1 font-semibold text-slate-900">{row.patient?.emergencyContactName || '—'}</div>
+              </div>
+              <div>
+                <div className={LABEL_CN}>Contact Phone</div>
+                <div className="mt-1 font-semibold text-slate-900">{row.patient?.emergencyContactPhone || '—'}</div>
+              </div>
+              <div>
+                <div className={LABEL_CN}>Relationship</div>
+                <div className="mt-1 font-semibold text-slate-900">{row.patient?.emergencyContactRelationship || '—'}</div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Surgery Details */}

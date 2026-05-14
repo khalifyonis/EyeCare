@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import api from '@/lib/axios';
 import { toast } from 'sonner';
 
@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 type ServiceType = 'APPOINTMENT' | 'PHARMACY' | 'OPTICAL' | 'SURGERY';
 
@@ -79,6 +80,8 @@ function toCurrency(value: number) {
 
 export default function NewBillingPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialServiceType = (searchParams.get('serviceType')?.toUpperCase() as ServiceType) || 'APPOINTMENT';
 
   const [loadingPatients, setLoadingPatients] = useState(false);
   const [loadingItems, setLoadingItems] = useState(false);
@@ -88,12 +91,13 @@ export default function NewBillingPage() {
   const [pharmacyItems, setPharmacyItems] = useState<ItemOption[]>([]);
   const [opticalItems, setOpticalItems] = useState<ItemOption[]>([]);
   const [patientId, setPatientId] = useState('');
-  const [serviceType, setServiceType] = useState<ServiceType>('APPOINTMENT');
+  const [serviceType, setServiceType] = useState<ServiceType>(initialServiceType);
   const [status, setStatus] = useState<'DRAFT' | 'UNPAID' | 'PARTIALLY_PAID' | 'PAID'>('UNPAID');
   const [tax, setTax] = useState('0');
   const [discount, setDiscount] = useState('0');
   const [dueDate, setDueDate] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
+  const [prescriptionId, setPrescriptionId] = useState<string | null>(null);
 
   const [lineItems, setLineItems] = useState<LineItem[]>([
     { id: '1', description: '', quantity: '1', unitPrice: '0' },
@@ -157,6 +161,54 @@ export default function NewBillingPage() {
   useEffect(() => {
     void loadInventoryItems();
   }, [loadInventoryItems]);
+
+  // Load prescription if prescriptionId is provided
+  useEffect(() => {
+    const pId = searchParams.get('prescriptionId');
+    if (!pId) return;
+    setPrescriptionId(pId);
+
+    const loadPrescription = async () => {
+      try {
+        const endpoint = serviceType === 'PHARMACY' ? `/prescription-items/${pId}` : `/prescriptions/${pId}`;
+        const res = await api.get(endpoint);
+        const data = res.data;
+
+        // Set patient
+        const p = data.patient || data.appointment?.patient || data.eyeExam?.patient;
+        if (p) setPatientId(p.id);
+
+        // Add line item
+        if (serviceType === 'PHARMACY') {
+           // Try to find the item in our already loaded pharmacy items for the most up-to-date price
+           const catalogItem = pharmacyItems.find(i => i.id === data.itemId);
+           const itemName = catalogItem?.label || data.itemName || 'Medicine';
+           const unitPrice = catalogItem?.unitPrice || data.item?.sellingPrice || 0;
+
+           setLineItems([{
+             id: 'presc-item',
+             description: itemName,
+             itemId: data.itemId || data.item?.id,
+             quantity: String(data.quantity || 1),
+             unitPrice: String(unitPrice)
+           }]);
+        } else if (serviceType === 'OPTICAL') {
+           const frameName = data.frameItem?.itemName || 'Optical Frame';
+           setLineItems([{
+             id: 'presc-frame',
+             description: `Frame: ${frameName}`,
+             itemId: data.frameItem?.id,
+             quantity: '1',
+             unitPrice: String(data.frameItem?.sellingPrice || 0)
+           }]);
+        }
+      } catch {
+        toast.error('Failed to load prescription data');
+      }
+    };
+
+    void loadPrescription();
+  }, [serviceType, searchParams, pharmacyItems, opticalItems]);
 
   const descriptionOptions = useMemo(() => {
     if (serviceType === 'PHARMACY') return pharmacyItems;
@@ -225,6 +277,8 @@ export default function NewBillingPage() {
       await api.post('/billing', {
         patientId,
         serviceType,
+        prescriptionId: serviceType === 'PHARMACY' ? prescriptionId : undefined,
+        opticalPrescriptionId: serviceType === 'OPTICAL' ? prescriptionId : undefined,
         totalAmount: subtotal + Math.max(0, Number(tax) || 0),
         discount: Math.max(0, Number(discount) || 0),
         dueDate: dueDate ? new Date(dueDate).toISOString() : undefined,
@@ -307,54 +361,85 @@ export default function NewBillingPage() {
           </div>
 
           <div className="space-y-3">
+            {/* Table Headers */}
+            <div className="hidden md:grid md:grid-cols-[1.5fr_120px_140px_140px_44px] gap-3 px-3">
+              <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Item Description</div>
+              <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Quantity</div>
+              <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Unit Price</div>
+              <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Line Total</div>
+              <div className="w-11"></div>
+            </div>
+
             {lineItems.map((line) => {
               const qty = parseMoney(line.quantity);
               const unit = parseMoney(line.unitPrice);
               const lineTotal = qty * unit;
 
               return (
-                <div key={line.id} className="grid grid-cols-1 md:grid-cols-[1.5fr_120px_140px_140px_auto] gap-3 rounded-lg border border-slate-200 dark:border-slate-800 p-3">
-                  <Input
-                    value={line.description}
-                    onChange={(e) => updateDescription(line.id, e.target.value)}
-                    placeholder="Search or enter item..."
-                    list={`billing-item-options-${line.id}`}
-                    className="h-11"
-                  />
-                  <datalist id={`billing-item-options-${line.id}`}>
-                    {descriptionOptions.map((option) => (
-                      <option key={`${serviceType}-${option.id || option.label}`} value={option.label} />
-                    ))}
-                  </datalist>
-                  <Input
-                    type="number"
-                    min={1}
-                    value={line.quantity}
-                    onChange={(e) => updateLine(line.id, 'quantity', e.target.value)}
-                    placeholder="Qty"
-                    className="h-11"
-                  />
-                  <Input
-                    type="number"
-                    min={0}
-                    step={0.01}
-                    value={line.unitPrice}
-                    onChange={(e) => updateLine(line.id, 'unitPrice', e.target.value)}
-                    placeholder="Unit Price"
-                    className="h-11"
-                  />
-                  <div className="h-11 rounded-lg border border-slate-200 dark:border-slate-800 px-3 flex items-center text-sm font-medium text-slate-700 dark:text-slate-300">
-                    {toCurrency(lineTotal)}
+                <div key={line.id} className="grid grid-cols-1 md:grid-cols-[1.5fr_120px_140px_140px_auto] gap-3 rounded-lg border border-slate-200 dark:border-slate-800 p-3 bg-white dark:bg-slate-900 shadow-sm transition-all hover:border-blue-200">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase md:hidden">Description</label>
+                    <Input
+                      value={line.description}
+                      onChange={(e) => updateDescription(line.id, e.target.value)}
+                      placeholder="Search or enter item..."
+                      list={`billing-item-options-${line.id}`}
+                      className="h-11 border-slate-200 focus:border-blue-400 focus:ring-blue-100"
+                    />
+                    <datalist id={`billing-item-options-${line.id}`}>
+                      {descriptionOptions.map((option) => (
+                        <option key={`${serviceType}-${option.id || option.label}`} value={option.label} />
+                      ))}
+                    </datalist>
                   </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeLine(line.id)}
-                    className="h-11 w-11 text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  
+                  <div className="space-y-1 text-center">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase md:hidden">Quantity</label>
+                    <Input
+                      type="number"
+                      min={1}
+                      value={line.quantity}
+                      onChange={(e) => updateLine(line.id, 'quantity', e.target.value)}
+                      placeholder="Qty"
+                      className="h-11 text-center font-semibold"
+                    />
+                  </div>
+
+                  <div className="space-y-1 text-center">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase md:hidden">Price</label>
+                    <Input
+                      type="number"
+                      min={0}
+                      step={0.01}
+                      value={line.unitPrice}
+                      readOnly={Boolean(line.itemId)}
+                      onChange={(e) => updateLine(line.id, 'unitPrice', e.target.value)}
+                      placeholder="Price"
+                      className={cn(
+                        "h-11 text-center font-semibold",
+                        line.itemId && "bg-slate-50 text-slate-500 cursor-not-allowed border-slate-100"
+                      )}
+                    />
+                  </div>
+
+                  <div className="space-y-1 text-center">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase md:hidden">Total</label>
+                    <div className="h-11 rounded-lg border border-slate-100 bg-slate-50/50 px-3 flex items-center justify-center text-sm font-black text-blue-600">
+                      {toCurrency(lineTotal)}
+                    </div>
+                  </div>
+
+                  <div className="flex items-end md:items-center">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeLine(line.id)}
+                      className="h-11 w-11 text-slate-300 hover:text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               );
             })}

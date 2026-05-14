@@ -1,14 +1,10 @@
 import 'dotenv/config';
-import pg from 'pg';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { sendOnboardingEmail } from '../services/emailService.js';
 
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+
 
 /**
  * Generate a random 8-character temporary password.
@@ -45,7 +41,6 @@ export const getAllUsers = async (req, res, next) => {
         const users = await prisma.user.findMany({
             where: whereClause,
             include: {
-                role: true,
                 branch: true,
                 staffAssignments: { include: { branch: true } }
             },
@@ -59,7 +54,7 @@ export const getAllUsers = async (req, res, next) => {
                 : (user.branch ? [user.branch] : []);
             return {
                 ...rest,
-                roleName: user.role.name,
+                roleName: user.role,
                 branchName: user.branch?.branchName || '',
                 branches
             };
@@ -85,7 +80,7 @@ export const uploadProfileImage = async (req, res, next) => {
         const updatedUser = await prisma.user.update({
             where: { id },
             data: { profileImage },
-            include: { role: true }
+            include: { branch: true }
         });
 
         res.status(200).json({
@@ -122,9 +117,9 @@ export const getUserById = async (req, res, next) => {
         const user = await prisma.user.findFirst({
             where: whereClause,
             include: {
-                role: true,
                 doctor: true,
-                staffAssignments: { include: { branch: true } }
+                staffAssignments: { include: { branch: true } },
+                branch: true,
             },
         });
 
@@ -140,7 +135,7 @@ export const getUserById = async (req, res, next) => {
             : (user.branch ? [user.branch] : []);
         res.status(200).json({
             ...sanitizedUser,
-            roleName: user.role.name,
+            roleName: user.role,
             branches
         });
     } catch (error) {
@@ -191,11 +186,8 @@ export const createUser = async (req, res, next) => {
             throw error;
         }
 
-        const roleRecord = await prisma.role.findUnique({
-            where: { name: roleName.toUpperCase() },
-        });
-
-        if (!roleRecord) {
+        const VALID_ROLES = ['ADMIN', 'DOCTOR', 'RECEPTIONIST', 'OPTICIAN', 'PHARMACIST', 'SUPERADMIN'];
+        if (!VALID_ROLES.includes(roleName.toUpperCase())) {
             const error = new Error(`Invalid role: ${roleName}`);
             error.statusCode = 400;
             throw error;
@@ -212,7 +204,7 @@ export const createUser = async (req, res, next) => {
                     username,
                     email,
                     password: hashedPassword,
-                    role: { connect: { id: roleRecord.id } },
+                    role: roleName.toUpperCase(),
                     branch: { connect: { id: finalBranchIds[0] } }, // Default primary branch
                     staffAssignments: {
                         create: finalBranchIds.map(id => ({ branchId: id }))
@@ -222,7 +214,7 @@ export const createUser = async (req, res, next) => {
 
             if (roleName.toUpperCase() === 'DOCTOR') {
                 if (!specialization) {
-                    throw new Error('Doctor profile requires specialization');
+                    throw new Error('Doctor profile requires a specialization');
                 }
                 await tx.doctor.create({
                     data: {
@@ -258,7 +250,7 @@ export const updateUser = async (req, res, next) => {
 
         const existingUser = await prisma.user.findUnique({
             where: { id },
-            include: { role: true, doctor: true }
+            include: { doctor: true }
         });
 
         if (!existingUser) {
@@ -311,11 +303,9 @@ export const updateUser = async (req, res, next) => {
         }
 
         if (roleName) {
-            const roleRecord = await prisma.role.findUnique({
-                where: { name: roleName.toUpperCase() },
-            });
-            if (roleRecord) {
-                updateData.role = { connect: { id: roleRecord.id } };
+            const VALID_ROLES = ['ADMIN', 'DOCTOR', 'RECEPTIONIST', 'OPTICIAN', 'PHARMACIST', 'SUPERADMIN'];
+            if (VALID_ROLES.includes(roleName.toUpperCase())) {
+                updateData.role = roleName.toUpperCase();
             }
         }
 
@@ -354,19 +344,19 @@ export const updateUser = async (req, res, next) => {
                 }
             }
 
-            const currentRole = existingUser.role.name;
+            const currentRole = existingUser.role;
             const targetRole = roleName ? roleName.toUpperCase() : currentRole;
 
             if (targetRole === 'DOCTOR') {
                 await tx.doctor.upsert({
                     where: { userId: id },
                     update: {
-                        specialization: specialization || existingUser.doctor?.specialization,
+                        specialization: specialization || existingUser.doctor?.specialization || 'OPHTHALMOLOGY',
                         branch: { connect: { id: branchId || existingUser.branchId } },
                     },
                     create: {
                         user: { connect: { id: id } },
-                        specialization: specialization || '',
+                        specialization: specialization || 'OPHTHALMOLOGY',
                         branch: { connect: { id: branchId || existingUser.branchId } },
                     },
                 });

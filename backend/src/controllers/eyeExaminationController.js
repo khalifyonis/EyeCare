@@ -1,5 +1,6 @@
 import prisma from '../lib/prisma.js';
 import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
+import { emitEvent } from '../lib/socket.js';
 
 const isEyeExamStoreNotReadyError = (err) => {
   // P2021: table does not exist, P2022: column does not exist
@@ -39,12 +40,16 @@ const coerceIntOrNull = (v) => {
 
 export const getEyeExaminations = async (req, res, next) => {
   try {
-    const { search, date, patientId } = req.query;
+    const { search, date, from, to, doctorId, patientId } = req.query;
     const { skip, take, page, limit } = getPaginationParams(req.query);
 
     const where = {
       ...getBranchFilter(req),
       ...(patientId ? { patientId: String(patientId) } : {}),
+      ...(doctorId ? { doctorId: String(doctorId) } : {}),
+      ...(req.query.stage 
+        ? { stage: { in: String(req.query.stage).split(',').map(s => s.trim()) } } 
+        : {}),
       ...(search
         ? {
             OR: [
@@ -54,11 +59,11 @@ export const getEyeExaminations = async (req, res, next) => {
             ],
           }
         : {}),
-      ...(date
+      ...((date || from || to || !search)
         ? {
             createdAt: {
-              gte: new Date(`${date}T00:00:00.000Z`),
-              lte: new Date(`${date}T23:59:59.999Z`),
+              gte: from ? new Date(`${from}T00:00:00.000Z`) : (date ? new Date(`${date}T00:00:00.000Z`) : new Date(`${new Date().toISOString().split('T')[0]}T00:00:00.000Z`)),
+              lte: to ? new Date(`${to}T23:59:59.999Z`) : (date ? new Date(`${date}T23:59:59.999Z`) : new Date(`${new Date().toISOString().split('T')[0]}T23:59:59.999Z`)),
             },
           }
         : {}),
@@ -114,6 +119,7 @@ export const createEyeExamination = async (req, res, next) => {
     const {
       patientId,
       doctorId,
+      appointmentId,
       chiefComplaint,
       historyOfPresentIllness,
       vaScale,
@@ -152,6 +158,7 @@ export const createEyeExamination = async (req, res, next) => {
         branchId,
         patientId,
         doctorId,
+        appointmentId: appointmentId || null,
         chiefComplaint,
         historyOfPresentIllness: historyOfPresentIllness || null,
         vaScale: vaScale || 'SNELLEN',
@@ -183,12 +190,24 @@ export const createEyeExamination = async (req, res, next) => {
         plan: plan || null,
         followUpDate: followUpDate ? new Date(followUpDate) : null,
         nextVisitReason: nextVisitReason || null,
+        stage: req.body.stage || 'PRELIMINARY',
       },
       include: {
         patient: { select: { id: true, fullName: true, patientNumber: true } },
         doctor: { include: { user: { select: { id: true, fullName: true } } } },
       },
     });
+
+    if (appointmentId) {
+      await prisma.appointment.update({
+        where: { id: appointmentId },
+        data: { status: 'EXAMINING' }
+      });
+      // Emit appointment update for real-time tracking
+      emitEvent('appointment:updated', { id: appointmentId, status: 'EXAMINING' }, branchId);
+    }
+
+    emitEvent('exam:created', created, branchId);
 
     return res.status(201).json(created);
   } catch (err) {
@@ -202,13 +221,14 @@ export const updateEyeExamination = async (req, res, next) => {
 
     const existing = await prisma.eyeExamination.findFirst({
       where: { id, ...getBranchFilter(req) },
-      select: { id: true, branchId: true },
+      select: { id: true, branchId: true, stage: true, appointmentId: true },
     });
     if (!existing) return res.status(404).json({ message: 'Eye examination not found' });
 
     const {
       patientId,
       doctorId,
+      appointmentId,
       chiefComplaint,
       historyOfPresentIllness,
       vaScale,
@@ -240,13 +260,34 @@ export const updateEyeExamination = async (req, res, next) => {
       plan,
       followUpDate,
       nextVisitReason,
+      stage,
     } = req.body;
+
+    let newStage = stage || existing.stage;
+    
+    // Logic for transition:
+    // 1. From PRELIMINARY to CLINICAL: When tech saves preliminary data
+    const isPreliminaryUpdate = vaScale || vaUnaidedOD || vaBcvaOD || iopOD;
+    if (newStage === 'PRELIMINARY' && isPreliminaryUpdate && !req.body.isPartialSave) {
+        newStage = 'CLINICAL';
+    }
+
+    // 2. From CLINICAL to COMPLETED: When doctor saves diagnosis and plan
+    // If diagnosis and plan are present, or if stage is explicitly set to COMPLETED
+    const hasDiagnosis = diagnosis && diagnosis.length > 0;
+    const hasPlan = plan && plan.length > 0;
+    
+    if (stage === 'COMPLETED' || (hasDiagnosis && hasPlan)) {
+        newStage = 'COMPLETED';
+    }
 
     const updated = await prisma.eyeExamination.update({
       where: { id: existing.id },
       data: {
         patientId,
         doctorId,
+        stage: newStage,
+        appointmentId: appointmentId === undefined ? undefined : (appointmentId || null),
         chiefComplaint,
         historyOfPresentIllness: historyOfPresentIllness === undefined ? undefined : historyOfPresentIllness || null,
         vaScale,
@@ -285,6 +326,19 @@ export const updateEyeExamination = async (req, res, next) => {
       },
     });
 
+    const finalAppointmentId = appointmentId || updated.appointmentId;
+    if (finalAppointmentId) {
+      const isActuallyCompleted = newStage === 'COMPLETED';
+      await prisma.appointment.update({
+        where: { id: finalAppointmentId },
+        data: { status: isActuallyCompleted ? 'COMPLETED' : 'EXAMINING' }
+      });
+      // Emit appointment update
+      emitEvent('appointment:updated', { id: finalAppointmentId, status: isActuallyCompleted ? 'COMPLETED' : 'EXAMINING' }, updated.branchId);
+    }
+
+    emitEvent('exam:updated', updated, updated.branchId);
+
     return res.json(updated);
   } catch (err) {
     next(err);
@@ -297,12 +351,13 @@ export const deleteEyeExamination = async (req, res, next) => {
 
     const existing = await prisma.eyeExamination.findFirst({
       where: { id, ...getBranchFilter(req) },
-      select: { id: true },
+      select: { id: true, branchId: true },
     });
 
     if (!existing) return res.status(404).json({ message: 'Eye examination not found' });
 
     await prisma.eyeExamination.delete({ where: { id: existing.id } });
+    emitEvent('exam:deleted', { id: existing.id }, existing.branchId);
     return res.json({ message: 'Eye examination deleted' });
   } catch (err) {
     next(err);

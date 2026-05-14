@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-import { Calendar as CalendarIcon, ChevronLeft, User as UserIcon, Scissors, Search, Clock } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, User as UserIcon, Scissors, Search, Clock, AlertCircle } from 'lucide-react';
 
 type PatientOption = {
   id: string;
@@ -100,16 +100,21 @@ export default function ScheduleSurgeryPage() {
   const [surgeonId, setSurgeonId] = useState('');
   const [anesthesiaType, setAnesthesiaType] = useState('Topical');
 
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
-  const [operatingRoom, setOperatingRoom] = useState('');
-
   const [technique, setTechnique] = useState('Phacoemulsification');
   const [iolModel, setIolModel] = useState('');
   const [iolPower, setIolPower] = useState<number | ''>('');
   const [targetRefraction, setTargetRefraction] = useState<number | ''>('');
 
   const [notes, setNotes] = useState('');
+  const [appointmentId, setAppointmentId] = useState<string | null>(null);
+
+  const now = new Date();
+  const defaultDate = now.toISOString().split('T')[0];
+  const defaultTime = now.toTimeString().split(' ')[0].slice(0, 5);
+
+  const [date, setDate] = useState(defaultDate);
+  const [time, setTime] = useState(defaultTime);
+  const [operatingRoom, setOperatingRoom] = useState('');
 
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
@@ -121,6 +126,29 @@ export default function ScheduleSurgeryPage() {
     const type = searchParams?.get('type') || '';
     const normalized = normalizeTypeParam(type);
     if (normalized) setSurgeryType(normalized);
+
+    const pid = searchParams?.get('patientId');
+    const pname = searchParams?.get('patientName');
+    const aid = searchParams?.get('appointmentId');
+    if (pid) {
+      setPatient({ id: pid, fullName: pname });
+      if (pname) setPatientQuery(pname);
+    }
+    if (aid) {
+      setAppointmentId(aid);
+      // Fetch appointment to get the assigned doctor (surgeon)
+      api.get(`/appointments/${aid}`).then(res => {
+        const apptData = res.data?.data || res.data;
+        if (apptData?.doctorId) {
+          setSurgeonId(apptData.doctorId);
+        }
+        if (apptData?.eyeSide) {
+          // Normalize eyeSide to the values expected by the surgery form (OD, OS, BOTH)
+          const normalizedEye = apptData.eyeSide === 'OU' ? 'BOTH' : apptData.eyeSide;
+          setEye(normalizedEye);
+        }
+      }).catch(err => console.error("Failed to fetch appointment details:", err));
+    }
   }, [searchParams]);
 
   useEffect(() => {
@@ -207,6 +235,7 @@ export default function ScheduleSurgeryPage() {
     try {
       const payload: any = {
         patientId: patient.id,
+        appointmentId: appointmentId || undefined,
         surgeryType,
         eye,
         procedure,
@@ -214,7 +243,7 @@ export default function ScheduleSurgeryPage() {
         anesthesiaType,
         date,
         time,
-        operatingRoom: operatingRoom.trim() || undefined,
+        status: 'completed',
         notes: notes.trim() || undefined,
       };
 
@@ -228,11 +257,11 @@ export default function ScheduleSurgeryPage() {
       }
 
       await api.post('/surgeries', payload);
-      toast.success('Surgery scheduled');
+      toast.success('Surgery report saved');
       router.push('/dashboard/surgery');
     } catch (e: any) {
       const msg = typeof e?.response?.data?.message === 'string' ? e.response.data.message : undefined;
-      toast.error(msg || 'Failed to schedule surgery');
+      toast.error(msg || 'Failed to save surgery report');
     } finally {
       setSaving(false);
     }
@@ -241,8 +270,8 @@ export default function ScheduleSurgeryPage() {
   return (
     <div className="w-full min-w-0 p-4 sm:p-6 lg:p-8 space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Schedule Surgery</h1>
-        <p className="text-slate-600">Schedule new eye surgery</p>
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Surgery Clinical Report</h1>
+        <p className="text-slate-600">Document the details of the eye surgery procedure</p>
       </div>
 
       <Link href="/dashboard/surgery" className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900">
@@ -310,11 +339,12 @@ export default function ScheduleSurgeryPage() {
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+          {/* 1. Surgery Type */}
           <div>
             <div className={LABEL_CN}>Surgery Type</div>
             <Select value={surgeryType} onValueChange={(v) => setSurgeryType(v as SurgeryType)}>
               <SelectTrigger className="mt-2 h-11">
-                <SelectValue placeholder="Select type" />
+                <SelectValue placeholder="Select surgery type" />
               </SelectTrigger>
               <SelectContent>
                 {SURGERY_TYPES.map((t) => (
@@ -326,10 +356,15 @@ export default function ScheduleSurgeryPage() {
             </Select>
           </div>
 
+          {/* 2. Eye Selection */}
           <div>
             <div className={LABEL_CN}>Eye</div>
-            <Select value={eye} onValueChange={setEye}>
-              <SelectTrigger className="mt-2 h-11">
+            <Select 
+              value={eye} 
+              onValueChange={setEye}
+              disabled={!!appointmentId}
+            >
+              <SelectTrigger className={`mt-2 h-11 ${appointmentId ? 'bg-slate-50 border-slate-200 cursor-not-allowed' : ''}`}>
                 <SelectValue placeholder="Select eye" />
               </SelectTrigger>
               <SelectContent>
@@ -340,6 +375,7 @@ export default function ScheduleSurgeryPage() {
             </Select>
           </div>
 
+          {/* 3. Procedure */}
           <div>
             <div className={LABEL_CN}>Procedure</div>
             <Select value={procedure} onValueChange={setProcedure}>
@@ -360,8 +396,12 @@ export default function ScheduleSurgeryPage() {
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div>
             <div className={LABEL_CN}>Surgeon</div>
-            <Select value={surgeonId} onValueChange={setSurgeonId}>
-              <SelectTrigger className="mt-2 h-11">
+            <Select 
+              value={surgeonId} 
+              onValueChange={setSurgeonId}
+              disabled={!!appointmentId}
+            >
+              <SelectTrigger className={`mt-2 h-11 ${appointmentId ? 'bg-slate-50 border-slate-200 cursor-not-allowed' : ''}`}>
                 <SelectValue placeholder="Select surgeon" />
               </SelectTrigger>
               <SelectContent>
@@ -372,6 +412,12 @@ export default function ScheduleSurgeryPage() {
                 ))}
               </SelectContent>
             </Select>
+            {appointmentId && (
+              <p className="mt-1.5 text-[11px] text-[#0EA5E9] font-medium flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                Linked to appointment surgeon
+              </p>
+            )}
           </div>
 
           <div>
@@ -391,47 +437,21 @@ export default function ScheduleSurgeryPage() {
         </div>
       </div>
 
-      {/* C. Schedule */}
+      {/* C. Surgery Notes */}
       <div className="rounded-xl border border-slate-100 bg-white p-6">
-        <div className="flex items-center gap-2 text-lg font-semibold text-slate-900">
-          <CalendarIcon className="h-5 w-5 text-[#0EA5E9]" />
-          Schedule
-        </div>
-
-        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div>
-            <div className={LABEL_CN}>Date *</div>
-            <div className="relative mt-2">
-              <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="h-11 pr-9" />
-              <CalendarIcon className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            </div>
-          </div>
-
-          <div>
-            <div className={LABEL_CN}>Time *</div>
-            <div className="relative mt-2">
-              <Input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="h-11 pr-9" />
-              <Clock className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            </div>
-          </div>
-
-          <div>
-            <div className={LABEL_CN}>Operating Room</div>
-            <Input
-              placeholder="e.g., OR-1"
-              value={operatingRoom}
-              onChange={(e) => setOperatingRoom(e.target.value)}
-              className="mt-2 h-11"
-            />
-          </div>
-        </div>
+        <div className="text-lg font-semibold text-slate-900">Post-Operative & Procedure Notes</div>
+        <Textarea
+          className="mt-3 min-h-[120px]"
+          placeholder="Procedure details, surgical findings, post-operative instructions..."
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+        />
       </div>
 
       {/* D. Cataract Surgery Details (Conditional) */}
       <div
-        className={`rounded-xl border border-slate-100 bg-white p-6 transition-all duration-200 ${
-          showCataractDetails ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1 pointer-events-none h-0 overflow-hidden p-0 border-0'
-        }`}
+        className={`rounded-xl border border-slate-100 bg-white p-6 transition-all duration-200 ${showCataractDetails ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1 pointer-events-none h-0 overflow-hidden p-0 border-0'
+          }`}
       >
         {showCataractDetails && (
           <>
@@ -489,16 +509,7 @@ export default function ScheduleSurgeryPage() {
         )}
       </div>
 
-      {/* E. Pre-Operative Notes */}
-      <div className="rounded-xl border border-slate-100 bg-white p-6">
-        <div className="text-lg font-semibold text-slate-900">Pre-Operative Notes</div>
-        <Textarea
-          className="mt-3 min-h-[120px]"
-          placeholder="Pre-operative instructions, special considerations..."
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-        />
-      </div>
+      {/* The previous notes section is now handled above */}
 
       {/* Footer */}
       <div className="flex items-center justify-end gap-3">
@@ -510,7 +521,7 @@ export default function ScheduleSurgeryPage() {
           disabled={saving}
           onClick={onSubmit}
         >
-          Schedule Surgery
+          Save Surgery Report
         </Button>
       </div>
     </div>

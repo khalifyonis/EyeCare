@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSocket } from '@/contexts/socket-context'
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
     PieChart, Pie, Cell, ResponsiveContainer,
@@ -14,7 +15,7 @@ import {
 } from '@tanstack/react-table'
 import {
     Users, Calendar, Eye,
-    TrendingUp, TrendingDown, ArrowUpRight, UserPlus, AlertTriangle, Package,
+    TrendingUp, TrendingDown, ArrowUpRight, UserPlus, AlertTriangle, Package, Activity
 } from 'lucide-react'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -67,6 +68,8 @@ type DashboardStats = {
     serviceStats?: { name: string; count: number; color: string }[]
     topDoctors?: { name: string; specialty: string; rating: string; patients: number }[]
     recentAppointments?: any[]
+    upcomingSurgeries?: any[]
+    todayAppointments?: any[]
 }
 
 const initialStats: DashboardStats = {
@@ -103,8 +106,11 @@ const statusConfig: Record<string, { bg: string; text: string; dot: string }> = 
     Completed: { bg: 'bg-emerald-100 dark:bg-emerald-900/40', text: 'text-emerald-800 dark:text-emerald-300', dot: 'bg-emerald-500' },
     'In Progress': { bg: 'bg-blue-100 dark:bg-blue-900/40', text: 'text-blue-800 dark:text-blue-300', dot: 'bg-blue-500' },
     Waiting: { bg: 'bg-amber-100 dark:bg-amber-900/40', text: 'text-amber-800 dark:text-amber-300', dot: 'bg-amber-500' },
-    Scheduled: { bg: 'bg-violet-100 dark:bg-violet-900/40', text: 'text-violet-800 dark:text-violet-300', dot: 'bg-violet-500' },
-    Pending: { bg: 'bg-amber-100 dark:bg-amber-900/40', text: 'text-amber-800 dark:text-amber-300', dot: 'bg-amber-500' },
+    Scheduled: { bg: 'bg-blue-100 dark:bg-blue-900/40', text: 'text-blue-800 dark:text-blue-300', dot: 'bg-blue-500' },
+    Received: { bg: 'bg-amber-100 dark:bg-amber-900/40', text: 'text-amber-800 dark:text-amber-300', dot: 'bg-amber-500' },
+    Examining: { bg: 'bg-purple-100 dark:bg-purple-900/40', text: 'text-purple-800 dark:text-purple-300', dot: 'bg-purple-500' },
+    Pending: { bg: 'bg-slate-100 dark:bg-slate-800/40', text: 'text-slate-800 dark:text-slate-300', dot: 'bg-slate-500' },
+    'In Surgery': { bg: 'bg-rose-100 dark:bg-rose-900/40', text: 'text-rose-800 dark:text-rose-300', dot: 'bg-rose-500' },
 }
 
 function DonutLegend({ data }: { data: { name: string; value: number; count: number; color: string }[] }) {
@@ -127,6 +133,7 @@ export function DashboardHome() {
     const [user, setUser] = useState<StoredUser | null>(null)
     const [stats, setStats] = useState<DashboardStats>(initialStats)
     const [loading, setLoading] = useState(true)
+    const { socket } = useSocket()
 
     useEffect(() => {
         const storedUser = readStoredUser()
@@ -159,6 +166,8 @@ export function DashboardHome() {
                 serviceStats: response.data?.serviceStats || [],
                 topDoctors: response.data?.topDoctors || [],
                 recentAppointments: response.data?.recentAppointments || [],
+                todayAppointments: response.data?.todayAppointments || [],
+                upcomingSurgeries: response.data?.upcomingSurgeries || [],
             })
             if (showToast) toast.success('Dashboard refreshed')
         } catch (error: any) {
@@ -168,10 +177,60 @@ export function DashboardHome() {
         }
     }, [])
 
+    // Silent fetch for background updates — no loading skeleton, no flickering
+    const silentFetchStats = useCallback(async () => {
+        try {
+            const response = await api.get('/dashboard/stats')
+            setStats({
+                totalPatients: Number(response.data?.totalPatients || 0),
+                appointmentsToday: Number(response.data?.appointmentsToday || 0),
+                totalDoctors: Number(response.data?.totalDoctors || 0),
+                totalExams: Number(response.data?.totalExams || 0),
+                dueFollowUps: Array.isArray(response.data?.dueFollowUps) ? response.data.dueFollowUps : [],
+                overdueFollowUpsCount: Number(response.data?.overdueFollowUpsCount ?? 0),
+                inventoryAlerts: response.data?.inventoryAlerts,
+                serviceStats: response.data?.serviceStats || [],
+                topDoctors: response.data?.topDoctors || [],
+                recentAppointments: response.data?.recentAppointments || [],
+                todayAppointments: response.data?.todayAppointments || [],
+                upcomingSurgeries: response.data?.upcomingSurgeries || [],
+            })
+        } catch {
+            // Silently ignore errors during background refresh
+        }
+    }, [])
+
     useEffect(() => {
         if (!user) return
         fetchDashboardStats()
     }, [user, fetchDashboardStats])
+
+    useEffect(() => {
+        if (!socket) return
+
+        const handleUpdate = () => {
+            silentFetchStats()
+        }
+
+        socket.on('appointment:created', handleUpdate)
+        socket.on('appointment:updated', handleUpdate)
+        socket.on('appointment:deleted', handleUpdate)
+
+        return () => {
+            socket.off('appointment:created', handleUpdate)
+            socket.off('appointment:updated', handleUpdate)
+            socket.off('appointment:deleted', handleUpdate)
+        }
+    }, [socket, silentFetchStats])
+
+    // Polling fallback: silent refresh every 15s for cross-device sync
+    useEffect(() => {
+        if (!user) return
+        const interval = setInterval(() => {
+            silentFetchStats()
+        }, 15000)
+        return () => clearInterval(interval)
+    }, [user, silentFetchStats])
 
     const isMainBranch = useMemo(() => {
         const branchName = String(user?.activeBranch?.branchName || '').toLowerCase()
@@ -182,12 +241,37 @@ export function DashboardHome() {
         return (stats.recentAppointments || []).map((app: any) => ({
             id: app.id,
             name: app.patient?.fullName || 'Unknown',
+            patientId: app.patient?.id || app.patientId,
             visit: app.type || 'Consultation',
-            status: app.status.charAt(0).toUpperCase() + app.status.slice(1).toLowerCase(),
+            status: app.status === 'IN_SURGERY' ? 'In Surgery' : app.status.charAt(0).toUpperCase() + app.status.slice(1).toLowerCase(),
             time: new Date(app.appointmentDate).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
             avatar: (app.patient?.fullName || ' ')[0].toUpperCase(),
         }))
     }, [stats.recentAppointments])
+
+    const surgeries = useMemo(() => {
+        return (stats.upcomingSurgeries || []).map((s: any) => ({
+            id: s.id,
+            patient: s.patient?.fullName || '—',
+            type: s.surgeryType,
+            date: new Date(s.date).toLocaleDateString(),
+            time: new Date(s.date).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
+            eye: s.eye,
+        }))
+    }, [stats.upcomingSurgeries])
+
+    const todayAppointments = useMemo(() => {
+        return (stats.todayAppointments || []).map((a: any) => ({
+            id: a.id,
+            time: new Date(a.appointmentDate).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
+            patient: a.patient?.fullName ?? '—',
+            patientId: a.patient?.id || a.patientId,
+            type: a.type || 'Eye Checkup',
+            status: a.status,
+            eyeExaminationId: a.eyeExamination?.id || null,
+            eyeExaminationStage: a.eyeExamination?.stage || null,
+        }))
+    }, [stats.todayAppointments])
 
     const topDoctors = useMemo(() => stats.topDoctors || [], [stats.topDoctors])
 
@@ -406,62 +490,110 @@ export function DashboardHome() {
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Today's Appointments */}
                         <Card className="border-none shadow-xl bg-white dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden flex flex-col">
                             <CardHeader className="flex flex-row items-center justify-between py-2.5 px-4 shrink-0 border-b border-slate-100 dark:border-slate-800">
-                                <CardTitle className="text-[12px] font-black uppercase tracking-[0.1em] text-muted-foreground">Recent Patients</CardTitle>
-                                <div className="flex items-center gap-2">
-                                    {(user?.role === 'RECEPTIONIST' || user?.role === 'SUPERADMIN') && (
-                                        <button title="Quick Register Patient" className="flex items-center gap-1 bg-[#0EA5E9] hover:bg-[#0c8cc7] text-[9px] font-bold px-2 py-1 rounded-lg transition-colors shadow-sm text-white">
-                                            <UserPlus className="h-3 w-3" />
-                                            <span className="hidden sm:inline">Register</span>
-                                        </button>
-                                    )}
-                                    <Link href="/dashboard/appointments" className="text-[9px] text-[#0EA5E9] font-bold hover:text-[#0c8cc7] transition-colors flex items-center gap-1 bg-blue-500/5 px-2 py-1 rounded-lg uppercase">
-                                        VIEW ALL <ArrowUpRight className="h-2.5 w-2.5" />
-                                    </Link>
-                                </div>
+                                <CardTitle className="text-[12px] font-black uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-2">
+                                    <Calendar className="h-3.5 w-3.5 text-[#0EA5E9]" /> Today&apos;s Appointments
+                                </CardTitle>
+                                <Link href="/dashboard/appointments" className="text-[9px] text-[#0EA5E9] font-bold hover:text-[#0c8cc7] transition-colors flex items-center gap-1 bg-blue-500/5 px-2 py-1 rounded-lg uppercase">
+                                    VIEW ALL <ArrowUpRight className="h-2.5 w-2.5" />
+                                </Link>
                             </CardHeader>
-                            <CardContent className="p-0 flex-1">
+                            <CardContent className="p-0 flex-1 overflow-auto max-h-[400px]">
                                 <Table>
                                     <TableBody>
-                                        {table.getRowModel().rows.map((row) => (
-                                            <TableRow key={row.id} className="hover:bg-accent border-none transition-colors duration-150 group cursor-default">
-                                                {row.getVisibleCells().map((cell) => (
-                                                    <TableCell key={cell.id} className="py-2">
-                                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                    </TableCell>
-                                                ))}
+                                        {todayAppointments.length > 0 ? todayAppointments.map((app, i) => (
+                                            <TableRow key={app.id} className="hover:bg-accent/50 border-none transition-colors duration-150 group cursor-default">
+                                                <TableCell className="py-2.5 pl-4 w-[80px] font-bold text-slate-500 tabular-nums">{app.time}</TableCell>
+                                                <TableCell className="py-2.5">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="h-8 w-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-600 font-black text-[10px]">
+                                                            {app.patient[0]}
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{app.patient}</span>
+                                                            <span className="text-[9px] text-muted-foreground uppercase tracking-widest">{app.type}</span>
+                                                        </div>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="py-2.5 text-right pr-4">
+                                                    <button
+                                                        onClick={async () => {
+                                                            try {
+                                                                await api.put(`/appointments/${app.id}/arrival`)
+                                                                
+                                                                const isSurgery = app.type?.toUpperCase() === 'SURGERY'
+                                                                let url = isSurgery 
+                                                                    ? `/dashboard/surgery/new?patientId=${app.patientId}&patientName=${encodeURIComponent(app.patient)}&appointmentId=${app.id}`
+                                                                    : `/dashboard/eye-examinations/new?patientId=${app.patientId}&patientName=${encodeURIComponent(app.patient)}&appointmentId=${app.id}&stage=PRELIMINARY`
+
+                                                                if (!isSurgery && app.eyeExaminationId) {
+                                                                     // If exam exists, edit it at the CLINICAL stage.
+                                                                     const nextStage = 'CLINICAL';
+                                                                     url = `/dashboard/eye-examinations/${app.eyeExaminationId}/edit?stage=${nextStage}`
+                                                                }
+                                                                router.push(url)
+                                                            } catch (err) {
+                                                                toast.error('Failed to start procedure')
+                                                            }
+                                                        }}
+                                                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0EA5E9] hover:bg-[#0c8cc7] text-white text-[10px] font-bold transition-all shadow-sm active:scale-95"
+                                                    >
+                                                        {app.type?.toUpperCase() === 'SURGERY' ? (
+                                                            <>
+                                                                <Activity className="h-3 w-3" />
+                                                                Perform Surgery
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Eye className="h-3 w-3" />
+                                                                Examine Patient
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                </TableCell>
                                             </TableRow>
-                                        ))}
+                                        )) : (
+                                            <TableRow>
+                                                <TableCell colSpan={3} className="py-10 text-center text-muted-foreground italic text-xs">
+                                                    No appointments for today
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
                                     </TableBody>
                                 </Table>
                             </CardContent>
                         </Card>
 
+                        {/* Upcoming Surgeries */}
                         <Card className="border-none shadow-xl bg-white dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden flex flex-col">
                             <CardHeader className="flex flex-row items-center justify-between py-2.5 px-4 shrink-0 border-b border-slate-100 dark:border-slate-800">
-                                <CardTitle className="text-[12px] font-black uppercase tracking-[0.1em] text-muted-foreground">Top Doctors</CardTitle>
-                                <Link href="/dashboard/admin/doctors" className="text-[9px] text-[#0EA5E9] font-bold hover:text-[#0c8cc7] transition-colors flex items-center gap-1 bg-blue-500/5 px-2 py-1 rounded-lg uppercase">
+                                <CardTitle className="text-[12px] font-black uppercase tracking-[0.1em] text-muted-foreground flex items-center gap-2">
+                                    <Activity className="h-3.5 w-3.5 text-rose-500" /> Upcoming Surgeries
+                                </CardTitle>
+                                <Link href="/dashboard/surgery" className="text-[9px] text-rose-500 font-bold hover:text-rose-600 transition-colors flex items-center gap-1 bg-rose-500/5 px-2 py-1 rounded-lg uppercase">
                                     VIEW ALL <ArrowUpRight className="h-2.5 w-2.5" />
                                 </Link>
                             </CardHeader>
-                            <CardContent className="px-3 pb-2.5 pt-1.5 space-y-1">
-                                {topDoctors.map((doctor, index) => (
-                                    <div key={doctor.name} className="flex items-center gap-3 rounded-lg px-2.5 py-2 hover:bg-accent transition-colors duration-150 group cursor-default">
-                                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#0EA5E9]/10 text-xs font-black text-[#0EA5E9] group-hover:scale-105 transition-transform">{index + 1}</div>
+                            <CardContent className="px-3 pb-2.5 pt-1.5 space-y-1 overflow-auto max-h-[400px]">
+                                {surgeries.length > 0 ? surgeries.map((s: any) => (
+                                    <div key={s.id} className="flex items-center gap-3 rounded-lg px-2.5 py-2 hover:bg-accent/50 transition-colors duration-150 group cursor-default border-b border-slate-50 dark:border-slate-800/30 last:border-0">
+                                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-rose-100 dark:bg-rose-900/30 text-[10px] font-black text-rose-600 uppercase">{s.eye}</div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-xs font-bold truncate tracking-tight">{doctor.name}</p>
-                                            <p className="text-[10px] text-muted-foreground/70 font-medium">{doctor.specialty}</p>
+                                            <p className="text-xs font-bold truncate tracking-tight">{s.patient}</p>
+                                            <p className="text-[10px] text-muted-foreground/70 font-medium">{s.type}</p>
                                         </div>
                                         <div className="text-right shrink-0">
-                                            <div className="flex items-center justify-end gap-1 text-xs font-black text-amber-500">
-                                                <span className="text-[9px] text-muted-foreground/50 font-medium mr-1 uppercase">⭐</span>
-                                                {doctor.rating}
-                                            </div>
-                                            <p className="text-[9px] text-muted-foreground/60 font-bold uppercase tracking-widest leading-none mt-1">{doctor.patients} pts</p>
+                                            <p className="text-[10px] font-black text-rose-500 tabular-nums leading-none">{s.time}</p>
+                                            <p className="text-[9px] text-muted-foreground/60 font-bold uppercase tracking-widest leading-none mt-1">{s.date}</p>
                                         </div>
                                     </div>
-                                ))}
+                                )) : (
+                                    <div className="py-10 text-center text-muted-foreground italic text-xs">
+                                        No upcoming surgeries
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </div>

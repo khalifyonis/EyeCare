@@ -1,6 +1,7 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { Pencil, Trash2, AlertTriangle, PackagePlus, History, SlidersHorizontal } from 'lucide-react';
+import { Pencil, Trash2, AlertTriangle, PackagePlus, History, SlidersHorizontal, Ban } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export interface PharmacyRow {
     id: string;
@@ -37,81 +38,111 @@ export function getPharmacyColumns({ onEdit, onDelete, onReceive, onHistory, onA
     return [
         {
             accessorKey: 'itemName',
-            header: 'Item',
+            header: 'MEDICINE NAME (GENERIC)',
             cell: ({ row }) => (
-                <span className="font-medium text-sm">{row.original.itemName || '—'}</span>
+                <div className="flex flex-col gap-0.5">
+                    <span className="font-bold text-slate-900 dark:text-slate-100">{row.original.itemName}</span>
+                    {row.original.genericName && (
+                        <span className="text-[10px] font-medium text-slate-500 uppercase tracking-tighter">{row.original.genericName}</span>
+                    )}
+                </div>
             ),
         },
         {
             accessorKey: 'category',
-            header: 'Category',
+            header: 'CATEGORY',
             cell: ({ row }) => (
-                <span className="text-sm text-muted-foreground">{row.original.category || '—'}</span>
-            ),
-        },
-        {
-            accessorKey: 'supplier',
-            header: 'Supplier',
-            cell: ({ row }) => (
-                <span className="text-sm text-muted-foreground">{row.original.supplier?.name || row.original.supplierName || '—'}</span>
+                <span className="inline-flex items-center rounded-lg bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-400 uppercase border border-slate-200 dark:border-slate-700">
+                    {row.original.category || 'General'}
+                </span>
             ),
         },
         {
             accessorKey: 'stockQuantity',
-            header: 'Stock',
+            header: 'STOCK STATUS',
             cell: ({ row }) => {
                 const qty = Number(row.original.stockQuantity) ?? 0;
                 const reorder = Number(row.original.reorderLevel) ?? 0;
                 const low = qty <= reorder;
+                const oos = qty === 0;
+
                 return (
-                    <span className={low ? 'text-amber-600 dark:text-amber-400 font-medium' : ''}>
-                        {qty}
-                        {low && <AlertTriangle className="inline h-3.5 w-3.5 ml-1 text-amber-500" />}
-                    </span>
+                    <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-1.5">
+                            <span className={cn(
+                                "text-sm font-black tabular-nums",
+                                oos ? "text-red-600" : low ? "text-amber-600" : "text-emerald-600"
+                            )}>
+                                {qty}
+                            </span>
+                            {oos ? (
+                                <Ban className="h-3 w-3 text-red-500" />
+                            ) : low ? (
+                                <AlertTriangle className="h-3 w-3 text-amber-500" />
+                            ) : null}
+                        </div>
+                        <div className="w-16 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div 
+                                className={cn(
+                                    "h-full transition-all",
+                                    oos ? "w-0" : low ? "w-1/3 bg-amber-500" : "w-full bg-emerald-500"
+                                )} 
+                            />
+                        </div>
+                    </div>
                 );
             },
         },
         {
-            accessorKey: 'reorderLevel',
-            header: 'Reorder at',
-            cell: ({ row }) => (
-                <span className="text-sm text-muted-foreground">{Number(row.original.reorderLevel) ?? 0}</span>
-            ),
-        },
-        {
             accessorKey: 'sellingPrice',
-            header: 'Selling price',
+            header: 'PRICE',
             cell: ({ row }) => (
-                <span className="tabular-nums text-sm">
-                    ${toNum(row.original.sellingPrice).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                <span className="tabular-nums font-black text-slate-900 dark:text-slate-100">
+                    ${toNum(row.original.sellingPrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
             ),
         },
         {
             accessorKey: 'expiryDate',
-            header: 'Expiry',
+            header: 'EXPIRY',
             cell: ({ row }) => {
                 const d = row.original.expiryDate;
-                if (!d) return <span className="text-muted-foreground">—</span>;
+                if (!d) return <span className="text-slate-300">—</span>;
                 const date = new Date(d);
-                const expired = date < new Date();
+                const now = new Date();
+                const cutoff = new Date(now);
+                cutoff.setDate(cutoff.getDate() + 90);
+                
+                const isExpired = date < now;
+                const isSoon = date <= cutoff;
+
                 return (
-                    <span className={expired ? 'text-red-600 dark:text-red-400 text-sm' : 'text-sm'}>
-                        {date.toLocaleDateString()}
-                    </span>
+                    <div className="flex flex-col">
+                        <span className={cn(
+                            "text-xs font-bold",
+                            isExpired ? "text-red-600" : isSoon ? "text-amber-600" : "text-slate-700 dark:text-slate-300"
+                        )}>
+                            {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                        {isExpired ? (
+                            <span className="text-[9px] font-black uppercase text-red-500">Expired</span>
+                        ) : isSoon ? (
+                            <span className="text-[9px] font-black uppercase text-amber-500">Expiring Soon</span>
+                        ) : null}
+                    </div>
                 );
             },
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: 'ACTIONS',
             cell: ({ row }: { row: { original: PharmacyRow } }) => (
-                <div className="flex items-center justify-end gap-1 px-1">
+                <div className="flex items-center justify-end gap-1.5">
                     <Button
                         variant="ghost"
                         size="icon"
                         title="Transaction history"
-                        className="h-8 w-8 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition-all active:scale-90 rounded-lg"
+                        className="h-8 w-8 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors"
                         onClick={() => onHistory(row.original)}
                     >
                         <History className="w-4 h-4" />
@@ -120,7 +151,7 @@ export function getPharmacyColumns({ onEdit, onDelete, onReceive, onHistory, onA
                         variant="ghost"
                         size="icon"
                         title="Adjust stock"
-                        className="h-8 w-8 bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 transition-all active:scale-90 rounded-lg"
+                        className="h-8 w-8 text-slate-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-colors"
                         onClick={() => onAdjust(row.original)}
                     >
                         <SlidersHorizontal className="w-4 h-4" />
@@ -129,7 +160,7 @@ export function getPharmacyColumns({ onEdit, onDelete, onReceive, onHistory, onA
                         variant="ghost"
                         size="icon"
                         title="Receive stock"
-                        className="h-8 w-8 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 transition-all active:scale-90 rounded-lg shadow-sm shadow-emerald-200/50"
+                        className="h-8 w-8 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
                         onClick={() => onReceive(row.original)}
                     >
                         <PackagePlus className="w-4 h-4" />
@@ -138,7 +169,7 @@ export function getPharmacyColumns({ onEdit, onDelete, onReceive, onHistory, onA
                         variant="ghost"
                         size="icon"
                         title="Edit item"
-                        className="h-8 w-8 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 transition-all active:scale-90 rounded-lg shadow-sm shadow-blue-200/50"
+                        className="h-8 w-8 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
                         onClick={() => onEdit(row.original)}
                     >
                         <Pencil className="w-4 h-4" />
@@ -147,7 +178,7 @@ export function getPharmacyColumns({ onEdit, onDelete, onReceive, onHistory, onA
                         variant="ghost"
                         size="icon"
                         title="Delete item"
-                        className="h-8 w-8 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition-all active:scale-90 rounded-lg shadow-sm shadow-red-200/50"
+                        className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                         onClick={() => onDelete(row.original.id)}
                     >
                         <Trash2 className="w-4 h-4" />

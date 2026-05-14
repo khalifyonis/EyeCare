@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import api from '@/lib/axios';
+import { useSocket } from '@/contexts/socket-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Receipt, Search, MoreVertical, Pencil, Eye } from 'lucide-react';
@@ -81,6 +82,14 @@ function computeDueDate(row: BillingRow) {
     return created.toLocaleDateString();
 }
 
+function getLocalDateValue(): string {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 export default function BillingPage() {
     const [role, setRole] = useState('');
     const [rows, setRows] = useState<BillingRow[]>([]);
@@ -99,6 +108,7 @@ export default function BillingPage() {
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const [pageSize, setPageSize] = useState(20);
+    const { socket } = useSocket();
 
     useEffect(() => {
         setRole(resolveRoleName(readStoredUser()));
@@ -125,7 +135,12 @@ export default function BillingPage() {
                 const params = new URLSearchParams();
                 if (searchTerm) params.set('search', searchTerm);
                 if (status !== 'all') params.set('status', status);
-                if (date) params.set('date', date);
+                if (date) {
+                    params.set('date', date);
+                } else if (!searchTerm) {
+                    // Today-first rule
+                    params.set('date', getLocalDateValue());
+                }
                 params.set('page', String(pageNum));
                 params.set('limit', String(pageSize));
                 const res = await api.get(`/billing?${params.toString()}`);
@@ -165,6 +180,25 @@ export default function BillingPage() {
         fetchStats();
     }, [fetchStats]);
 
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleUpdate = () => {
+            fetchRows(search, statusFilter, dateFilter, page);
+            fetchStats();
+        };
+
+        socket.on('billing:created', handleUpdate);
+        socket.on('billing:updated', handleUpdate);
+        socket.on('billing:deleted', handleUpdate);
+
+        return () => {
+            socket.off('billing:created', handleUpdate);
+            socket.off('billing:updated', handleUpdate);
+            socket.off('billing:deleted', handleUpdate);
+        };
+    }, [socket, search, statusFilter, dateFilter, page, fetchRows, fetchStats]);
+
     const handleDelete = useCallback(
         async (id: string) => {
             if (!confirm('Delete this billing record?')) return;
@@ -188,7 +222,7 @@ export default function BillingPage() {
                     <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Manage invoices and payments</p>
                 </div>
                 {canManage && (
-                    <Button asChild className="h-11 rounded-lg bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-semibold px-5">
+                    <Button asChild className="h-11 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold px-5">
                         <Link href="/dashboard/billing/new">
                         <Receipt className="w-4 h-4 mr-2" />
                         Create New Invoice
@@ -217,7 +251,6 @@ export default function BillingPage() {
                             <SelectItem value="UNPAID">Unpaid</SelectItem>
                             <SelectItem value="PARTIAL">Partially Paid</SelectItem>
                             <SelectItem value="PAID">Paid</SelectItem>
-                            <SelectItem value="OVERDUE">Overdue</SelectItem>
                         </SelectContent>
                     </Select>
                     <Input
@@ -277,15 +310,8 @@ export default function BillingPage() {
                                             {formatAmount(row.finalAmount)}
                                         </TableCell>
                                         <TableCell className="px-4 py-4 align-middle">
-                                            <StatusPill variant={
-                                                ((row.status || '').toUpperCase() !== 'PAID' && row.dueDate && new Date(row.dueDate) < new Date())
-                                                    ? 'destructive'
-                                                    : statusToVariant(row.status || 'UNPAID')
-                                            }>
-                                                {((row.status || '').toUpperCase() !== 'PAID' && row.dueDate && new Date(row.dueDate) < new Date())
-                                                    ? 'OVERDUE'
-                                                    : (row.status || 'UNPAID')
-                                                }
+                                            <StatusPill variant={statusToVariant(row.status || 'UNPAID')}>
+                                                {row.status || 'UNPAID'}
                                             </StatusPill>
                                         </TableCell>
                                         <TableCell className="px-4 py-4 align-middle text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap">

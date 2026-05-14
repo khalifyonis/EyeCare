@@ -201,7 +201,9 @@ export default function SurgeryListPage() {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [dateFilter, setDateFilter] = useState('');
+  
+  // Default to today's date for operational focus
+  const [dateFilter, setDateFilter] = useState(new Date().toISOString().split('T')[0]);
 
   const typeOptions = useMemo(() => {
     const base = [
@@ -320,7 +322,7 @@ export default function SurgeryListPage() {
             <CataractRefIcon className="h-8 w-8" />
             <div>
               <div className="font-semibold text-slate-900 dark:text-slate-100">Cataract</div>
-              <div className="text-sm font-normal text-slate-900 dark:text-slate-400">Schedule Surgery</div>
+              <div className="text-sm font-normal text-slate-900 dark:text-slate-400">Add Surgery Report</div>
             </div>
           </div>
         </Link>
@@ -403,7 +405,7 @@ export default function SurgeryListPage() {
           <Button asChild className="h-11 rounded-xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white">
             <Link href="/dashboard/surgery/new">
               <Plus className="h-4 w-4" />
-              Schedule Surgery
+              New Surgery Report
             </Link>
           </Button>
         </div>

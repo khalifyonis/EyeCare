@@ -158,7 +158,7 @@ export default function MedicinePrescriptionDetailsPage() {
   return (
     <div className="w-full min-w-0 space-y-6 p-4 sm:p-5 md:p-6 lg:p-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Medicine Prescription</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">Medicine Prescription</h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Review prescription details and treatment instructions</p>
       </div>
 
@@ -167,25 +167,48 @@ export default function MedicinePrescriptionDetailsPage() {
         Back to Medicine Prescriptions
       </Link>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
-        <h2 className="mb-4 text-base font-semibold text-slate-900 dark:text-slate-100">Prescription Info</h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Patient Information Section */}
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
+          <h2 className="mb-6 text-lg font-semibold text-slate-900 dark:text-slate-100">Patient Information</h2>
+          <div className="space-y-5">
+            <Field label="Patient Name" value={patient?.fullName || '—'} />
+            <Field label="Phone Number" value={patient?.phone || '—'} />
+            <div className="pt-2">
+               <Link href={`/dashboard/patients?view=${patient?.id}`} className="text-sm font-medium text-blue-600 hover:underline">
+                 View Patient Profile {"->"}
+               </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Prescription Metadata Section */}
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
+          <h2 className="mb-6 text-lg font-semibold text-slate-900 dark:text-slate-100">Prescription Info</h2>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <Field label="Prescribed Date" value={formatDate(row.createdAt)} />
+            <Field label="Status" value={row.quantity ? 'Active' : 'N/A'} />
+            <Field label="Quantity" value={String(row.quantity ?? 0)} />
+          </div>
+        </div>
+      </div>
+
+      {/* Treatment Details Section */}
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
+        <h2 className="mb-6 text-lg font-semibold text-slate-900 dark:text-slate-100">Treatment Details</h2>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <Field label="Medicine" value={medicineLabel(item)} />
           <Field label="Type" value={item?.itemType || 'General'} />
           <Field label="Strength" value={item?.strength || '—'} />
-          <Field label="Quantity" value={String(row.quantity ?? 0)} />
           <Field label="Dosage" value={parsed.dosage} />
           <Field label="Frequency" value={parsed.frequency} />
           <Field label="Duration" value={parsed.duration} />
           <Field label="Eye" value={parsed.eye} />
-          <Field label="Created" value={formatDate(row.createdAt)} />
-          <Field label="Patient" value={patient?.fullName || '—'} />
-          <Field label="Phone" value={patient?.phone || '—'} />
         </div>
 
         {parsed.notes !== '—' && (
-          <div className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-300">
-            <span className="font-semibold text-slate-900 dark:text-slate-100">Notes:</span> {parsed.notes}
+          <div className="mt-8 rounded-lg border border-slate-100 bg-slate-50/50 p-4 text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-300">
+            <span className="font-bold text-slate-900 dark:text-slate-100">Notes:</span> {parsed.notes}
           </div>
         )}
       </div>

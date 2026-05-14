@@ -16,6 +16,16 @@ interface UserFormProps {
 }
 
 const ROLES = ['ADMIN', 'DOCTOR', 'PHARMACIST', 'OPTICIAN', 'RECEPTIONIST'];
+const SPECIALIZATIONS = [
+    { value: 'OPHTHALMOLOGY', label: 'Ophthalmology' },
+    { value: 'OPTOMETRY', label: 'Optometry' },
+    { value: 'PEDIATRIC_OPHTHALMOLOGY', label: 'Pediatric Ophthalmology' },
+    { value: 'RETINA_SPECIALIST', label: 'Retina Specialist' },
+    { value: 'GLAUCOMA_SPECIALIST', label: 'Glaucoma Specialist' },
+    { value: 'CORNEA_SPECIALIST', label: 'Cornea Specialist' },
+    { value: 'OCULOPLASTICS', label: 'Oculoplastics' },
+];
+
 
 export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
     const [saving, setSaving] = useState(false);
@@ -192,12 +202,21 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
                                 <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Specialization</label>
-                                <Input
-                                    placeholder="e.g. Ophthalmology"
-                                    value={formData.specialization}
-                                    onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
-                                    className="h-10 rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus-visible:ring-[#0EA5E9] text-sm"
-                                />
+                                <Select 
+                                    value={formData.specialization} 
+                                    onValueChange={(v) => setFormData({ ...formData, specialization: v })}
+                                >
+                                    <SelectTrigger className="h-10 rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:ring-[#0EA5E9] text-sm">
+                                        <SelectValue placeholder="Select Specialization..." />
+                                    </SelectTrigger>
+                                    <SelectContent className="rounded-lg">
+                                        {SPECIALIZATIONS.map(spec => (
+                                            <SelectItem key={spec.value} value={spec.value} className="text-sm">
+                                                {spec.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </div>
                     )}

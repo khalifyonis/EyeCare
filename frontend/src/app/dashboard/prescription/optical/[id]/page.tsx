@@ -214,10 +214,6 @@ export default function PrescriptionDetailsPage() {
             </div>
             <p className="mt-2 text-base text-slate-600">{toDisplayType(row.type)}</p>
           </div>
-          <div className="text-right">
-            <p className="text-sm text-slate-500">Valid Until</p>
-            <p className="text-lg font-semibold text-slate-900">{formatDate(row.expiryDate)}</p>
-          </div>
         </div>
       </div>
 
@@ -259,10 +255,6 @@ export default function PrescriptionDetailsPage() {
             <div>
               <p className={LABEL_CN}>Prescriber</p>
               <p className="text-lg font-medium text-slate-900 leading-tight">Dr. {createdByName}</p>
-            </div>
-            <div>
-              <p className={LABEL_CN}>Expiry Date</p>
-              <p className="text-lg font-medium text-slate-900 leading-tight">{formatDate(row.expiryDate)}</p>
             </div>
             <div>
               <p className={LABEL_CN}>Status</p>

@@ -3,35 +3,39 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+import { cn } from '@/lib/utils'
+
 const tabs = [
-  { label: 'Medicines', href: '/dashboard/pharmacy/inventory' },
-  { label: 'Sales', href: '/dashboard/pharmacy' },
+  { label: 'Sales Feed', href: '/dashboard/pharmacy' },
+  { label: 'Medicine Inventory', href: '/dashboard/pharmacy/inventory' },
 ]
 
 export function PharmacyTabs() {
   const pathname = usePathname()
-  const normalized = pathname
 
   return (
-    <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-[#0f172a] overflow-hidden shadow-sm">
-      <div className="grid grid-cols-1 sm:grid-cols-2">
+    <div className="p-1 bg-slate-100/80 dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 w-fit">
+      <div className="flex items-center gap-1">
         {tabs.map((t) => {
-          const active =
-            t.href === '/dashboard/pharmacy'
-              ? normalized === '/dashboard/pharmacy' || normalized.startsWith('/dashboard/pharmacy/sales')
-              : normalized === t.href || normalized.startsWith(`${t.href}/`)
+          const active = t.href === '/dashboard/pharmacy'
+            ? pathname === '/dashboard/pharmacy'
+            : pathname.startsWith(t.href)
+
           return (
             <Link
               key={t.href}
               href={t.href}
-              className={[
-                'relative flex items-center justify-center px-4 py-3 text-sm md:text-base font-semibold transition-colors border-b',
+              className={cn(
+                "relative px-6 py-2.5 text-sm font-bold transition-all duration-300 rounded-xl whitespace-nowrap",
                 active
-                  ? 'text-[#0EA5E9] dark:text-[#38BDF8] bg-sky-50/70 dark:bg-sky-900/20 border-[#0EA5E9] dark:border-[#38BDF8]'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 border-slate-100 dark:border-slate-800',
-              ].join(' ')}
+                  ? "bg-white dark:bg-slate-800 text-[#0EA5E9] shadow-sm ring-1 ring-slate-200 dark:ring-slate-700"
+                  : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-800/50"
+              )}
             >
               {t.label}
+              {active && (
+                <div className="absolute -bottom-[5px] left-1/2 -translate-x-1/2 w-1 h-1 bg-[#0EA5E9] rounded-full shadow-[0_0_8px_#0EA5E9]" />
+              )}
             </Link>
           )
         })}

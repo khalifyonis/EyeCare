@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import api from '@/lib/axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Pill, Package, Search, AlertTriangle } from 'lucide-react';
+import { Pill, Package, Search, AlertTriangle, Ban, CalendarDays, RefreshCcw } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { DataTable } from '@/components/ui/data-table';
 import { getPharmacyColumns, type PharmacyRow } from './columns';
 import { PharmacyItemDialog } from './pharmacy-item-dialog';
@@ -16,11 +17,19 @@ import { StatsCard } from '@/components/dashboard/stats-card';
 import { PageBreadcrumb } from '@/components/dashboard/page-breadcrumb';
 import { ServerPagination } from '@/components/dashboard/server-pagination';
 
-type PharmacyStats = { total: number; lowStock: number };
+import { PharmacyTabs } from '../../_components/pharmacy-tabs';
+import { PharmacyKpiCard } from '../../_components/pharmacy-kpi-card';
+
+type PharmacyStats = { 
+    total: number; 
+    lowStock: number;
+    outOfStock: number;
+    expiringSoon: number;
+};
 
 export default function PharmacyInventoryPage() {
     const [rows, setRows] = useState<PharmacyRow[]>([]);
-    const [stats, setStats] = useState<PharmacyStats>({ total: 0, lowStock: 0 });
+    const [stats, setStats] = useState<PharmacyStats>({ total: 0, lowStock: 0, outOfStock: 0, expiringSoon: 0 });
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('');
@@ -220,63 +229,92 @@ export default function PharmacyInventoryPage() {
                 </Button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-5">
-                <StatsCard
-                    title="Total items"
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <PharmacyKpiCard
+                    title="Total Items"
                     value={stats.total.toLocaleString()}
                     icon={Package}
-                    color="blue"
+                    tone="indigo"
                 />
-                <StatsCard
-                    title="Low stock"
+                <PharmacyKpiCard
+                    title="Low Stock"
                     value={stats.lowStock.toLocaleString()}
                     icon={AlertTriangle}
-                    color="amber"
+                    tone="orange"
+                />
+                <PharmacyKpiCard
+                    title="Out of Stock"
+                    value={stats.outOfStock.toLocaleString()}
+                    icon={Ban}
+                    tone="red"
+                />
+                <PharmacyKpiCard
+                    title="Expiring Soon"
+                    value={stats.expiringSoon.toLocaleString()}
+                    icon={CalendarDays}
+                    tone="amber"
                 />
             </div>
 
-            <div className="flex flex-col md:flex-row md:items-center gap-3 sm:gap-4">
-                <div className="relative w-full md:w-[260px]">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-                    <Input
-                        placeholder="Search pharmacy..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="pl-9 h-9 w-full rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-sm shadow-sm focus-visible:ring-1 focus-visible:ring-[#0EA5E9]"
-                    />
+            <PharmacyTabs />
+
+            <div className="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex flex-col md:flex-row md:items-center gap-3 flex-1">
+                        <div className="relative w-full md:w-[260px]">
+                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                            <Input
+                                placeholder="Search inventory..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="pl-10 h-10 bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl focus-visible:ring-1 focus-visible:ring-[#0EA5E9]"
+                            />
+                        </div>
+                        <Input
+                            placeholder="Category filter..."
+                            value={categoryFilter}
+                            onChange={(e) => setCategoryFilter(e.target.value)}
+                            className="h-10 w-full md:w-[160px] bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl focus-visible:ring-1 focus-visible:ring-[#0EA5E9]"
+                        />
+                    </div>
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-10 w-10 rounded-xl border-slate-200 dark:border-slate-800"
+                        onClick={refresh}
+                        disabled={loading}
+                    >
+                        <RefreshCcw className={cn("h-4 w-4 text-slate-500", loading && "animate-spin")} />
+                    </Button>
                 </div>
-                <Input
-                    placeholder="Category"
-                    value={categoryFilter}
-                    onChange={(e) => setCategoryFilter(e.target.value)}
-                    className="h-9 w-full md:w-[150px] rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-sm shadow-sm focus-visible:ring-1 focus-visible:ring-[#0EA5E9]"
-                />
-            </div>
 
-            <div className="min-w-0">
-                <DataTable
-                    columns={columns}
-                    data={rows}
-                    loading={loading}
-                    onRefresh={refresh}
-                    itemLabel="items"
-                    hideSearch
-                    hidePagination
-                    enableRowSelection
-                    quickActions={quickActions}
-                    selectionKey={selectionKey}
-                    emptyMessage="No pharmacy items yet"
-                    emptyDescription="Click 'Add item' to add your first medication to the inventory."
-                />
-                <ServerPagination
-                    page={page}
-                    limit={pageSize}
-                    total={total}
-                    totalPages={totalPages}
-                    onPageChange={setPage}
-                    onLimitChange={(limit) => { setPageSize(limit); setPage(1); }}
-                    disabled={loading}
-                />
+                <div className="min-w-0">
+                    <DataTable
+                        columns={columns}
+                        data={rows}
+                        loading={loading}
+                        onRefresh={refresh}
+                        itemLabel="items"
+                        hideSearch
+                        hidePagination
+                        enableRowSelection
+                        quickActions={quickActions}
+                        selectionKey={selectionKey}
+                        emptyMessage="No pharmacy items yet"
+                        emptyDescription="Click 'Add item' to add your first medication to the inventory."
+                    />
+                    <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-800">
+                        <ServerPagination
+                            page={page}
+                            limit={pageSize}
+                            total={total}
+                            totalPages={totalPages}
+                            onPageChange={setPage}
+                            onLimitChange={(limit) => { setPageSize(limit); setPage(1); }}
+                            disabled={loading}
+                        />
+                    </div>
+                </div>
             </div>
 
             <PharmacyItemDialog

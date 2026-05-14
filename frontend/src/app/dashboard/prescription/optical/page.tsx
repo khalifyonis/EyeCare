@@ -4,6 +4,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import api from '@/lib/axios';
 import { toast } from 'sonner';
 
@@ -22,14 +23,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ServerPagination } from '@/components/dashboard/server-pagination';
 import { OpticalKpiCard } from '../../optical-shop/_components/optical-kpi-card';
 
-import { CheckCircle2, Download, Glasses, MoreVertical, Plus, Search, Trash2, XCircle } from 'lucide-react';
+import { CheckCircle2, Download, Glasses, MoreVertical, Plus, Search, Trash2, XCircle, ShoppingCart, Eye, Pencil } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { readStoredUser, resolveRoleName } from '@/lib/auth';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 type OpticalPrescription = {
     id: string;
-    type: 'SPECTACLES' | 'CONTACT_LENS' | 'BOTH' | string;
+    type: 'SPECTACLES' | string;
     status: 'FILLED' | 'DISPENSED' | string;
     createdAt: string;
-    expiryDate: string;
     patient?: { id: string; fullName?: string | null; patientNumber?: string | null } | null;
 
     odSphere?: string | null;
@@ -59,7 +64,7 @@ type Stats = {
     total: number;
     active: number;
     dispensed: number;
-    expired: number;
+    issuedToday: number;
 };
 
 function formatDate(iso?: string | null): string {
@@ -69,19 +74,11 @@ function formatDate(iso?: string | null): string {
 }
 
 function toTypeLabel(type: string): string {
-    if (type === 'CONTACT_LENS') return 'Contact Lens';
-    if (type === 'SPECTACLES') return 'Spectacles';
-    if (type === 'BOTH') return 'Both';
-    return type || '—';
+    return 'Spectacles';
 }
 
-function computeStatusLabel(row: OpticalPrescription): { label: string; tone: 'neutral' | 'danger' } {
-    const now = new Date();
-    const expiry = new Date(row.expiryDate);
-    const expired = !Number.isNaN(expiry.getTime()) && expiry < now;
-
+function computeStatusLabel(row: OpticalPrescription): { label: string; tone: 'neutral' } {
     if ((row.status || '').toUpperCase() === 'DISPENSED') return { label: 'dispensed', tone: 'neutral' };
-    if (expired) return { label: 'expired', tone: 'danger' };
     return { label: 'active', tone: 'neutral' };
 }
 
@@ -122,11 +119,11 @@ function renderEyeSummary(prefix: 'od' | 'os', row: OpticalPrescription) {
     const secondary = detailTokens.join(' · ');
 
     return (
-        <div className="min-w-[150px] py-1">
-            <p className="whitespace-nowrap text-sm font-normal text-slate-700 dark:text-slate-300">
+        <div className="py-1">
+            <p className="text-sm font-normal text-slate-700 dark:text-slate-300">
                 {primary}
             </p>
-            <p className="mt-0.5 whitespace-nowrap text-xs font-normal text-slate-500 dark:text-slate-400">
+            <p className="mt-0.5 text-xs font-normal text-slate-500 dark:text-slate-400">
                 {secondary}
             </p>
         </div>
@@ -146,14 +143,20 @@ async function downloadJson(filename: string, data: unknown) {
 }
 
 export default function OpticalPrescriptionsPage() {
+    const router = useRouter();
+    const role = useMemo(() => resolveRoleName(readStoredUser()), []);
+    const canManage = useMemo(() => ['ADMIN', 'SUPERADMIN', 'DOCTOR', 'OPTICIAN'].includes(role), [role]);
+
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('all');
-    const [type, setType] = useState('all');
+    const type = 'SPECTACLES';
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(20);
+    const [dateFrom, setDateFrom] = useState('');
+    const [dateTo, setDateTo] = useState('');
 
     const [rows, setRows] = useState<OpticalPrescription[]>([]);
-    const [stats, setStats] = useState<Stats>({ total: 0, active: 0, dispensed: 0, expired: 0 });
+    const [stats, setStats] = useState<Stats>({ total: 0, active: 0, dispensed: 0, issuedToday: 0 });
     const [loading, setLoading] = useState(true);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [total, setTotal] = useState(0);
@@ -164,7 +167,7 @@ export default function OpticalPrescriptionsPage() {
             const res = await api.get('/prescriptions/stats');
             setStats(res.data as Stats);
         } catch {
-            setStats({ total: 0, active: 0, dispensed: 0, expired: 0 });
+            setStats({ total: 0, active: 0, dispensed: 0, issuedToday: 0 });
         }
     }, []);
 
@@ -175,6 +178,11 @@ export default function OpticalPrescriptionsPage() {
             if (search) params.search = search;
             if (status !== 'all') params.status = status;
             if (type !== 'all') params.type = type;
+            if (dateFrom) params.from = dateFrom;
+            if (dateTo) params.to = dateTo;
+            if (!dateFrom && !dateTo) {
+                params.todayOnly = '1';
+            }
             const res = await api.get('/prescriptions', { params });
             const body = res.data as Paginated<OpticalPrescription>;
             setRows(body.data ?? []);
@@ -197,11 +205,11 @@ export default function OpticalPrescriptionsPage() {
     useEffect(() => {
         const t = setTimeout(() => void fetchRows(), 250);
         return () => clearTimeout(t);
-    }, [fetchRows]);
+    }, [fetchRows, dateFrom, dateTo]);
 
     useEffect(() => {
         setPage(1);
-    }, [search, status, type, pageSize]);
+    }, [search, status, pageSize, dateFrom, dateTo]);
 
     const handleDelete = async (id: string) => {
         const ok = window.confirm('Delete this prescription? This cannot be undone.');
@@ -219,12 +227,15 @@ export default function OpticalPrescriptionsPage() {
             setDeletingId(null);
         }
     };
+    const handleDispenseClick = (presc: any) => {
+        router.push(`/dashboard/billing/new?serviceType=OPTICAL&prescriptionId=${presc.id}`);
+    };
 
     const statCards = useMemo(() => ([
         { title: 'Total Prescriptions', value: stats.total, icon: Glasses, tone: 'blue' as const },
         { title: 'Active', value: stats.active, icon: CheckCircle2, tone: 'emerald' as const },
         { title: 'Dispensed', value: stats.dispensed, icon: Glasses, tone: 'amber' as const },
-        { title: 'Expired', value: stats.expired, icon: XCircle, tone: 'rose' as const },
+        { title: 'Issued Today', value: stats.issuedToday || 0, icon: Plus, tone: 'rose' as const },
     ]), [stats]);
 
     return (
@@ -262,21 +273,26 @@ export default function OpticalPrescriptionsPage() {
                             <SelectItem value="all">All Status</SelectItem>
                             <SelectItem value="ACTIVE">Active</SelectItem>
                             <SelectItem value="DISPENSED">Dispensed</SelectItem>
-                            <SelectItem value="EXPIRED">Expired</SelectItem>
                         </SelectContent>
                     </Select>
 
-                    <Select value={type} onValueChange={setType}>
-                        <SelectTrigger className="h-10 w-full sm:w-[160px] border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
-                            <SelectValue placeholder="All Types" />
-                        </SelectTrigger>
-                        <SelectContent className="dark:bg-slate-900 dark:border-slate-800">
-                            <SelectItem value="all">All Types</SelectItem>
-                            <SelectItem value="SPECTACLES">Spectacles</SelectItem>
-                            <SelectItem value="CONTACT_LENS">Contact Lens</SelectItem>
-                            <SelectItem value="BOTH">Both</SelectItem>
-                        </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-md px-2 h-10">
+                        <input
+                            type="date"
+                            value={dateFrom}
+                            onChange={(e) => setDateFrom(e.target.value)}
+                            className="bg-transparent border-none text-sm outline-none w-32 dark:text-slate-200"
+                        />
+                    </div>
+
+                    <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-md px-2 h-10">
+                        <input
+                            type="date"
+                            value={dateTo}
+                            onChange={(e) => setDateTo(e.target.value)}
+                            className="bg-transparent border-none text-sm outline-none w-32 dark:text-slate-200"
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -287,11 +303,10 @@ export default function OpticalPrescriptionsPage() {
             </div>
 
             <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                <Table className="min-w-[980px]">
+                <Table>
                     <TableHeader>
                         <TableRow className="bg-slate-50/80 dark:bg-slate-900/80 hover:bg-slate-50/80 dark:hover:bg-slate-900/80 border-slate-200 dark:border-slate-800">
-                            {['PATIENT', 'TYPE', 'OD (RIGHT)', 'OS (LEFT)', 'DATE', 'EXPIRY', 'STATUS', 'ACTIONS'].map((h) => (
+                            {['PATIENT & ID', 'OD (RIGHT)', 'OS (LEFT)', 'DATE', 'STATUS', 'ACTIONS'].map((h) => (
                                 <TableHead key={h} className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">
                                     {h}
                                 </TableHead>
@@ -322,69 +337,67 @@ export default function OpticalPrescriptionsPage() {
                                 const statusInfo = computeStatusLabel(row);
 
                                 return (
-                                    <TableRow key={row.id} className="border-slate-100 dark:border-slate-800/60 hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
+                                    <TableRow key={row.id} className="border-slate-100 dark:border-slate-800/60">
                                         <TableCell className="py-4 px-4">
-                                            <div className="min-w-[140px]">
-                                                <p className="text-sm font-medium text-slate-900 dark:text-slate-200">{patientName}</p>
-                                                <p className="text-xs text-slate-500 dark:text-slate-400">ID: {patientDisplayId}</p>
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">{patientName}</span>
+                                                <Badge variant="outline" className="w-fit font-mono text-[9px] text-slate-500 border-slate-200 bg-slate-50/50 dark:bg-slate-900/50 dark:border-slate-800">
+                                                    {row.patient?.patientNumber || 'PAT-PENDING'}
+                                                </Badge>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="py-4 px-4 text-sm font-normal text-slate-700 dark:text-slate-300">{toTypeLabel(row.type)}</TableCell>
-                                        <TableCell className="py-2.5 px-4 align-top">{renderEyeSummary('od', row)}</TableCell>
-                                        <TableCell className="py-2.5 px-4 align-top">{renderEyeSummary('os', row)}</TableCell>
-                                        <TableCell className="py-4 px-4 text-sm font-normal text-slate-700 dark:text-slate-300 whitespace-nowrap">{formatDate(row.createdAt)}</TableCell>
-                                        <TableCell className="py-4 px-4 text-sm font-normal text-slate-700 dark:text-slate-300 whitespace-nowrap">{formatDate(row.expiryDate)}</TableCell>
+                                        <TableCell className="py-2.5 px-4">{renderEyeSummary('od', row)}</TableCell>
+                                        <TableCell className="py-2.5 px-4">{renderEyeSummary('os', row)}</TableCell>
+                                        <TableCell className="py-4 px-4 text-sm font-normal text-slate-600 dark:text-slate-300 whitespace-nowrap">{formatDate(row.createdAt)}</TableCell>
                                         <TableCell className="py-4 px-4">
-                                            <Badge
-                                                variant="secondary"
-                                                className={
-                                                    statusInfo.tone === 'danger'
-                                                        ? 'rounded-full bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/50 px-3 py-1 font-semibold'
-                                                        : 'rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-3 py-1 font-semibold'
-                                                }
-                                            >
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                                                 {statusInfo.label}
-                                            </Badge>
+                                            </span>
                                         </TableCell>
-                                        <TableCell className="py-4 px-4">
-                                            <div className="flex items-center gap-4">
-                                                <Link href={`/dashboard/prescription/optical/${row.id}`} className="text-sm font-medium text-[#0EA5E9] hover:text-[#0c96d4] hover:underline transition-all">
+                                        <TableCell className="py-4 px-4 text-right">
+                                            <div className="flex items-center justify-end gap-3">
+                                                <Link 
+                                                    href={`/dashboard/prescription/optical/${row.id}`}
+                                                    className="text-sm font-medium text-[#0EA5E9] hover:underline"
+                                                >
                                                     View
                                                 </Link>
-                                                <Link
+                                                <Link 
                                                     href={`/dashboard/prescription/optical/${row.id}/edit`}
-                                                    className="text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 transition-all hover:underline"
+                                                    className="text-sm font-medium text-emerald-600 hover:underline"
                                                 >
                                                     Edit
                                                 </Link>
+
+                                                {statusInfo.label === 'active' && canManage && (
+                                                    <Button 
+                                                        size="sm"
+                                                        onClick={() => void handleDispenseClick(row)}
+                                                        className="h-7 px-3 bg-[#0EA5E9] hover:bg-[#0c96d4] text-white text-[11px] font-bold rounded-md shadow-sm"
+                                                    >
+                                                        Sell
+                                                    </Button>
+                                                )}
+
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600">
-                                                            <MoreVertical className="h-4 w-4" />
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                            <MoreVertical className="h-4 w-4 text-slate-400" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="w-44">
-                                                        <DropdownMenuItem
-                                                            onClick={async () => {
-                                                                try {
-                                                                    const res = await api.get(`/prescriptions/${row.id}`);
-                                                                    await downloadJson(`optical-prescription-${row.id}.json`, res.data);
-                                                                } catch {
-                                                                    toast.error('Download failed');
-                                                                }
-                                                            }}
-                                                            className="gap-2 text-[12px]"
-                                                        >
-                                                            <Download className="h-3.5 w-3.5 text-[#0EA5E9]" />
+                                                    <DropdownMenuContent align="end" className="rounded-xl border-slate-200 dark:border-slate-800 shadow-xl">
+                                                        <DropdownMenuItem onClick={async () => {
+                                                            try {
+                                                                const res = await api.get(`/prescriptions/${row.id}`);
+                                                                downloadJson(`optical-prescription-${row.id}.json`, res.data);
+                                                            } catch {
+                                                                toast.error('Download failed');
+                                                            }
+                                                        }} className="flex items-center gap-2 p-3 font-medium">
                                                             Download
                                                         </DropdownMenuItem>
                                                         <DropdownMenuSeparator />
-                                                        <DropdownMenuItem
-                                                            onClick={() => void handleDelete(row.id)}
-                                                            disabled={deletingId === row.id}
-                                                            className="gap-2 text-[12px] text-red-600 focus:text-red-600"
-                                                        >
-                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                        <DropdownMenuItem onClick={() => void handleDelete(row.id)} className="flex items-center gap-2 p-3 font-medium text-red-600 focus:text-red-600">
                                                             Delete
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
@@ -397,7 +410,6 @@ export default function OpticalPrescriptionsPage() {
                         )}
                     </TableBody>
                 </Table>
-                </div>
             </div>
 
             <div className="mt-3">
@@ -415,6 +427,9 @@ export default function OpticalPrescriptionsPage() {
                     itemLabel="prescriptions"
                 />
             </div>
+
         </div>
     );
 }
+
+

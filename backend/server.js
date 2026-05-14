@@ -1,7 +1,9 @@
 import 'dotenv/config';
 import express from 'express';
+import http from 'http';
 import cors from 'cors';
 import morgan from 'morgan';
+import { initSocket } from './src/lib/socket.js';
 import authRoutes from './src/routes/authRoutes.js';
 import userRoutes from './src/routes/userRoutes.js';
 import branchRoutes from './src/routes/branchRoutes.js';
@@ -68,7 +70,12 @@ app.get('/', (req, res) => {
 app.use(errorMiddleware);
 
 // Start server (fixed port)
-const server = app.listen(PORT, () => {
+const server = http.createServer(app);
+
+// Initialize Socket.io
+initSocket(server);
+
+server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
 

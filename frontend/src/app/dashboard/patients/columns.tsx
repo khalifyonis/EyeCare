@@ -22,7 +22,6 @@ export interface PatientRow {
     phone?: string | null;
     email?: string | null;
     dateOfBirth?: string | null;
-    isActive?: boolean;
     createdAt?: string;
     city?: string | null;
     state?: string | null;
@@ -95,17 +94,13 @@ export const getPatientColumns = ({
             },
         },
         {
-            id: 'status',
-            header: 'STATUS',
-            cell: ({ row }) => {
-                const active = row.original.isActive !== false;
-                return (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                        <span className="size-2 rounded-full bg-slate-400" />
-                        {active ? 'Active' : 'Inactive'}
-                    </span>
-                );
-            },
+            id: 'gender',
+            header: 'GENDER',
+            cell: ({ row }) => (
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    {row.original.gender || '—'}
+                </span>
+            ),
         },
         {
             id: 'registrationDate',

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import api from '@/lib/axios'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -27,15 +27,11 @@ type InventoryItem = {
   sellingPrice?: number | null
 }
 
-type PrescriptionType = 'SPECTACLES' | 'CONTACT_LENS' | 'BOTH'
+type PrescriptionType = 'SPECTACLES'
 
 const COATING_OPTIONS = ['Anti-Reflective', 'Blue Light Filter', 'Scratch Resistant', 'UV Protection', 'Photochromic', 'Hydrophobic', 'Oleophobic'] as const
 
-const ORDER_TYPES: { value: PrescriptionType; label: string }[] = [
-  { value: 'SPECTACLES', label: 'Spectacles Only' },
-  { value: 'CONTACT_LENS', label: 'Contact Lenses' },
-  { value: 'BOTH', label: 'Both' },
-]
+
 
 const LENS_TYPE_OPTIONS = ['Single Vision', 'Bifocal', 'Progressive', 'Occupational'] as const
 const LENS_MATERIAL_OPTIONS = ['CR-39 (Standard Plastic)', 'Polycarbonate', 'Trivex', 'High Index 1.67', 'High Index 1.74', 'Photochromic'] as const
@@ -54,6 +50,8 @@ function inventoryLabel(item: InventoryItem) {
 
 export default function NewOpticalOrderPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const prescriptionId = searchParams.get('prescriptionId')
 
   const [saving, setSaving] = useState(false)
 
@@ -64,7 +62,7 @@ export default function NewOpticalOrderPage() {
   const [patient, setPatient] = useState<Patient | null>(null)
   const patientRef = useRef<HTMLDivElement | null>(null)
 
-  const [orderType, setOrderType] = useState<PrescriptionType>('SPECTACLES')
+  const orderType: PrescriptionType = 'SPECTACLES'
 
   const [frameLoading, setFrameLoading] = useState(false)
   const [frames, setFrames] = useState<InventoryItem[]>([])
@@ -182,6 +180,48 @@ export default function NewOpticalOrderPage() {
     return () => clearTimeout(timer)
   }, [searchInventory])
 
+  // Auto-populate from prescription if prescriptionId is provided
+  useEffect(() => {
+    if (!prescriptionId) return
+    let cancelled = false
+    const loadPrescription = async () => {
+      try {
+        const res = await api.get(`/prescriptions/${prescriptionId}`)
+        const rx = res.data as Record<string, any>
+        if (cancelled) return
+
+        // Auto-select patient
+        if (rx.patient) {
+          setPatient({
+            id: rx.patient.id,
+            fullName: rx.patient.fullName || null,
+            patientNumber: rx.patient.patientNumber || null,
+          })
+        }
+
+        // Auto-select order type
+        if (rx.type) {
+          setOrderType(rx.type as PrescriptionType)
+        }
+
+        // Auto-select frame if linked
+        if (rx.frameItemId) {
+          const frameRes = await api.get(`/inventory/optical/${rx.frameItemId}`).catch(() => null)
+          if (frameRes && !cancelled) {
+            const f = frameRes.data as InventoryItem
+            setFrameItem({ id: f.id, itemName: f.itemName, brand: f.brand, stockQuantity: f.stockQuantity, sellingPrice: f.sellingPrice })
+          }
+        }
+
+        toast.info('Prescription data loaded — review and complete the order')
+      } catch {
+        toast.error('Could not load prescription details')
+      }
+    }
+    void loadPrescription()
+    return () => { cancelled = true }
+  }, [prescriptionId])
+
   const toggleCoating = (value: string) => {
     setCoatings((prev) => (prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]))
   }
@@ -219,26 +259,42 @@ export default function NewOpticalOrderPage() {
         .filter(Boolean)
         .join(' | ')
 
-      const payload = {
+      const status = paidAmountValue >= totalAmountValue && totalAmountValue > 0 ? 'PAID' : paidAmountValue > 0 ? 'PARTIAL' : 'UNPAID'
+
+      const lineItems = []
+      if (frameItem) {
+        lineItems.push({
+          itemType: 'OPTICAL_FRAME',
+          itemId: frameItem.id,
+          description: `Frame: ${frameItem.itemName} (${frameItem.brand || ''})`,
+          quantity: 1,
+          unitPrice: frameItem.sellingPrice || 0,
+        })
+      }
+      if (lensPriceValue > 0) {
+        lineItems.push({
+          itemType: 'LENSES',
+          itemId: 'manual',
+          description: `Lenses: ${lensType} (${lensMaterial || ''})`,
+          quantity: 2,
+          unitPrice: lensPriceValue / 2,
+        })
+      }
+
+      await api.post('/billing', {
         patientId: patient.id,
-        type: orderType,
-        validityMonths: 12,
-        frameType: frameItem ? inventoryLabel(frameItem) : null,
-        lensType: lensType || null,
-        lensMaterial: lensMaterial || null,
-        coatings,
-        frameItemId: frameItem?.id || null,
-        lensItemId: null,
+        serviceType: 'OPTICAL',
+        opticalPrescriptionId: prescriptionId || undefined,
+        totalAmount: subTotalAmountValue,
+        discount: discountAppliedValue,
+        finalAmount: totalAmountValue,
+        paymentMethod: paymentMethod.toUpperCase(),
+        status,
         notes,
-      }
+        lineItems,
+      })
 
-      try {
-        await api.post('/prescriptions', payload)
-      } catch {
-        await api.post('/optical-prescriptions', payload)
-      }
-
-      toast.success('Order created')
+      toast.success('Order & Billing created')
       router.push('/dashboard/optical-shop')
     } catch (error: unknown) {
       const message =
@@ -256,7 +312,7 @@ export default function NewOpticalOrderPage() {
     <div className="optical-page optical-form-page w-full min-w-0 p-4 sm:p-6 lg:p-8 space-y-6">
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">New Optical Order</h1>
-        <p className="mt-1 text-lg text-slate-700">Create a new spectacles or contact lens order</p>
+        <p className="mt-1 text-lg text-slate-700">Create a new spectacle order</p>
         <div className="mt-4">
           <Link href="/dashboard/optical-shop" className="text-lg text-slate-700 hover:text-slate-900">
             ← Back to Optical Shop
@@ -321,28 +377,7 @@ export default function NewOpticalOrderPage() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl border-slate-300 shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl text-slate-900">Order Type</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {ORDER_TYPES.map((option) => {
-              const active = orderType === option.value
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setOrderType(option.value)}
-                  className={active ? 'rounded-xl border-2 border-[#0EA5E9] bg-sky-50 p-5 text-center text-xl font-semibold text-[#0c96d4]' : 'rounded-xl border border-slate-200 bg-white p-5 text-center text-xl font-medium text-slate-600 hover:bg-slate-50'}
-                >
-                  {option.label}
-                </button>
-              )
-            })}
-          </div>
-        </CardContent>
-      </Card>
+
 
       <Card className="rounded-2xl border-slate-300 shadow-sm">
         <CardHeader>

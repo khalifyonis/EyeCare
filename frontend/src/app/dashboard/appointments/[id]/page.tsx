@@ -18,6 +18,7 @@ import {
     Hash,
     Mail,
     Phone,
+    AlertCircle,
 } from 'lucide-react'
 
 type Appointment = {
@@ -28,8 +29,19 @@ type Appointment = {
     type?: string | null
     location?: string | null
     notes?: string | null
-    patient?: { id: string; fullName?: string | null; email?: string | null; phone?: string | null } | null
+    eyeSide?: string | null
+    patient?: { 
+        id: string; 
+        fullName?: string | null; 
+        email?: string | null; 
+        phone?: string | null;
+        emergencyContactName?: string | null;
+        emergencyContactPhone?: string | null;
+        emergencyContactRelationship?: string | null;
+    } | null
     doctor?: { id?: string | null; user?: { fullName?: string | null; email?: string | null } | null } | null
+    clinicalExamination?: { surgery?: { date?: string | null; time?: string | null; operatingRoom?: string | null; surgeryType?: string | null } | null } | null
+    billings?: Array<{ id: string; invoiceNumber?: string | null; status?: string | null; totalAmount?: number | string | null; finalAmount?: number | string | null; dueDate?: string | null; serviceType?: string | null }> | null
 }
 
 function getApiErrorMessage(error: unknown, fallback: string): string {
@@ -61,29 +73,6 @@ const STATUS_STYLES: Record<string, string> = {
     CANCELLED: 'bg-red-50 text-red-700 border-red-200',
 }
 
-function parseAdditionalNotes(notes: string | null | undefined) {
-    const out = { symptoms: [] as string[], diagnosis: '', treatment: '', notes: '' }
-    if (!notes) return out
-    const lines = notes.split('\n')
-    const getLine = (prefix: string) => lines.find((l) => l.toLowerCase().startsWith(prefix.toLowerCase() + ':'))
-    const symptomsLine = getLine('symptoms')
-    const diagnosisLine = getLine('diagnosis')
-    const treatmentLine = getLine('treatment')
-    const freeNotesLine = getLine('notes')
-
-    if (symptomsLine) {
-        const raw = symptomsLine.split(':').slice(1).join(':').trim()
-        out.symptoms = raw ? raw.split(',').map((s) => s.trim()).filter(Boolean) : []
-    }
-    if (diagnosisLine) out.diagnosis = diagnosisLine.split(':').slice(1).join(':').trim()
-    if (treatmentLine) out.treatment = treatmentLine.split(':').slice(1).join(':').trim()
-    if (freeNotesLine) out.notes = freeNotesLine.split(':').slice(1).join(':').trim()
-
-    if (!symptomsLine && !diagnosisLine && !treatmentLine && !freeNotesLine) {
-        out.notes = notes
-    }
-    return out
-}
 
 /* ────────────────────────────────────────────────────
    InfoRow — Clean field display matching reference:
@@ -107,6 +96,11 @@ function InfoRow({
             </div>
         </div>
     )
+}
+
+function money(value?: number | string | null) {
+    const n = Number(value || 0)
+    return `$${Number.isFinite(n) ? n.toFixed(2) : '0.00'}`
 }
 
 export default function AppointmentDetailsPage() {
@@ -134,7 +128,7 @@ export default function AppointmentDetailsPage() {
 
     const patientName = appt?.patient?.fullName || 'Unknown Patient'
     const doctorName = appt?.doctor?.user?.fullName || 'Unassigned'
-    const parsed = useMemo(() => parseAdditionalNotes(appt?.notes), [appt?.notes])
+    const billing = appt?.billings?.[0] || null
 
     return (
         <div className="min-h-screen bg-slate-50/50">
@@ -203,6 +197,17 @@ export default function AppointmentDetailsPage() {
                                     <InfoRow icon={Hash} label="Patient ID" value={appt.bookingNumber || 'N/A'} />
                                     <InfoRow icon={Stethoscope} label="Doctor" value={`Dr. ${doctorName}`} />
                                     <InfoRow icon={Calendar} label="Date" value={formatDate(appt.appointmentDate)} />
+                                    {appt.eyeSide && (
+                                        <InfoRow 
+                                            icon={AlertCircle} 
+                                            label="Eye Side" 
+                                            value={
+                                                <span className="font-bold text-[#0EA5E9]">
+                                                    {appt.eyeSide === 'OD' ? 'Right Eye (OD)' : appt.eyeSide === 'OS' ? 'Left Eye (OS)' : 'Both Eyes (OU)'}
+                                                </span>
+                                            } 
+                                        />
+                                    )}
                                 </div>
                                 {/* Right Column — NO divider lines */}
                                 <div>
@@ -218,6 +223,13 @@ export default function AppointmentDetailsPage() {
                                     />
                                     <InfoRow icon={MapPin} label="Location" value={appt.location || 'Not specified'} />
                                     <InfoRow icon={Clock} label="Time" value={formatTime(appt.appointmentDate)} />
+                                    {String(appt.type || '').toLowerCase() === 'surgery' && appt.clinicalExamination?.surgery && (
+                                        <>
+                                            <InfoRow icon={Calendar} label="Surgery Date" value={formatDate(appt.clinicalExamination.surgery.date)} />
+                                            <InfoRow icon={Clock} label="Surgery Time" value={appt.clinicalExamination.surgery.time || '—'} />
+                                            <InfoRow icon={MapPin} label="Operating Room" value={appt.clinicalExamination.surgery.operatingRoom || '—'} />
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -233,44 +245,55 @@ export default function AppointmentDetailsPage() {
                                     <InfoRow icon={Phone} label="Phone" value={appt.patient?.phone || '—'} />
                                 </div>
                             </div>
-                        </div>
 
-                        {/* ── Symptoms Card ── */}
-                        <div className="rounded-xl border border-slate-200 bg-white p-6">
-                            <h3 className="text-lg font-bold text-slate-900 mb-3">Symptoms</h3>
-                            {parsed.symptoms.length ? (
-                                <div className="flex flex-wrap gap-2">
-                                    {parsed.symptoms.map((s) => (
-                                        <span key={s} className="inline-flex items-center rounded-full bg-sky-50 text-sky-700 border border-sky-200 px-3 py-1 text-xs font-medium">
-                                            {s}
-                                        </span>
-                                    ))}
+                            {(appt.patient?.emergencyContactName || appt.patient?.emergencyContactPhone) && (
+                                <div className="mt-6 pt-6 border-t border-slate-100">
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <AlertCircle className="h-4 w-4 text-amber-500" />
+                                        <h4 className="text-[13px] font-bold text-slate-900 uppercase tracking-wider">Emergency Contact</h4>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-12">
+                                        <InfoRow icon={User} label="Contact Name" value={appt.patient?.emergencyContactName || '—'} />
+                                        <InfoRow icon={Phone} label="Contact Phone" value={appt.patient?.emergencyContactPhone || '—'} />
+                                        <InfoRow icon={User} label="Relationship" value={appt.patient?.emergencyContactRelationship || '—'} />
+                                    </div>
                                 </div>
-                            ) : (
-                                <p className="text-sm text-slate-400">—</p>
                             )}
                         </div>
 
-                        {/* ── Diagnosis & Treatment Card ── */}
+                        {/* ── Billing Card ── */}
                         <div className="rounded-xl border border-slate-200 bg-white p-6">
-                            <h3 className="text-lg font-bold text-slate-900 mb-2">Diagnosis & Treatment</h3>
-                            <div className="space-y-1">
-                                <div className="py-3">
-                                    <p className="text-[13px] text-slate-500">Diagnosis</p>
-                                    <p className="text-[15px] text-slate-800 mt-0.5">{parsed.diagnosis || '—'}</p>
-                                </div>
-                                <div className="py-3">
-                                    <p className="text-[13px] text-slate-500">Treatment</p>
-                                    <p className="text-[15px] text-slate-800 mt-0.5">{parsed.treatment || '—'}</p>
-                                </div>
+                            <div className="flex items-center justify-between gap-3 mb-3">
+                                <h3 className="text-lg font-bold text-slate-900">Payment & Billing</h3>
+                                {billing?.id && (
+                                    <Link href={`/dashboard/billing/${billing.id}`} className="text-sm font-medium text-[#0EA5E9] hover:text-[#0c8fd0]">
+                                        Open invoice
+                                    </Link>
+                                )}
                             </div>
+                            {billing ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12">
+                                    <div>
+                                        <InfoRow icon={Hash} label="Invoice" value={billing.invoiceNumber || 'Pending'} />
+                                        <InfoRow icon={FileText} label="Service Type" value={billing.serviceType || '—'} />
+                                        <InfoRow icon={Clock} label="Status" value={billing.status || 'UNPAID'} />
+                                    </div>
+                                    <div>
+                                        <InfoRow icon={Calendar} label="Total" value={money(billing.totalAmount)} />
+                                        <InfoRow icon={Calendar} label="Final Amount" value={money(billing.finalAmount)} />
+                                        <InfoRow icon={Clock} label="Due Date" value={billing.dueDate ? formatDate(billing.dueDate) : '—'} />
+                                    </div>
+                                </div>
+                            ) : (
+                                <p className="text-sm text-slate-400">No billing record linked to this appointment.</p>
+                            )}
                         </div>
 
-                        {/* ── Notes Card ── */}
-                        {(parsed.notes || appt.notes) && (
+                        {/* ── Additional Information Card ── */}
+                        {appt.notes && (
                             <div className="rounded-xl border border-slate-200 bg-white p-6">
-                                <h3 className="text-lg font-bold text-slate-900 mb-2">Notes</h3>
-                                <p className="text-[15px] text-slate-600 whitespace-pre-wrap leading-relaxed">{parsed.notes || appt.notes || '—'}</p>
+                                <h3 className="text-lg font-bold text-slate-900 mb-2">Additional Information</h3>
+                                <p className="text-[15px] text-slate-600 whitespace-pre-wrap leading-relaxed">{appt.notes}</p>
                             </div>
                         )}
                     </div>

@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../generated/client/index.js';
 
 const errorMiddleware = (err, req, res, next) => {
     let statusCode = err.statusCode || 500;

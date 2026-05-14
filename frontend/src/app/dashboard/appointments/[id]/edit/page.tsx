@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import api from '@/lib/axios'
@@ -24,6 +24,7 @@ type Appointment = {
     type?: string | null
     location?: string | null
     notes?: string | null
+    eyeSide?: string | null
     patientId?: string | null
     doctorId?: string | null
     patient?: { id: string; fullName?: string | null; email?: string | null; phone?: string | null } | null
@@ -43,12 +44,13 @@ const APPOINTMENT_TYPES = [
     { value: 'follow-up', label: 'Follow-up' },
     { value: 'checkup', label: 'Checkup' },
     { value: 'emergency', label: 'Emergency' },
+    { value: 'surgery', label: 'Surgery' },
 ]
 
 const STATUS_OPTIONS = [
     { value: 'SCHEDULED', label: 'Scheduled' },
-    { value: 'CONFIRMED', label: 'Confirmed' },
-    { value: 'PENDING', label: 'Pending' },
+    { value: 'RECEIVED', label: 'Received' },
+    { value: 'EXAMINING', label: 'Examining' },
     { value: 'COMPLETED', label: 'Completed' },
     { value: 'CANCELLED', label: 'Cancelled' },
 ]
@@ -78,34 +80,7 @@ function getApiErrorMessage(error: unknown, fallback: string): string {
     return typeof msg === 'string' && msg.trim().length > 0 ? msg : fallback
 }
 
-function parseAdditionalNotes(notes: string | null | undefined) {
-    const out = { symptoms: [] as string[], diagnosis: '', treatment: '', notes: '' }
-    if (!notes) return out
-    const lines = notes.split('\n')
-    const getLine = (prefix: string) => lines.find((l) => l.toLowerCase().startsWith(prefix.toLowerCase() + ':'))
-    const symptomsLine = getLine('symptoms')
-    const diagnosisLine = getLine('diagnosis')
-    const treatmentLine = getLine('treatment')
-    const freeNotesLine = getLine('notes')
-    if (symptomsLine) {
-        const raw = symptomsLine.split(':').slice(1).join(':').trim()
-        out.symptoms = raw ? raw.split(',').map((s) => s.trim()).filter(Boolean) : []
-    }
-    if (diagnosisLine) out.diagnosis = diagnosisLine.split(':').slice(1).join(':').trim()
-    if (treatmentLine) out.treatment = treatmentLine.split(':').slice(1).join(':').trim()
-    if (freeNotesLine) out.notes = freeNotesLine.split(':').slice(1).join(':').trim()
-    if (!symptomsLine && !diagnosisLine && !treatmentLine && !freeNotesLine) out.notes = notes
-    return out
-}
 
-function buildNotes(payload: { symptoms: string[]; diagnosis: string; treatment: string; notes: string }) {
-    const parts: string[] = []
-    if (payload.symptoms.length) parts.push(`Symptoms: ${payload.symptoms.join(', ')}`)
-    if (payload.diagnosis.trim()) parts.push(`Diagnosis: ${payload.diagnosis.trim()}`)
-    if (payload.treatment.trim()) parts.push(`Treatment: ${payload.treatment.trim()}`)
-    if (payload.notes.trim()) parts.push(`Notes: ${payload.notes.trim()}`)
-    return parts.join('\n')
-}
 
 function ScrollableColumn({
     options,
@@ -222,49 +197,6 @@ function UnifiedTimePicker({
     )
 }
 
-function SymptomTags({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
-    const [draft, setDraft] = useState('')
-    const add = useCallback((raw: string) => {
-        const t = raw.trim()
-        if (!t) return
-        if (value.some((x) => x.toLowerCase() === t.toLowerCase())) return
-        onChange([...value, t])
-    }, [onChange, value])
-
-    return (
-        <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-[#0EA5E9]">
-            <div className="flex flex-wrap gap-2">
-                {value.map((t) => (
-                    <button
-                        key={t}
-                        type="button"
-                        onClick={() => onChange(value.filter((x) => x !== t))}
-                        className="inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 text-xs font-bold hover:bg-emerald-100"
-                        title="Click to remove"
-                    >
-                        {t}
-                        <span className="ml-2 text-emerald-500">×</span>
-                    </button>
-                ))}
-                <input
-                    value={draft}
-                    onChange={(e) => setDraft(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            e.preventDefault()
-                            add(draft)
-                            setDraft('')
-                        } else if (e.key === 'Backspace' && !draft && value.length) {
-                            onChange(value.slice(0, -1))
-                        }
-                    }}
-                    placeholder="Type a symptom and press Enter..."
-                    className="min-w-[180px] flex-1 bg-transparent text-sm font-medium outline-none placeholder:text-slate-400 py-1"
-                />
-            </div>
-        </div>
-    )
-}
 
 export default function EditAppointmentPage() {
     const router = useRouter()
@@ -290,10 +222,8 @@ export default function EditAppointmentPage() {
     const [timePeriod, setTimePeriod] = useState('AM')
     const [status, setStatus] = useState('SCHEDULED')
     const [location, setLocation] = useState('')
-    const [symptoms, setSymptoms] = useState<string[]>([])
-    const [diagnosis, setDiagnosis] = useState('')
-    const [treatment, setTreatment] = useState('')
-    const [freeNotes, setFreeNotes] = useState('')
+    const [reason, setReason] = useState('')
+    const [eyeSide, setEyeSide] = useState('OD')
 
     useEffect(() => {
         if (!id) return
@@ -347,12 +277,9 @@ export default function EditAppointmentPage() {
                 setTimePeriod(p)
                 setStatus(a?.status || 'SCHEDULED')
                 setLocation(a?.location || '')
+                setEyeSide(a?.eyeSide || 'OD')
 
-                const parsed = parseAdditionalNotes(a?.notes)
-                setSymptoms(parsed.symptoms)
-                setDiagnosis(parsed.diagnosis)
-                setTreatment(parsed.treatment)
-                setFreeNotes(parsed.notes)
+                setReason(a?.notes || '')
             })
             .catch((e) => toast.error(getApiErrorMessage(e, 'Failed to load appointment')))
             .finally(() => { if (mounted) setLoading(false) })
@@ -370,7 +297,7 @@ export default function EditAppointmentPage() {
 
     const handleUpdate = async () => {
         if (!id) return
-        if (!patientId || !doctorId || !appointmentDate || !appointmentTime || !appointmentType) {
+        if (!patientId || !doctorId || !appointmentDate || !appointmentType) {
             toast.error('Please complete required fields')
             return
         }
@@ -390,7 +317,8 @@ export default function EditAppointmentPage() {
                 type: appointmentType,
                 status,
                 location,
-                notes: buildNotes({ symptoms, diagnosis, treatment, notes: freeNotes }),
+                notes: reason,
+                eyeSide: appointmentType === 'surgery' ? eyeSide : null,
             })
             toast.success('Appointment updated')
             router.push(`/dashboard/appointments/${id}`)
@@ -532,10 +460,25 @@ export default function EditAppointmentPage() {
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                {appointmentType === 'surgery' && (
+                                    <div className="space-y-2">
+                                        <Label className="text-sm font-semibold text-slate-800">Eye Side *</Label>
+                                        <Select value={eyeSide} onValueChange={setEyeSide}>
+                                            <SelectTrigger className="h-11 rounded-xl border-slate-200 font-semibold">
+                                                <SelectValue placeholder="Select eye side" />
+                                            </SelectTrigger>
+                                            <SelectContent className="rounded-xl">
+                                                <SelectItem value="OD">Right Eye (OD)</SelectItem>
+                                                <SelectItem value="OS">Left Eye (OS)</SelectItem>
+                                                <SelectItem value="OU">Both Eyes (OU)</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                )}
                                 <div className="space-y-2">
                                     <Label className="text-sm font-semibold text-slate-800">Status</Label>
-                                    <Select value={status} onValueChange={setStatus}>
-                                        <SelectTrigger className="h-11 rounded-xl border-slate-200 font-semibold">
+                                    <Select value={status} onValueChange={setStatus} disabled>
+                                        <SelectTrigger className="h-11 rounded-xl border-slate-200 bg-slate-50 cursor-not-allowed font-semibold">
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent className="rounded-xl">
@@ -564,22 +507,8 @@ export default function EditAppointmentPage() {
                             </h3>
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label className="text-sm font-semibold text-slate-800">Symptoms</Label>
-                                    <SymptomTags value={symptoms} onChange={setSymptoms} />
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label className="text-sm font-semibold text-slate-800">Diagnosis</Label>
-                                        <Input value={diagnosis} onChange={(e) => setDiagnosis(e.target.value)} className="h-11 rounded-xl border-slate-200" placeholder="Diagnosis..." />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-sm font-semibold text-slate-800">Treatment</Label>
-                                        <Input value={treatment} onChange={(e) => setTreatment(e.target.value)} className="h-11 rounded-xl border-slate-200" placeholder="Treatment..." />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-semibold text-slate-800">Notes</Label>
-                                    <Textarea value={freeNotes} onChange={(e) => setFreeNotes(e.target.value)} className="min-h-[120px] rounded-xl border-slate-200" placeholder="Additional notes..." />
+                                    <Label className="text-sm font-semibold text-slate-800">Reason for Visit</Label>
+                                    <Textarea value={reason} onChange={(e) => setReason(e.target.value)} className="min-h-[120px] rounded-xl border-slate-200" placeholder="Describe the reason for the visit..." />
                                 </div>
                             </div>
                         </div>

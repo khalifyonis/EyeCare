@@ -206,6 +206,7 @@ export const createSurgery = async (req, res, next) => {
     try {
         const {
             examId,
+            appointmentId, // Added for workflow linking
             branchId,
             patientId,
             eye,
@@ -237,12 +238,43 @@ export const createSurgery = async (req, res, next) => {
         if (!patient) return res.status(404).json({ message: 'Patient not found' });
         assertBranchAccess(req, patient.branchId);
 
-        // Legacy: validate examId when provided
-        let clinicalExam = null;
-        if (examId) {
-            clinicalExam = await prisma.clinicalExamination.findFirst({
+        // Workflow Linking: Ensure surgery is tied to an exam (and thus an appointment)
+        let clinicalExamId = examId;
+
+        if (!clinicalExamId && appointmentId) {
+            // Find if an exam already exists for this appointment
+            const existingExam = await prisma.clinicalExamination.findUnique({
+                where: { appointmentId }
+            });
+
+            if (existingExam) {
+                clinicalExamId = existingExam.id;
+            } else {
+                // Fetch appointment to get its doctor for the "examinedBy" requirement
+                const appointment = await prisma.appointment.findUnique({
+                    where: { id: appointmentId },
+                    select: { doctorId: true }
+                });
+
+                if (!appointment) return res.status(404).json({ message: 'Appointment not found' });
+
+                // Create a shell clinical exam to bridge the Surgery to the Appointment
+                const newExam = await prisma.clinicalExamination.create({
+                    data: {
+                        appointment: { connect: { id: appointmentId } },
+                        examinedBy: { connect: { id: appointment.doctorId } },
+                        diagnosis: surgeryType ? `Scheduled for ${surgeryType}` : 'Scheduled Surgery',
+                    }
+                });
+                clinicalExamId = newExam.id;
+            }
+        }
+
+        // Validate clinical exam access
+        if (clinicalExamId) {
+            const clinicalExam = await prisma.clinicalExamination.findFirst({
                 where: {
-                    id: examId,
+                    id: clinicalExamId,
                     appointment: {
                         branchId: activeBranchId,
                         patientId: patientId,
@@ -253,7 +285,7 @@ export const createSurgery = async (req, res, next) => {
                 },
             });
 
-            if (!clinicalExam) return res.status(404).json({ message: 'Clinical examination not found' });
+            if (!clinicalExam) return res.status(404).json({ message: 'Clinical examination context not found' });
             assertBranchAccess(req, clinicalExam.appointment.branchId);
         }
 
@@ -273,7 +305,7 @@ export const createSurgery = async (req, res, next) => {
 
         const row = await prisma.surgery.create({
             data: {
-                examId: examId || null,
+                examId: clinicalExamId || null,
                 branchId: activeBranchId,
                 patientId,
                 eye: normalizeEye(eye),
@@ -292,6 +324,14 @@ export const createSurgery = async (req, res, next) => {
             },
             include: surgeryInclude,
         });
+
+        // Professional Workflow: If linked to an appointment, mark it as completed
+        if (appointmentId) {
+            await prisma.appointment.update({
+                where: { id: appointmentId },
+                data: { status: 'COMPLETED' }
+            });
+        }
 
         if (nextFollowUpDate && patientId) {
             await prisma.followUp.create({

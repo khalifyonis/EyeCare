@@ -1,5 +1,6 @@
 import prisma from '../lib/prisma.js';
 import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
+import { emitEvent } from '../lib/socket.js';
 
 const getBranchFilter = (req) => {
     return (req.user.role === 'SUPERADMIN' || !req.user.branchId)
@@ -126,6 +127,8 @@ export const createPharmacyItem = async (req, res, next) => {
             data,
             include: { branch: { select: { id: true, branchName: true } }, supplier: { select: { id: true, name: true } } },
         });
+
+        emitEvent('inventory:updated', item, branchId);
         res.status(201).json(item);
     } catch (error) {
         next(error);
@@ -174,6 +177,8 @@ export const updatePharmacyItem = async (req, res, next) => {
             data,
             include: { branch: { select: { id: true, branchName: true } }, supplier: { select: { id: true, name: true } } },
         });
+
+        emitEvent('inventory:updated', item, item.branchId);
         res.status(200).json(item);
     } catch (error) {
         next(error);
@@ -188,6 +193,7 @@ export const deletePharmacyItem = async (req, res, next) => {
             return res.status(403).json({ message: 'Forbidden' });
         }
         await prisma.pharmacyItem.delete({ where: { id: req.params.id } });
+        emitEvent('inventory:updated', { id: req.params.id }, existing.branchId);
         res.status(200).json({ message: 'Pharmacy item deleted successfully' });
     } catch (error) {
         next(error);
@@ -229,6 +235,7 @@ export const receivePharmacyStock = async (req, res, next) => {
             }),
         ]);
 
+        emitEvent('pharmacy:updated', updated, item.branchId);
         res.status(200).json({ item: updated, transaction });
     } catch (error) {
         next(error);
@@ -275,6 +282,7 @@ export const adjustPharmacyStock = async (req, res, next) => {
             }),
         ]);
 
+        emitEvent('pharmacy:updated', updated, item.branchId);
         res.status(200).json({ item: updated, transaction });
     } catch (error) {
         next(error);
@@ -350,12 +358,45 @@ export const listAllPharmacyTransactions = async (req, res, next) => {
 export const getPharmacyStats = async (req, res, next) => {
     try {
         const branchFilter = getBranchFilter(req);
-        const [total, lowStockCount] = await Promise.all([
-            prisma.pharmacyItem.count({ where: branchFilter }),
-            prisma.pharmacyItem.findMany({ where: branchFilter, select: { stockQuantity: true, reorderLevel: true } }),
-        ]);
-        const lowStock = lowStockCount.filter((i) => Number(i.stockQuantity) <= Number(i.reorderLevel)).length;
-        res.status(200).json({ total, lowStock });
+        
+        // Fetch all items for the branch to calculate specific stock and expiry stats
+        const allItems = await prisma.pharmacyItem.findMany({
+            where: branchFilter,
+            select: {
+                stockQuantity: true,
+                reorderLevel: true,
+                expiryDate: true,
+            },
+        });
+
+        const total = allItems.length;
+        let lowStock = 0;
+        let outOfStock = 0;
+        let expiringSoon = 0;
+
+        const now = new Date();
+        const cutoff = new Date(now);
+        cutoff.setDate(cutoff.getDate() + 90);
+
+        for (const item of allItems) {
+            const qty = Number(item.stockQuantity) || 0;
+            const reorder = Number(item.reorderLevel) || 0;
+
+            if (qty <= reorder) lowStock++;
+            if (qty === 0) outOfStock++;
+
+            if (item.expiryDate) {
+                const exp = new Date(item.expiryDate);
+                if (exp > now && exp <= cutoff) expiringSoon++;
+            }
+        }
+
+        res.status(200).json({ 
+            total, 
+            lowStock, 
+            outOfStock, 
+            expiringSoon 
+        });
     } catch (error) {
         next(error);
     }

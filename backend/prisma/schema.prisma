@@ -8,14 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Role {
-  id          String  @id @default(uuid())
-  name        String  @unique
-  description String?
-  users       User[]
-
-  @@map("roles")
-}
 
 model Branch {
   id                   String                     @id @default(uuid())
@@ -73,7 +65,7 @@ model User {
   resetToken                  String?                    @unique @map("reset_token")
   resetTokenExpiry            DateTime?                  @map("reset_token_expiry")
   isActive                    Boolean                    @default(true) @map("is_active")
-  roleId                      String                     @map("role_id")
+  role                        Role                       @default(RECEPTIONIST)
   branchId                    String                     @map("branch_id")
   createdAt                   DateTime                   @default(now()) @map("created_at")
   updatedAt                   DateTime                   @updatedAt @map("updated_at")
@@ -88,10 +80,8 @@ model User {
   pharmacyTransactions        PharmacyStockTransaction[] @relation("PerformedBy")
   staffAssignments            StaffAssignment[]
   branch                      Branch                     @relation(fields: [branchId], references: [id])
-  role                        Role                       @relation(fields: [roleId], references: [id])
 
   @@index([branchId])
-  @@index([roleId])
   @@map("users")
 }
 
@@ -117,8 +107,8 @@ model ActivityLog {
 model Doctor {
   id                    String                @id @default(uuid())
   userId                String                @unique @map("user_id")
-  licenseNumber         String                @unique @map("license_number")
-  specialization        String
+  licenseNumber         String?               @unique @map("license_number")
+  specialization        Specialization        @default(OPHTHALMOLOGY)
   phone                 String?
   branchId              String                @map("branch_id")
   createdAt             DateTime              @default(now()) @map("created_at")
@@ -156,7 +146,6 @@ model Patient {
   emergencyContactRelationship String?               @map("emergency_contact_relationship")
   familyMedicalHistory         String?               @map("family_medical_history")
   firstName                    String?               @map("first_name")
-  isActive                     Boolean               @default(true) @map("is_active")
   lastName                     String?               @map("last_name")
   medicalHistory               String?               @map("medical_history")
   patientNumber                String?               @unique @map("patient_number")
@@ -175,7 +164,6 @@ model Patient {
   @@index([branchId])
   @@index([fullName])
   @@index([phone])
-  @@index([isActive])
   @@map("patients")
 }
 
@@ -215,6 +203,7 @@ model OpticalPrescription {
   frameItem      OpticalItem?              @relation("OpticalPrescriptionFrameItem", fields: [frameItemId], references: [id])
   lensItem       OpticalItem?              @relation("OpticalPrescriptionLensItem", fields: [lensItemId], references: [id])
   patient        Patient                   @relation(fields: [patientId], references: [id])
+  billings       Billing[]
 
   @@index([branchId])
   @@index([patientId])
@@ -241,6 +230,7 @@ model Appointment {
   location            String?
   notes               String?
   type                String?              @default("consultation")
+  eyeSide             String?              @map("eye_side")
   branch              Branch               @relation(fields: [branchId], references: [id])
   createdBy           User                 @relation("CreatedBy", fields: [createdById], references: [id])
   doctor              Doctor               @relation(fields: [doctorId], references: [id])
@@ -250,6 +240,7 @@ model Appointment {
   erExamination       ERExamination?
   completedFollowUps  FollowUp[]           @relation("FollowUpCompletedBy")
   prescriptions       Prescription[]
+  eyeExamination      EyeExamination?      @relation("AppointmentToEyeExam")
 
   @@index([branchId])
   @@index([patientId])
@@ -259,11 +250,13 @@ model Appointment {
   @@map("appointments")
 }
 
+
 model EyeExamination {
   id                      String    @id @default(uuid())
   branchId                String    @map("branch_id")
   patientId               String    @map("patient_id")
   doctorId                String    @map("doctor_id")
+  appointmentId           String?   @unique @map("appointment_id")
   chiefComplaint          String    @map("chief_complaint")
   historyOfPresentIllness String?   @map("history_of_present_illness")
   vaScale                 String    @default("SNELLEN") @map("va_scale")
@@ -295,12 +288,14 @@ model EyeExamination {
   plan                    String?   @map("plan")
   followUpDate            DateTime? @map("follow_up_date")
   nextVisitReason         String?   @map("next_visit_reason")
+  stage                   ExaminationStage @default(PRELIMINARY)
   prescriptions           Prescription[] @relation("EyeExamToPrescription")
   createdAt               DateTime  @default(now()) @map("created_at")
   updatedAt               DateTime  @updatedAt @map("updated_at")
   branch                  Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
   doctor                  Doctor    @relation(fields: [doctorId], references: [id])
   patient                 Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  appointment             Appointment? @relation("AppointmentToEyeExam", fields: [appointmentId], references: [id])
 
   @@index([branchId])
   @@index([patientId])
@@ -392,8 +387,11 @@ model Prescription {
   branchId        String              @map("branch_id")
   itemType        String              @map("item_type")
   itemId          String?             @map("item_id")
+  itemName        String?             @map("item_name")
   quantity        Int
   instructions    String?
+  status          PrescriptionStatus  @default(PENDING)
+  dispensedAt     DateTime?           @map("dispensed_at")
   createdAt       DateTime            @default(now()) @map("created_at")
   reviewAfterDays Int?                @map("review_after_days")
   billings        Billing[]
@@ -408,6 +406,7 @@ model Prescription {
   @@index([clinicalExamId])
   @@index([eyeExamId])
   @@index([itemType])
+  @@index([status])
   @@map("prescriptions")
 }
 
@@ -544,10 +543,12 @@ model Billing {
   createdBy            User                       @relation("CreatedBy", fields: [createdById], references: [id])
   patient              Patient                    @relation(fields: [patientId], references: [id])
   prescription         Prescription?              @relation(fields: [prescriptionId], references: [id])
+  opticalPrescription  OpticalPrescription?       @relation(fields: [opticalPrescriptionId], references: [id])
   surgery              Surgery?                   @relation(fields: [surgeryId], references: [id])
   lineItems            BillingLineItem[]
   opticalTransactions  OpticalStockTransaction[]
   pharmacyTransactions PharmacyStockTransaction[]
+  opticalPrescriptionId String?                   @map("optical_prescription_id")
 
   @@index([branchId])
   @@index([patientId])
@@ -555,6 +556,7 @@ model Billing {
   @@index([serviceType])
   @@index([createdAt])
   @@index([dueDate])
+  @@index([opticalPrescriptionId])
   @@map("billing")
 }
 
@@ -629,12 +631,20 @@ enum OpticalPrescriptionStatus {
   DISPENSED
 }
 
+enum PrescriptionStatus {
+  PENDING
+  DISPENSED
+}
+
 enum AppointmentStatus {
   PENDING
-  COMPLETED
-  CANCELLED
   SCHEDULED
   CONFIRMED
+  RECEIVED
+  EXAMINING
+  IN_SURGERY
+  COMPLETED
+  CANCELLED
 }
 
 enum ServiceType {
@@ -652,6 +662,12 @@ enum BillingStatus {
   DRAFT
 }
 
+enum ExaminationStage {
+  PRELIMINARY
+  CLINICAL
+  COMPLETED
+}
+
 enum FollowUpSourceType {
   EXAMINATION
   PRESCRIPTION
@@ -664,4 +680,26 @@ enum FollowUpStatus {
   DONE
   CANCELLED
   OVERDUE
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Specialization {
+  OPHTHALMOLOGY
+  OPTOMETRY
+  PEDIATRIC_OPHTHALMOLOGY
+  RETINA_SPECIALIST
+  CONTACT_LENS_SPECIALIST
+  GLAUCOMA_SPECIALIST
+  CORNEA_SPECIALIST
+  OCULOPLASTICS
+}
+
+enum Role {
+  ADMIN
+  DOCTOR
+  RECEPTIONIST
+  OPTICIAN
+  PHARMACIST
+  SUPERADMIN
 }

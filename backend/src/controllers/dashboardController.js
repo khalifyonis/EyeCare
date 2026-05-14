@@ -45,7 +45,8 @@ export const getDashboardStats = async (req, res, next) => {
             opticalItems,
             expiringPharmacy,
             serviceStatsRaw,
-            topDoctorsRaw
+            topDoctorsRaw,
+            todayAppointmentsRaw
         ] = await Promise.all([
             prisma.patient.count({ where: branchFilter }),
             prisma.appointment.count({ where: { ...branchFilter, appointmentDate: today } }),
@@ -77,7 +78,6 @@ export const getDashboardStats = async (req, res, next) => {
                 prisma.surgery.count({ where: branchFilter }),
                 prisma.followUp.count({ where: branchFilter }),
                 prisma.opticalPrescription.count({ where: { ...branchFilter, type: 'SPECTACLES' } }),
-                prisma.opticalPrescription.count({ where: { ...branchFilter, type: 'CONTACT_LENS' } })
             ]),
             // Top Doctors - ranked by patient volume (examinations + surgeries)
             prisma.doctor.findMany({
@@ -92,6 +92,14 @@ export const getDashboardStats = async (req, res, next) => {
                         }
                     }
                 }
+            }),
+            prisma.appointment.findMany({
+                where: { ...branchFilter, appointmentDate: today },
+                orderBy: { appointmentDate: 'asc' },
+                include: { 
+                    patient: { select: { id: true, fullName: true } },
+                    eyeExamination: { select: { id: true, stage: true } }
+                },
             })
         ]);
 
@@ -99,13 +107,12 @@ export const getDashboardStats = async (req, res, next) => {
         const opticalLowStock = opticalItems.filter(i => i.stockQuantity <= i.reorderLevel);
 
         // Process service stats
-        const [examCount, surgeryCount, followUpCount, glassesCount, contactsCount] = serviceStatsRaw;
+        const [examCount, surgeryCount, followUpCount, glassesCount] = serviceStatsRaw;
         const serviceStats = [
             { name: 'Eye Exams', count: examCount, color: '#8b5cf6' },
             { name: 'Surgery', count: surgeryCount, color: '#10b981' },
             { name: 'Follow-up', count: followUpCount, color: '#0EA5E9' },
             { name: 'Glasses', count: glassesCount, color: '#06b6d4' },
-            { name: 'Contacts', count: contactsCount, color: '#f59e0b' },
         ];
 
         // Process top doctors
@@ -135,6 +142,13 @@ export const getDashboardStats = async (req, res, next) => {
                 expiringPharmacy: expiringPharmacy.map(i => ({ id: i.id, itemName: i.itemName, itemType: i.itemType, stockQuantity: i.stockQuantity, expiryDate: i.expiryDate })),
                 expiringCount: expiringPharmacy.length,
             },
+            todayAppointments: todayAppointmentsRaw,
+            upcomingSurgeries: await prisma.surgery.findMany({
+                where: { ...branchFilter, status: 'scheduled', date: { gte: new Date() } },
+                orderBy: { date: 'asc' },
+                take: 5,
+                include: { patient: { select: { fullName: true } } },
+            }),
         });
     } catch (error) {
         next(error);
@@ -168,9 +182,10 @@ export const getDoctorDashboard = async (req, res, next) => {
                 orderBy: { appointmentDate: 'asc' },
                 take: 10,
                 include: {
-                    patient: { select: { fullName: true, phone: true, gender: true } },
+                    patient: { select: { id: true, fullName: true, phone: true, gender: true } },
                     erExamination: { select: { id: true } },
                     clinicalExamination: { select: { id: true } },
+                    eyeExamination: { select: { id: true, stage: true } },
                 },
             }),
             prisma.prescription.findMany({
@@ -227,6 +242,7 @@ export const getReceptionistDashboard = async (req, res, next) => {
                 include: {
                     patient: { select: { fullName: true, phone: true } },
                     doctor: { include: { user: { select: { fullName: true } } } },
+                    eyeExamination: { select: { id: true, stage: true } },
                 },
             }),
             prisma.patient.findMany({ where: branchFilter, orderBy: { createdAt: 'desc' }, take: 5 }),

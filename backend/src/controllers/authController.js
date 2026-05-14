@@ -1,17 +1,12 @@
 import 'dotenv/config';
-import pg from 'pg';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma.js';
 import bcrypt from 'bcrypt';
 import { createActivityLog } from '../lib/activityLog.js';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 
-// Set up PostgreSQL connection pool and Prisma adapter
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+
 
 export const login = async (req, res, next) => {
   try {
@@ -31,7 +26,6 @@ export const login = async (req, res, next) => {
         ],
       },
       include: {
-        role: true,
         staffAssignments: {
           include: { branch: true }
         }
@@ -70,13 +64,13 @@ export const login = async (req, res, next) => {
 
     // Use role.name and branchId in token (branchId needed for list filtering)
     const token = jwt.sign(
-      { id: user.id, role: user.role.name, branchId: user.branchId ?? null },
+      { id: user.id, role: user.role, branchId: user.branchId ?? null },
       process.env.JWT_SECRET,
       { expiresIn: '8h' }
     );
 
     const branches = user.staffAssignments.map(sa => sa.branch);
-    const { password: _, roleId: __, role: ___, staffAssignments: ____, ...userDetails } = user;
+    const { password: _, staffAssignments: ____, ...userDetails } = user;
 
     if (user.branchId) {
       createActivityLog({
@@ -92,7 +86,7 @@ export const login = async (req, res, next) => {
     res.status(200).json({
       message: 'Login successful',
       token,
-      user: { ...userDetails, role: user.role.name, branches },
+      user: { ...userDetails, role: user.role, branches },
     });
   } catch (error) {
     next(error);
@@ -221,7 +215,6 @@ export const getMe = async (req, res, next) => {
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },
       include: {
-        role: true,
         branch: true,
         staffAssignments: {
           include: { branch: true }
@@ -256,7 +249,6 @@ export const updateMe = async (req, res, next) => {
       where: { id: req.user.id },
       data: updateData,
       include: {
-        role: true,
         branch: true,
         staffAssignments: { include: { branch: true } },
       },

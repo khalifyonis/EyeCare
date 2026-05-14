@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -51,9 +51,11 @@ type EyeExamApiResponse = {
 
 export default function EditEyeExamPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const rawId = params?.id;
   const id = Array.isArray(rawId) ? rawId[0] : rawId;
+  const stage = (searchParams.get('stage') as 'PRELIMINARY' | 'CLINICAL') || 'ALL';
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -112,9 +114,10 @@ export default function EditEyeExamPage() {
 
     setSubmitting(true);
     try {
-      await api.put(`/eye-examinations/${id}`, payload);
+      const res = await api.put(`/eye-examinations/${id}`, payload);
       toast.success('Examination updated successfully');
       router.push(`/dashboard/eye-examinations/${id}`);
+      return res.data;
     } catch (error: unknown) {
       const message =
         error && typeof error === 'object' && 'response' in error
@@ -143,6 +146,7 @@ export default function EditEyeExamPage() {
           submitting={submitting}
           onSubmit={handleSubmit}
           cancelHref={`/dashboard/eye-examinations/${id}`}
+          stage={stage}
         />
       </div>
     </div>

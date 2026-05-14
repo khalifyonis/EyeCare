@@ -4,6 +4,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import api from '@/lib/axios';
 import { toast } from 'sonner';
 
@@ -11,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,8 +22,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ServerPagination } from '@/components/dashboard/server-pagination';
 import { OpticalKpiCard } from '../../optical-shop/_components/optical-kpi-card';
-import { Search, Plus, MoreVertical, Trash2, FileText, CheckCircle2, Clock3, CalendarDays } from 'lucide-react';
+import { Search, Plus, MoreVertical, Trash2, FileText, CheckCircle2, Clock3, CalendarDays, ShoppingCart, Eye, Pencil } from 'lucide-react';
 import { readStoredUser, resolveRoleName } from '@/lib/auth';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 type MedicinePrescription = {
   id: string;
@@ -44,6 +49,8 @@ type MedicinePrescription = {
     diagnosis?: string | null;
     patient?: { id: string; fullName?: string | null; phone?: string | null } | null;
   } | null;
+  status: 'PENDING' | 'DISPENSED';
+  billings?: any[];
 };
 
 type PharmacyItem = {
@@ -52,6 +59,7 @@ type PharmacyItem = {
   genericName?: string | null;
   itemType?: string | null;
   strength?: string | null;
+  sellingPrice?: number | string | null;
 };
 
 function formatDate(iso?: string) {
@@ -151,6 +159,7 @@ function parseDurationDays(durationText: string): number | null {
 }
 
 export default function MedicinePrescriptionsPage() {
+  const router = useRouter();
   const role = useMemo(() => resolveRoleName(readStoredUser()), []);
   const canManage = useMemo(() => ['ADMIN', 'SUPERADMIN', 'DOCTOR', 'PHARMACIST'].includes(role), [role]);
 
@@ -160,7 +169,8 @@ export default function MedicinePrescriptionsPage() {
 
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [date, setDate] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [page, setPage] = useState(1);
@@ -171,7 +181,15 @@ export default function MedicinePrescriptionsPage() {
     try {
       const params: Record<string, string> = {};
       if (searchTerm.trim()) params.search = searchTerm.trim();
-      if (dateTerm) params.date = dateTerm;
+      if (dateFrom) params.from = dateFrom;
+      if (dateTo) params.to = dateTo;
+      if (!dateFrom && !dateTo) {
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        params.date = `${year}-${month}-${day}`;
+      }
       const res = await api.get('/prescription-items', { params });
       setRows(Array.isArray(res.data) ? (res.data as MedicinePrescription[]) : []);
     } catch {
@@ -201,10 +219,10 @@ export default function MedicinePrescriptionsPage() {
 
   useEffect(() => {
     const t = setTimeout(() => {
-      void fetchRows(search, date);
+      void fetchRows(search, '');
     }, 250);
     return () => clearTimeout(t);
-  }, [search, date, fetchRows]);
+  }, [search, dateFrom, dateTo, fetchRows]);
 
   useEffect(() => {
     void fetchItems();
@@ -215,11 +233,15 @@ export default function MedicinePrescriptionsPage() {
     try {
       await api.delete(`/prescription-items/${id}`);
       toast.success('Medicine prescription deleted');
-      await fetchRows(search, date);
+      await fetchRows(search);
     } catch {
       toast.error('Failed to delete medicine prescription');
     }
-  }, [fetchRows, search, date]);
+  }, [fetchRows, search]);
+  
+  const handleDispenseClick = useCallback((presc: any) => {
+    router.push(`/dashboard/billing/new?serviceType=PHARMACY&prescriptionId=${presc.row.id}`);
+  }, [router]);
 
   const medicineTypes = useMemo(() => {
     const values = new Set<string>();
@@ -232,7 +254,7 @@ export default function MedicinePrescriptionsPage() {
 
   const normalizedRows = useMemo(() => {
     return rows.map((row) => {
-      const item = row.itemId ? itemMap[row.itemId] : undefined;
+      const item = row.itemId ? itemMap[row.itemId] : (row.itemName ? { itemName: row.itemName } : undefined);
       const structured = parseInstruction(row.instructions, item?.strength);
       const hasRequiredFields = [structured.dosage, structured.frequency, structured.duration, structured.eye].every((v) => v !== '—');
       const durationDays = parseDurationDays(structured.duration);
@@ -281,7 +303,7 @@ export default function MedicinePrescriptionsPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, date, typeFilter, statusFilter, pageSize]);
+  }, [search, dateFrom, dateTo, typeFilter, statusFilter, pageSize]);
 
   const pagedRows = useMemo(() => {
     const start = (page - 1) * pageSize;
@@ -306,7 +328,7 @@ export default function MedicinePrescriptionsPage() {
     if (loading) {
       return (
         <TableRow>
-          <TableCell colSpan={9} className="h-24 text-center text-sm text-slate-500">Loading medicine prescriptions...</TableCell>
+          <TableCell colSpan={10} className="h-24 text-center text-sm text-slate-500">Loading medicine prescriptions...</TableCell>
         </TableRow>
       );
     }
@@ -314,7 +336,7 @@ export default function MedicinePrescriptionsPage() {
     if (pagedRows.length === 0) {
       return (
         <TableRow>
-          <TableCell colSpan={9} className="h-24 text-center text-sm text-slate-500">No medicine prescriptions found</TableCell>
+          <TableCell colSpan={10} className="h-24 text-center text-sm text-slate-500">No medicine prescriptions found</TableCell>
         </TableRow>
       );
     }
@@ -322,78 +344,82 @@ export default function MedicinePrescriptionsPage() {
     return pagedRows.map(({ row, item, structured, patientId, patientName, status }) => {
       const statusText = status === 'COMPLETED' ? 'completed' : 'active';
       return (
-      <TableRow key={row.id} className="border-slate-100 dark:border-slate-800 hover:bg-slate-50/70 dark:hover:bg-slate-900/40">
+      <TableRow key={row.id} className="border-slate-100 dark:border-slate-800">
         <TableCell className="px-4 py-3">
-          {patientId ? (
-            <Link href={`/dashboard/patients?view=${patientId}`} className="text-sm font-normal text-slate-900 hover:text-[#0284C7] dark:text-slate-100">
-              {patientName}
-            </Link>
-          ) : (
-            <span className="text-sm text-slate-500">Unknown</span>
-          )}
+          <div className="flex flex-col gap-1">
+            <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">{patientName}</span>
+            <Badge variant="outline" className="w-fit font-mono text-[9px] text-slate-500 border-slate-200 bg-slate-50/50 dark:bg-slate-900/50 dark:border-slate-800">
+              {row.appointment?.patient?.patientNumber || row.eyeExam?.patient?.patientNumber || 'PAT-PENDING'}
+            </Badge>
+          </div>
         </TableCell>
         <TableCell className="px-4 py-3">
           <div className="text-sm font-normal text-slate-900 dark:text-slate-100">{medicineLabel(item)}</div>
-          <div className="text-xs text-slate-500">{item?.strength || item?.itemType || 'General'}</div>
+          <div className="text-xs text-slate-400 font-normal">{item?.strength || item?.itemType || 'General'}</div>
         </TableCell>
-        <TableCell className="px-4 py-3 text-sm font-normal text-slate-700 dark:text-slate-200">{structured.dosage}</TableCell>
-        <TableCell className="px-4 py-3 text-sm font-normal text-slate-700 dark:text-slate-200">{structured.frequency}</TableCell>
-        <TableCell className="px-4 py-3 text-sm font-normal text-slate-700 dark:text-slate-200">{structured.duration}</TableCell>
-        <TableCell className="px-4 py-3 text-sm font-normal text-slate-700 dark:text-slate-200">{structured.eye}</TableCell>
+        <TableCell className="px-4 py-3 text-sm font-normal text-slate-600 dark:text-slate-300">{structured.dosage}</TableCell>
+        <TableCell className="px-4 py-3 text-sm font-normal text-slate-600 dark:text-slate-300">{structured.frequency}</TableCell>
+        <TableCell className="px-4 py-3 text-sm font-normal text-slate-600 dark:text-slate-300">{structured.duration}</TableCell>
+        <TableCell className="px-4 py-3 text-sm font-normal text-slate-600 dark:text-slate-300 uppercase">{structured.eye}</TableCell>
         <TableCell className="px-4 py-3">
-            <span className={`inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ${
-            status === 'ACTIVE'
-              ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-              : 'border-blue-200 bg-blue-50 text-blue-700'
-          }`}>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
             {statusText}
           </span>
         </TableCell>
-        <TableCell className="px-4 py-3 text-sm font-normal text-slate-700 dark:text-slate-200">{row.quantity ?? 0}</TableCell>
+        <TableCell className="px-4 py-3 text-sm font-normal text-slate-600 dark:text-slate-300">{row.quantity ?? 0}</TableCell>
+        <TableCell className="px-4 py-3">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+            {row.status === 'DISPENSED' || (row.billings && row.billings.length > 0) ? 'DONE' : 'DUE'}
+          </span>
+        </TableCell>
         <TableCell className="px-4 py-3 text-right">
-          {canManage ? (
-            <div className="flex items-center justify-end gap-2">
-              {patientId ? (
-                <Link href={`/dashboard/prescription/medicine/${row.id}`} className="text-sm font-normal text-[#0EA5E9] hover:text-[#0c96d4] hover:underline transition-all">
-                  View
-                </Link>
-              ) : (
-                <span className="text-sm font-normal text-slate-400">View</span>
-              )}
-
-              <Link href={`/dashboard/prescription/medicine/${row.id}/edit`} className="text-sm font-normal text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 transition-all hover:underline">
+          <div className="flex items-center justify-end gap-3">
+              <Link 
+                 href={`/dashboard/prescription/medicine/${row.id}`}
+                 className="text-sm font-medium text-[#0EA5E9] hover:underline"
+               >
+                 View
+               </Link>
+              <Link 
+                href={`/dashboard/prescription/medicine/${row.id}/edit`}
+                className="text-sm font-medium text-emerald-600 hover:underline"
+              >
                 Edit
               </Link>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-36">
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => void handleDelete(row.id)} className="gap-2 text-[12px]">
-                    <Trash2 className="h-3.5 w-3.5" />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          ) : (
-            row.id ? (
-              <Link href={`/dashboard/prescription/medicine/${row.id}`} className="text-sm font-normal text-[#0EA5E9] hover:text-[#0c96d4] hover:underline transition-all">
-                View
-              </Link>
-            ) : (
-              <span className="text-xs text-slate-400">—</span>
-            )
-          )}
+ 
+             {row.status !== 'DISPENSED' && (!row.billings || row.billings.length === 0) && (
+                <Button
+                   size="sm"
+                   onClick={() => void handleDispenseClick({ row, item, patientName })}
+                   className="h-7 px-3 bg-[#0EA5E9] hover:bg-[#0c96d4] text-white text-[11px] font-bold rounded-md shadow-sm"
+                 >
+                   Sell
+                 </Button>
+             )}
+             
+             <div className="flex items-center gap-1">
+               <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <MoreVertical className="h-4 w-4 text-slate-400" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem 
+                      onClick={() => void handleDelete(row.id)}
+                      className="text-red-600 focus:text-red-600"
+                    >
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+               </DropdownMenu>
+             </div>
+          </div>
         </TableCell>
       </TableRow>
     );
     });
-  }, [loading, pagedRows, canManage, handleDelete]);
+  }, [loading, pagedRows, canManage, handleDelete, handleDispenseClick]);
 
   return (
     <div className="w-full min-w-0 p-4 sm:p-5 md:p-6 lg:p-8 space-y-6 animate-in fade-in duration-300">
@@ -447,12 +473,23 @@ export default function MedicinePrescriptionsPage() {
             </SelectContent>
           </Select>
 
-          <Input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="h-10 w-full sm:w-[160px] border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50"
-          />
+          <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-md px-2 h-10">
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="bg-transparent border-none text-sm outline-none w-32 dark:text-slate-200"
+            />
+          </div>
+
+          <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-md px-2 h-10">
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="bg-transparent border-none text-sm outline-none w-32 dark:text-slate-200"
+            />
+          </div>
         </div>
       </div>
 
@@ -463,24 +500,23 @@ export default function MedicinePrescriptionsPage() {
       </div>
 
       <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-        <Table className="min-w-[1080px]">
+        <Table>
           <TableHeader>
             <TableRow className="bg-slate-50/80 dark:bg-slate-900/80 hover:bg-slate-50/80 dark:hover:bg-slate-900/80 border-slate-200 dark:border-slate-800">
-              <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">PATIENT</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">PATIENT & ID</TableHead>
               <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">MEDICINE</TableHead>
               <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">DOSAGE</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">FREQUENCY</TableHead>
-              <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">DURATION</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">FREQ</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">DUR</TableHead>
               <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">EYE</TableHead>
               <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">STATUS</TableHead>
               <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">QTY</TableHead>
+              <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 whitespace-nowrap">DISPENSE</TableHead>
               <TableHead className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider py-3 px-4 text-right whitespace-nowrap">ACTIONS</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>{content}</TableBody>
         </Table>
-        </div>
       </div>
 
       <div className="mt-3">
@@ -498,6 +534,8 @@ export default function MedicinePrescriptionsPage() {
           itemLabel="prescriptions"
         />
       </div>
+
+
     </div>
   );
 }

@@ -54,7 +54,6 @@ export default function EditPrescriptionPage() {
   const [patientLabel, setPatientLabel] = useState('');
   const [type, setType] = useState('SPECTACLES');
   const [status, setStatus] = useState('FILLED');
-  const [validityMonths, setValidityMonths] = useState('12');
   const [notes, setNotes] = useState('');
 
   const [odSphere, setOdSphere] = useState('');
@@ -89,7 +88,6 @@ export default function EditPrescriptionPage() {
 
         setType(row.type || 'SPECTACLES');
         setStatus(row.status || 'FILLED');
-        setValidityMonths(String(row.validityMonths || 12));
         setNotes(row.notes || '');
 
         setOdSphere(row.odSphere || '');
@@ -116,18 +114,12 @@ export default function EditPrescriptionPage() {
   }, [id]);
 
   const onSave = async () => {
-    const validity = Number(validityMonths);
-    if (!Number.isFinite(validity) || validity < 1) {
-      toast.error('Validity must be at least 1 month');
-      return;
-    }
 
     setSaving(true);
     try {
       await api.put(`/prescriptions/${id}`, {
         type,
         status,
-        validityMonths: validity,
         notes: notes || null,
 
         odSphere,
@@ -183,7 +175,7 @@ export default function EditPrescriptionPage() {
           <Input value={patientLabel} disabled className="mt-1 h-11" />
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <label className={LABEL_CN}>Type</label>
             <Select value={type} onValueChange={setType}>
@@ -204,10 +196,6 @@ export default function EditPrescriptionPage() {
                 <SelectItem value="DISPENSED">Dispensed</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-          <div>
-            <label className={LABEL_CN}>Validity (months)</label>
-            <Input value={validityMonths} onChange={(e) => setValidityMonths(e.target.value)} className="mt-1 h-11" />
           </div>
         </div>
 

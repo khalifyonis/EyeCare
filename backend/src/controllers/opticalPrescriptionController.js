@@ -49,6 +49,10 @@ export const listOpticalPrescriptions = async (req, res, next) => {
             patientId,
             page = '1',
             limit = '20',
+            todayOnly,
+            date,
+            from,
+            to,
         } = req.query;
 
         const pageNum = Math.max(1, Number(page) || 1);
@@ -72,6 +76,28 @@ export const listOpticalPrescriptions = async (req, res, next) => {
                         }
                         : { status }
                 : {}),
+            ...((from || to)
+                ? {
+                    createdAt: {
+                        ...(from ? { gte: new Date(new Date(from).setHours(0, 0, 0, 0)) } : {}),
+                        ...(to ? { lte: new Date(new Date(to).setHours(23, 59, 59, 999)) } : {}),
+                    },
+                }
+                : date
+                    ? {
+                        createdAt: {
+                            gte: new Date(new Date(date).setHours(0, 0, 0, 0)),
+                            lte: new Date(new Date(date).setHours(23, 59, 59, 999)),
+                        },
+                    }
+                    : todayOnly === '1'
+                        ? {
+                            createdAt: {
+                                gte: new Date(new Date().setHours(0, 0, 0, 0)),
+                                lte: new Date(new Date().setHours(23, 59, 59, 999)),
+                            },
+                        }
+                        : {}),
             ...(search
                 ? {
                     OR: [
@@ -463,6 +489,122 @@ export const deleteOpticalPrescription = async (req, res, next) => {
 
         await prisma.opticalPrescription.delete({ where: { id: existing.id } });
         res.status(200).json({ message: 'Optical prescription deleted successfully' });
+    } catch (error) {
+        next(error);
+    }
+};
+export const dispenseOpticalPrescription = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { 
+            frameItemId, 
+            lensItemId, 
+            paymentMethod = 'CASH', 
+            status = 'PAID', 
+            notes = '' 
+        } = req.body || {};
+
+        const prescription = await prisma.opticalPrescription.findUnique({
+            where: { id },
+            include: {
+                patient: true,
+                branch: true,
+                frameItem: true,
+                lensItem: true,
+            }
+        });
+
+        if (!prescription) return res.status(404).json({ message: 'Optical prescription not found' });
+        if (prescription.status === 'DISPENSED') return res.status(400).json({ message: 'Prescription already dispensed' });
+
+        const frameId = frameItemId || prescription.frameItemId;
+        const lensId = lensItemId || prescription.lensItemId;
+
+        if (!frameId && !lensId) {
+            return res.status(400).json({ message: 'No items linked to this prescription. Please select frame or lens.' });
+        }
+
+        const transactions = [];
+        let totalAmount = 0;
+        const lineItems = [];
+
+        if (frameId) {
+            const frame = await prisma.opticalItem.findUnique({ where: { id: frameId } });
+            if (!frame) return res.status(404).json({ message: 'Frame item not found' });
+            if (frame.stockQuantity < 1) return res.status(400).json({ message: `Frame ${frame.itemName} is out of stock` });
+            
+            totalAmount += Number(frame.sellingPrice);
+            lineItems.push({
+                itemType: 'OPTICAL_FRAME',
+                itemId: frame.id,
+                description: `Frame: ${frame.itemName} (${frame.brand || ''})`,
+                quantity: 1,
+                unitPrice: frame.sellingPrice,
+                lineTotal: frame.sellingPrice,
+            });
+            transactions.push(prisma.opticalItem.update({ where: { id: frame.id }, data: { stockQuantity: { decrement: 1 } } }));
+            transactions.push(prisma.opticalStockTransaction.create({
+                data: {
+                    opticalItemId: frame.id,
+                    branchId: prescription.branchId,
+                    transactionType: 'SALE',
+                    quantity: 1,
+                    unitPrice: frame.sellingPrice,
+                    performedById: req.user.id,
+                }
+            }));
+        }
+
+        if (lensId) {
+            const lens = await prisma.opticalItem.findUnique({ where: { id: lensId } });
+            if (!lens) return res.status(404).json({ message: 'Lens item not found' });
+            if (lens.stockQuantity < 2) return res.status(400).json({ message: `Lens ${lens.itemName} insufficient stock (Need 2)` });
+            
+            totalAmount += Number(lens.sellingPrice) * 2;
+            lineItems.push({
+                itemType: 'OPTICAL_LENS',
+                itemId: lens.id,
+                description: `Lens: ${lens.itemName} (Pair)`,
+                quantity: 2,
+                unitPrice: lens.sellingPrice,
+                lineTotal: Number(lens.sellingPrice) * 2,
+            });
+            transactions.push(prisma.opticalItem.update({ where: { id: lens.id }, data: { stockQuantity: { decrement: 2 } } }));
+            transactions.push(prisma.opticalStockTransaction.create({
+                data: {
+                    opticalItemId: lens.id,
+                    branchId: prescription.branchId,
+                    transactionType: 'SALE',
+                    quantity: 2,
+                    unitPrice: lens.sellingPrice,
+                    performedById: req.user.id,
+                }
+            }));
+        }
+
+        const result = await prisma.$transaction([
+            ...transactions,
+            prisma.billing.create({
+                data: {
+                    patientId: prescription.patientId,
+                    branchId: prescription.branchId,
+                    serviceType: 'OPTICAL',
+                    totalAmount,
+                    finalAmount: totalAmount,
+                    status: status,
+                    paymentMethod: paymentMethod,
+                    notes: notes || null,
+                    createdById: req.user.id,
+                    lineItems: { create: lineItems }
+                }
+            }),
+            prisma.opticalPrescription.update({
+                where: { id: prescription.id },
+                data: { status: 'DISPENSED', dispensedAt: new Date() }
+            })
+        ]);
+
+        res.status(200).json({ message: 'Optical items dispensed and billed successfully', billing: result[result.length - 2] });
     } catch (error) {
         next(error);
     }

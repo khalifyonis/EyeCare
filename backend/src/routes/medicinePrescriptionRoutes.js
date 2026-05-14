@@ -11,6 +11,7 @@ import {
     createPrescription,
     updatePrescription,
     deletePrescription,
+    dispenseMedicine,
 } from '../controllers/medicinePrescriptionController.js';
 
 const router = express.Router();
@@ -18,6 +19,7 @@ const router = express.Router();
 router.get('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'PHARMACIST'), listPrescriptions);
 router.get('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'PHARMACIST'), getPrescriptionById);
 router.post('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR', 'PHARMACIST'), validate(createPrescriptionSchema), createPrescription);
+router.post('/:id/dispense', authenticate, authorize('ADMIN', 'SUPERADMIN', 'PHARMACIST'), dispenseMedicine);
 router.put('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR', 'PHARMACIST'), validate(updatePrescriptionSchema), updatePrescription);
 router.delete('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR', 'PHARMACIST'), deletePrescription);
 

@@ -75,7 +75,7 @@ export default function NewPrescriptionPage() {
   const [patientResults, setPatientResults] = useState<Patient[]>([]);
   const [patient, setPatient] = useState<Patient | null>(null);
 
-  const [type, setType] = useState<PrescriptionType>('SPECTACLES');
+  const type: PrescriptionType = 'SPECTACLES';
 
   const [od, setOd] = useState<EyeRefraction>({ sphere: '+0.00', cylinder: '0.00', axis: '180', add: '+0.00', pd: '32', prism: '0' });
   const [os, setOs] = useState<EyeRefraction>({ sphere: '+0.00', cylinder: '0.00', axis: '180', add: '+0.00', pd: '32', prism: '0' });
@@ -132,6 +132,40 @@ export default function NewPrescriptionPage() {
   }, [patientQuery, patientOpen, fetchPatients]);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const pid = params.get('patientId');
+    const pname = params.get('patientName');
+
+    if (pid) {
+      setPatient({ id: pid, fullName: pname || 'Selected Patient' });
+    }
+
+    const sphereOD = params.get('sphereOD');
+    const cylinderOD = params.get('cylinderOD');
+    const axisOD = params.get('axisOD');
+    if (sphereOD || cylinderOD || axisOD) {
+      setOd(prev => ({
+        ...prev,
+        sphere: sphereOD || prev.sphere,
+        cylinder: cylinderOD || prev.cylinder,
+        axis: axisOD || prev.axis,
+      }));
+    }
+
+    const sphereOS = params.get('sphereOS');
+    const cylinderOS = params.get('cylinderOS');
+    const axisOS = params.get('axisOS');
+    if (sphereOS || cylinderOS || axisOS) {
+      setOs(prev => ({
+        ...prev,
+        sphere: sphereOS || prev.sphere,
+        cylinder: cylinderOS || prev.cylinder,
+        axis: axisOS || prev.axis,
+      }));
+    }
+  }, []);
+
+  useEffect(() => {
     const onClick = (e: MouseEvent) => {
       if (!patientOpen) return;
       const target = e.target as Node;
@@ -145,14 +179,6 @@ export default function NewPrescriptionPage() {
 
   const toggleCoating = (label: string) => {
     setCoatings((prev) => (prev.includes(label) ? prev.filter((x) => x !== label) : [...prev, label]));
-  };
-
-  const typeButtonClass = (value: PrescriptionType) => {
-    const active = type === value;
-    return [
-      'w-full rounded-lg border px-4 py-4 text-left transition-colors',
-      active ? 'border-[#0EA5E9] bg-sky-50/60 font-semibold' : 'border-slate-200 bg-white hover:bg-slate-50',
-    ].join(' ');
   };
 
   const canSave = useMemo(() => {
@@ -267,15 +293,8 @@ export default function NewPrescriptionPage() {
         </div>
       </div>
 
-      {/* B. Prescription Type */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6">
-        <SectionHeader icon={Glasses} title="Prescription Type" />
-        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
-          <button type="button" className={typeButtonClass('SPECTACLES')} onClick={() => setType('SPECTACLES')}>Spectacles</button>
-          <button type="button" className={typeButtonClass('CONTACT_LENS')} onClick={() => setType('CONTACT_LENS')}>Contact Lens</button>
-          <button type="button" className={typeButtonClass('BOTH')} onClick={() => setType('BOTH')}>Both</button>
-        </div>
-      </div>
+      {/* B. Prescription Type - Removed as only Spectacles are used */}
+      <input type="hidden" value="SPECTACLES" />
 
       {/* C. Refraction Data */}
       <div className="rounded-xl border border-slate-200 bg-white p-6">

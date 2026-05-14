@@ -127,10 +127,18 @@ export const appointmentSchema = Joi.object({
         'number.min': 'Invalid amount'
     }),
     // Appointments module additions
-    type: Joi.string().valid('consultation', 'follow-up', 'checkup', 'emergency').optional().allow('', null),
+    type: Joi.string().valid('consultation', 'follow-up', 'checkup', 'emergency', 'surgery').optional().allow('', null),
     location: Joi.string().optional().allow('', null),
     notes: Joi.string().optional().allow('', null),
-    status: Joi.string().valid('PENDING', 'SCHEDULED', 'CONFIRMED', 'COMPLETED', 'CANCELLED').optional()
+    status: Joi.string().valid('PENDING', 'SCHEDULED', 'CONFIRMED', 'COMPLETED', 'CANCELLED').optional(),
+    // Billing fields (created alongside appointment)
+    billingAmount: Joi.number().min(0).optional().allow(null),
+    billingDiscount: Joi.number().min(0).optional().allow(null),
+    billingStatus: Joi.string().valid('PAID', 'UNPAID', 'PARTIAL', 'PARTIALLY_PAID', 'DRAFT').optional().allow('', null),
+    paymentMethod: Joi.string().optional().allow('', null),
+    referenceNumber: Joi.string().optional().allow('', null),
+    dueDate: Joi.date().iso().optional().allow('', null),
+    billingNotes: Joi.string().optional().allow('', null),
 });
 
 export const updateAppointmentSchema = Joi.object({
@@ -142,10 +150,18 @@ export const updateAppointmentSchema = Joi.object({
     amount: Joi.number().min(0).optional().messages({
         'number.min': 'Invalid amount'
     }),
-    type: Joi.string().valid('consultation', 'follow-up', 'checkup', 'emergency').optional().allow('', null),
+    type: Joi.string().valid('consultation', 'follow-up', 'checkup', 'emergency', 'surgery').optional().allow('', null),
     location: Joi.string().optional().allow('', null),
     notes: Joi.string().optional().allow('', null),
-    status: Joi.string().valid('PENDING', 'SCHEDULED', 'CONFIRMED', 'COMPLETED', 'CANCELLED').optional()
+    status: Joi.string().valid('PENDING', 'SCHEDULED', 'CONFIRMED', 'COMPLETED', 'CANCELLED').optional(),
+    // Billing fields (updated alongside appointment)
+    billingAmount: Joi.number().min(0).optional().allow(null),
+    billingDiscount: Joi.number().min(0).optional().allow(null),
+    billingStatus: Joi.string().valid('PAID', 'UNPAID', 'PARTIAL', 'PARTIALLY_PAID', 'DRAFT').optional().allow('', null),
+    paymentMethod: Joi.string().optional().allow('', null),
+    referenceNumber: Joi.string().optional().allow('', null),
+    dueDate: Joi.date().iso().optional().allow('', null),
+    billingNotes: Joi.string().optional().allow('', null),
 });
 
 // ── Eye Examination Schemas ──
@@ -271,6 +287,7 @@ export const createPrescriptionSchema = Joi.object({
     examId: Joi.string().uuid().required(),
     itemType: Joi.string().valid('PHARMACY').required(),
     itemId: Joi.string().allow('', null).optional(),
+    itemName: Joi.string().allow('', null).optional(),
     quantity: Joi.number().integer().min(1).required().messages({
         'number.base': 'Quantity must be a number',
         'number.integer': 'Quantity must be a whole number',
@@ -284,6 +301,7 @@ export const updatePrescriptionSchema = Joi.object({
     examId: Joi.string().uuid().optional(),
     itemType: Joi.string().valid('PHARMACY').optional(),
     itemId: Joi.string().allow('', null).optional(),
+    itemName: Joi.string().allow('', null).optional(),
     quantity: Joi.number().integer().min(1).optional().messages({
         'number.base': 'Quantity must be a number',
         'number.integer': 'Quantity must be a whole number',

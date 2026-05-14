@@ -65,7 +65,6 @@ export default function PatientsPage() {
   const [detailsLoading, setDetailsLoading] = useState(false);
 
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
 
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
@@ -101,8 +100,6 @@ export default function PatientsPage() {
         sortOrder: selectedSort.sortOrder,
       });
       if (q) params.set('search', q);
-      if (statusFilter === 'active') params.set('isActive', 'true');
-      if (statusFilter === 'inactive') params.set('isActive', 'false');
 
       const res = await api.get(`/patients?${params.toString()}`);
       const body = res.data as { data?: PatientRow[]; total?: number; page?: number; totalPages?: number };
@@ -115,11 +112,11 @@ export default function PatientsPage() {
     } finally {
       setLoading(false);
     }
-  }, [pageSize, sortBy, statusFilter]);
+  }, [pageSize, sortBy]);
 
   useEffect(() => {
     setPage(1);
-  }, [search, sortBy, statusFilter]);
+  }, [search, sortBy]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -306,19 +303,6 @@ export default function PatientsPage() {
           />
         </div>
 
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-slate-400" />
-          <Select value={statusFilter} onValueChange={(value) => { setStatusFilter(value); setPage(1); }}>
-            <SelectTrigger className="h-9 w-[150px] border-slate-300 bg-white text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 [&>span]:text-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All patients</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
 
         <div className="ml-auto flex items-center gap-2">
           <Select value={sortBy} onValueChange={setSortBy}>
@@ -350,7 +334,7 @@ export default function PatientsPage() {
           <Table className="w-full table-fixed">
             <TableHeader>
               <TableRow className="border-slate-200 bg-slate-50 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/70 dark:hover:bg-slate-900/70">
-                {['PATIENT', 'CONTACT', 'STATUS', 'REGISTRATION DATE', 'ADDRESS', 'ACTIONS'].map((header) => (
+                {['PATIENT', 'CONTACT', 'GENDER', 'REGISTRATION DATE', 'ADDRESS', 'ACTIONS'].map((header) => (
                   <TableHead key={header} className="whitespace-nowrap px-4 py-3 text-[12px] font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
                     {header}
                   </TableHead>

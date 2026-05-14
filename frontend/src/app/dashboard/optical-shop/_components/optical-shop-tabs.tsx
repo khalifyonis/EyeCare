@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 
 const tabs = [
   { label: 'Orders', href: '/dashboard/optical-shop' },
+  { label: 'Prescriptions', href: '/dashboard/prescription/optical' },
   { label: 'Frame Inventory', href: '/dashboard/optical-shop/frames' },
   { label: 'Lens Inventory', href: '/dashboard/optical-shop/lenses' },
 ]
@@ -14,7 +15,7 @@ export function OpticalShopTabs() {
 
   return (
     <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a] overflow-hidden">
-      <div className="grid grid-cols-1 sm:grid-cols-3">
+      <div className="grid grid-cols-1 sm:grid-cols-4">
         {tabs.map((t) => {
           const active = pathname === t.href
           return (

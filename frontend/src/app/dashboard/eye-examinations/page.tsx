@@ -3,9 +3,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useSocket } from '@/contexts/socket-context';
 import api from '@/lib/axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 import {
   Search,
   Plus,
@@ -43,6 +46,8 @@ interface Exam {
   vaBcvaOS?: string | null;
   iopOD?: number | null;
   iopOS?: number | null;
+  stage?: string | null;
+  diagnosis?: string | null;
   amount?: number | string | null;
   createdAt?: string | null;
   patient?: { id: string; fullName?: string | null; patientNumber?: string | null } | null;
@@ -86,6 +91,27 @@ function resolveExamId(exam: Exam): string {
   return fallback;
 }
 
+function getLocalDateValue(): string {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function getStageBadge(stage: string | null | undefined) {
+  switch (stage) {
+    case 'PRELIMINARY':
+      return <Badge className="bg-blue-50 text-blue-700 border border-blue-100 text-[10px] font-bold uppercase rounded-full px-2">Preliminary</Badge>;
+    case 'CLINICAL':
+      return <Badge className="bg-amber-50 text-amber-700 border border-amber-100 text-[10px] font-bold uppercase rounded-full px-2">Clinical</Badge>;
+    case 'COMPLETED':
+      return <Badge className="bg-emerald-50 text-emerald-700 border border-emerald-100 text-[10px] font-bold uppercase rounded-full px-2">Completed</Badge>;
+    default:
+      return <Badge className="bg-gray-50 text-gray-500 border border-gray-100 text-[10px] font-bold uppercase rounded-full px-2">{stage || '—'}</Badge>;
+  }
+}
+
 export default function EyeExaminationsPage() {
   const router = useRouter();
   const [exams, setExams] = useState<Exam[]>([]);
@@ -98,6 +124,7 @@ export default function EyeExaminationsPage() {
   const [pageSize, setPageSize] = useState(20);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  const { socket } = useSocket();
 
   const fetchStats = useCallback(async () => {
     try {
@@ -113,7 +140,12 @@ export default function EyeExaminationsPage() {
     try {
       const params: Record<string, string | number> = { limit: pageSize, page };
       if (search) params.search = search;
-      if (dateFilter) params.date = dateFilter;
+      if (dateFilter) {
+          params.date = dateFilter;
+      } else if (!search) {
+          params.date = getLocalDateValue();
+      }
+
       const res = await api.get('/eye-examinations', { params });
       const body = res.data as PaginatedEyeExamResponse;
       setExams(body.data ?? []);
@@ -142,6 +174,22 @@ export default function EyeExaminationsPage() {
     setPage(1);
   }, [search, dateFilter, pageSize]);
 
+  useEffect(() => {
+      if (!socket) return;
+      const handleUpdate = () => {
+          fetchExams();
+          fetchStats();
+      };
+      socket.on('exam:created', handleUpdate);
+      socket.on('exam:updated', handleUpdate);
+      socket.on('exam:deleted', handleUpdate);
+      return () => {
+          socket.off('exam:created', handleUpdate);
+          socket.off('exam:updated', handleUpdate);
+          socket.off('exam:deleted', handleUpdate);
+      };
+  }, [socket, fetchExams, fetchStats]);
+
   const handleDelete = async (id: string) => {
     const ok = window.confirm('Delete this examination? This cannot be undone.');
     if (!ok) return;
@@ -161,58 +209,74 @@ export default function EyeExaminationsPage() {
   };
 
   const statCards = [
-    { label: "Today's Exams", count: stats?.todays ?? 0, grad: 'from-[#3B82F6] to-[#60A5FA]', icon: Eye },
-    { label: 'This Week', count: stats?.thisWeek ?? 0, grad: 'from-[#14B8A6] to-[#2DD4BF]', icon: Calendar },
-    { label: 'High IOP Cases', count: stats?.highIop ?? 0, grad: 'from-[#8B5CF6] to-[#A78BFA]', icon: TrendingUp },
-    { label: 'Total Records', count: stats?.total ?? 0, grad: 'from-[#F97316] to-[#FB923C]', icon: FileText },
+    { label: "Today's Exams", count: stats?.todays ?? 0, color: 'text-blue-600', bg: 'bg-blue-50', icon: Eye },
+    { label: 'This Week', count: stats?.thisWeek ?? 0, color: 'text-teal-600', bg: 'bg-teal-50', icon: Calendar },
+    { label: 'High IOP Cases', count: stats?.highIop ?? 0, color: 'text-purple-600', bg: 'bg-purple-50', icon: TrendingUp },
+    { label: 'Total Records', count: stats?.total ?? 0, color: 'text-orange-600', bg: 'bg-orange-50', icon: FileText },
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <div className="border-b border-slate-100 px-6 py-5 dark:border-slate-800">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Eye Examinations</h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Manage comprehensive eye examination records</p>
+    <div className="min-h-screen bg-gray-50/50">
+      <div className="border-b border-gray-200 bg-white px-6 py-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900">Eye Examinations</h1>
+            <p className="mt-1 text-sm text-gray-500">Clinical records and documentation dashboard</p>
+          </div>
+          <Link href="/dashboard/eye-examinations/new">
+            <Button className="bg-blue-600 px-6 font-bold text-white hover:bg-blue-700 shadow-sm transition-all hover:shadow-md">
+              <Plus className="mr-2 h-4 w-4" />
+              New Eye Exam
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <div className="p-6 space-y-6">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {statCards.map(({ label, count, grad, icon: Icon }) => (
-            <div key={label} className={`min-h-[110px] rounded-2xl bg-gradient-to-br ${grad} p-5 text-white shadow-md`}>
-              <div className="flex items-start justify-between gap-3">
-                <p className="text-sm font-medium opacity-90 sm:text-[15px]">{label}</p>
-                <Icon className="h-5 w-5 shrink-0 opacity-80" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {statCards.map(({ label, count, color, bg, icon: Icon }) => (
+            <div key={label} className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:border-blue-200 hover:shadow-md">
+              <div className="flex items-center justify-between">
+                <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg shadow-sm transition-transform group-hover:scale-110", bg, color)}>
+                  <Icon className="h-5 w-5" />
+                </div>
+                <p className="text-2xl font-bold tracking-tight text-gray-900">{count}</p>
               </div>
-              <p className="mt-2 text-3xl font-bold leading-none sm:text-[32px]">{count}</p>
+              <div className="mt-4">
+                <p className="text-[10px] font-black uppercase tracking-[0.1em] text-gray-400">{label}</p>
+              </div>
             </div>
           ))}
         </div>
 
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               placeholder="Search by patient name or ID..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800"
+              className="pl-9 bg-white border-gray-200 h-10 text-sm focus:ring-1 focus:ring-blue-100 focus:border-blue-400"
             />
           </div>
-          <Input type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className="w-full lg:w-44 bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800" />
-          <Link href="/dashboard/eye-examinations/new" className="w-full lg:w-auto">
-            <Button className="w-full bg-[#0EA5E9] text-white hover:bg-[#0284C7] lg:w-auto">
-              <Plus className="mr-2 h-4 w-4" />
-              New Eye Exam
-            </Button>
-          </Link>
+          <div className="relative w-full lg:w-48">
+            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+            <Input 
+              type="date" 
+              value={dateFilter} 
+              onChange={(e) => setDateFilter(e.target.value)} 
+              className="pl-9 bg-white border-gray-200 h-10 text-sm focus:ring-1 focus:ring-blue-100 focus:border-blue-400" 
+            />
+          </div>
         </div>
 
         <div>
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
             <Table className="table-fixed">
                 <TableHeader>
-                  <TableRow className="bg-slate-50/80 dark:bg-slate-900/80 hover:bg-slate-50/80 dark:hover:bg-slate-900/80 border-slate-200 dark:border-slate-800">
-                    {['PATIENT & ID', 'CHIEF COMPLAINT', 'VA (BCVA)', 'IOP', 'AMOUNT', 'DATE / EXAMINER', 'ACTIONS'].map((head) => (
-                      <TableHead key={head} className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                  <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-gray-200">
+                    {['PATIENT & ID', 'CHIEF COMPLAINT', 'VA (BCVA)', 'IOP', 'STAGE', 'DATE / EXAMINER', 'ACTIONS'].map((head) => (
+                      <TableHead key={head} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 whitespace-nowrap">
                         {head}
                       </TableHead>
                     ))}
@@ -222,14 +286,14 @@ export default function EyeExaminationsPage() {
                   {loading ? (
                     <TableRow>
                       <TableCell colSpan={7} className="py-16 text-center">
-                        <div className="inline-flex items-center gap-2 text-slate-500">
+                        <div className="inline-flex items-center gap-2 text-gray-500">
                           <Loader2 className="h-5 w-5 animate-spin" /> Loading examinations...
                         </div>
                       </TableCell>
                     </TableRow>
                   ) : exams.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="py-16 text-center text-slate-500">
+                      <TableCell colSpan={7} className="py-16 text-center text-gray-500">
                         No examinations found.
                       </TableCell>
                     </TableRow>
@@ -239,43 +303,41 @@ export default function EyeExaminationsPage() {
                       const patientLabel = e.patient?.patientNumber ?? e.patient?.id ?? '—';
                       const patientName = e.patient?.fullName?.trim() || 'Unknown Patient';
                       return (
-                        <TableRow key={examId || `${patientName}-${formatDate(e.createdAt)}`} className="border-slate-100 dark:border-slate-800/60 hover:bg-slate-50/40 dark:hover:bg-slate-800/40">
+                        <TableRow key={examId || `${patientName}-${formatDate(e.createdAt)}`} className="border-gray-100 hover:bg-gray-50/40 transition-colors">
                           <TableCell className="px-4 py-3">
                             <div className="min-w-[180px]">
-                              <p className="text-sm font-semibold text-slate-900 dark:text-slate-200 truncate">{patientName}</p>
-                              <p className="text-xs text-slate-500 dark:text-slate-400">ID: {patientLabel}</p>
+                              <p className="text-sm font-bold text-gray-900 truncate">{patientName}</p>
+                              <p className="text-[11px] font-medium text-gray-400">ID: {patientLabel}</p>
                             </div>
                           </TableCell>
 
                           <TableCell className="px-4 py-3">
-                            <p className="min-w-0 text-sm text-slate-700 dark:text-slate-300 truncate">{e.chiefComplaint ?? '—'}</p>
+                            <p className="min-w-0 text-sm text-gray-600 truncate">{e.chiefComplaint ?? '—'}</p>
                           </TableCell>
 
-                          <TableCell className="px-4 py-3 text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                          <TableCell className="px-4 py-3 text-sm font-medium text-gray-700 whitespace-nowrap">
                             OD {e.vaBcvaOD ?? '—'} | OS {e.vaBcvaOS ?? '—'}
                           </TableCell>
 
-                          <TableCell className="px-4 py-3 text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                          <TableCell className="px-4 py-3 text-sm font-medium text-gray-700 whitespace-nowrap">
                             OD {e.iopOD ?? '—'} | OS {e.iopOS ?? '—'}
                           </TableCell>
 
-                          <TableCell className="px-4 py-3 text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap">
-                            <span className="font-semibold text-slate-900 dark:text-slate-200 tabular-nums">
-                                ${Number(e.amount || 0).toFixed(2)}
-                            </span>
+                          <TableCell className="px-4 py-3">
+                            {getStageBadge(e.stage)}
                           </TableCell>
 
-                          <TableCell className="px-4 py-3 text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap">
-                            <div className="space-y-1">
-                              <p>{formatDate(e.createdAt)}</p>
-                              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{formatDoctorName(e.doctor?.user?.fullName)}</p>
+                          <TableCell className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
+                            <div className="space-y-0.5">
+                              <p className="font-medium">{formatDate(e.createdAt)}</p>
+                              <p className="text-[11px] text-gray-400 truncate">{formatDoctorName(e.doctor?.user?.fullName)}</p>
                             </div>
                           </TableCell>
 
                           <TableCell className="px-4 py-3">
                             <div className="flex items-center gap-2 whitespace-nowrap">
                               <button
-                                className="rounded-md px-2 py-1 text-sm font-medium text-sky-600 hover:bg-sky-50 hover:text-sky-700"
+                                className="rounded-lg px-3 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50 transition-colors border border-transparent hover:border-blue-100"
                                 onClick={() => {
                                   if (!examId) {
                                     toast.error('Invalid examination record');
@@ -286,36 +348,25 @@ export default function EyeExaminationsPage() {
                               >
                                 View
                               </button>
-                              <button
-                                className="rounded-md px-2 py-1 text-sm font-medium text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
-                                onClick={() => {
-                                  if (!examId) {
-                                    toast.error('Cannot edit: examination id is missing');
-                                    return;
-                                  }
-                                  router.push(`/dashboard/eye-examinations/${examId}/edit`);
-                                }}
-                              >
-                                Edit
-                              </button>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-md">
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100">
                                     <MoreVertical className="h-4 w-4" />
                                   </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
+                                <DropdownMenuContent align="end" className="rounded-xl border-gray-200 shadow-lg">
                                   <DropdownMenuItem asChild>
-                                    <Link href={examId ? `/dashboard/eye-examinations/${examId}` : '/dashboard/eye-examinations'}>View Details</Link>
+                                    <Link href={examId ? `/dashboard/eye-examinations/${examId}` : '/dashboard/eye-examinations'} className="text-xs font-medium">View Details</Link>
                                   </DropdownMenuItem>
                                   <DropdownMenuItem asChild>
-                                    <Link href={examId ? `/dashboard/eye-examinations/${examId}/edit` : '/dashboard/eye-examinations'} className="flex items-center gap-2">
-                                      <Pencil className="h-4 w-4" />
+                                    <Link href={examId ? `/dashboard/eye-examinations/${examId}/edit` : '/dashboard/eye-examinations'} className="flex items-center gap-2 text-xs font-medium">
+                                      <Pencil className="h-3.5 w-3.5" />
                                       Edit Examination
                                     </Link>
                                   </DropdownMenuItem>
+                                  <div className="h-px bg-gray-100 my-1" />
                                   <DropdownMenuItem
-                                    className="text-red-600 focus:text-red-700"
+                                    className="text-red-600 focus:text-red-700 text-xs font-medium"
                                     onClick={() => {
                                       if (!examId) {
                                         toast.error('Cannot delete: examination id is missing');
@@ -325,7 +376,7 @@ export default function EyeExaminationsPage() {
                                     }}
                                     disabled={!examId || deletingId === examId}
                                   >
-                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    <Trash2 className="mr-2 h-3.5 w-3.5" />
                                     {deletingId === examId ? 'Deleting...' : 'Delete'}
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -340,7 +391,7 @@ export default function EyeExaminationsPage() {
               </Table>
           </div>
 
-          <div className="mt-3 overflow-hidden">
+          <div className="mt-4">
             <ServerPagination
               page={page}
               limit={pageSize}

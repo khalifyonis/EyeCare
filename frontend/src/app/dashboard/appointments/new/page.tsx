@@ -33,6 +33,10 @@ import {
     CheckCircle2,
     MapPin,
     Plus,
+    CreditCard,
+    DollarSign,
+    AlertTriangle,
+    Phone,
 } from 'lucide-react'
 import {
     Sheet,
@@ -49,6 +53,9 @@ type Patient = {
     patientNumber?: string | null
     phone?: string | null
     email?: string | null
+    emergencyContactName?: string | null
+    emergencyContactPhone?: string | null
+    emergencyContactRelationship?: string | null
 }
 
 type Doctor = {
@@ -81,18 +88,19 @@ const APPOINTMENT_TYPES = [
     { value: 'follow-up', label: 'Follow-up' },
     { value: 'checkup', label: 'Checkup' },
     { value: 'emergency', label: 'Emergency' },
+    { value: 'surgery', label: 'Surgery' },
 ]
 
 const STATUS_OPTIONS = [
     { value: 'SCHEDULED', label: 'Scheduled' },
-    { value: 'CONFIRMED', label: 'Confirmed' },
-    { value: 'PENDING', label: 'Pending' },
+    { value: 'RECEIVED', label: 'Received' },
 ]
 
 const STEPS = [
-    { label: 'Patient Information', icon: User },
+    { label: 'Patient Info', icon: User },
     { label: 'Appointment Details', icon: Calendar },
-    { label: 'Additional Information', icon: FileText },
+    { label: 'Additional Info', icon: FileText },
+    { label: 'Payment & Billing', icon: CreditCard },
     { label: 'Review', icon: CheckCircle2 },
 ]
 
@@ -106,7 +114,7 @@ const SOMALIA_CITIES = [
 ].sort()
 
 const HOURS = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'))
-const MINUTES = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55']
+const MINUTES = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'))
 
 const GENERATED_TIME_SLOTS = (() => {
     const slots: string[] = []
@@ -345,6 +353,9 @@ function QuickAddPatientForm({
         address: '',
         city: '',
         state: '',
+        emergencyContactName: '',
+        emergencyContactPhone: '',
+        emergencyContactRelationship: '',
     })
 
     const handleSave = async () => {
@@ -485,6 +496,54 @@ function QuickAddPatientForm({
                     </Select>
                 </div>
             </div>
+
+            {/* Emergency Contact Section */}
+            <div className="pt-4 border-t border-slate-200">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                    <AlertTriangle className="h-3 w-3" />
+                    Emergency Contact <span className="text-amber-500 font-normal normal-case">(required for surgery)</span>
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Contact Name</Label>
+                        <Input
+                            className="h-9 text-sm"
+                            placeholder="Emergency Contact Name"
+                            value={form.emergencyContactName}
+                            onChange={(e) => setForm({ ...form, emergencyContactName: e.target.value })}
+                        />
+                    </div>
+                    <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Contact Phone</Label>
+                        <Input
+                            className="h-9 text-sm"
+                            placeholder="Emergency Phone"
+                            value={form.emergencyContactPhone}
+                            onChange={(e) => setForm({ ...form, emergencyContactPhone: e.target.value })}
+                        />
+                    </div>
+                </div>
+                <div className="mt-3 space-y-1.5">
+                    <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Relationship</Label>
+                    <Select
+                        value={form.emergencyContactRelationship}
+                        onValueChange={(v) => setForm({ ...form, emergencyContactRelationship: v })}
+                    >
+                        <SelectTrigger className="h-9 text-sm">
+                            <SelectValue placeholder="Select relationship" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Spouse">Spouse</SelectItem>
+                            <SelectItem value="Parent">Parent</SelectItem>
+                            <SelectItem value="Sibling">Sibling</SelectItem>
+                            <SelectItem value="Child">Child</SelectItem>
+                            <SelectItem value="Friend">Friend</SelectItem>
+                            <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            </div>
+
             <div className="flex gap-3 pt-6 sticky bottom-0 bg-white border-t mt-4 pb-2">
                 <Button variant="outline" className="flex-1 rounded-xl font-bold" onClick={onCancel}>
                     Cancel
@@ -516,32 +575,46 @@ export default function NewAppointmentPage() {
     const [patientDropdownOpen, setPatientDropdownOpen] = useState(false)
     const [doctorId, setDoctorId] = useState('')
     const [appointmentType, setAppointmentType] = useState('')
-    const [appointmentDate, setAppointmentDate] = useState('')
-    const [timeHour, setTimeHour] = useState('09')
-    const [timeMinute, setTimeMinute] = useState('00')
-    const [timePeriod, setTimePeriod] = useState('AM')
+    const now = new Date()
+    const defaultDate = now.toISOString().split('T')[0]
+    
+    let hours = now.getHours()
+    const ampm = hours >= 12 ? 'PM' : 'AM'
+    hours = hours % 12
+    hours = hours ? hours : 12
+    const defaultHour = String(hours).padStart(2, '0')
+    const defaultMinute = String(now.getMinutes()).padStart(2, '0')
+
+    const [appointmentDate, setAppointmentDate] = useState(defaultDate)
+    const [timeHour, setTimeHour] = useState(defaultHour)
+    const [timeMinute, setTimeMinute] = useState(defaultMinute)
+    const [timePeriod, setTimePeriod] = useState(ampm)
     const [status, setStatus] = useState('SCHEDULED')
     const [location, setLocation] = useState('')
     const [reason, setReason] = useState('')
-    const [symptoms, setSymptoms] = useState<string[]>([])
-    const [diagnosis, setDiagnosis] = useState('')
-    const [treatment, setTreatment] = useState('')
-    const [notes, setNotes] = useState('')
+    const [eyeSide, setEyeSide] = useState('OD') // Default to Right Eye
+    
+    // Emergency Contact state for existing patients missing it
+    const [emergencyName, setEmergencyName] = useState('')
+    const [emergencyPhone, setEmergencyPhone] = useState('')
+    const [emergencyRelation, setEmergencyRelation] = useState('')
+    const [isEmergencyMissing, setIsEmergencyMissing] = useState(false)
+
     const [quickAddOpen, setQuickAddOpen] = useState(false)
     const patientDropdownRef = useRef<HTMLDivElement | null>(null)
+
+    // Billing state for step 5
+    const [billingAmount, setBillingAmount] = useState('')
+    const [billingDiscount, setBillingDiscount] = useState('')
+    const [billingStatus, setBillingStatus] = useState('UNPAID')
+    const [paymentMethod, setPaymentMethod] = useState('')
 
     // Today's date string for min attribute on date picker
     const todayStr = new Date().toISOString().split('T')[0]
 
     const buildNotes = useCallback(() => {
-        const parts: string[] = []
-        if (reason.trim()) parts.push(`Reason: ${reason.trim()}`)
-        if (symptoms.length) parts.push(`Symptoms: ${symptoms.join(', ')}`)
-        if (diagnosis.trim()) parts.push(`Diagnosis: ${diagnosis.trim()}`)
-        if (treatment.trim()) parts.push(`Treatment: ${treatment.trim()}`)
-        if (notes.trim()) parts.push(`Notes: ${notes.trim()}`)
-        return parts.join('\n')
-    }, [diagnosis, notes, reason, symptoms, treatment])
+        return reason.trim()
+    }, [reason])
 
     const fetchPatients = useCallback(async () => {
         setLoadingPatients(true)
@@ -555,6 +628,15 @@ export default function NewAppointmentPage() {
             setLoadingPatients(false)
         }
     }, [])
+
+    useEffect(() => {
+        if (appointmentType === 'surgery') {
+            const multiplier = eyeSide === 'OU' ? 2 : 1
+            setBillingAmount((150 * multiplier).toString())
+        } else if (appointmentType) {
+            setBillingAmount('10')
+        }
+    }, [appointmentType, eyeSide])
 
     const fetchDoctors = useCallback(async () => {
         setLoadingDoctors(true)
@@ -580,6 +662,23 @@ export default function NewAppointmentPage() {
     }, [fetchPatients, fetchDoctors])
 
     const selectedPatient = patients.find((p) => p.id === patientId)
+
+    useEffect(() => {
+        if (selectedPatient) {
+            const missing = !selectedPatient.emergencyContactName || !selectedPatient.emergencyContactPhone
+            setIsEmergencyMissing(missing)
+            if (!missing) {
+                setEmergencyName(selectedPatient.emergencyContactName || '')
+                setEmergencyPhone(selectedPatient.emergencyContactPhone || '')
+                setEmergencyRelation(selectedPatient.emergencyContactRelationship || '')
+            }
+        } else {
+            setIsEmergencyMissing(false)
+            setEmergencyName('')
+            setEmergencyPhone('')
+            setEmergencyRelation('')
+        }
+    }, [selectedPatient])
     const selectedDoctor = doctors.find((d) => getDoctorRecordId(d) === doctorId)
 
     useEffect(() => {
@@ -617,32 +716,76 @@ export default function NewAppointmentPage() {
         return selected < today
     }
 
+    const isTimeInPast = (dateStr: string, hour: string, minute: string, period: string): boolean => {
+        if (!dateStr) return false
+        const selectedDate = new Date(dateStr + 'T00:00:00')
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        
+        if (selectedDate < today) return true
+        if (selectedDate > today) return false
+        
+        // If today, check time
+        let h = parseInt(hour)
+        if (period === 'PM' && h < 12) h += 12
+        if (period === 'AM' && h === 12) h = 0
+        
+        const now = new Date()
+        const selectedTime = new Date()
+        selectedTime.setHours(h, parseInt(minute), 0, 0)
+        
+        return selectedTime < now
+    }
+
     const canProceedStep = (s: number): boolean => {
         switch (s) {
             case 0:
-                return !!patientId
+                const hasPatient = !!patientId
+                if (appointmentType === 'surgery' && isEmergencyMissing) {
+                    return hasPatient && !!emergencyName && !!emergencyPhone
+                }
+                return hasPatient
             case 1:
-                return !!doctorId && !!appointmentType && !!appointmentDate && !!timeHour && !!timeMinute && !!timePeriod && !isDateInPast(appointmentDate)
+                return !!doctorId && !!appointmentType && !!appointmentDate && !!timeHour && !!timeMinute && !!timePeriod && !isTimeInPast(appointmentDate, timeHour, timeMinute, timePeriod)
             case 2:
-                return !!reason.trim()
+                // Skip logic handled in handleNext/Prev, but validation here for direct clicks
+                return appointmentType === 'surgery' || !!reason.trim()
+            case 3:
+                return true // Billing
+            case 4:
+                return true // Review
             default:
                 return true
         }
     }
 
     const handleNext = () => {
-        if (step === 1 && isDateInPast(appointmentDate)) {
-            toast.error('Appointment date cannot be in the past. Please select today or a future date.')
+        if (step === 1 && isTimeInPast(appointmentDate, timeHour, timeMinute, timePeriod)) {
+            toast.error('Appointment date and time cannot be in the past')
             return
         }
         if (!canProceedStep(step)) {
             toast.error('Please fill in all required fields before continuing.')
             return
         }
-        setStep((s) => Math.min(s + 1, 3))
+
+        let nextStep = step + 1
+        // Skip "Additional Info" (Step 2) for surgery
+        if (nextStep === 2 && appointmentType === 'surgery') {
+            nextStep = 3
+            if (!reason) setReason('Surgery Appointment')
+        }
+        setStep(Math.min(nextStep, STEPS.length - 1))
     }
 
-    const handlePrev = () => setStep((s) => Math.max(s - 1, 0))
+    const handlePrev = () => {
+        let prevStep = step - 1
+        // Skip "Additional Info" (Step 2) for surgery
+        if (prevStep === 2 && appointmentType === 'surgery') {
+            prevStep = 1
+        }
+        setStep(Math.max(prevStep, 0))
+    }
 
     const handleSubmit = async () => {
         if (!canProceedStep(0) || !canProceedStep(1) || !canProceedStep(2)) {
@@ -664,6 +807,9 @@ export default function NewAppointmentPage() {
             const appointmentTime = `${hour.toString().padStart(2, '0')}:${timeMinute}`
 
             const dateTime = new Date(`${appointmentDate}T${appointmentTime}:00`)
+            const totalAmount = parseFloat(billingAmount) || 0
+            const discountAmount = parseFloat(billingDiscount) || 0
+
             await api.post('/appointments', {
                 patientId,
                 doctorId,
@@ -672,7 +818,16 @@ export default function NewAppointmentPage() {
                 notes: buildNotes(),
                 location,
                 status,
-                amount: 0,
+                amount: totalAmount,
+                billingAmount: totalAmount,
+                billingDiscount: discountAmount,
+                billingStatus: billingStatus || 'UNPAID',
+                paymentMethod: paymentMethod || null,
+                eyeSide: appointmentType === 'surgery' ? eyeSide : undefined,
+                // Include emergency contact if it was missing and now filled
+                emergencyContactName: isEmergencyMissing ? emergencyName : undefined,
+                emergencyContactPhone: isEmergencyMissing ? emergencyPhone : undefined,
+                emergencyContactRelationship: isEmergencyMissing ? emergencyRelation : undefined,
             })
             toast.success('Appointment scheduled successfully!')
             router.push('/dashboard/appointments')
@@ -756,27 +911,6 @@ export default function NewAppointmentPage() {
                     </div>
                 </div>
 
-                {/* Step Tabs (Vercel-like) */}
-                <div className="mb-6 flex flex-wrap items-center gap-7 border-b border-slate-200 pb-3">
-                    {STEPS.map((s, i) => {
-                        const Icon = s.icon
-                        const active = i === step
-                        return (
-                            <button
-                                key={s.label}
-                                type="button"
-                                onClick={() => setStep(i)}
-                                className={`inline-flex items-center gap-2 text-[15px] font-semibold transition-colors ${active ? 'text-[#0EA5E9]' : 'text-slate-600 hover:text-slate-900'
-                                    }`}
-                            >
-                                <Icon className={`h-[18px] w-[18px] ${active ? 'text-[#0EA5E9]' : 'text-slate-500'}`} />
-                                <span className={active ? 'border-b-2 border-[#0EA5E9] pb-3 -mb-3' : ''}>
-                                    {s.label}
-                                </span>
-                            </button>
-                        )
-                    })}
-                </div>
 
                 {/* Card */}
                 <div className="rounded-2xl border border-slate-100 bg-white shadow-sm">
@@ -908,6 +1042,57 @@ export default function NewAppointmentPage() {
                                         </div>
                                     </div>
                                 )}
+
+                                {isEmergencyMissing && (
+                                    <div className="mt-6 pt-6 border-t border-slate-100 animate-in fade-in slide-in-from-top-2 duration-300">
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+                                                <AlertTriangle className="h-4 w-4" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-sm font-bold text-slate-900">Emergency Contact Missing</h3>
+                                                <p className="text-xs text-slate-500">Please provide emergency contact details {appointmentType === 'surgery' ? ' (required for surgery)' : '(optional)'}.</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div className="space-y-1.5">
+                                                <Label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Contact Name {appointmentType === 'surgery' && <span className="text-red-500">*</span>}</Label>
+                                                <Input
+                                                    placeholder="Full Name"
+                                                    value={emergencyName}
+                                                    onChange={(e) => setEmergencyName(e.target.value)}
+                                                    className="h-10 text-sm rounded-lg border-slate-200"
+                                                />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <Label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Phone Number {appointmentType === 'surgery' && <span className="text-red-500">*</span>}</Label>
+                                                <Input
+                                                    placeholder="Phone Number"
+                                                    value={emergencyPhone}
+                                                    onChange={(e) => setEmergencyPhone(e.target.value)}
+                                                    className="h-10 text-sm rounded-lg border-slate-200"
+                                                />
+                                            </div>
+                                            <div className="space-y-1.5 sm:col-span-2">
+                                                <Label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Relationship</Label>
+                                                <Select value={emergencyRelation} onValueChange={setEmergencyRelation}>
+                                                    <SelectTrigger className="h-10 text-sm rounded-lg border-slate-200">
+                                                        <SelectValue placeholder="Select relationship" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="Spouse">Spouse</SelectItem>
+                                                        <SelectItem value="Parent">Parent</SelectItem>
+                                                        <SelectItem value="Sibling">Sibling</SelectItem>
+                                                        <SelectItem value="Child">Child</SelectItem>
+                                                        <SelectItem value="Friend">Friend</SelectItem>
+                                                        <SelectItem value="Other">Other</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
 
@@ -948,7 +1133,7 @@ export default function NewAppointmentPage() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                     <div className="space-y-2">
                                         <Label className="text-sm font-semibold text-slate-800">
-                                            Doctor <span className="text-red-500">*</span>
+                                            {appointmentType === 'surgery' ? 'Surgeon' : 'Doctor'} <span className="text-red-500">*</span>
                                         </Label>
                                         {loadingDoctors ? (
                                             <div className="flex items-center gap-2 h-11 px-3 rounded-lg border border-slate-200 bg-slate-50">
@@ -958,7 +1143,7 @@ export default function NewAppointmentPage() {
                                         ) : (
                                             <Select value={doctorId} onValueChange={setDoctorId}>
                                                 <SelectTrigger className="h-11 text-[15px] rounded-lg border-slate-200">
-                                                    <SelectValue placeholder="Select a doctor" />
+                                                    <SelectValue placeholder={appointmentType === 'surgery' ? 'Select a surgeon' : 'Select a doctor'} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {doctors.map((d) => (
@@ -989,6 +1174,28 @@ export default function NewAppointmentPage() {
                                             </SelectContent>
                                         </Select>
                                     </div>
+
+                                    {appointmentType === 'surgery' && (
+                                        <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <Label className="text-sm font-semibold text-slate-800">
+                                                Eye Side <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Select value={eyeSide} onValueChange={setEyeSide}>
+                                                <SelectTrigger className="h-11 text-[15px] rounded-lg border-slate-200">
+                                                    <SelectValue placeholder="Select eye side" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="OD">Right Eye (OD)</SelectItem>
+                                                    <SelectItem value="OS">Left Eye (OS)</SelectItem>
+                                                    <SelectItem value="OU">Both Eyes (OU)</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <p className="text-[11px] text-slate-500 italic">
+                                                {eyeSide === 'OU' ? 'Surgery for both eyes ($300)' : 'Surgery for a single eye ($150)'}
+                                            </p>
+                                        </div>
+                                    )}
+
 
                                     <div className="space-y-2">
                                         <Label className="text-sm font-semibold text-slate-800">
@@ -1024,8 +1231,8 @@ export default function NewAppointmentPage() {
                                         <Label className="text-sm font-semibold text-slate-800">
                                             Status
                                         </Label>
-                                        <Select value={status} onValueChange={setStatus}>
-                                            <SelectTrigger className="h-11 text-[15px] rounded-lg border-slate-200">
+                                        <Select value={status} onValueChange={setStatus} disabled>
+                                            <SelectTrigger className="h-11 text-[15px] rounded-lg border-slate-200 bg-slate-50 cursor-not-allowed">
                                                 <SelectValue placeholder="Select status" />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -1066,9 +1273,7 @@ export default function NewAppointmentPage() {
                                         </div>
                                         <h2 className="text-xl font-bold text-slate-900">Additional Information</h2>
                                     </div>
-                                </div>
-
-                                <div className="space-y-2">
+                                                              <div className="space-y-2">
                                     <Label className="text-sm font-semibold text-slate-800">
                                         Reason for Visit <span className="text-red-500">*</span>
                                     </Label>
@@ -1080,53 +1285,130 @@ export default function NewAppointmentPage() {
                                         className="text-base rounded-lg border-slate-200 resize-none"
                                     />
                                 </div>
+                            </div>
+                        </div>
+                    )}
 
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-semibold text-slate-800">
-                                        Notes <span className="text-slate-400 font-normal">(optional)</span>
-                                    </Label>
-                                    <Textarea
-                                        placeholder="Add any additional notes or comments"
-                                        value={notes}
-                                        onChange={(e) => setNotes(e.target.value)}
-                                        rows={5}
-                                        className="text-base rounded-lg border-slate-200 resize-none"
-                                    />
+                        {/* Step 4 - Payment & Billing */}
+                        {step === 3 && (
+                            <div className="space-y-6">
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-50 text-violet-600">
+                                            <CreditCard className="h-4 w-4" />
+                                        </div>
+                                        <h2 className="text-xl font-bold text-slate-900">Payment & Billing</h2>
+                                    </div>
+                                    <p className="text-sm text-slate-500 mt-1 ml-11">
+                                        Set the billing details for this appointment. You can leave defaults and update later.
+                                    </p>
                                 </div>
 
-                                <div className="pt-2 border-t border-slate-200 space-y-4">
-                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                                        Clinical (optional)
-                                    </p>
-                                    <div className="space-y-2">
-                                        <Label className="text-sm font-semibold text-slate-800">Symptoms</Label>
-                                        <SymptomTags value={symptoms} onChange={setSymptoms} />
+                                {appointmentType === 'surgery' && (
+                                    <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-4 flex items-start gap-3">
+                                        <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 shrink-0" />
+                                        <div>
+                                            <p className="text-sm font-bold text-amber-800">Surgery Appointment</p>
+                                            <p className="text-xs text-amber-700 mt-0.5">Surgery appointments typically have higher costs. Please ensure the billing amount is set accurately.</p>
+                                        </div>
                                     </div>
+                                )}
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                     <div className="space-y-2">
-                                        <Label className="text-sm font-semibold text-slate-800">Diagnosis</Label>
+                                        <Label className="text-sm font-semibold text-slate-800">
+                                            <div className="flex items-center gap-1.5">
+                                                <DollarSign className="h-3.5 w-3.5 text-emerald-500" />
+                                                Billing Amount
+                                            </div>
+                                        </Label>
                                         <Input
-                                            placeholder="Diagnosis"
-                                            value={diagnosis}
-                                            onChange={(e) => setDiagnosis(e.target.value)}
-                                            className="h-12 text-base rounded-lg border-slate-200"
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            placeholder="0.00"
+                                            value={billingAmount}
+                                            readOnly
+                                            className="h-11 text-[15px] rounded-lg border-slate-200 bg-slate-50 cursor-not-allowed"
                                         />
                                     </div>
+
                                     <div className="space-y-2">
-                                        <Label className="text-sm font-semibold text-slate-800">Treatment</Label>
-                                        <Textarea
-                                            placeholder="Treatment plan"
-                                            value={treatment}
-                                            onChange={(e) => setTreatment(e.target.value)}
-                                            rows={4}
-                                            className="text-base rounded-lg border-slate-200 resize-none"
+                                        <Label className="text-sm font-semibold text-slate-800">
+                                            Discount
+                                        </Label>
+                                        <Input
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            placeholder="0.00"
+                                            value={billingDiscount}
+                                            onChange={(e) => setBillingDiscount(e.target.value)}
+                                            className="h-11 text-[15px] rounded-lg border-slate-200"
                                         />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-sm font-semibold text-slate-800">
+                                            Payment Method
+                                        </Label>
+                                        <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                                            <SelectTrigger className="h-11 text-[15px] rounded-lg border-slate-200">
+                                                <SelectValue placeholder="Select method" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="CASH">Cash</SelectItem>
+                                                <SelectItem value="CARD">Card</SelectItem>
+                                                <SelectItem value="MOBILE">Mobile Money</SelectItem>
+                                                <SelectItem value="INSURANCE">Insurance</SelectItem>
+                                                <SelectItem value="BANK_TRANSFER">Bank Transfer</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-sm font-semibold text-slate-800">
+                                            Billing Status
+                                        </Label>
+                                        <Select value={billingStatus} onValueChange={setBillingStatus}>
+                                            <SelectTrigger className="h-11 text-[15px] rounded-lg border-slate-200">
+                                                <SelectValue placeholder="Select status" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="UNPAID">Unpaid</SelectItem>
+                                                <SelectItem value="PAID">Paid</SelectItem>
+                                                <SelectItem value="PARTIAL">Partial</SelectItem>
+                                                <SelectItem value="DRAFT">Draft</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
+
+                                {/* Summary card */}
+                                <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-5">
+                                    <h3 className="text-sm font-bold text-slate-700 mb-3">Billing Summary</h3>
+                                    <div className="space-y-2 text-sm">
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Subtotal</span>
+                                            <span className="font-semibold text-slate-900">${(parseFloat(billingAmount) || 0).toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-slate-500">Discount</span>
+                                            <span className="font-semibold text-red-500">-${(parseFloat(billingDiscount) || 0).toFixed(2)}</span>
+                                        </div>
+                                        <div className="border-t border-slate-200 pt-2 flex justify-between">
+                                            <span className="font-bold text-slate-700">Total</span>
+                                            <span className="font-bold text-lg text-emerald-600">
+                                                ${Math.max(0, (parseFloat(billingAmount) || 0) - (parseFloat(billingDiscount) || 0)).toFixed(2)}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* Step 4 */}
-                        {step === 3 && (
+                        {/* Step 5 - Review */}
+                        {step === 4 && (
                             <div className="space-y-6">
                                 <div>
                                     <div className="flex items-center gap-2">
@@ -1157,6 +1439,25 @@ export default function NewAppointmentPage() {
                                                     <span className="w-28 text-slate-500">Patient ID:</span>
                                                     <span className="font-medium text-slate-900">{selectedPatient?.patientNumber || 'Not provided'}</span>
                                                 </div>
+                                                {isEmergencyMissing && (
+                                                    <div className="mt-4 pt-4 border-t border-slate-100">
+                                                        <p className="text-xs font-bold text-amber-600 uppercase mb-2">Emergency Contact (New)</p>
+                                                        <div className="space-y-2">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="w-28 text-slate-500">Name:</span>
+                                                                <span className="font-medium text-slate-900">{emergencyName}</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="w-28 text-slate-500">Phone:</span>
+                                                                <span className="font-medium text-slate-900">{emergencyPhone}</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="w-28 text-slate-500">Relationship:</span>
+                                                                <span className="font-medium text-slate-900">{emergencyRelation}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
 
@@ -1167,13 +1468,21 @@ export default function NewAppointmentPage() {
                                             </div>
                                             <div className="space-y-2 text-sm">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="w-28 text-slate-500">Doctor:</span>
+                                                    <span className="w-28 text-slate-500">{appointmentType === 'surgery' ? 'Surgeon:' : 'Doctor:'}</span>
                                                     <span className="font-medium text-slate-900">{getDoctorName(selectedDoctor) || 'Not provided'}</span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <span className="w-28 text-slate-500">Type:</span>
                                                     <span className="font-medium text-slate-900">{APPOINTMENT_TYPES.find((t) => t.value === appointmentType)?.label || 'Not provided'}</span>
                                                 </div>
+                                                {appointmentType === 'surgery' && (
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="w-28 text-slate-500">Eye Side:</span>
+                                                        <span className="font-medium text-[#0EA5E9]">
+                                                            {eyeSide === 'OD' ? 'Right Eye (OD)' : eyeSide === 'OS' ? 'Left Eye (OS)' : 'Both Eyes (OU)'}
+                                                        </span>
+                                                    </div>
+                                                )}
                                                 <div className="flex items-center gap-2">
                                                     <span className="w-28 text-slate-500">Date:</span>
                                                     <span className="font-medium text-slate-900">{appointmentDate || 'Not selected'}</span>
@@ -1186,6 +1495,20 @@ export default function NewAppointmentPage() {
                                                     <span className="w-28 text-slate-500">Status:</span>
                                                     <span className="font-medium text-slate-900">{STATUS_OPTIONS.find((s) => s.value === status)?.label || 'Scheduled'}</span>
                                                 </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="w-28 text-slate-500">Method:</span>
+                                                    <span className="font-medium text-slate-900">{paymentMethod || 'Not selected'}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 pt-2 border-t border-slate-50 mt-2">
+                                                    <span className="w-28 text-slate-500">Total Amount:</span>
+                                                    <span className="font-bold text-emerald-600">${billingAmount}</span>
+                                                </div>
+                                                {billingDiscount && parseFloat(billingDiscount) > 0 && (
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="w-28 text-slate-500">Discount:</span>
+                                                        <span className="font-medium text-red-500">-${billingDiscount}</span>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -1200,41 +1523,6 @@ export default function NewAppointmentPage() {
                                                 <p className="text-slate-500">Reason for Visit:</p>
                                                 <p className="font-medium text-slate-900 whitespace-pre-wrap">{reason || 'Not provided'}</p>
                                             </div>
-                                            {notes && (
-                                                <div>
-                                                    <p className="text-slate-500">Notes:</p>
-                                                    <p className="font-medium text-slate-900 whitespace-pre-wrap">{notes}</p>
-                                                </div>
-                                            )}
-                                            {(symptoms.length > 0 || diagnosis || treatment) && (
-                                                <div className="pt-3 border-t border-slate-100">
-                                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Clinical (optional)</p>
-                                                    {symptoms.length > 0 && (
-                                                        <div className="mb-2">
-                                                            <p className="text-slate-500">Symptoms:</p>
-                                                            <div className="flex flex-wrap gap-2 mt-1">
-                                                                {symptoms.map((s) => (
-                                                                    <span key={s} className="inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 text-xs font-bold">
-                                                                        {s}
-                                                                    </span>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                    {diagnosis && (
-                                                        <div className="mb-2">
-                                                            <p className="text-slate-500">Diagnosis:</p>
-                                                            <p className="font-medium text-slate-900 whitespace-pre-wrap">{diagnosis}</p>
-                                                        </div>
-                                                    )}
-                                                    {treatment && (
-                                                        <div>
-                                                            <p className="text-slate-500">Treatment:</p>
-                                                            <p className="font-medium text-slate-900 whitespace-pre-wrap">{treatment}</p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -1265,7 +1553,7 @@ export default function NewAppointmentPage() {
                             >
                                 Cancel
                             </Button>
-                            {step < 3 ? (
+                            {step < STEPS.length - 1 ? (
                                 <Button
                                     type="button"
                                     onClick={handleNext}

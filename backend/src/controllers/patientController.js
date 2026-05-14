@@ -28,7 +28,7 @@ export const createPatient = async (req, res, next) => {
             bloodGroup, weight, allergies, chiefComplaint,
             currentMedications, medicalHistory, familyMedicalHistory,
             emergencyContactName, emergencyContactRelationship, emergencyContactPhone,
-            assignedDoctorId, isActive,
+            assignedDoctorId,
             branchId,
         } = req.body;
 
@@ -41,16 +41,6 @@ export const createPatient = async (req, res, next) => {
         const resolvedFullName = (fullName || [firstName, lastName].filter(Boolean).join(' ')).trim();
         if (!resolvedFullName) {
             return res.status(400).json({ message: 'Patient name is required' });
-        }
-
-        // Check if phone number already exists
-        if (phone) {
-            const existingPatient = await prisma.patient.findUnique({
-                where: { phone }
-            });
-            if (existingPatient) {
-                return res.status(400).json({ message: 'A patient with this phone number already exists' });
-            }
         }
 
         // Date of birth validation
@@ -91,7 +81,6 @@ export const createPatient = async (req, res, next) => {
                         emergencyContactRelationship: emergencyContactRelationship || null,
                         emergencyContactPhone: emergencyContactPhone || null,
                         assignedDoctorId: assignedDoctorId || null,
-                        isActive: isActive !== undefined ? Boolean(isActive) : true,
                         branchId: activeBranchId,
                     },
                     include: {
@@ -295,7 +284,7 @@ export const updatePatient = async (req, res, next) => {
             bloodGroup, weight, allergies, chiefComplaint,
             currentMedications, medicalHistory, familyMedicalHistory,
             emergencyContactName, emergencyContactRelationship, emergencyContactPhone,
-            assignedDoctorId, isActive,
+            assignedDoctorId,
         } = req.body;
 
         // Date of birth validation
@@ -326,7 +315,6 @@ export const updatePatient = async (req, res, next) => {
         if (emergencyContactRelationship !== undefined) data.emergencyContactRelationship = emergencyContactRelationship || null;
         if (emergencyContactPhone !== undefined) data.emergencyContactPhone = emergencyContactPhone || null;
         if (assignedDoctorId !== undefined) data.assignedDoctorId = assignedDoctorId || null;
-        if (isActive !== undefined) data.isActive = Boolean(isActive);
 
         const patient = await prisma.patient.update({
             where: { id: req.params.id },

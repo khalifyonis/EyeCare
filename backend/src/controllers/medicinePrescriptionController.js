@@ -57,7 +57,8 @@ const prescriptionInclude = {
             doctor: { include: { user: { select: { id: true, fullName: true } } } },
             branch: { select: { id: true, branchName: true } },
         }
-    }
+    },
+    billings: true,
 };
 
 const resolveExamContext = async (req, examId) => {
@@ -95,13 +96,14 @@ const resolveExamContext = async (req, examId) => {
         select: {
             id: true,
             branchId: true,
+            appointmentId: true,
         },
     });
 
     if (eyeExam) {
         return {
             branchId: eyeExam.branchId,
-            appointmentId: null,
+            appointmentId: eyeExam.appointmentId,
             clinicalExamId: null,
             eyeExamId: eyeExam.id,
         };
@@ -112,7 +114,7 @@ const resolveExamContext = async (req, examId) => {
 
 export const listPrescriptions = async (req, res, next) => {
     try {
-        const { search, itemType = 'all', date, patientId } = req.query;
+        const { search, itemType = 'all', date, from, to, patientId, status = 'all', todayOnly } = req.query;
 
         assertMedicineItemType(itemType === 'all' ? MEDICINE_ITEM_TYPE : itemType);
 
@@ -176,15 +178,39 @@ export const listPrescriptions = async (req, res, next) => {
         const whereClause = {
             ...getBranchFilter(req),
             itemType: MEDICINE_ITEM_TYPE,
-            ...(date
+            ...(status !== 'all' ? { status } : {}),
+            ...((from || to)
                 ? {
                     createdAt: {
-                        gte: new Date(new Date(date).setHours(0, 0, 0, 0)),
-                        lte: new Date(new Date(date).setHours(23, 59, 59, 999)),
+                        ...(from ? { gte: new Date(new Date(from).setHours(0, 0, 0, 0)) } : {}),
+                        ...(to ? { lte: new Date(new Date(to).setHours(23, 59, 59, 999)) } : {}),
                     },
                 }
-                : {}),
+                : date
+                    ? {
+                        createdAt: {
+                            gte: new Date(new Date(date).setHours(0, 0, 0, 0)),
+                            lte: new Date(new Date(date).setHours(23, 59, 59, 999)),
+                        },
+                    }
+                    : todayOnly === '1'
+                        ? {
+                            createdAt: {
+                                gte: new Date(new Date().setHours(0, 0, 0, 0)),
+                                lte: new Date(new Date().setHours(23, 59, 59, 999)),
+                            },
+                        }
+                        : {}),
         };
+
+        // If todayOnly is active, also include anything created since start of today in local time
+        if (todayOnly === '1' && !date && !from && !to) {
+            const startOfToday = new Date();
+            startOfToday.setHours(0, 0, 0, 0);
+            whereClause.createdAt = {
+                gte: startOfToday
+            };
+        }
 
         if (andFilters.length > 0) {
             whereClause.AND = andFilters;
@@ -213,6 +239,18 @@ export const getPrescriptionById = async (req, res, next) => {
         });
 
         if (!row) return res.status(404).json({ message: 'Prescription not found' });
+
+        // Manually fetch linked pharmacy item if it exists
+        if (row.itemId && row.itemType === MEDICINE_ITEM_TYPE) {
+            const item = await prisma.pharmacyItem.findUnique({
+                where: { id: row.itemId }
+            });
+            if (item) {
+                // Attach as 'item' for frontend compatibility
+                row.item = item;
+            }
+        }
+
         res.status(200).json(row);
     } catch (error) {
         next(error);
@@ -225,6 +263,7 @@ export const createPrescription = async (req, res, next) => {
             examId,
             itemType,
             itemId,
+            itemName,
             quantity,
             instructions,
         } = req.body;
@@ -244,6 +283,7 @@ export const createPrescription = async (req, res, next) => {
                 branchId: resolvedExam.branchId,
                 itemType: MEDICINE_ITEM_TYPE,
                 itemId: normalizeOptionalString(itemId),
+                itemName: normalizeOptionalString(itemName),
                 quantity: Number(quantity),
                 instructions: normalizeOptionalString(instructions),
             },
@@ -270,6 +310,7 @@ export const updatePrescription = async (req, res, next) => {
             examId,
             itemType,
             itemId,
+            itemName,
             quantity,
             instructions,
         } = req.body;
@@ -279,6 +320,7 @@ export const updatePrescription = async (req, res, next) => {
         const data = {
             ...(itemType !== undefined ? { itemType: MEDICINE_ITEM_TYPE } : {}),
             ...(itemId !== undefined ? { itemId: normalizeOptionalString(itemId) } : {}),
+            ...(itemName !== undefined ? { itemName: normalizeOptionalString(itemName) } : {}),
             ...(quantity !== undefined ? { quantity: Number(quantity) } : {}),
             ...(instructions !== undefined ? { instructions: normalizeOptionalString(instructions) } : {}),
         };
@@ -319,6 +361,95 @@ export const deletePrescription = async (req, res, next) => {
 
         await prisma.prescription.delete({ where: { id: req.params.id } });
         res.status(200).json({ message: 'Prescription deleted successfully' });
+    } catch (error) {
+        next(error);
+    }
+};
+export const dispenseMedicine = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { 
+            quantity: overrideQuantity, 
+            paymentMethod = 'CASH', 
+            status = 'PAID',
+            notes = ''
+        } = req.body || {};
+
+        const prescription = await prisma.prescription.findUnique({
+            where: { id },
+            include: {
+                branch: true,
+                appointment: { include: { patient: true } },
+                eyeExam: { include: { patient: true } },
+            }
+        });
+
+        if (!prescription) return res.status(404).json({ message: 'Prescription not found' });
+        if (!prescription.itemId) return res.status(400).json({ message: 'No item linked to this prescription' });
+
+        const item = await prisma.pharmacyItem.findUnique({
+            where: { id: prescription.itemId }
+        });
+
+        if (!item) return res.status(404).json({ message: 'Pharmacy item not found in inventory' });
+
+        const qty = overrideQuantity !== undefined ? Number(overrideQuantity) : prescription.quantity;
+        if (item.stockQuantity < qty) {
+            return res.status(400).json({ message: `Insufficient stock. Available: ${item.stockQuantity}` });
+        }
+
+        const patientId = prescription.appointment?.patientId || prescription.eyeExam?.patientId;
+        const totalAmount = Number(item.sellingPrice) * qty;
+
+        // Transaction: Create Billing + Deduct Stock
+        const result = await prisma.$transaction([
+            // 1. Create Billing
+            prisma.billing.create({
+                data: {
+                    patientId,
+                    appointmentId: prescription.appointmentId,
+                    prescriptionId: prescription.id,
+                    branchId: prescription.branchId,
+                    serviceType: 'PHARMACY',
+                    totalAmount,
+                    finalAmount: totalAmount,
+                    status: status,
+                    paymentMethod: paymentMethod,
+                    notes: notes || null,
+                    createdById: req.user.id,
+                    lineItems: {
+                        create: {
+                            itemType: 'PHARMACY',
+                            itemId: item.id,
+                            description: `Medication: ${item.itemName} (${item.strength || ''})`,
+                            quantity: qty,
+                            unitPrice: item.sellingPrice,
+                            lineTotal: totalAmount,
+                        }
+                    }
+                }
+            }),
+            // 2. Deduct Stock
+            prisma.pharmacyItem.update({
+                where: { id: item.id },
+                data: {
+                    stockQuantity: { decrement: qty }
+                }
+            }),
+            // 3. Log transaction
+            prisma.pharmacyStockTransaction.create({
+                data: {
+                    pharmacyItemId: item.id,
+                    branchId: prescription.branchId,
+                    transactionType: 'SALE',
+                    quantity: qty,
+                    unitPrice: item.sellingPrice,
+                    performedById: req.user.id,
+                }
+            })
+        ]);
+
+        res.status(200).json({ message: 'Medicine dispensed and billed successfully', billing: result[0] });
     } catch (error) {
         next(error);
     }
