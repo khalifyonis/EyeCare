@@ -59,6 +59,7 @@ interface Appointment {
         id: string;
         fullName?: string | null;
         phone?: string | null;
+        patientNumber?: string | null;
     } | null;
     doctor?: {
         id?: string | null;

@@ -17,8 +17,8 @@ import { StatsCard } from '@/components/dashboard/stats-card';
 import { PageBreadcrumb } from '@/components/dashboard/page-breadcrumb';
 import { ServerPagination } from '@/components/dashboard/server-pagination';
 
-import { PharmacyTabs } from '../../_components/pharmacy-tabs';
-import { PharmacyKpiCard } from '../../_components/pharmacy-kpi-card';
+import { PharmacyTabs } from '../../pharmacy/_components/pharmacy-tabs';
+import { PharmacyKpiCard } from '../../pharmacy/_components/pharmacy-kpi-card';
 
 type PharmacyStats = { 
     total: number; 

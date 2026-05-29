@@ -272,7 +272,7 @@ export default function ViewEyeExamPage() {
               </div>
             </div>
 
-            {exam.opticalPrescriptions && (exam.opticalPrescriptions as any[]).length > 0 && (
+            {!!exam.opticalPrescriptions && (exam.opticalPrescriptions as any[]).length > 0 && (
               <div className="rounded-2xl border border-blue-100 bg-blue-50/20 p-6 shadow-sm">
                 <SectionTitle icon={FileText} title="Optical Prescription" />
                 <div className="space-y-4">

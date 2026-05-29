@@ -21,6 +21,7 @@ import opticalItemRoutes from './src/routes/opticalItemRoutes.js';
 import followUpRoutes from './src/routes/followUpRoutes.js';
 import supplierRoutes from './src/routes/supplierRoutes.js';
 import activityLogRoutes from './src/routes/activityLogRoutes.js';
+import reportRoutes from './src/routes/reportRoutes.js';
 import errorMiddleware from './src/middlewares/errorMiddleware.js';
 
 // Keep process alive on uncaught errors (log and continue)
@@ -60,6 +61,7 @@ app.use('/api/inventory/optical', opticalItemRoutes);
 app.use('/api/follow-ups', followUpRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/activity-logs', activityLogRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Health check
 app.get('/', (req, res) => {
