@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSocket } from '@/contexts/socket-context';
@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { readStoredUser, resolveRoleName } from '@/lib/auth';
 import {
   Table,
   TableBody,
@@ -103,6 +104,15 @@ export default function ClinicalExamPage() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const { socket } = useSocket();
+
+  const canWrite = useMemo(() => {
+    const user = readStoredUser();
+    const role = resolveRoleName(user);
+    // Optometrists should not have write access to clinical exams
+    const isOptometrist = role === 'DOCTOR' && user?.doctor?.specialization?.toUpperCase() === 'OPTOMETRY';
+    if (isOptometrist) return false;
+    return ['ADMIN', 'SUPERADMIN', 'DOCTOR'].includes(role);
+  }, []);
 
   useEffect(() => {
     api.get('/doctors').then(res => setDoctors(res.data)).catch(() => {});
@@ -197,12 +207,14 @@ export default function ClinicalExamPage() {
               </div>
             </div>
           </div>
-          <Link href="/dashboard/eye-examinations/new?stage=CLINICAL">
-            <Button className="bg-blue-600 px-6 font-bold text-white hover:bg-blue-700 shadow-sm transition-all hover:shadow-md">
-              <Plus className="mr-2 h-4 w-4" />
-              New Eye Exam
-            </Button>
-          </Link>
+          {canWrite && (
+            <Link href="/dashboard/eye-examinations/new?stage=CLINICAL">
+              <Button className="bg-blue-600 px-6 font-bold text-white hover:bg-blue-700 shadow-sm transition-all hover:shadow-md">
+                <Plus className="mr-2 h-4 w-4" />
+                New Eye Exam
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -310,21 +322,27 @@ export default function ClinicalExamPage() {
                               <DropdownMenuItem asChild>
                                 <Link href={`/dashboard/eye-examinations/${examId}`} className="text-xs font-medium">View Details</Link>
                               </DropdownMenuItem>
-                              <DropdownMenuItem asChild>
-                                <Link href={`/dashboard/eye-examinations/${examId}/edit?stage=CLINICAL`} className="flex items-center gap-2 text-xs font-medium">
-                                  <Pencil className="h-3.5 w-3.5" />
-                                  Edit Examination
-                                </Link>
-                              </DropdownMenuItem>
-                              <div className="h-px bg-gray-100 my-1" />
-                              <DropdownMenuItem
-                                className="text-red-600 focus:text-red-700 text-xs font-medium"
-                                onClick={() => void handleDelete(examId)}
-                                disabled={deletingId === examId}
-                              >
-                                <Trash2 className="mr-2 h-3.5 w-3.5" />
-                                {deletingId === examId ? 'Deleting...' : 'Delete'}
-                              </DropdownMenuItem>
+                              {canWrite && (
+                                <DropdownMenuItem asChild>
+                                  <Link href={`/dashboard/eye-examinations/${examId}/edit?stage=CLINICAL`} className="flex items-center gap-2 text-xs font-medium">
+                                    <Pencil className="h-3.5 w-3.5" />
+                                    Edit Examination
+                                  </Link>
+                                </DropdownMenuItem>
+                              )}
+                              {canWrite && (
+                                <>
+                                  <div className="h-px bg-gray-100 my-1" />
+                                  <DropdownMenuItem
+                                    className="text-red-600 focus:text-red-700 text-xs font-medium"
+                                    onClick={() => void handleDelete(examId)}
+                                    disabled={deletingId === examId}
+                                  >
+                                    <Trash2 className="mr-2 h-3.5 w-3.5" />
+                                    {deletingId === examId ? 'Deleting...' : 'Delete'}
+                                  </DropdownMenuItem>
+                                </>
+                              )}
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>

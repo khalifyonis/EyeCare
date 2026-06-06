@@ -70,9 +70,34 @@ export default function LoginPage() {
         }
     };
 
-    const completeLogin = (token: string, user: StoredUser, branch: BranchSummary | null) => {
+    const completeLogin = async (token: string, user: StoredUser, branch: BranchSummary | null) => {
         try {
+            // Temporarily store token so next API request is authenticated
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('token', token);
+                if (branch?.id) {
+                    localStorage.setItem('activeBranchId', branch.id);
+                }
+            }
+
+            // Fetch dynamic permissions for the user's role
+            let permissions = [];
+            try {
+                const permsResponse = await api.get('/permissions/mine', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                permissions = permsResponse.data;
+            } catch (err) {
+                console.error('Failed to load user permissions:', err);
+            }
+
             const storedUser = persistSession(token, user, branch);
+
+            // Store permissions list in localStorage
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('permissions', JSON.stringify(permissions));
+            }
+
             const targetPath = getDefaultDashboardPath(resolveRoleName(storedUser));
 
             setShowBranchSelector(false);

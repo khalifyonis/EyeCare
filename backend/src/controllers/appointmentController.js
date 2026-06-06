@@ -29,6 +29,21 @@ const generateBookingNumber = async () => {
     return `BK-${maxNumber + 1}`;
 };
 
+const getDayBounds = (date) => {
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+    return { start, end };
+};
+
+const isSameDay = (left, right) => {
+    if (!left || !right) return false;
+    return left.getFullYear() === right.getFullYear()
+        && left.getMonth() === right.getMonth()
+        && left.getDate() === right.getDate();
+};
+
 export const createAppointment = async (req, res, next) => {
     try {
         const {
@@ -70,6 +85,34 @@ export const createAppointment = async (req, res, next) => {
         today.setHours(0, 0, 0, 0);
         if (parsedDate < today) {
             return res.status(400).json({ message: 'Appointment date cannot be in the past' });
+        }
+
+        const { start: dayStart, end: dayEnd } = getDayBounds(parsedDate);
+
+        const existingSameDay = await prisma.appointment.findFirst({
+            where: {
+                patientId,
+                branchId: activeBranchId,
+                appointmentDate: { gte: dayStart, lte: dayEnd },
+                NOT: { status: 'CANCELLED' }
+            }
+        });
+
+        if (existingSameDay) {
+            return res.status(409).json({ message: 'Patient already has an appointment on this date.' });
+        }
+
+        const existingTimeSlot = await prisma.appointment.findFirst({
+            where: {
+                doctorId,
+                branchId: activeBranchId,
+                appointmentDate: parsedDate,
+                NOT: { status: 'CANCELLED' }
+            }
+        });
+
+        if (existingTimeSlot) {
+            return res.status(409).json({ message: 'This time slot is already booked for the selected doctor.' });
         }
 
         let appointment;
@@ -358,6 +401,40 @@ export const updateAppointment = async (req, res, next) => {
                 }
             }
         }
+
+        if (appointmentDate !== undefined || doctorId !== undefined) {
+            const nextDate = appointmentDate !== undefined ? new Date(appointmentDate) : existing.appointmentDate;
+            const nextDoctorId = doctorId ?? existing.doctorId;
+            const { start: dayStart, end: dayEnd } = getDayBounds(nextDate);
+
+            const existingSameDay = await prisma.appointment.findFirst({
+                where: {
+                    id: { not: existing.id },
+                    patientId: existing.patientId,
+                    branchId: existing.branchId,
+                    appointmentDate: { gte: dayStart, lte: dayEnd },
+                    NOT: { status: 'CANCELLED' }
+                }
+            });
+
+            if (existingSameDay) {
+                return res.status(409).json({ message: 'Patient already has an appointment on this date.' });
+            }
+
+            const existingTimeSlot = await prisma.appointment.findFirst({
+                where: {
+                    id: { not: existing.id },
+                    doctorId: nextDoctorId,
+                    branchId: existing.branchId,
+                    appointmentDate: nextDate,
+                    NOT: { status: 'CANCELLED' }
+                }
+            });
+
+            if (existingTimeSlot) {
+                return res.status(409).json({ message: 'This time slot is already booked for the selected doctor.' });
+            }
+        }
         if (status !== undefined) data.status = status;
         if (amount !== undefined) data.amount = amount;
         if (type !== undefined) data.type = type;
@@ -460,8 +537,18 @@ export const markAsArrived = async (req, res, next) => {
         const existing = await prisma.appointment.findUnique({ where: { id: req.params.id } });
         if (!existing) return res.status(404).json({ message: 'Appointment not found' });
 
-        const isSurgery = String(existing.type || '').toLowerCase() === 'surgery';
-        const newStatus = isSurgery ? 'IN_SURGERY' : 'EXAMINING';
+        if (existing.status === 'CANCELLED' || existing.status === 'COMPLETED') {
+            return res.status(400).json({ message: 'Cannot mark a completed or cancelled appointment as arrived.' });
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const aptDate = new Date(existing.appointmentDate);
+        if (!isSameDay(aptDate, today)) {
+            return res.status(400).json({ message: 'Only today appointments can be marked as arrived.' });
+        }
+
+        const newStatus = 'RECEIVED';
 
         const appointment = await prisma.appointment.update({
             where: { id: req.params.id },

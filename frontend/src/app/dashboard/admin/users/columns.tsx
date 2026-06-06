@@ -18,6 +18,7 @@ export type User = {
     username: string;
     email: string;
     roleName: string;
+    createdAt?: string;
     branchName?: string;
     branches?: Array<{
         id: string;

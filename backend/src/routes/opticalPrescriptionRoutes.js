@@ -20,9 +20,9 @@ const router = express.Router();
 router.get('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), listOpticalPrescriptions);
 router.get('/stats', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), getOpticalPrescriptionStats);
 router.get('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), getOpticalPrescriptionById);
-router.post('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR', 'OPTICIAN'), validate(createOpticalPrescriptionSchema), createOpticalPrescription);
+router.post('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), validate(createOpticalPrescriptionSchema), createOpticalPrescription);
 router.post('/:id/dispense', authenticate, authorize('ADMIN', 'SUPERADMIN', 'OPTICIAN'), dispenseOpticalPrescription);
-router.put('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR', 'OPTICIAN'), validate(updateOpticalPrescriptionSchema), updateOpticalPrescription);
-router.delete('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR', 'OPTICIAN'), deleteOpticalPrescription);
+router.put('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), validate(updateOpticalPrescriptionSchema), updateOpticalPrescription);
+router.delete('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), deleteOpticalPrescription);
 
 export default router;

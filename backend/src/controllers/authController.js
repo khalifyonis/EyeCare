@@ -28,6 +28,9 @@ export const login = async (req, res, next) => {
       include: {
         staffAssignments: {
           include: { branch: true }
+        },
+        doctor: {
+          select: { specialization: true }
         }
       },
     });
@@ -64,7 +67,12 @@ export const login = async (req, res, next) => {
 
     // Use role.name and branchId in token (branchId needed for list filtering)
     const token = jwt.sign(
-      { id: user.id, role: user.role, branchId: user.branchId ?? null },
+      { 
+        id: user.id, 
+        role: user.role, 
+        branchId: user.branchId ?? null,
+        specialization: user.doctor?.specialization ?? null 
+      },
       process.env.JWT_SECRET,
       { expiresIn: '8h' }
     );
@@ -86,7 +94,7 @@ export const login = async (req, res, next) => {
     res.status(200).json({
       message: 'Login successful',
       token,
-      user: { ...userDetails, role: user.role, branches },
+      user: { ...userDetails, role: user.role, branches, doctor: user.doctor },
     });
   } catch (error) {
     next(error);
@@ -218,6 +226,9 @@ export const getMe = async (req, res, next) => {
         branch: true,
         staffAssignments: {
           include: { branch: true }
+        },
+        doctor: {
+          select: { specialization: true }
         }
       },
     });
@@ -228,7 +239,7 @@ export const getMe = async (req, res, next) => {
 
     const { password: _, staffAssignments, ...sanitizedUser } = user;
     const branches = staffAssignments.map(sa => sa.branch);
-    res.status(200).json({ ...sanitizedUser, branches });
+    res.status(200).json({ ...sanitizedUser, branches, doctor: user.doctor });
   } catch (error) {
     next(error);
   }

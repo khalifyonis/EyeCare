@@ -11,13 +11,11 @@ import { authenticate, authorize } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
-const allRoles = ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'];
-
-router.get('/financial', authenticate, authorize(...allRoles), getFinancialReport);
-router.get('/clinical', authenticate, authorize(...allRoles), getClinicalReport);
-router.get('/appointments', authenticate, authorize(...allRoles), getAppointmentReport);
-router.get('/patients', authenticate, authorize(...allRoles), getPatientReport);
-router.get('/inventory', authenticate, authorize(...allRoles), getInventoryReport);
-router.get('/operational', authenticate, authorize(...allRoles), getOperationalReport);
+router.get('/financial', authenticate, authorize('ADMIN', 'SUPERADMIN'), getFinancialReport);
+router.get('/clinical', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), getClinicalReport);
+router.get('/appointments', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR', 'RECEPTIONIST'), getAppointmentReport);
+router.get('/patients', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR', 'RECEPTIONIST'), getPatientReport);
+router.get('/inventory', authenticate, authorize('ADMIN', 'SUPERADMIN', 'PHARMACIST', 'OPTICIAN'), getInventoryReport);
+router.get('/operational', authenticate, authorize('ADMIN', 'SUPERADMIN'), getOperationalReport);
 
 export default router;

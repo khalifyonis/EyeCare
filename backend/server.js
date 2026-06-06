@@ -22,6 +22,8 @@ import followUpRoutes from './src/routes/followUpRoutes.js';
 import supplierRoutes from './src/routes/supplierRoutes.js';
 import activityLogRoutes from './src/routes/activityLogRoutes.js';
 import reportRoutes from './src/routes/reportRoutes.js';
+import permissionRoutes from './src/routes/permissionRoutes.js';
+import roleRoutes from './src/routes/roleRoutes.js';
 import errorMiddleware from './src/middlewares/errorMiddleware.js';
 
 // Keep process alive on uncaught errors (log and continue)
@@ -62,6 +64,8 @@ app.use('/api/follow-ups', followUpRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/activity-logs', activityLogRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/permissions', permissionRoutes);
+app.use('/api/roles', roleRoutes);
 
 // Health check
 app.get('/', (req, res) => {

@@ -199,11 +199,6 @@ export default function NewOpticalOrderPage() {
           })
         }
 
-        // Auto-select order type
-        if (rx.type) {
-          setOrderType(rx.type as PrescriptionType)
-        }
-
         // Auto-select frame if linked
         if (rx.frameItemId) {
           const frameRes = await api.get(`/inventory/optical/${rx.frameItemId}`).catch(() => null)

@@ -275,6 +275,18 @@ export const createPrescription = async (req, res, next) => {
         if (!resolvedExam) return res.status(404).json({ message: 'Examination not found' });
         assertBranchAccess(req, resolvedExam.branchId);
 
+        // Auto-resolve itemName from pharmacy item if not provided
+        let resolvedItemName = normalizeOptionalString(itemName);
+        if (!resolvedItemName && itemId) {
+            const pharmacyItem = await prisma.pharmacyItem.findUnique({
+                where: { id: itemId },
+                select: { genericName: true, itemName: true },
+            });
+            if (pharmacyItem) {
+                resolvedItemName = pharmacyItem.genericName || pharmacyItem.itemName;
+            }
+        }
+
         const row = await prisma.prescription.create({
             data: {
                 appointmentId: resolvedExam.appointmentId,
@@ -283,7 +295,7 @@ export const createPrescription = async (req, res, next) => {
                 branchId: resolvedExam.branchId,
                 itemType: MEDICINE_ITEM_TYPE,
                 itemId: normalizeOptionalString(itemId),
-                itemName: normalizeOptionalString(itemName),
+                itemName: resolvedItemName,
                 quantity: Number(quantity),
                 instructions: normalizeOptionalString(instructions),
             },
@@ -317,10 +329,24 @@ export const updatePrescription = async (req, res, next) => {
 
         assertMedicineItemType(itemType);
 
+        let resolvedItemName = normalizeOptionalString(itemName);
+        if (itemId !== undefined && !resolvedItemName) {
+            const resolvedId = normalizeOptionalString(itemId);
+            if (resolvedId) {
+                const pharmacyItem = await prisma.pharmacyItem.findUnique({
+                    where: { id: resolvedId },
+                    select: { genericName: true, itemName: true },
+                });
+                if (pharmacyItem) {
+                    resolvedItemName = pharmacyItem.genericName || pharmacyItem.itemName;
+                }
+            }
+        }
+
         const data = {
             ...(itemType !== undefined ? { itemType: MEDICINE_ITEM_TYPE } : {}),
             ...(itemId !== undefined ? { itemId: normalizeOptionalString(itemId) } : {}),
-            ...(itemName !== undefined ? { itemName: normalizeOptionalString(itemName) } : {}),
+            ...(itemName !== undefined || resolvedItemName !== undefined ? { itemName: resolvedItemName } : {}),
             ...(quantity !== undefined ? { quantity: Number(quantity) } : {}),
             ...(instructions !== undefined ? { instructions: normalizeOptionalString(instructions) } : {}),
         };

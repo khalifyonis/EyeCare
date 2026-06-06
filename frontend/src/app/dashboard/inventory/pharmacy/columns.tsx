@@ -18,6 +18,7 @@ export interface PharmacyRow {
     purchasePrice?: number | string | null;
     sellingPrice?: number | string | null;
     expiryDate?: string | null;
+    genericName?: string | null;
     branch?: { id: string; branchName?: string | null } | null;
 }
 

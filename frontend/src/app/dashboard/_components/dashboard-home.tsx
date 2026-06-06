@@ -261,16 +261,18 @@ export function DashboardHome() {
     }, [stats.upcomingSurgeries])
 
     const todayAppointments = useMemo(() => {
-        return (stats.todayAppointments || []).map((a: any) => ({
-            id: a.id,
-            time: new Date(a.appointmentDate).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
-            patient: a.patient?.fullName ?? '—',
-            patientId: a.patient?.id || a.patientId,
-            type: a.type || 'Eye Checkup',
-            status: a.status,
-            eyeExaminationId: a.eyeExamination?.id || null,
-            eyeExaminationStage: a.eyeExamination?.stage || null,
-        }))
+        return (stats.todayAppointments || [])
+            .filter((a: any) => ['RECEIVED', 'EXAMINING', 'IN_SURGERY'].includes(a.status))
+            .map((a: any) => ({
+                id: a.id,
+                time: new Date(a.appointmentDate).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
+                patient: a.patient?.fullName ?? '—',
+                patientId: a.patient?.id || a.patientId,
+                type: a.type || 'Eye Checkup',
+                status: a.status,
+                eyeExaminationId: a.eyeExamination?.id || null,
+                eyeExaminationStage: a.eyeExamination?.stage || null,
+            }))
     }, [stats.todayAppointments])
 
     const topDoctors = useMemo(() => stats.topDoctors || [], [stats.topDoctors])

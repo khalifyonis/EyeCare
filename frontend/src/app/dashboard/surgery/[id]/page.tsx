@@ -16,6 +16,8 @@ import {
   FileText,
   Scissors,
   User as UserIcon,
+  Pill,
+  Plus,
 } from 'lucide-react';
 
 type SurgeryDetail = {
@@ -45,6 +47,10 @@ type SurgeryDetail = {
     emergencyContactName?: string | null;
     emergencyContactPhone?: string | null;
     emergencyContactRelationship?: string | null;
+  } | null;
+  clinicalExam?: {
+    id: string;
+    appointmentId?: string | null;
   } | null;
 };
 
@@ -86,6 +92,24 @@ function toPatientDisplayId(patient?: { id: string; patientNumber?: string | nul
   return `PAT-${code}`;
 }
 
+function extractRxField(pattern: RegExp, text: string): string {
+  const match = text.match(pattern);
+  const val = (match?.[1] || '').trim();
+  return val && val.toLowerCase() !== 'n/a' ? val : '—';
+}
+
+function parseRxInstruction(raw?: string | null): { dosage: string; frequency: string; duration: string; eye: string } {
+  const text = (raw || '').trim();
+  if (!text) return { dosage: '—', frequency: '—', duration: '—', eye: '—' };
+
+  return {
+    dosage: extractRxField(/(?:^|\||;)\s*Dosage\s*[:=-]\s*([^|;]+)/i, text),
+    frequency: extractRxField(/(?:^|\||;)\s*Frequency\s*[:=-]\s*([^|;]+)/i, text),
+    duration: extractRxField(/(?:^|\||;)\s*Duration\s*[:=-]\s*([^|;]+)/i, text),
+    eye: extractRxField(/(?:^|\||;)\s*Eye\s*[:=-]\s*([^|;]+)/i, text),
+  };
+}
+
 export default function SurgeryDetailPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
@@ -93,6 +117,9 @@ export default function SurgeryDetailPage() {
 
   const [loading, setLoading] = useState(true);
   const [row, setRow] = useState<SurgeryDetail | null>(null);
+
+  const [prescriptions, setPrescriptions] = useState<any[]>([]);
+  const [prescriptionsLoading, setPrescriptionsLoading] = useState(false);
 
   const displaySurgeryType = useMemo(() => {
     const v = (row?.surgeryType || '').trim();
@@ -102,12 +129,30 @@ export default function SurgeryDetailPage() {
     return v;
   }, [row?.surgeryType]);
 
+  const fetchPrescriptions = useCallback(async (clinicalExamId: string, patientId: string) => {
+    setPrescriptionsLoading(true);
+    try {
+      const res = await api.get(`/prescription-items`, { params: { patientId } });
+      const allRxs = Array.isArray(res.data) ? res.data : [];
+      const filtered = allRxs.filter((rx: any) => rx.clinicalExamId === clinicalExamId);
+      setPrescriptions(filtered);
+    } catch (err) {
+      console.error('Failed to load prescriptions', err);
+    } finally {
+      setPrescriptionsLoading(false);
+    }
+  }, []);
+
   const fetchRow = useCallback(async () => {
     if (!id) return;
     setLoading(true);
     try {
       const res = await api.get(`/surgeries/${id}`);
-      setRow(res.data as SurgeryDetail);
+      const data = res.data as SurgeryDetail;
+      setRow(data);
+      if (data.clinicalExam?.id && data.patient?.id) {
+        void fetchPrescriptions(data.clinicalExam.id, data.patient.id);
+      }
     } catch (e: any) {
       const msg = typeof e?.response?.data?.message === 'string' ? e.response.data.message : undefined;
       toast.error(msg || 'Failed to load surgery');
@@ -115,7 +160,7 @@ export default function SurgeryDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [id, fetchPrescriptions]);
 
   useEffect(() => {
     fetchRow();
@@ -305,6 +350,88 @@ export default function SurgeryDetailPage() {
           Operative Notes
         </div>
         <div className="mt-3 text-slate-700 whitespace-pre-wrap">{row.notes?.trim() || '—'}</div>
+      </div>
+
+      {/* Medicine Prescriptions */}
+      <div className="rounded-xl border border-slate-100 bg-white p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+            <Pill className="h-5 w-5 text-emerald-600" />
+            Medicine Prescriptions
+          </div>
+          {row.clinicalExam?.id && (
+            <Button
+              size="sm"
+              className="h-9 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 text-xs gap-1.5"
+              onClick={() => router.push(`/dashboard/prescription/medicine/new?examId=${row.clinicalExam!.id}&patientId=${row.patient?.id || ''}&patientName=${encodeURIComponent(patientName)}`)}
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Add Prescription
+            </Button>
+          )}
+        </div>
+
+        <div className="mt-4">
+          {prescriptionsLoading ? (
+            <div className="py-8 text-center text-sm text-slate-400">Loading prescriptions…</div>
+          ) : prescriptions.length === 0 ? (
+            <div className="rounded-lg border-2 border-dashed border-slate-200 py-10 text-center">
+              <Pill className="mx-auto h-8 w-8 text-slate-300 mb-2" />
+              <p className="text-sm font-medium text-slate-500">No medicines prescribed yet</p>
+              <p className="text-xs text-slate-400 mt-1">Prescribe post-operative medications for this patient</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto rounded-lg border border-slate-100">
+              <table className="w-full text-sm text-left">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                    <th className="px-4 py-3">Medicine</th>
+                    <th className="px-4 py-3">Qty</th>
+                    <th className="px-4 py-3">Dosage</th>
+                    <th className="px-4 py-3">Frequency</th>
+                    <th className="px-4 py-3">Duration</th>
+                    <th className="px-4 py-3">Eye</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {prescriptions.map((rx: any) => {
+                    const parsed = parseRxInstruction(rx.instructions);
+                    const medicineName = rx.itemName || rx.itemId || '—';
+                    return (
+                      <tr key={rx.id} className="hover:bg-slate-50/60 transition-colors">
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <div className="rounded-md bg-emerald-50 p-1.5 text-emerald-500">
+                              <Pill className="h-3.5 w-3.5" />
+                            </div>
+                            <span className="font-semibold text-slate-900">{medicineName}</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 font-bold text-slate-800">{rx.quantity ?? '—'}</td>
+                        <td className="px-4 py-3 text-slate-600">{parsed.dosage}</td>
+                        <td className="px-4 py-3 text-slate-600">{parsed.frequency}</td>
+                        <td className="px-4 py-3 text-slate-600">{parsed.duration}</td>
+                        <td className="px-4 py-3 text-slate-600 font-medium">{parsed.eye}</td>
+                        <td className="px-4 py-3">
+                          <Badge className={
+                            rx.status === 'DISPENSED'
+                              ? 'rounded-full bg-emerald-100 text-emerald-700 border-0 px-2.5 py-0.5 text-[10px] font-semibold'
+                              : 'rounded-full bg-amber-100 text-amber-700 border-0 px-2.5 py-0.5 text-[10px] font-semibold'
+                          }>
+                            {rx.status || 'PENDING'}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-slate-500 whitespace-nowrap">{rx.createdAt ? formatShortDate(rx.createdAt) : '—'}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center justify-end text-xs text-slate-500">

@@ -1,5 +1,5 @@
 import express from 'express';
-import { authenticate, authorize } from '../middlewares/authMiddleware.js';
+import { authenticate, authorize, restrictOptometrist } from '../middlewares/authMiddleware.js';
 import validate from '../middlewares/validate.js';
 import {
     createPrescriptionSchema,
@@ -18,9 +18,9 @@ const router = express.Router();
 
 router.get('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'PHARMACIST'), listPrescriptions);
 router.get('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'PHARMACIST'), getPrescriptionById);
-router.post('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR', 'PHARMACIST'), validate(createPrescriptionSchema), createPrescription);
+router.post('/', authenticate, restrictOptometrist, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), validate(createPrescriptionSchema), createPrescription);
 router.post('/:id/dispense', authenticate, authorize('ADMIN', 'SUPERADMIN', 'PHARMACIST'), dispenseMedicine);
-router.put('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR', 'PHARMACIST'), validate(updatePrescriptionSchema), updatePrescription);
-router.delete('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR', 'PHARMACIST'), deletePrescription);
+router.put('/:id', authenticate, restrictOptometrist, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), validate(updatePrescriptionSchema), updatePrescription);
+router.delete('/:id', authenticate, restrictOptometrist, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), deletePrescription);
 
 export default router;

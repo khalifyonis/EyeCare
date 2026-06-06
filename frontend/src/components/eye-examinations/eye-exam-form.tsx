@@ -690,7 +690,7 @@ export default function EyeExamForm({ mode, initialData, submitting, onSubmit, c
   const selectedMethod = IOP_METHODS.find((method) => method.value === form.iop.method);
   const highIop = Number(form.iop.OD) > 21 || Number(form.iop.OS) > 21;
 
-  const updateMedication = (index: number, key: keyof MedicationItem, value: string) => {
+  const updateMedication = (index: number, key: keyof MedicationItem, value: any) => {
     setForm((prev) => ({
       ...prev,
       medications: prev.medications.map((item, itemIndex) => (itemIndex === index ? { ...item, [key]: value } : item)),
@@ -825,7 +825,7 @@ export default function EyeExamForm({ mode, initialData, submitting, onSubmit, c
         notes: toOptionalString(form.fundus.notes) || '',
       },
       appointmentId: propAppointmentId,
-      stage: stage === 'CLINICAL' ? 'COMPLETED' : stage,
+      stage: stage === 'PRELIMINARY' ? 'PRELIMINARY' : 'COMPLETED',
     };
 
     const res = await onSubmit(payload);

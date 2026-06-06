@@ -32,13 +32,14 @@ type MedicinePrescription = {
   id: string;
   itemType: 'PHARMACY' | string;
   itemId?: string | null;
+  itemName?: string | null;
   quantity?: number | null;
   instructions?: string | null;
   createdAt?: string;
   appointmentId?: string | null;
   appointment?: {
     bookingNumber?: string | null;
-    patient?: { id: string; fullName?: string | null; phone?: string | null } | null;
+    patient?: { id: string; fullName?: string | null; phone?: string | null; patientNumber?: string | null } | null;
   } | null;
   clinicalExam?: {
     id: string;
@@ -47,7 +48,7 @@ type MedicinePrescription = {
   eyeExam?: {
     id: string;
     diagnosis?: string | null;
-    patient?: { id: string; fullName?: string | null; phone?: string | null } | null;
+    patient?: { id: string; fullName?: string | null; phone?: string | null; patientNumber?: string | null } | null;
   } | null;
   status: 'PENDING' | 'DISPENSED';
   billings?: any[];
@@ -161,7 +162,17 @@ function parseDurationDays(durationText: string): number | null {
 export default function MedicinePrescriptionsPage() {
   const router = useRouter();
   const role = useMemo(() => resolveRoleName(readStoredUser()), []);
-  const canManage = useMemo(() => ['ADMIN', 'SUPERADMIN', 'DOCTOR', 'PHARMACIST'].includes(role), [role]);
+  
+  const isOptometrist = useMemo(() => {
+    const user = readStoredUser();
+    return resolveRoleName(user) === 'DOCTOR' && (user?.doctor as { specialization?: string })?.specialization?.toUpperCase() === 'OPTOMETRY';
+  }, []);
+
+  const canManage = useMemo(() => {
+    if (role === 'PHARMACIST') return false; // Pharmacists can only view and dispense
+    if (isOptometrist) return false; // Optometrists cannot prescribe medicines
+    return ['ADMIN', 'SUPERADMIN', 'DOCTOR'].includes(role);
+  }, [role, isOptometrist]);
 
   const [rows, setRows] = useState<MedicinePrescription[]>([]);
   const [items, setItems] = useState<PharmacyItem[]>([]);
@@ -254,7 +265,7 @@ export default function MedicinePrescriptionsPage() {
 
   const normalizedRows = useMemo(() => {
     return rows.map((row) => {
-      const item = row.itemId ? itemMap[row.itemId] : (row.itemName ? { itemName: row.itemName } : undefined);
+      const item = row.itemId ? itemMap[row.itemId] : (row.itemName ? { id: '', itemName: row.itemName } as PharmacyItem : undefined);
       const structured = parseInstruction(row.instructions, item?.strength);
       const hasRequiredFields = [structured.dosage, structured.frequency, structured.duration, structured.eye].every((v) => v !== '—');
       const durationDays = parseDurationDays(structured.duration);

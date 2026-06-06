@@ -3,9 +3,6 @@ import 'dotenv/config';
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -21,10 +18,13 @@ const transporter = nodemailer.createTransport({
  * @param {string} roleName - The assigned role.
  */
 export const sendOnboardingEmail = async (recipientEmail, fullName, username, temporaryPassword, roleName) => {
+    // Log the credentials to the console for admin visibility
+    console.log(`[EMAIL_SERVICE] Preparing onboarding email for ${username} (${recipientEmail}). Temporary Password: ${temporaryPassword}`);
+
     const mailOptions = {
         from: `"EyeCare System" <${process.env.EMAIL_USER}>`,
         to: recipientEmail,
-        subject: '🎉 Welcome to EyeCare – Your Account Credentials',
+        subject: 'Welcome to EyeCare - Your Account Credentials',
         html: `
             <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
                 <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 32px 24px; text-align: center;">

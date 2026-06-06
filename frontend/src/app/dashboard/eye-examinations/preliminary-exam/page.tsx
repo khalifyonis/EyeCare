@@ -2,7 +2,7 @@
 // Force rebuild
 
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSocket } from '@/contexts/socket-context';
@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ServerPagination } from '@/components/dashboard/server-pagination';
 import { Badge } from '@/components/ui/badge';
+import { readStoredUser, resolveRoleName } from '@/lib/auth';
 
 interface Exam {
   id: string;
@@ -104,6 +105,18 @@ export default function PreliminaryExamPage() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const { socket } = useSocket();
+
+  const canWrite = useMemo(() => {
+    const user = readStoredUser();
+    const role = resolveRoleName(user);
+    return ['ADMIN', 'SUPERADMIN', 'DOCTOR'].includes(role);
+  }, []);
+
+  const isOptometrist = useMemo(() => {
+    const user = readStoredUser();
+    const role = resolveRoleName(user);
+    return role === 'DOCTOR' && user?.doctor?.specialization?.toUpperCase() === 'OPTOMETRY';
+  }, []);
 
   useEffect(() => {
     api.get('/doctors').then(res => setDoctors(res.data)).catch(() => {});
@@ -204,12 +217,14 @@ export default function PreliminaryExamPage() {
               </div>
             </div>
           </div>
-          <Link href="/dashboard/eye-examinations/new?stage=PRELIMINARY">
-            <Button className="bg-[#0EA5E9] text-white hover:bg-[#0284C7]">
-              <Plus className="mr-2 h-4 w-4" />
-              New Eye Exam
-            </Button>
-          </Link>
+          {canWrite && (
+            <Link href="/dashboard/eye-examinations/new?stage=PRELIMINARY">
+              <Button className="bg-[#0EA5E9] text-white hover:bg-[#0284C7]">
+                <Plus className="mr-2 h-4 w-4" />
+                New Eye Exam
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -318,12 +333,14 @@ export default function PreliminaryExamPage() {
                           >
                             View
                           </button>
-                          <button
-                            className="rounded-md px-2 py-1 text-sm font-medium text-emerald-600 hover:bg-emerald-50"
-                            onClick={() => router.push(`/dashboard/eye-examinations/${examId}/edit?stage=PRELIMINARY`)}
-                          >
-                            Edit
-                          </button>
+                          {canWrite && (
+                            <button
+                              className="rounded-md px-2 py-1 text-sm font-medium text-emerald-600 hover:bg-emerald-50"
+                              onClick={() => router.push(`/dashboard/eye-examinations/${examId}/edit?stage=PRELIMINARY`)}
+                            >
+                              Edit
+                            </button>
+                          )}
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="icon" className="h-8 w-8 rounded-md">
@@ -331,27 +348,33 @@ export default function PreliminaryExamPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="rounded-xl">
-                              <DropdownMenuItem onClick={() => handlePromoteToClinical(examId)}>
-                                <Stethoscope className="mr-2 h-4 w-4" />
-                                Move to Clinical
-                              </DropdownMenuItem>
+                              {canWrite && !isOptometrist && (
+                                <DropdownMenuItem onClick={() => handlePromoteToClinical(examId)}>
+                                  <Stethoscope className="mr-2 h-4 w-4" />
+                                  Move to Clinical
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuItem asChild>
                                 <Link href={`/dashboard/eye-examinations/${examId}`}>View Details</Link>
                               </DropdownMenuItem>
-                              <DropdownMenuItem asChild>
-                                <Link href={`/dashboard/eye-examinations/${examId}/edit?stage=PRELIMINARY`} className="flex items-center gap-2">
-                                  <Pencil className="h-4 w-4" />
-                                  Edit Examination
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="text-red-600 focus:text-red-700"
-                                onClick={() => void handleDelete(examId)}
-                                disabled={deletingId === examId}
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                {deletingId === examId ? 'Deleting...' : 'Delete'}
-                              </DropdownMenuItem>
+                              {canWrite && (
+                                <DropdownMenuItem asChild>
+                                  <Link href={`/dashboard/eye-examinations/${examId}/edit?stage=PRELIMINARY`} className="flex items-center gap-2">
+                                    <Pencil className="h-4 w-4" />
+                                    Edit Examination
+                                  </Link>
+                                </DropdownMenuItem>
+                              )}
+                              {canWrite && (
+                                <DropdownMenuItem
+                                  className="text-red-600 focus:text-red-700"
+                                  onClick={() => void handleDelete(examId)}
+                                  disabled={deletingId === examId}
+                                >
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  {deletingId === examId ? 'Deleting...' : 'Delete'}
+                                </DropdownMenuItem>
+                              )}
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>

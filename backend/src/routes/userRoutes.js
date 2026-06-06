@@ -7,7 +7,7 @@ import {
     deleteUser,
     uploadProfileImage, // Added uploadProfileImage
 } from '../controllers/userController.js';
-import { authenticate, authorize } from '../middlewares/authMiddleware.js';
+import { authenticate, authorize, checkPermission } from '../middlewares/authMiddleware.js';
 import { upload } from '../middlewares/uploadMiddleware.js'; // Added upload middleware import
 
 const router = express.Router();
@@ -24,13 +24,11 @@ const authorizeSelfOrAdmin = (req, res, next) => {
 
 router.post('/:id/profile-image', authorizeSelfOrAdmin, upload.single('image'), uploadProfileImage);
 
-// User management: ADMIN and SUPERADMIN only
-router.use(authorize('ADMIN', 'SUPERADMIN'));
-
-router.get('/', getAllUsers);
-router.get('/:id', getUserById);
-router.post('/', createUser);
-router.put('/:id', updateUser);
-router.delete('/:id', deleteUser);
+// User management: dynamic permissions
+router.get('/', checkPermission('users', 'canRead'), getAllUsers);
+router.get('/:id', checkPermission('users', 'canRead'), getUserById);
+router.post('/', checkPermission('users', 'canCreate'), createUser);
+router.put('/:id', checkPermission('users', 'canUpdate'), updateUser);
+router.delete('/:id', checkPermission('users', 'canDelete'), deleteUser);
 
 export default router;

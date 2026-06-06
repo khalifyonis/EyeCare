@@ -33,6 +33,7 @@ import {
     CalendarPlus,
     Store,
     ShoppingCart,
+    ShieldCheck,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useParams, usePathname } from 'next/navigation'
@@ -110,6 +111,7 @@ const roleNavigation: Record<string, NavSection[]> = {
             items: [
                 { title: 'Dashboard', icon: LayoutDashboard, url: '/dashboard/admin' },
                 { title: 'Users', icon: UserCog, url: '/dashboard/admin/users' },
+                { title: 'Permissions', icon: ShieldCheck, url: '/dashboard/admin/permissions' },
                 { title: 'Doctors', icon: Stethoscope, url: '/dashboard/admin/doctors' },
                 { title: 'Branches', icon: LayoutDashboard, url: '/dashboard/admin/branches' },
             ],
@@ -202,6 +204,7 @@ const roleNavigation: Record<string, NavSection[]> = {
             items: [
                 { title: 'Dashboard', icon: LayoutDashboard, url: '/dashboard/admin' },
                 { title: 'Users', icon: UserCog, url: '/dashboard/admin/users' },
+                { title: 'Permissions', icon: ShieldCheck, url: '/dashboard/admin/permissions' },
                 { title: 'Doctors', icon: Stethoscope, url: '/dashboard/admin/doctors' },
                 { title: 'Branches', icon: LayoutDashboard, url: '/dashboard/admin/branches' },
             ],
@@ -638,11 +641,101 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         router.push('/login')
     }
 
-    const sections = roleNavigation[role] ?? roleNavigation['ADMIN'] ?? []
+    let rawSections = roleNavigation[role] ?? roleNavigation['ADMIN'] ?? []
+
+    const isItemAllowed = (itemUrl: string) => {
+        if (!itemUrl || itemUrl === '#') return true
+        if (role === 'SUPERADMIN') return true
+
+        if (typeof window !== 'undefined') {
+            const rawPerms = localStorage.getItem('permissions')
+            if (rawPerms) {
+                try {
+                    const permissions = JSON.parse(rawPerms)
+                    if (Array.isArray(permissions)) {
+                        let moduleKey = ''
+                        if (itemUrl.startsWith('/dashboard/patients')) moduleKey = 'patients'
+                        else if (itemUrl.startsWith('/dashboard/appointments')) moduleKey = 'appointments'
+                        else if (itemUrl.startsWith('/dashboard/eye-examinations')) moduleKey = 'eye_exams'
+                        else if (itemUrl.startsWith('/dashboard/surgery')) moduleKey = 'surgery'
+                        else if (itemUrl.startsWith('/dashboard/prescription')) moduleKey = 'prescriptions'
+                        else if (itemUrl.startsWith('/dashboard/reports')) moduleKey = 'reports'
+                        else if (itemUrl.startsWith('/dashboard/pharmacy') || itemUrl.startsWith('/dashboard/inventory/pharmacy')) moduleKey = 'pharmacy'
+                        else if (itemUrl.startsWith('/dashboard/optical-shop') || itemUrl.startsWith('/dashboard/inventory/optical')) moduleKey = 'optical'
+                        else if (itemUrl.startsWith('/dashboard/billing')) moduleKey = 'billing'
+                        else if (itemUrl.startsWith('/dashboard/admin/users') || itemUrl.startsWith('/dashboard/admin/doctors')) moduleKey = 'users'
+                        else if (itemUrl.startsWith('/dashboard/admin/branches')) moduleKey = 'branches'
+                        else if (itemUrl.startsWith('/dashboard/activity-log')) moduleKey = 'logs'
+                        else if (itemUrl.startsWith('/dashboard/admin/permissions')) moduleKey = 'users'
+
+                        if (moduleKey) {
+                            const perm = permissions.find((p: any) => p.module === moduleKey)
+                            if (perm) {
+                                return !!perm.canRead
+                            }
+                            return false
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error filtering sidebar items', e)
+                }
+            }
+        }
+        return true
+    }
+
+    let sections = rawSections.map(section => {
+        const filteredItems = section.items.map(item => {
+            if (item.subItems) {
+                return {
+                    ...item,
+                    subItems: item.subItems.filter(sub => isItemAllowed(sub.url))
+                }
+            }
+            return item
+        }).filter(item => {
+            if (item.subItems && item.subItems.length === 0) return false
+            return isItemAllowed(item.url)
+        })
+
+        return {
+            ...section,
+            items: filteredItems
+        }
+    }).filter(section => section.items.length > 0)
+
+    const specialization = (user?.doctor as { specialization?: string })?.specialization || '';
+    if (role === 'DOCTOR' && specialization.toUpperCase() === 'OPTOMETRY') {
+        sections = sections.map(section => {
+            if (section.section === 'CLINICAL') {
+                return {
+                    ...section,
+                    items: section.items
+                        .filter(item => item.title !== 'Eye Surgery')
+                        .map(item => {
+                            if (item.title === 'Eye Examinations' && item.subItems) {
+                                return {
+                                    ...item,
+                                    subItems: item.subItems.filter(sub => sub.title === 'Preliminary Exam')
+                                };
+                            }
+                            if (item.title === 'Prescriptions' && item.subItems) {
+                                return {
+                                    ...item,
+                                    subItems: item.subItems.filter(sub => sub.title === 'Optical Prescriptions')
+                                };
+                            }
+                            return item;
+                        })
+                };
+            }
+            return section;
+        });
+    }
 
     return (
         <Sidebar collapsible="icon" className="border-sidebar-border shrink-0" {...props}>
-            <SidebarHeader className="bg-sidebar border-b border-sidebar-border px-4 sm:px-5 py-4 shrink-0">
+            <SidebarHeader className="bg-white border-b border-sidebar-border px-4 sm:px-5 py-4 shrink-0">
                 <div
                     className="flex items-center gap-3.5 cursor-pointer hover:opacity-90 transition-opacity min-w-0"
                     onClick={() => router.push(getDefaultDashboardPath(role))}
@@ -659,7 +752,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
             <SidebarSeparator className="bg-sidebar-border/50" />
 
-            <SidebarContent className="bg-sidebar text-sidebar-foreground overflow-y-auto overflow-x-hidden flex-1 min-h-0">
+            <SidebarContent className="bg-white text-slate-800 overflow-y-auto overflow-x-hidden flex-1 min-h-0">
                 {sections.map((section, sectionIndex) => (
                     <CollapsibleSection
                         key={section.section}
@@ -687,7 +780,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
             <SidebarSeparator className="bg-sidebar-border/50" />
 
-            <SidebarFooter className="bg-sidebar border-t border-sidebar-border relative z-50 shrink-0">
+            <SidebarFooter className="bg-white border-t border-sidebar-border relative z-50 shrink-0">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <DropdownMenu>

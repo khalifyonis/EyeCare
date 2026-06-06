@@ -8,20 +8,20 @@ import {
     getAppointmentStats,
     markAsArrived
 } from '../controllers/appointmentController.js';
-import { authenticate, authorize } from '../middlewares/authMiddleware.js';
+import { authenticate, checkPermission } from '../middlewares/authMiddleware.js';
 import validate from '../middlewares/validate.js';
 import { appointmentSchema, updateAppointmentSchema } from '../middlewares/validationSchemas.js';
 
 const router = express.Router();
 
-router.get('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), getAppointments);
+router.get('/', authenticate, checkPermission('appointments', 'canRead'), getAppointments);
 // Stats: same roles that can view the list (so dashboard cards load without 403)
-router.get('/stats', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), getAppointmentStats);
-router.get('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), getAppointmentById);
+router.get('/stats', authenticate, checkPermission('appointments', 'canRead'), getAppointmentStats);
+router.get('/:id', authenticate, checkPermission('appointments', 'canRead'), getAppointmentById);
 
-router.post('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST'), validate(appointmentSchema), createAppointment);
-router.put('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST'), validate(updateAppointmentSchema), updateAppointment);
-router.put('/:id/arrival', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST'), markAsArrived);
-router.delete('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST'), deleteAppointment);
+router.post('/', authenticate, checkPermission('appointments', 'canCreate'), validate(appointmentSchema), createAppointment);
+router.put('/:id', authenticate, checkPermission('appointments', 'canUpdate'), validate(updateAppointmentSchema), updateAppointment);
+router.put('/:id/arrival', authenticate, checkPermission('appointments', 'canUpdate'), markAsArrived);
+router.delete('/:id', authenticate, checkPermission('appointments', 'canDelete'), deleteAppointment);
 
 export default router;

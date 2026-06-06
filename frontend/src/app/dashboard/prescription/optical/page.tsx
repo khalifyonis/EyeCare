@@ -145,7 +145,10 @@ async function downloadJson(filename: string, data: unknown) {
 export default function OpticalPrescriptionsPage() {
     const router = useRouter();
     const role = useMemo(() => resolveRoleName(readStoredUser()), []);
-    const canManage = useMemo(() => ['ADMIN', 'SUPERADMIN', 'DOCTOR', 'OPTICIAN'].includes(role), [role]);
+    const canManage = useMemo(() => {
+        if (role === 'OPTICIAN') return false; // Opticians can only view and dispense
+        return ['ADMIN', 'SUPERADMIN', 'DOCTOR'].includes(role);
+    }, [role]);
 
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('all');
@@ -177,7 +180,7 @@ export default function OpticalPrescriptionsPage() {
             const params: Record<string, string | number> = { page, limit: pageSize };
             if (search) params.search = search;
             if (status !== 'all') params.status = status;
-            if (type !== 'all') params.type = type;
+            params.type = type;
             if (dateFrom) params.from = dateFrom;
             if (dateTo) params.to = dateTo;
             if (!dateFrom && !dateTo) {

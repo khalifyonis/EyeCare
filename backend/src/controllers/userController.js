@@ -186,9 +186,12 @@ export const createUser = async (req, res, next) => {
             throw error;
         }
 
-        const VALID_ROLES = ['ADMIN', 'DOCTOR', 'RECEPTIONIST', 'OPTICIAN', 'PHARMACIST', 'SUPERADMIN'];
-        if (!VALID_ROLES.includes(roleName.toUpperCase())) {
-            const error = new Error(`Invalid role: ${roleName}`);
+        // Validate role exists in CustomRole table
+        const roleExists = await prisma.customRole.findUnique({
+            where: { name: roleName.toUpperCase() }
+        });
+        if (!roleExists) {
+            const error = new Error(`Invalid role: ${roleName}. This role does not exist in the database.`);
             error.statusCode = 400;
             throw error;
         }
@@ -232,11 +235,19 @@ export const createUser = async (req, res, next) => {
         // Send onboarding email with the actual password used
         const emailResult = await sendOnboardingEmail(email, fullName, username, finalPassword, roleName.toUpperCase());
 
+        if (!emailResult.success) {
+            // Delete the created user so we do not have an orphaned user without credentials
+            await prisma.user.delete({ where: { id: newUser.id } });
+            const error = new Error(`Failed to send onboarding email to ${email}: ${emailResult.error}`);
+            error.statusCode = 500;
+            throw error;
+        }
+
         const { password: _, ...sanitizedUser } = newUser;
         res.status(201).json({
             message: 'User created successfully',
             user: sanitizedUser,
-            emailSent: emailResult.success,
+            emailSent: true,
         });
     } catch (error) {
         next(error);
@@ -303,10 +314,15 @@ export const updateUser = async (req, res, next) => {
         }
 
         if (roleName) {
-            const VALID_ROLES = ['ADMIN', 'DOCTOR', 'RECEPTIONIST', 'OPTICIAN', 'PHARMACIST', 'SUPERADMIN'];
-            if (VALID_ROLES.includes(roleName.toUpperCase())) {
-                updateData.role = roleName.toUpperCase();
+            const roleExists = await prisma.customRole.findUnique({
+                where: { name: roleName.toUpperCase() }
+            });
+            if (!roleExists) {
+                const error = new Error(`Invalid role: ${roleName}. This role does not exist in the database.`);
+                error.statusCode = 400;
+                throw error;
             }
+            updateData.role = roleName.toUpperCase();
         }
 
         if (branchIds && Array.isArray(branchIds)) {

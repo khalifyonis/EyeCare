@@ -22,7 +22,7 @@ export default function UsersPage() {
     const [editingUser, setEditingUser] = useState<User | null>(null);
     const [search, setSearch] = useState('');
     const [roleFilter, setRoleFilter] = useState('all');
-    const [sortBy, setSortBy] = useState('name-asc');
+    const [sortBy, setSortBy] = useState('newest');
 
     const fetchUsers = async () => {
         setLoading(true);
@@ -61,6 +61,7 @@ export default function UsersPage() {
         }
         if (roleFilter !== 'all') list = list.filter(u => u.roleName === roleFilter);
         list.sort((a, b) => {
+            if (sortBy === 'newest') return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
             if (sortBy === 'name-asc') return (a.fullName || '').localeCompare(b.fullName || '');
             if (sortBy === 'name-desc') return (b.fullName || '').localeCompare(a.fullName || '');
             return 0;
@@ -160,11 +161,12 @@ export default function UsersPage() {
                         </div>
                         <div>
                             <label className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 block">Sort By</label>
-                            <Select value={sortBy} onValueChange={setSortBy}>
+                             <Select value={sortBy} onValueChange={setSortBy}>
                                 <SelectTrigger className="h-10 rounded-lg border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-sm focus:ring-[#0EA5E9]">
-                                    <SelectValue placeholder="Name (A-Z)" />
+                                    <SelectValue placeholder="Newest First" />
                                 </SelectTrigger>
                                 <SelectContent>
+                                    <SelectItem value="newest">Newest First</SelectItem>
                                     <SelectItem value="name-asc">Name (A-Z)</SelectItem>
                                     <SelectItem value="name-desc">Name (Z-A)</SelectItem>
                                 </SelectContent>

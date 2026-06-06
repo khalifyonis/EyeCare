@@ -15,6 +15,7 @@ export type StoredUser = {
     branchId?: string | null
     branches?: BranchSummary[]
     activeBranch?: BranchSummary | null
+    doctor?: { specialization?: string | null } | null
 }
 
 const ROLE_ALIASES: Record<string, string> = {
@@ -103,5 +104,6 @@ export function clearSession() {
     localStorage.removeItem('user')
     localStorage.removeItem('activeBranchId')
     localStorage.removeItem('branches')
+    localStorage.removeItem('permissions')
     document.cookie = 'token=; path=/; max-age=0; SameSite=Lax'
 }

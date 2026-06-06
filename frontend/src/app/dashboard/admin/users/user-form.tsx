@@ -15,7 +15,7 @@ interface UserFormProps {
     onCancel: () => void;
 }
 
-const ROLES = ['ADMIN', 'DOCTOR', 'PHARMACIST', 'OPTICIAN', 'RECEPTIONIST'];
+// Removed static ROLES array, fetching dynamically from database instead
 const SPECIALIZATIONS = [
     { value: 'OPHTHALMOLOGY', label: 'Ophthalmology' },
     { value: 'OPTOMETRY', label: 'Optometry' },
@@ -30,6 +30,7 @@ const SPECIALIZATIONS = [
 export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
     const [saving, setSaving] = useState(false);
     const [branches, setBranches] = useState<any[]>([]);
+    const [rolesList, setRolesList] = useState<string[]>([]);
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         fullName: '',
@@ -53,7 +54,19 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
                 console.error('Failed to load branches');
             }
         };
+        const fetchRoles = async () => {
+            try {
+                const res = await api.get('/roles');
+                const names = res.data
+                    .map((r: any) => r.name)
+                    .filter((name: string) => name !== 'SUPERADMIN');
+                setRolesList(names.length > 0 ? names : ['ADMIN', 'DOCTOR', 'PHARMACIST', 'OPTICIAN', 'RECEPTIONIST']);
+            } catch (err) {
+                setRolesList(['ADMIN', 'DOCTOR', 'PHARMACIST', 'OPTICIAN', 'RECEPTIONIST']);
+            }
+        };
         fetchBranches();
+        fetchRoles();
     }, []);
 
     useEffect(() => {
@@ -191,7 +204,7 @@ export function UserForm({ user, onSuccess, onCancel }: UserFormProps) {
                                     <SelectValue placeholder="Select..." />
                                 </SelectTrigger>
                                 <SelectContent className="rounded-lg">
-                                    {ROLES.map(r => <SelectItem key={r} value={r} className="text-sm">{r}</SelectItem>)}
+                                    {rolesList.map(r => <SelectItem key={r} value={r} className="text-sm">{r}</SelectItem>)}
                                 </SelectContent>
                             </Select>
                         </div>

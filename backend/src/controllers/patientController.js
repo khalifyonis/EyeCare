@@ -242,8 +242,11 @@ export const getPatientById = async (req, res, next) => {
                                         id: true,
                                         itemType: true,
                                         itemId: true,
+                                        itemName: true,
                                         quantity: true,
                                         instructions: true,
+                                        status: true,
+                                        dispensedAt: true,
                                         createdAt: true,
                                     }
                                 }
@@ -257,10 +260,84 @@ export const getPatientById = async (req, res, next) => {
                                     }
                                 }
                             }
+                        },
+                        prescriptions: {
+                            select: {
+                                id: true,
+                                itemType: true,
+                                itemId: true,
+                                itemName: true,
+                                quantity: true,
+                                instructions: true,
+                                status: true,
+                                dispensedAt: true,
+                                createdAt: true,
+                            }
                         }
                     },
                     orderBy: {
                         appointmentDate: 'desc'
+                    }
+                },
+                billings: {
+                    include: {
+                        createdBy: {
+                            select: { fullName: true }
+                        }
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                },
+                eyeExaminations: {
+                    include: {
+                        doctor: {
+                            include: {
+                                user: {
+                                    select: { fullName: true }
+                                }
+                            }
+                        },
+                        prescriptions: {
+                            select: {
+                                id: true,
+                                itemType: true,
+                                itemId: true,
+                                itemName: true,
+                                quantity: true,
+                                instructions: true,
+                                status: true,
+                                dispensedAt: true,
+                                createdAt: true,
+                            }
+                        }
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                },
+                opticalPrescriptions: {
+                    include: {
+                        createdBy: {
+                            select: { fullName: true }
+                        }
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                },
+                surgeries: {
+                    include: {
+                        surgeon: {
+                            include: {
+                                user: {
+                                    select: { fullName: true }
+                                }
+                            }
+                        }
+                    },
+                    orderBy: {
+                        date: 'desc'
                     }
                 },
                 branch: true

@@ -98,10 +98,16 @@ export default function PatientsPage() {
         limit: String(pageSize),
         sortBy: selectedSort.sortBy,
         sortOrder: selectedSort.sortOrder,
+        _ts: String(Date.now()),
       });
       if (q) params.set('search', q);
 
-      const res = await api.get(`/patients?${params.toString()}`);
+      const res = await api.get(`/patients?${params.toString()}`, {
+        headers: {
+          'Cache-Control': 'no-cache',
+          Pragma: 'no-cache',
+        },
+      });
       const body = res.data as { data?: PatientRow[]; total?: number; page?: number; totalPages?: number };
       setPatients(Array.isArray(body.data) ? body.data : []);
       setTotal(typeof body.total === 'number' ? body.total : 0);

@@ -190,7 +190,9 @@ export const createEyeExamination = async (req, res, next) => {
         plan: plan || null,
         followUpDate: followUpDate ? new Date(followUpDate) : null,
         nextVisitReason: nextVisitReason || null,
-        stage: req.body.stage || 'PRELIMINARY',
+        stage: req.user.role === 'DOCTOR' && req.user.specialization === 'OPTOMETRY'
+          ? 'PRELIMINARY'
+          : (req.body.stage || 'PRELIMINARY'),
       },
       include: {
         patient: { select: { id: true, fullName: true, patientNumber: true } },
@@ -219,11 +221,16 @@ export const updateEyeExamination = async (req, res, next) => {
   try {
     const { id } = req.params;
 
+    const isOptometrist = req.user.role === 'DOCTOR' && req.user.specialization === 'OPTOMETRY';
     const existing = await prisma.eyeExamination.findFirst({
       where: { id, ...getBranchFilter(req) },
       select: { id: true, branchId: true, stage: true, appointmentId: true },
     });
     if (!existing) return res.status(404).json({ message: 'Eye examination not found' });
+
+    if (isOptometrist && existing.stage !== 'PRELIMINARY') {
+      return res.status(403).json({ message: 'Forbidden. Optometrists can only modify examinations in the Preliminary stage.' });
+    }
 
     const {
       patientId,
@@ -265,20 +272,24 @@ export const updateEyeExamination = async (req, res, next) => {
 
     let newStage = stage || existing.stage;
     
-    // Logic for transition:
-    // 1. From PRELIMINARY to CLINICAL: When tech saves preliminary data
-    const isPreliminaryUpdate = vaScale || vaUnaidedOD || vaBcvaOD || iopOD;
-    if (newStage === 'PRELIMINARY' && isPreliminaryUpdate && !req.body.isPartialSave) {
-        newStage = 'CLINICAL';
-    }
+    if (isOptometrist) {
+      newStage = 'PRELIMINARY';
+    } else {
+      // Logic for transition:
+      // 1. From PRELIMINARY to CLINICAL: When tech saves preliminary data
+      const isPreliminaryUpdate = vaScale || vaUnaidedOD || vaBcvaOD || iopOD;
+      if (newStage === 'PRELIMINARY' && isPreliminaryUpdate && !req.body.isPartialSave) {
+          newStage = 'CLINICAL';
+      }
 
-    // 2. From CLINICAL to COMPLETED: When doctor saves diagnosis and plan
-    // If diagnosis and plan are present, or if stage is explicitly set to COMPLETED
-    const hasDiagnosis = diagnosis && diagnosis.length > 0;
-    const hasPlan = plan && plan.length > 0;
-    
-    if (stage === 'COMPLETED' || (hasDiagnosis && hasPlan)) {
-        newStage = 'COMPLETED';
+      // 2. From CLINICAL to COMPLETED: When doctor saves diagnosis and plan
+      // If diagnosis and plan are present, or if stage is explicitly set to COMPLETED
+      const hasDiagnosis = diagnosis && diagnosis.length > 0;
+      const hasPlan = plan && plan.length > 0;
+      
+      if (stage === 'COMPLETED' || (hasDiagnosis && hasPlan)) {
+          newStage = 'COMPLETED';
+      }
     }
 
     const updated = await prisma.eyeExamination.update({

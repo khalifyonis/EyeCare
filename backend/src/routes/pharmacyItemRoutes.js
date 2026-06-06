@@ -29,6 +29,6 @@ router.post('/sync-expired', authenticate, authorize('ADMIN', 'SUPERADMIN', 'PHA
 router.post('/:id/receive', authenticate, authorize('ADMIN', 'SUPERADMIN', 'PHARMACIST'), receivePharmacyStock);
 router.post('/:id/adjust', authenticate, authorize('ADMIN', 'SUPERADMIN', 'PHARMACIST'), adjustPharmacyStock);
 router.put('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'PHARMACIST'), validate(updatePharmacyItemSchema), updatePharmacyItem);
-router.delete('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'PHARMACIST'), deletePharmacyItem);
+router.delete('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN'), deletePharmacyItem);
 
 export default router;

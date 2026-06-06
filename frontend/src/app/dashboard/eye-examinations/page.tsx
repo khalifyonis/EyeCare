@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSocket } from '@/contexts/socket-context';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { readStoredUser, resolveRoleName } from '@/lib/auth';
 import {
   Search,
   Plus,
@@ -126,6 +127,12 @@ export default function EyeExaminationsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const { socket } = useSocket();
 
+  const canWrite = useMemo(() => {
+    const user = readStoredUser();
+    const role = resolveRoleName(user);
+    return ['ADMIN', 'SUPERADMIN', 'DOCTOR'].includes(role);
+  }, []);
+
   const fetchStats = useCallback(async () => {
     try {
       const res = await api.get('/eye-examinations/stats');
@@ -223,12 +230,14 @@ export default function EyeExaminationsPage() {
             <h1 className="text-2xl font-bold tracking-tight text-gray-900">Eye Examinations</h1>
             <p className="mt-1 text-sm text-gray-500">Clinical records and documentation dashboard</p>
           </div>
-          <Link href="/dashboard/eye-examinations/new">
-            <Button className="bg-blue-600 px-6 font-bold text-white hover:bg-blue-700 shadow-sm transition-all hover:shadow-md">
-              <Plus className="mr-2 h-4 w-4" />
-              New Eye Exam
-            </Button>
-          </Link>
+          {canWrite && (
+            <Link href="/dashboard/eye-examinations/new">
+              <Button className="bg-blue-600 px-6 font-bold text-white hover:bg-blue-700 shadow-sm transition-all hover:shadow-md">
+                <Plus className="mr-2 h-4 w-4" />
+                New Eye Exam
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -358,27 +367,33 @@ export default function EyeExaminationsPage() {
                                   <DropdownMenuItem asChild>
                                     <Link href={examId ? `/dashboard/eye-examinations/${examId}` : '/dashboard/eye-examinations'} className="text-xs font-medium">View Details</Link>
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem asChild>
-                                    <Link href={examId ? `/dashboard/eye-examinations/${examId}/edit` : '/dashboard/eye-examinations'} className="flex items-center gap-2 text-xs font-medium">
-                                      <Pencil className="h-3.5 w-3.5" />
-                                      Edit Examination
-                                    </Link>
-                                  </DropdownMenuItem>
-                                  <div className="h-px bg-gray-100 my-1" />
-                                  <DropdownMenuItem
-                                    className="text-red-600 focus:text-red-700 text-xs font-medium"
-                                    onClick={() => {
-                                      if (!examId) {
-                                        toast.error('Cannot delete: examination id is missing');
-                                        return;
-                                      }
-                                      void handleDelete(examId);
-                                    }}
-                                    disabled={!examId || deletingId === examId}
-                                  >
-                                    <Trash2 className="mr-2 h-3.5 w-3.5" />
-                                    {deletingId === examId ? 'Deleting...' : 'Delete'}
-                                  </DropdownMenuItem>
+                                  {canWrite && (
+                                    <DropdownMenuItem asChild>
+                                      <Link href={examId ? `/dashboard/eye-examinations/${examId}/edit` : '/dashboard/eye-examinations'} className="flex items-center gap-2 text-xs font-medium">
+                                        <Pencil className="h-3.5 w-3.5" />
+                                        Edit Examination
+                                      </Link>
+                                    </DropdownMenuItem>
+                                  )}
+                                  {canWrite && (
+                                    <>
+                                      <div className="h-px bg-gray-100 my-1" />
+                                      <DropdownMenuItem
+                                        className="text-red-600 focus:text-red-700 text-xs font-medium"
+                                        onClick={() => {
+                                          if (!examId) {
+                                            toast.error('Cannot delete: examination id is missing');
+                                            return;
+                                          }
+                                          void handleDelete(examId);
+                                        }}
+                                        disabled={!examId || deletingId === examId}
+                                      >
+                                        <Trash2 className="mr-2 h-3.5 w-3.5" />
+                                        {deletingId === examId ? 'Deleting...' : 'Delete'}
+                                      </DropdownMenuItem>
+                                    </>
+                                  )}
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </div>

@@ -65,7 +65,7 @@ model User {
   resetToken                  String?                    @unique @map("reset_token")
   resetTokenExpiry            DateTime?                  @map("reset_token_expiry")
   isActive                    Boolean                    @default(true) @map("is_active")
-  role                        Role                       @default(RECEPTIONIST)
+  role                        String                     @default("RECEPTIONIST")
   branchId                    String                     @map("branch_id")
   createdAt                   DateTime                   @default(now()) @map("created_at")
   updatedAt                   DateTime                   @updatedAt @map("updated_at")
@@ -695,11 +695,30 @@ enum Specialization {
   OCULOPLASTICS
 }
 
-enum Role {
-  ADMIN
-  DOCTOR
-  RECEPTIONIST
-  OPTICIAN
-  PHARMACIST
-  SUPERADMIN
+model RolePermission {
+  id        String   @id @default(uuid())
+  roleName  String   @default("RECEPTIONIST") @map("role_name")
+  module    String   // 'patients', 'appointments', 'eye_exams', 'surgery', 'prescriptions', 'reports', 'pharmacy', 'optical', 'billing', 'users', 'logs'
+  canRead   Boolean  @default(false) @map("can_read")
+  canCreate Boolean  @default(false) @map("can_create")
+  canUpdate Boolean  @default(false) @map("can_update")
+  canDelete Boolean  @default(false) @map("can_delete")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([roleName, module])
+  @@map("role_permissions")
 }
+
+model CustomRole {
+  id          String   @id @default(uuid())
+  name        String   @unique // e.g. "ADMIN", "DOCTOR", "RECEPTIONIST", "NURSE", "INTERN"
+  description String?
+  isSystem    Boolean  @default(false) @map("is_system") // System roles cannot be renamed or deleted
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("custom_roles")
+}
+
+

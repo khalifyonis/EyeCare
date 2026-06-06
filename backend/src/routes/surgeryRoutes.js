@@ -1,5 +1,5 @@
 import express from 'express';
-import { authenticate, authorize } from '../middlewares/authMiddleware.js';
+import { authenticate, authorize, restrictOptometrist } from '../middlewares/authMiddleware.js';
 import validate from '../middlewares/validate.js';
 import {
     createSurgerySchema,
@@ -15,10 +15,12 @@ import {
 
 const router = express.Router();
 
-router.get('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), listSurgeries);
-router.get('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), getSurgeryById);
-router.post('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), validate(createSurgerySchema), createSurgery);
-router.put('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), validate(updateSurgerySchema), updateSurgery);
-router.delete('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), deleteSurgery);
+router.use(authenticate, restrictOptometrist);
+
+router.get('/', authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), listSurgeries);
+router.get('/:id', authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), getSurgeryById);
+router.post('/', authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), validate(createSurgerySchema), createSurgery);
+router.put('/:id', authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), validate(updateSurgerySchema), updateSurgery);
+router.delete('/:id', authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), deleteSurgery);
 
 export default router;

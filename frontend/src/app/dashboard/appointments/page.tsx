@@ -16,6 +16,7 @@ import {
     Plus,
     Filter,
     RefreshCcw,
+    UserCheck,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -144,6 +145,14 @@ function getLocalDateValue(date = new Date()): string {
     return `${year}-${month}-${day}`;
 }
 
+function isToday(iso: string | null | undefined): boolean {
+    if (!iso) return false;
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return false;
+    const now = new Date();
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+}
+
 /* ── Skeleton ──────────────────────────────────────────────── */
 
 function SkeletonRow() {
@@ -185,7 +194,7 @@ export default function AppointmentsPage() {
     }, []);
 
     const buildParams = useCallback(() => {
-        const params: Record<string, string | number> = { page, limit: pageSize };
+        const params: Record<string, string | number> = { page, limit: pageSize, _ts: Date.now() };
         const trimmedSearch = search.trim();
         const hasSearch = trimmedSearch.length > 0;
         const hasExplicitFilter = statusFilter !== 'all' || doctorFilter !== 'all' || Boolean(dateFrom) || Boolean(dateTo);
@@ -223,7 +232,13 @@ export default function AppointmentsPage() {
     const fetchAppointments = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await api.get('/appointments', { params: buildParams() });
+            const res = await api.get('/appointments', { 
+                params: buildParams(),
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
+            });
             applyResponse(res.data);
         } catch {
             toast.error('Failed to load appointments');
@@ -235,7 +250,13 @@ export default function AppointmentsPage() {
     // Silent fetch — no loading skeleton, no flickering (for polling & socket events)
     const silentFetch = useCallback(async () => {
         try {
-            const res = await api.get('/appointments', { params: buildParams() });
+            const res = await api.get('/appointments', { 
+                params: buildParams(),
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
+            });
             applyResponse(res.data);
         } catch {
             // Silently ignore errors during background refresh
@@ -279,6 +300,16 @@ export default function AppointmentsPage() {
     }, [silentFetch]);
 
     /* ── Actions ───────────────────────────────────────────── */
+
+    const handleCheckIn = async (id: string, patientName: string) => {
+        try {
+            await api.put(`/appointments/${id}/arrival`);
+            toast.success(`${patientName || 'Patient'} checked in successfully`);
+            fetchAppointments();
+        } catch (error) {
+            toast.error(getApiError(error, 'Check-in failed'));
+        }
+    };
 
     const handleCancel = async (id: string) => {
         if (!confirm('Cancel this appointment?')) return;
@@ -501,6 +532,24 @@ export default function AppointmentsPage() {
                                         {/* ACTIONS */}
                                         <TableCell className="py-3 px-4">
                                             <div className="flex items-center gap-2">
+                                                {/* Check-In Button — only for today's PENDING/SCHEDULED appointments */}
+                                                {isToday(a.appointmentDate) && (a.status === 'PENDING' || a.status === 'SCHEDULED') && (
+                                                    <button
+                                                        onClick={() => handleCheckIn(a.id, a.patient?.fullName || '')}
+                                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-all shadow-sm active:scale-95"
+                                                        title="Mark patient as arrived"
+                                                    >
+                                                        <UserCheck className="h-3.5 w-3.5" />
+                                                        Check In
+                                                    </button>
+                                                )}
+                                                {/* Already checked-in badge */}
+                                                {a.status === 'RECEIVED' && (
+                                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold">
+                                                        <UserCheck className="h-3.5 w-3.5" />
+                                                        Arrived
+                                                    </span>
+                                                )}
                                                 <button
                                                     onClick={() => router.push(`/dashboard/appointments/${a.id}`)}
                                                     className="text-sm font-medium text-sky-600 hover:text-sky-700 hover:underline transition-colors"
@@ -535,6 +584,16 @@ export default function AppointmentsPage() {
                                                                 Reschedule
                                                             </Link>
                                                         </DropdownMenuItem>
+                                                        {/* Check-In from dropdown too */}
+                                                        {isToday(a.appointmentDate) && (a.status === 'PENDING' || a.status === 'SCHEDULED') && (
+                                                            <DropdownMenuItem
+                                                                onClick={() => handleCheckIn(a.id, a.patient?.fullName || '')}
+                                                                className="cursor-pointer text-amber-600 focus:text-amber-500 dark:focus:text-amber-400 focus:bg-amber-50 dark:focus:bg-amber-900/20"
+                                                            >
+                                                                <UserCheck className="h-4 w-4 mr-2" />
+                                                                Check In (Mark Arrived)
+                                                            </DropdownMenuItem>
+                                                        )}
                                                         <DropdownMenuItem
                                                             onClick={() => handleCancel(a.id)}
                                                             className="cursor-pointer text-red-600 focus:text-red-400 dark:focus:text-red-400 focus:bg-red-50 dark:focus:bg-red-900/20"

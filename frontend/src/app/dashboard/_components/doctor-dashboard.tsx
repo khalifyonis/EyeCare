@@ -7,8 +7,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import {
-    AreaChart, Area, LineChart, Line,
-    PieChart, Pie, Cell,
+    LineChart, Line,
     XAxis, YAxis, CartesianGrid,
     Tooltip as RechartsTooltip,
     ResponsiveContainer,
@@ -17,11 +16,7 @@ import api from '@/lib/axios'
 import { toast } from 'sonner'
 import { readStoredUser, type StoredUser } from '@/lib/auth'
 
-/* ─── DEMO / FALLBACK DATA ─── */
-const SPARK_TODAY     = [3,5,4,8,6,10,12]
-const SPARK_PENDING   = [2,4,3,5,4,6,5]
-const SPARK_COMPLETED = [1,3,5,7,6,8,9]
-const SPARK_FOLLOWUP  = [1,2,2,3,2,4,3]
+
 
 const DEMO_SCHEDULE = [
     { id:'s1', time:'09:00 AM', patient:'Sara Khalid',  type:'Eye Checkup', status:'ACTIVE' },
@@ -69,40 +64,21 @@ function Dot({ status }: { status: string }) {
 const AV = ['bg-blue-500','bg-violet-500','bg-emerald-500','bg-orange-500','bg-pink-500','bg-cyan-500']
 
 /* ─── STAT CARD ─── */
-function StatCard({ label, value, loading, icon: Icon, color, sparkColor, sparkData }: {
+function StatCard({ label, value, loading, icon: Icon, bgClass }: {
     label: string; value: number | string; loading: boolean
-    icon: React.ElementType; color: string; sparkColor: string; sparkData: number[]
+    icon: React.ElementType; bgClass: string
 }) {
-    const d = sparkData.map((v, i) => ({ i, v }))
     return (
-        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col">
-            <div className="px-4 pt-3.5 pb-1 flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                        <div className={`h-[22px] w-[22px] rounded-md flex items-center justify-center ${color}`}>
-                            <Icon className="h-3 w-3 text-white" />
-                        </div>
-                        <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide truncate">{label}</p>
-                    </div>
-                    <p className="mt-1 text-2xl font-extrabold text-slate-800 dark:text-white tabular-nums leading-none">
-                        {loading ? <span className="text-lg opacity-40">…</span> : value}
-                    </p>
-                </div>
+        <div className={`${bgClass} text-white rounded-2xl p-5 shadow-md hover:shadow-lg hover:scale-[1.015] transition-all duration-300 flex flex-col justify-between min-h-[110px]`}>
+            <div className="flex justify-between items-start">
+                <span className="text-[11px] font-semibold opacity-90 tracking-wide">
+                    {label}
+                </span>
+                <Icon className="h-5 w-5 opacity-80" />
             </div>
-            <div className="h-10 w-full mt-auto">
-                <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={d} margin={{ top:0, right:0, left:0, bottom:0 }}>
-                        <defs>
-                            <linearGradient id={`sg-${sparkColor.replace('#','')}`} x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%"  stopColor={sparkColor} stopOpacity={0.25} />
-                                <stop offset="95%" stopColor={sparkColor} stopOpacity={0.02} />
-                            </linearGradient>
-                        </defs>
-                        <Area type="monotone" dataKey="v" stroke={sparkColor} strokeWidth={1.5}
-                            fill={`url(#sg-${sparkColor.replace('#','')})`} dot={false} isAnimationActive={false} />
-                    </AreaChart>
-                </ResponsiveContainer>
-            </div>
+            <p className="text-[30px] font-extrabold tracking-tight mt-3 leading-none">
+                {loading ? <span className="text-lg opacity-40">…</span> : value}
+            </p>
         </div>
     )
 }
@@ -113,6 +89,10 @@ export function DoctorDashboard() {
     const [user, setUser]       = useState<StoredUser | null>(null)
     const [data, setData]       = useState<any>(null)
     const [loading, setLoading] = useState(true)
+
+    const isOptometrist = useMemo(() => {
+        return user?.doctor?.specialization?.toUpperCase() === 'OPTOMETRY'
+    }, [user])
 
     useEffect(() => {
         const u = readStoredUser()
@@ -137,24 +117,27 @@ export function DoctorDashboard() {
     }), [data])
 
     const schedule = useMemo(() => {
-        if (data?.todaySchedule?.length)
-            return data.todaySchedule.map((a: any) => ({
-                id: a.id,
-                time: new Date(a.appointmentDate).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
-                patient: a.patient?.fullName ?? '—',
-                patientId: a.patient?.id || a.patientId,
-                type: a.type?.toLowerCase() === 'surgery' 
-                    ? 'Surgery' 
-                    : a.eyeExamination?.stage === 'PRELIMINARY'
-                        ? 'Ready for Doctor'
-                        : a.clinicalExamination 
-                            ? 'Clinical Exam' 
-                            : a.erExamination 
-                                ? 'ER Exam' 
-                                : 'Eye Checkup',
-                status: a.status,
-                eyeExaminationId: a.eyeExamination?.id || null,
-            }))
+        if (data?.todaySchedule?.length) {
+            return data.todaySchedule
+                .filter((a: any) => ['RECEIVED', 'EXAMINING', 'IN_SURGERY'].includes(a.status))
+                .map((a: any) => ({
+                    id: a.id,
+                    time: new Date(a.appointmentDate).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
+                    patient: a.patient?.fullName ?? '—',
+                    patientId: a.patient?.id || a.patientId,
+                    type: a.type?.toLowerCase() === 'surgery' 
+                        ? 'Surgery' 
+                        : a.eyeExamination?.stage === 'PRELIMINARY'
+                            ? 'Ready for Doctor'
+                            : a.clinicalExamination 
+                                ? 'Clinical Exam' 
+                                : a.erExamination 
+                                    ? 'ER Exam' 
+                                    : 'Eye Checkup',
+                    status: a.status,
+                    eyeExaminationId: a.eyeExamination?.id || null,
+                }))
+        }
         return DEMO_SCHEDULE
     }, [data])
 
@@ -199,17 +182,17 @@ export function DoctorDashboard() {
 
                 {/* Stat Cards */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                    <StatCard label="Today Patients" value={stats.today}     loading={loading} icon={Users}        color="bg-sky-500"     sparkColor="#0EA5E9" sparkData={SPARK_TODAY} />
-                    <StatCard label="Pending Exams"  value={stats.pending}   loading={loading} icon={Eye}          color="bg-violet-500"  sparkColor="#8b5cf6" sparkData={SPARK_PENDING} />
-                    <StatCard label="Completed"      value={stats.completed} loading={loading} icon={CheckCircle2} color="bg-emerald-500" sparkColor="#10b981" sparkData={SPARK_COMPLETED} />
-                    <StatCard label="Follow Ups"     value={stats.patients}  loading={loading} icon={RefreshCw}    color="bg-orange-500"  sparkColor="#f59e0b" sparkData={SPARK_FOLLOWUP} />
+                    <StatCard label="Today Patients" value={stats.today}     loading={loading} icon={Users}        bgClass="bg-[#3B82F6]" />
+                    <StatCard label="Pending Exams"  value={stats.pending}   loading={loading} icon={Eye}          bgClass="bg-[#EC4899]" />
+                    <StatCard label="Completed"      value={stats.completed} loading={loading} icon={CheckCircle2} bgClass="bg-[#10B981]" />
+                    <StatCard label="Follow Ups"     value={stats.patients}  loading={loading} icon={RefreshCw}    bgClass="bg-[#8B5CF6]" />
                 </div>
 
                 {/* Schedule + Patient Summary */}
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+                <div className={`grid grid-cols-1 ${isOptometrist ? 'xl:grid-cols-1' : 'xl:grid-cols-3'} gap-4`}>
 
                     {/* Today's Appointments */}
-                    <div className="xl:col-span-2 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+                    <div className={`${isOptometrist ? 'xl:col-span-1' : 'xl:col-span-2'} bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden`}>
                         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
                             <h2 className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
                                 <Calendar className="h-3.5 w-3.5 text-sky-500" /> Today&apos;s Appointments
@@ -261,9 +244,10 @@ export function DoctorDashboard() {
                                                                 : `/dashboard/eye-examinations/new?patientId=${r.patientId}&patientName=${encodeURIComponent(r.patient)}&appointmentId=${r.id}&stage=PRELIMINARY`
 
                                                             if (!isSurgery && r.eyeExaminationId) {
-                                                                // If exam already exists, we edit it. 
-                                                                // If it was in Preliminary stage, we now move to Clinical stage.
-                                                                url = `/dashboard/eye-examinations/${r.eyeExaminationId}/edit?stage=CLINICAL`
+                                                                // For optometrists we only navigate to preliminary edit. For ophthalmologists we navigate to clinical.
+                                                                url = isOptometrist 
+                                                                    ? `/dashboard/eye-examinations/${r.eyeExaminationId}/edit?stage=PRELIMINARY`
+                                                                    : `/dashboard/eye-examinations/${r.eyeExaminationId}/edit?stage=CLINICAL`
                                                             }
                                                             router.push(url)
                                                         } catch (err) {
@@ -299,40 +283,42 @@ export function DoctorDashboard() {
                     </div>
 
                     {/* Upcoming Surgeries */}
-                    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col">
-                        <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                            <h2 className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
-                                <Activity className="h-3.5 w-3.5 text-rose-500" /> Upcoming Surgeries
-                            </h2>
-                            <Link href="/dashboard/surgery" className="text-[10px] font-bold text-rose-500 hover:text-rose-600 uppercase tracking-wider">
-                                View All
-                            </Link>
-                        </div>
-                        <div className="flex-1 overflow-y-auto max-h-[300px]">
-                            {surgeries.length > 0 ? surgeries.map((s: any, i: number) => (
-                                <div key={s.id} className="p-3 border-b last:border-0 border-slate-50 dark:border-slate-800/50 hover:bg-slate-50/50 transition-colors">
-                                    <div className="flex items-start justify-between mb-1">
-                                        <div className="flex items-center gap-2">
-                                            <div className="h-7 w-7 rounded-lg bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 font-bold text-[10px]">
-                                                {s.eye}
+                    {!isOptometrist && (
+                        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col">
+                            <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                <h2 className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                                    <Activity className="h-3.5 w-3.5 text-rose-500" /> Upcoming Surgeries
+                                </h2>
+                                <Link href="/dashboard/surgery" className="text-[10px] font-bold text-rose-500 hover:text-rose-600 uppercase tracking-wider">
+                                    View All
+                                </Link>
+                            </div>
+                            <div className="flex-1 overflow-y-auto max-h-[300px]">
+                                {surgeries.length > 0 ? surgeries.map((s: any, i: number) => (
+                                    <div key={s.id} className="p-3 border-b last:border-0 border-slate-50 dark:border-slate-800/50 hover:bg-slate-50/50 transition-colors">
+                                        <div className="flex items-start justify-between mb-1">
+                                            <div className="flex items-center gap-2">
+                                                <div className="h-7 w-7 rounded-lg bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 font-bold text-[10px]">
+                                                    {s.eye}
+                                                </div>
+                                                <span className="text-[13px] font-bold text-slate-700 dark:text-slate-200">{s.patient}</span>
                                             </div>
-                                            <span className="text-[13px] font-bold text-slate-700 dark:text-slate-200">{s.patient}</span>
+                                            <span className="text-[11px] font-black text-rose-500 tabular-nums">{s.time}</span>
                                         </div>
-                                        <span className="text-[11px] font-black text-rose-500 tabular-nums">{s.time}</span>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[11px] font-medium text-slate-500 truncate mr-2">{s.type}</span>
+                                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{s.date}</span>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-[11px] font-medium text-slate-500 truncate mr-2">{s.type}</span>
-                                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{s.date}</span>
+                                )) : (
+                                    <div className="flex flex-col items-center justify-center h-full py-10 px-4 text-center">
+                                        <Activity className="h-8 w-8 text-slate-200 mb-2" />
+                                        <p className="text-xs font-medium text-slate-400 italic">No surgeries scheduled</p>
                                     </div>
-                                </div>
-                            )) : (
-                                <div className="flex flex-col items-center justify-center h-full py-10 px-4 text-center">
-                                    <Activity className="h-8 w-8 text-slate-200 mb-2" />
-                                    <p className="text-xs font-medium text-slate-400 italic">No surgeries scheduled</p>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
 
                 {/* Recent Prescriptions + Examination Stats */}
@@ -342,9 +328,9 @@ export function DoctorDashboard() {
                     <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
                         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
                             <h2 className="text-sm font-bold text-slate-700 dark:text-slate-200">Recent Prescriptions</h2>
-                                <button type="button" onClick={() => router.push('/dashboard/prescription/medicine')}
+                            <button type="button" onClick={() => router.push(isOptometrist ? '/dashboard/prescription/optical' : '/dashboard/prescription/medicine')}
                                 className="flex items-center gap-0.5 text-[11px] font-semibold text-sky-500 hover:text-sky-600 transition-colors">
-                                View All <ArrowUpRight className="h-3 w-3" />
+                                View All
                             </button>
                         </div>
                         <div className="px-4 py-2">

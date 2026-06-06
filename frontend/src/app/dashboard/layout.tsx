@@ -60,7 +60,7 @@ export default function DashboardLayout({
                 const fallbackRole = resolveRoleName(fallbackUser)
                 const currentPath = resolveCurrentPath()
 
-                if (fallbackRole && !isPathAllowedForRole(currentPath, fallbackRole)) {
+                if (fallbackUser && !isPathAllowedForRole(currentPath, fallbackUser)) {
                     router.replace(getDefaultDashboardPath(fallbackRole))
                 }
 
@@ -98,7 +98,7 @@ export default function DashboardLayout({
                 const role = resolveRoleName(userData)
                 const currentPath = (typeof window !== 'undefined' ? window.location.pathname : '/dashboard') || '/dashboard'
 
-                if (!isPathAllowedForRole(currentPath, role)) {
+                if (!isPathAllowedForRole(currentPath, userData)) {
                     toast.error('You do not have permission to view this page.')
                     router.replace(getDefaultDashboardPath(role))
                     setReady()
@@ -124,7 +124,7 @@ export default function DashboardLayout({
                     const fallbackRole = resolveRoleName(fallbackUser)
                     const currentPath = (typeof window !== 'undefined' ? window.location.pathname : '/dashboard') || '/dashboard'
 
-                    if (!isPathAllowedForRole(currentPath, fallbackRole)) {
+                    if (!isPathAllowedForRole(currentPath, fallbackUser)) {
                         router.replace(getDefaultDashboardPath(fallbackRole))
                     }
 
@@ -183,7 +183,7 @@ export default function DashboardLayout({
         }
         const role = resolveRoleName(user)
         if (!role || !currentPath.startsWith('/dashboard')) return
-        if (!isPathAllowedForRole(currentPath, role)) {
+        if (!isPathAllowedForRole(currentPath, user)) {
             toast.error('You do not have permission to view this page.')
             router.replace(getDefaultDashboardPath(role))
         }

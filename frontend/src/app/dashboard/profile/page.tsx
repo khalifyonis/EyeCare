@@ -151,30 +151,30 @@ export default function ProfilePage() {
         : null;
 
     return (
-        <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-500">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 space-y-6 animate-in fade-in duration-500">
             <header className="space-y-1">
-                <h1 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-white">Profile</h1>
-                <p className="text-slate-500 dark:text-slate-400">Manage your personal information and profile picture.</p>
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-800 dark:text-white">Profile</h1>
+                <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400">Manage your personal information and profile picture.</p>
             </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
                 {/* Left Column: Avatar Card */}
                 <Card className="md:col-span-1 overflow-hidden shadow-xl border-blue-100/50 dark:border-slate-800">
-                    <CardContent className="pt-8 pb-6 text-center space-y-4">
+                    <CardContent className="pt-6 sm:pt-8 pb-5 sm:pb-6 text-center space-y-4">
                         <div className="relative inline-block group">
-                            <div className="size-32 rounded-full overflow-hidden border-4 border-white dark:border-slate-900 bg-gradient-to-br from-[#0EA5E9] to-[#0c96d4] shadow-2xl flex items-center justify-center">
+                            <div className="size-24 sm:size-32 rounded-full overflow-hidden border-4 border-white dark:border-slate-900 bg-gradient-to-br from-[#0EA5E9] to-[#0c96d4] shadow-2xl flex items-center justify-center">
                                 {profileImageUrl ? (
                                     <img src={profileImageUrl} alt={user.fullName} className="size-full object-cover" />
                                 ) : (
-                                    <span className="text-4xl font-black text-white">{initials}</span>
+                                    <span className="text-3xl sm:text-4xl font-black text-white">{initials}</span>
                                 )}
                             </div>
                             <button
                                 onClick={handleUploadClick}
                                 disabled={uploading}
-                                className="absolute bottom-1 right-1 p-2.5 rounded-full bg-white dark:bg-slate-800 shadow-lg border border-slate-100 dark:border-slate-700 text-[#0EA5E9] hover:bg-blue-50 dark:hover:bg-slate-700 transition-all duration-200 active:scale-90 disabled:opacity-50"
+                                className="absolute bottom-0.5 right-0.5 sm:bottom-1 sm:right-1 p-2 sm:p-2.5 rounded-full bg-white dark:bg-slate-800 shadow-lg border border-slate-100 dark:border-slate-700 text-[#0EA5E9] hover:bg-blue-50 dark:hover:bg-slate-700 transition-all duration-200 active:scale-90 disabled:opacity-50"
                             >
-                                {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+                                {uploading ? <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" /> : <Camera className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
                             </button>
                             <input
                                 type="file"
@@ -186,20 +186,20 @@ export default function ProfilePage() {
                         </div>
 
                         <div className="space-y-1">
-                            <h2 className="text-xl font-bold text-slate-800 dark:text-white">{user.fullName}</h2>
-                            <p className="text-xs font-black uppercase tracking-widest text-[#0EA5E9]">{user.role}</p>
+                            <h2 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white">{user.fullName}</h2>
+                            <p className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-[#0EA5E9]">{user.role}</p>
                         </div>
                     </CardContent>
                 </Card>
 
                 {/* Right Column: User Info */}
                 <Card className="md:col-span-2 shadow-xl border-blue-100/50 dark:border-slate-800">
-                    <CardHeader>
-                        <CardTitle className="text-lg">Personal Information</CardTitle>
-                        <CardDescription>View and manage your account details.</CardDescription>
+                    <CardHeader className="pb-3 sm:pb-4">
+                        <CardTitle className="text-base sm:text-lg">Personal Information</CardTitle>
+                        <CardDescription className="text-xs sm:text-sm">View and manage your account details.</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <CardContent className="space-y-4 sm:space-y-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Full Name</label>
                                 {editing ? (
@@ -214,8 +214,8 @@ export default function ProfilePage() {
                                     </div>
                                 ) : (
                                     <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800">
-                                        <User className="w-4 h-4 text-[#0EA5E9]" />
-                                        <span className="text-sm font-medium">{user.fullName}</span>
+                                        <User className="w-4 h-4 text-[#0EA5E9] shrink-0" />
+                                        <span className="text-sm font-medium truncate">{user.fullName}</span>
                                     </div>
                                 )}
                             </div>
@@ -233,47 +233,47 @@ export default function ProfilePage() {
                                     </div>
                                 ) : (
                                     <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800">
-                                        <Phone className="w-4 h-4 text-[#0EA5E9]" />
-                                        <span className="text-sm font-medium">{user.phone || '—'}</span>
+                                        <Phone className="w-4 h-4 text-[#0EA5E9] shrink-0" />
+                                        <span className="text-sm font-medium truncate">{user.phone || '—'}</span>
                                     </div>
                                 )}
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Username</label>
                                 <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800">
-                                    <ShieldCheck className="w-4 h-4 text-[#0EA5E9]" />
-                                    <span className="text-sm font-medium">{user.username}</span>
+                                    <ShieldCheck className="w-4 h-4 text-[#0EA5E9] shrink-0" />
+                                    <span className="text-sm font-medium truncate">{user.username}</span>
                                 </div>
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Email Address</label>
                                 <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800">
-                                    <Mail className="w-4 h-4 text-[#0EA5E9]" />
-                                    <span className="text-sm font-medium">{user.email}</span>
+                                    <Mail className="w-4 h-4 text-[#0EA5E9] shrink-0" />
+                                    <span className="text-sm font-medium truncate">{user.email}</span>
                                 </div>
                             </div>
-                            <div className="space-y-1.5">
+                            <div className="space-y-1.5 sm:col-span-2">
                                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Role</label>
                                 <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800 uppercase tracking-tight">
-                                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                                    <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
                                     <span className="text-sm font-bold text-emerald-600">{user.role}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-end gap-2">
                             {editing ? (
                                 <>
-                                    <Button variant="outline" className="rounded-xl" onClick={cancelEdit} disabled={saving}>
+                                    <Button variant="outline" className="rounded-xl w-full sm:w-auto" onClick={cancelEdit} disabled={saving}>
                                         Cancel
                                     </Button>
-                                    <Button className="rounded-xl bg-[#0EA5E9] hover:bg-[#0c96d4]" onClick={saveProfile} disabled={saving}>
+                                    <Button className="rounded-xl bg-[#0EA5E9] hover:bg-[#0c96d4] w-full sm:w-auto" onClick={saveProfile} disabled={saving}>
                                         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4 mr-1" />}
                                         Save
                                     </Button>
                                 </>
                             ) : (
-                                <Button variant="outline" className="rounded-xl" onClick={startEdit}>
+                                <Button variant="outline" className="rounded-xl w-full sm:w-auto" onClick={startEdit}>
                                     <Pencil className="w-4 h-4 mr-2" />
                                     Edit profile
                                 </Button>

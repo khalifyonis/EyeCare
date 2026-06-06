@@ -13,24 +13,6 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function seed() {
-    console.log('Seeding roles...');
-    const roles = [
-        { name: 'SUPERADMIN', description: 'Complete System Access' },
-        { name: 'ADMIN', description: 'System Administrator' },
-        { name: 'DOCTOR', description: 'Medical Professional' },
-        { name: 'RECEPTIONIST', description: 'Front Desk Staff' },
-        { name: 'OPTICIAN', description: 'Eyewear Specialist' },
-        { name: 'PHARMACIST', description: 'Medication Specialist' },
-    ];
-
-    for (const role of roles) {
-        await prisma.role.upsert({
-            where: { name: role.name },
-            update: {},
-            create: role,
-        });
-    }
-
     console.log('Seeding default branch...');
     const mainBranch = await prisma.branch.upsert({
         where: { id: MAIN_BRANCH_ID }, // Using a fixed UUID for consistency in seed
@@ -43,15 +25,6 @@ async function seed() {
         }
     });
 
-    const adminRole = await prisma.role.findUnique({ where: { name: 'ADMIN' } });
-    const doctorRole = await prisma.role.findUnique({ where: { name: 'DOCTOR' } });
-    const receptionistRole = await prisma.role.findUnique({ where: { name: 'RECEPTIONIST' } });
-    const opticianRole = await prisma.role.findUnique({ where: { name: 'OPTICIAN' } });
-    const pharmacistRole = await prisma.role.findUnique({ where: { name: 'PHARMACIST' } });
-    if (!adminRole || !doctorRole || !receptionistRole || !opticianRole || !pharmacistRole) {
-        throw new Error('One or more roles not found after seeding');
-    }
-
     const hashedPassword = await bcrypt.hash('admin123', 10);
 
     const usersToSeed = [
@@ -60,7 +33,7 @@ async function seed() {
             username: 'admin',
             email: 'admin@eyecare.com',
             password: hashedPassword,
-            roleId: adminRole.id,
+            role: 'ADMIN',
             branchId: mainBranch.id,
         },
         {
@@ -68,7 +41,7 @@ async function seed() {
             username: 'yonis',
             email: 'yonis@eyecare.com',
             password: hashedPassword,
-            roleId: adminRole.id, // Giving admin access as requested
+            role: 'ADMIN', // Giving admin access as requested
             branchId: mainBranch.id,
         },
         {
@@ -76,7 +49,7 @@ async function seed() {
             username: 'doctor1',
             email: 'doctor1@eyecare.com',
             password: hashedPassword,
-            roleId: doctorRole.id,
+            role: 'DOCTOR',
             branchId: mainBranch.id,
         },
         {
@@ -84,7 +57,7 @@ async function seed() {
             username: 'reception1',
             email: 'reception1@eyecare.com',
             password: hashedPassword,
-            roleId: receptionistRole.id,
+            role: 'RECEPTIONIST',
             branchId: mainBranch.id,
         },
         {
@@ -92,7 +65,7 @@ async function seed() {
             username: 'pharmacist1',
             email: 'pharmacist1@eyecare.com',
             password: hashedPassword,
-            roleId: pharmacistRole.id,
+            role: 'PHARMACIST',
             branchId: mainBranch.id,
         },
         {
@@ -100,7 +73,7 @@ async function seed() {
             username: 'optician1',
             email: 'optician1@eyecare.com',
             password: hashedPassword,
-            roleId: opticianRole.id,
+            role: 'OPTICIAN',
             branchId: mainBranch.id,
         },
     ];
@@ -111,8 +84,12 @@ async function seed() {
         for (const userData of usersToSeed) {
             const existing = await prisma.user.findUnique({ where: { username: userData.username } });
             if (existing) {
-                console.log(`User ${userData.username} already exists. Skipping.`);
-                createdUsers[userData.username] = existing;
+                console.log(`User ${userData.username} already exists. Updating role to ${userData.role}.`);
+                const user = await prisma.user.update({
+                    where: { username: userData.username },
+                    data: { role: userData.role }
+                });
+                createdUsers[userData.username] = user;
             } else {
                 const user = await prisma.user.create({ data: userData });
                 console.log(`User created: ${user.username}`);
@@ -123,7 +100,7 @@ async function seed() {
         console.log('Skipping demo user seeding. (Set SEED_DEMO_USERS=1 to enable)');
         const existing = await prisma.user.findMany({
             where: { branchId: mainBranch.id },
-            select: { id: true, username: true, roleId: true, branchId: true },
+            select: { id: true, username: true, role: true, branchId: true },
         });
         for (const u of existing) createdUsers[u.username] = u;
         if (existing.length === 0) {
@@ -133,7 +110,7 @@ async function seed() {
 
     // Ensure every DOCTOR user has a Doctor profile (including existing users like \"omar\")
     console.log('Ensuring doctor profiles for all doctor users...');
-    const doctorUsers = await prisma.user.findMany({ where: { roleId: doctorRole.id } });
+    const doctorUsers = await prisma.user.findMany({ where: { role: 'DOCTOR' } });
     for (let i = 0; i < doctorUsers.length; i++) {
         const user = doctorUsers[i];
         const existingDoctor = await prisma.doctor.findUnique({ where: { userId: user.id } });
@@ -242,7 +219,7 @@ async function seed() {
                 await prisma.prescription.create({
                     data: {
                         appointmentId: appt.id,
-                        examId,
+                        clinicalExamId: examId,
                         branchId: mainBranch.id,
                         itemType: 'PHARMACY',
                         itemId: chosen.id,
@@ -457,7 +434,7 @@ async function seed() {
                             prescription = await prisma.prescription.create({
                                 data: {
                                     appointmentId: appt.id,
-                                    examId: clinical.id,
+                                    clinicalExamId: clinical.id,
                                     branchId: mainBranch.id,
                                     itemType: 'PHARMACY',
                                     itemId: randItem?.id || null,
@@ -839,7 +816,7 @@ async function seed() {
                 faraxPrescription = await prisma.prescription.create({
                     data: {
                         appointmentId: firstAppointment.id,
-                        examId: firstClinical.id,
+                        clinicalExamId: firstClinical.id,
                         branchId: mainBranch.id,
                         itemType: 'PHARMACY',
                         itemId: workflowItem.id,

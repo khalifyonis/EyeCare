@@ -62,3 +62,49 @@ export const authorize = (...roles) => {
         next();
     };
 };
+
+export const checkPermission = (module, action) => {
+    return async (req, res, next) => {
+        try {
+            if (!req.user) {
+                return res.status(401).json({ message: 'Access denied. No token provided.' });
+            }
+
+            const role = req.user.role;
+
+            // SUPERADMIN bypasses all checks
+            if (role === 'SUPERADMIN') {
+                return next();
+            }
+
+            const permission = await prisma.rolePermission.findUnique({
+                where: {
+                    roleName_module: {
+                        roleName: role,
+                        module: module
+                    }
+                }
+            });
+
+            if (!permission) {
+                return res.status(403).json({ message: `Forbidden. No permissions configured for module: ${module}` });
+            }
+
+            const hasAccess = permission[action]; // canRead, canCreate, canUpdate, canDelete
+            if (!hasAccess) {
+                return res.status(403).json({ message: `Forbidden. Insufficient rights for ${action.replace('can', '').toLowerCase()} on module ${module}.` });
+            }
+
+            next();
+        } catch (error) {
+            return res.status(500).json({ message: 'Internal server error validating permissions.' });
+        }
+    };
+};
+
+export const restrictOptometrist = (req, res, next) => {
+    if (req.user && req.user.role === 'DOCTOR' && req.user.specialization === 'OPTOMETRY') {
+        return res.status(403).json({ message: 'Forbidden. Optometrists cannot perform this clinical/surgical action.' });
+    }
+    next();
+};

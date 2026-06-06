@@ -48,6 +48,8 @@ type MedicinePrescriptionFormProps = {
   mode: 'create' | 'edit';
   id?: string;
   preselectedExamId?: string;
+  preselectedPatientId?: string;
+  preselectedPatientName?: string;
 };
 
 type StructuredInstruction = {
@@ -111,7 +113,13 @@ function normalizeEyeValue(raw?: string | null): string {
   return value;
 }
 
-export default function MedicinePrescriptionForm({ mode, id, preselectedExamId }: MedicinePrescriptionFormProps) {
+export default function MedicinePrescriptionForm({
+  mode,
+  id,
+  preselectedExamId,
+  preselectedPatientId,
+  preselectedPatientName,
+}: MedicinePrescriptionFormProps) {
   const router = useRouter();
 
   const [loading, setLoading] = useState(mode === 'edit');
@@ -124,7 +132,24 @@ export default function MedicinePrescriptionForm({ mode, id, preselectedExamId }
   const [patientResults, setPatientResults] = useState<any[]>([]);
   const [patientLoading, setPatientLoading] = useState(false);
   const [patientOpen, setPatientOpen] = useState(false);
-  const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
+  const [selectedPatient, setSelectedPatient] = useState<any | null>(
+    preselectedPatientId && preselectedPatientName
+      ? { id: preselectedPatientId, fullName: preselectedPatientName }
+      : null
+  );
+
+  const examOptions = useMemo(() => {
+    const list = [...eyeExams];
+    if (preselectedExamId && !list.some((exam) => exam.id === preselectedExamId)) {
+      list.push({
+        id: preselectedExamId,
+        diagnosis: 'Clinical Exam / Surgery Post-Op',
+        patient: selectedPatient ? { id: selectedPatient.id, fullName: selectedPatient.fullName } : null,
+        createdAt: new Date().toISOString(),
+      });
+    }
+    return list;
+  }, [eyeExams, preselectedExamId, selectedPatient]);
 
   const [examId, setExamId] = useState(preselectedExamId || '');
   const [itemId, setItemId] = useState('');
@@ -323,7 +348,7 @@ export default function MedicinePrescriptionForm({ mode, id, preselectedExamId }
               <SelectValue placeholder={selectedPatient ? "Select eye examination for this patient" : "Select patient first"} />
             </SelectTrigger>
             <SelectContent>
-              {eyeExams
+              {examOptions
                 .filter(exam => !selectedPatient || (exam.patient?.id === selectedPatient.id || exam.appointment?.patient?.id === selectedPatient.id))
                 .map((exam) => {
                   const patientName = exam.patient?.fullName || exam.appointment?.patient?.fullName || 'Unknown';
