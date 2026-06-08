@@ -5,9 +5,9 @@ import { getBranchFilter, buildDateFilter, buildSearchFilter, toCsv } from '../l
 const userSelect = { id: true, fullName: true, username: true, role: true };
 const branchSelect = { id: true, branchName: true };
 
-export const listActivityLogs = async (req, res, next) => {
+export const listAuditLogs = async (req, res, next) => {
     try {
-        const { entityType, action, module, userId, from, to, search } = req.query;
+        const { entityType, action, module, userId, entityId, from, to, search } = req.query;
         const { skip, take, page, limit } = getPaginationParams(req.query, 20, 100);
         const branchFilter = getBranchFilter(req);
 
@@ -18,17 +18,12 @@ export const listActivityLogs = async (req, res, next) => {
             ...(action ? { action } : {}),
             ...(module ? { module } : {}),
             ...(userId ? { userId } : {}),
-            ...(search ? {
-                OR: [
-                    ...buildSearchFilter(search, ['details', 'entityType', 'action']).OR,
-                    { user: { fullName: { contains: search.trim(), mode: 'insensitive' } } },
-                    { user: { username: { contains: search.trim(), mode: 'insensitive' } } },
-                ],
-            } : {}),
+            ...(entityId ? { entityId } : {}),
+            ...(search ? buildSearchFilter(search, ['summary', 'entityType', 'action']) : {}),
         };
 
         const [rows, total] = await Promise.all([
-            prisma.activityLog.findMany({
+            prisma.auditLog.findMany({
                 where,
                 orderBy: { createdAt: 'desc' },
                 skip,
@@ -38,7 +33,7 @@ export const listActivityLogs = async (req, res, next) => {
                     branch: { select: branchSelect },
                 },
             }),
-            prisma.activityLog.count({ where }),
+            prisma.auditLog.count({ where }),
         ]);
 
         sendPaginated(res, rows, total, page, limit);
@@ -47,14 +42,35 @@ export const listActivityLogs = async (req, res, next) => {
     }
 };
 
-export const getActivityLogFilters = async (req, res, next) => {
+export const getAuditLogById = async (req, res, next) => {
+    try {
+        const branchFilter = getBranchFilter(req);
+        const log = await prisma.auditLog.findFirst({
+            where: { id: req.params.id, ...branchFilter },
+            include: {
+                user: { select: userSelect },
+                branch: { select: branchSelect },
+            },
+        });
+
+        if (!log) {
+            return res.status(404).json({ message: 'Audit log not found' });
+        }
+
+        res.status(200).json(log);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getAuditLogFilters = async (req, res, next) => {
     try {
         const branchFilter = getBranchFilter(req);
         const [entityTypes, actions, modules, users] = await Promise.all([
-            prisma.activityLog.findMany({ where: branchFilter, distinct: ['entityType'], select: { entityType: true }, orderBy: { entityType: 'asc' } }),
-            prisma.activityLog.findMany({ where: branchFilter, distinct: ['action'], select: { action: true }, orderBy: { action: 'asc' } }),
-            prisma.activityLog.findMany({ where: { ...branchFilter, module: { not: null } }, distinct: ['module'], select: { module: true }, orderBy: { module: 'asc' } }),
-            prisma.activityLog.findMany({
+            prisma.auditLog.findMany({ where: branchFilter, distinct: ['entityType'], select: { entityType: true }, orderBy: { entityType: 'asc' } }),
+            prisma.auditLog.findMany({ where: branchFilter, distinct: ['action'], select: { action: true }, orderBy: { action: 'asc' } }),
+            prisma.auditLog.findMany({ where: { ...branchFilter, module: { not: null } }, distinct: ['module'], select: { module: true }, orderBy: { module: 'asc' } }),
+            prisma.auditLog.findMany({
                 where: branchFilter,
                 distinct: ['userId'],
                 select: { user: { select: userSelect } },
@@ -73,36 +89,36 @@ export const getActivityLogFilters = async (req, res, next) => {
     }
 };
 
-export const getActivityLogStats = async (req, res, next) => {
+export const getAuditLogStats = async (req, res, next) => {
     try {
         const branchFilter = getBranchFilter(req);
         const since = new Date();
         since.setDate(since.getDate() - 7);
 
         const [total, last7Days, recent, topUsers, topModules, byAction] = await Promise.all([
-            prisma.activityLog.count({ where: branchFilter }),
-            prisma.activityLog.count({ where: { ...branchFilter, createdAt: { gte: since } } }),
-            prisma.activityLog.findMany({
+            prisma.auditLog.count({ where: branchFilter }),
+            prisma.auditLog.count({ where: { ...branchFilter, createdAt: { gte: since } } }),
+            prisma.auditLog.findMany({
                 where: branchFilter,
                 orderBy: { createdAt: 'desc' },
                 take: 5,
                 include: { user: { select: userSelect } },
             }),
-            prisma.activityLog.groupBy({
+            prisma.auditLog.groupBy({
                 by: ['userId'],
                 where: { ...branchFilter, createdAt: { gte: since } },
                 _count: { id: true },
                 orderBy: { _count: { id: 'desc' } },
                 take: 5,
             }),
-            prisma.activityLog.groupBy({
+            prisma.auditLog.groupBy({
                 by: ['module'],
                 where: { ...branchFilter, createdAt: { gte: since }, module: { not: null } },
                 _count: { id: true },
                 orderBy: { _count: { id: 'desc' } },
                 take: 5,
             }),
-            prisma.activityLog.groupBy({
+            prisma.auditLog.groupBy({
                 by: ['action'],
                 where: { ...branchFilter, createdAt: { gte: since } },
                 _count: { id: true },
@@ -133,7 +149,7 @@ export const getActivityLogStats = async (req, res, next) => {
     }
 };
 
-export const exportActivityLogs = async (req, res, next) => {
+export const exportAuditLogs = async (req, res, next) => {
     try {
         const { entityType, action, module, userId, from, to } = req.query;
         const branchFilter = getBranchFilter(req);
@@ -147,7 +163,7 @@ export const exportActivityLogs = async (req, res, next) => {
             ...(userId ? { userId } : {}),
         };
 
-        const rows = await prisma.activityLog.findMany({
+        const rows = await prisma.auditLog.findMany({
             where,
             orderBy: { createdAt: 'desc' },
             take: 5000,
@@ -164,76 +180,15 @@ export const exportActivityLogs = async (req, res, next) => {
             { label: 'Module', get: r => r.module || '' },
             { label: 'Entity Type', get: r => r.entityType },
             { label: 'Entity ID', get: r => r.entityId || '' },
-            { label: 'Details', get: r => r.details || '' },
+            { label: 'Summary', get: r => r.summary || '' },
+            { label: 'Changed Fields', get: r => Array.isArray(r.changedFields) ? r.changedFields.join('; ') : '' },
             { label: 'IP Address', get: r => r.ipAddress || '' },
             { label: 'Branch', get: r => r.branch?.branchName || '' },
         ]);
 
         res.setHeader('Content-Type', 'text/csv');
-        res.setHeader('Content-Disposition', 'attachment; filename="activity-logs.csv"');
+        res.setHeader('Content-Disposition', 'attachment; filename="audit-logs.csv"');
         res.status(200).send(csv);
-    } catch (error) {
-        next(error);
-    }
-};
-
-export const getLogsOverview = async (req, res, next) => {
-    try {
-        const branchFilter = getBranchFilter(req);
-        const since = new Date();
-        since.setDate(since.getDate() - 7);
-
-        const [
-            activityTotal,
-            activityLast7,
-            auditTotal,
-            auditLast7,
-            recentActivity,
-            recentAudit,
-            topActiveUsers,
-        ] = await Promise.all([
-            prisma.activityLog.count({ where: branchFilter }),
-            prisma.activityLog.count({ where: { ...branchFilter, createdAt: { gte: since } } }),
-            prisma.auditLog.count({ where: branchFilter }),
-            prisma.auditLog.count({ where: { ...branchFilter, createdAt: { gte: since } } }),
-            prisma.activityLog.findMany({
-                where: branchFilter,
-                orderBy: { createdAt: 'desc' },
-                take: 8,
-                include: { user: { select: userSelect } },
-            }),
-            prisma.auditLog.findMany({
-                where: branchFilter,
-                orderBy: { createdAt: 'desc' },
-                take: 8,
-                include: { user: { select: userSelect } },
-            }),
-            prisma.activityLog.groupBy({
-                by: ['userId'],
-                where: { ...branchFilter, createdAt: { gte: since } },
-                _count: { id: true },
-                orderBy: { _count: { id: 'desc' } },
-                take: 5,
-            }),
-        ]);
-
-        const userIds = topActiveUsers.map(u => u.userId);
-        const userMap = userIds.length
-            ? Object.fromEntries(
-                (await prisma.user.findMany({ where: { id: { in: userIds } }, select: userSelect })).map(u => [u.id, u])
-            )
-            : {};
-
-        res.status(200).json({
-            activity: { total: activityTotal, last7Days: activityLast7 },
-            audit: { total: auditTotal, last7Days: auditLast7 },
-            recentActivity,
-            recentAudit,
-            topActiveUsers: topActiveUsers.map(u => ({
-                user: userMap[u.userId] || { id: u.userId },
-                count: u._count.id,
-            })),
-        });
     } catch (error) {
         next(error);
     }

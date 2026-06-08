@@ -248,7 +248,7 @@ export function PharmacistDashboard() {
                         </div>
                         
                         {!data?.recentPrescriptions?.length ? (
-                            <div className="py-12 text-center text-[13px] text-slate-400">No pharmacy prescriptions yet</div>
+                            <div className="py-12 text-center text-[13px] text-slate-400">No pharmacy prescriptions created today</div>
                         ) : (
                             <div className="overflow-x-auto w-full mt-2">
                                 <table className="w-full text-left border-collapse">

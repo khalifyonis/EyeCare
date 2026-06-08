@@ -1,5 +1,5 @@
 import express from 'express';
-import { authenticate, authorize } from '../middlewares/authMiddleware.js';
+import { authenticate, checkPermission } from '../middlewares/authMiddleware.js';
 import validate from '../middlewares/validate.js';
 import {
     createOpticalPrescriptionSchema,
@@ -17,12 +17,12 @@ import {
 
 const router = express.Router();
 
-router.get('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), listOpticalPrescriptions);
-router.get('/stats', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), getOpticalPrescriptionStats);
-router.get('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), getOpticalPrescriptionById);
-router.post('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), validate(createOpticalPrescriptionSchema), createOpticalPrescription);
-router.post('/:id/dispense', authenticate, authorize('ADMIN', 'SUPERADMIN', 'OPTICIAN'), dispenseOpticalPrescription);
-router.put('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), validate(updateOpticalPrescriptionSchema), updateOpticalPrescription);
-router.delete('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), deleteOpticalPrescription);
+router.get('/', authenticate, checkPermission('optical_prescriptions', 'canRead'), listOpticalPrescriptions);
+router.get('/stats', authenticate, checkPermission('optical_prescriptions', 'canRead'), getOpticalPrescriptionStats);
+router.get('/:id', authenticate, checkPermission('optical_prescriptions', 'canRead'), getOpticalPrescriptionById);
+router.post('/', authenticate, checkPermission('optical_prescriptions', 'canCreate'), validate(createOpticalPrescriptionSchema), createOpticalPrescription);
+router.post('/:id/dispense', authenticate, checkPermission('optical_prescriptions', 'canUpdate'), dispenseOpticalPrescription);
+router.put('/:id', authenticate, checkPermission('optical_prescriptions', 'canUpdate'), validate(updateOpticalPrescriptionSchema), updateOpticalPrescription);
+router.delete('/:id', authenticate, checkPermission('optical_prescriptions', 'canDelete'), deleteOpticalPrescription);
 
 export default router;

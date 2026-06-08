@@ -121,7 +121,7 @@ export function OpticianDashboard() {
                             </div>
 
                             {!data?.recentPrescriptions?.length ? (
-                                <div className="py-12 text-center text-[13px] text-slate-400 flex-1 flex items-center justify-center">No optical orders yet</div>
+                                <div className="py-12 text-center text-[13px] text-slate-400 flex-1 flex items-center justify-center">No optical orders created today</div>
                             ) : (
                                 <div className="overflow-x-auto w-full mt-2 flex-1">
                                     <table className="w-full text-left border-collapse">

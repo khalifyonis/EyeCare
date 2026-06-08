@@ -1,4 +1,5 @@
 import prisma from '../lib/prisma.js';
+import { logActivity, logAudit, LOG_MODULES, ACTIVITY_ACTIONS, AUDIT_ACTIONS, ENTITY_TYPES, computePermissionChanges } from '../lib/logging/index.js';
 
 /**
  * Fetch all role permissions grouped by role
@@ -46,9 +47,10 @@ export const getMyPermissions = async (req, res, next) => {
         // SUPERADMIN gets full access dynamically
         if (role === 'SUPERADMIN') {
             const modules = [
-                'patients', 'appointments', 'eye_exams', 'surgery', 
-                'prescriptions', 'reports', 'pharmacy', 'optical', 
-                'billing', 'users', 'logs', 'branches'
+                'patients', 'appointments', 'preliminary_exams', 'clinical_exams', 'surgery', 
+                'medicine_prescriptions', 'optical_prescriptions', 
+                'reports_financial', 'reports_clinical', 'reports_appointments', 'reports_patients', 'reports_inventory', 'reports_operational',
+                'pharmacy', 'optical', 'billing', 'users', 'logs', 'branches'
             ];
             const superadminPerms = modules.map(m => ({
                 module: m,
@@ -107,6 +109,10 @@ export const updateRolePermissions = async (req, res, next) => {
             throw error;
         }
 
+        const beforePerms = await prisma.rolePermission.findMany({
+            where: { roleName: role.toUpperCase() },
+        });
+
         const updated = await prisma.$transaction(
             permissions.map(perm => {
                 return prisma.rolePermission.upsert({
@@ -133,6 +139,30 @@ export const updateRolePermissions = async (req, res, next) => {
                 });
             })
         );
+
+        const permDiff = computePermissionChanges(beforePerms, permissions);
+
+        logActivity(req, {
+            action: ACTIVITY_ACTIONS.UPDATE,
+            module: LOG_MODULES.PERMISSIONS,
+            entityType: ENTITY_TYPES.PERMISSION,
+            entityId: role.toUpperCase(),
+            details: `Updated permissions for role ${role.toUpperCase()}`,
+        }).catch(() => {});
+        logAudit(req, {
+            action: AUDIT_ACTIONS.PERMISSION_CHANGE,
+            module: LOG_MODULES.PERMISSIONS,
+            entityType: ENTITY_TYPES.PERMISSION,
+            entityId: role.toUpperCase(),
+            summary: `Changed role permissions for ${role.toUpperCase()}`,
+            oldValues: { permissions: beforePerms },
+            newValues: { permissions, diff: permDiff },
+            changedFields: [
+                ...permDiff.added.map(p => `+${p.module}`),
+                ...permDiff.removed.map(p => `-${p.module}`),
+                ...permDiff.changed.map(p => `~${p.module}`),
+            ],
+        }).catch(() => {});
 
         res.status(200).json({
             message: `Permissions updated successfully for role ${role}`,

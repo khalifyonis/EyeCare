@@ -2,6 +2,98 @@ import prisma from '../lib/prisma.js';
 import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
 import { emitEvent } from '../lib/socket.js';
 
+const verifyStagePermissions = async (role, body, isUpdate, existingExam = null) => {
+  if (role === 'SUPERADMIN') return;
+
+  const permissions = await prisma.rolePermission.findMany({
+    where: { roleName: role }
+  });
+
+  const getPermission = (mod) => {
+    return permissions.find(p => p.module === mod) || { canRead: false, canCreate: false, canUpdate: false, canDelete: false };
+  };
+
+  const prelimPerm = getPermission('preliminary_exams');
+  const clinicalPerm = getPermission('clinical_exams');
+
+  const action = isUpdate ? 'canUpdate' : 'canCreate';
+
+  // 1. Check if trying to perform clinical exam actions
+  const hasStage2Fields = 
+    body.anteriorSegmentFindings !== undefined ||
+    body.fundusFindings !== undefined ||
+    (body.diagnosis && body.diagnosis.trim().length > 0) ||
+    (body.plan && body.plan.trim().length > 0) ||
+    body.followUpDate !== undefined ||
+    body.nextVisitReason !== undefined;
+
+  const isTransitioningToClinicalOrCompleted = 
+    body.stage === 'CLINICAL' || body.stage === 'COMPLETED';
+
+  if (hasStage2Fields || isTransitioningToClinicalOrCompleted) {
+    if (!clinicalPerm[action]) {
+      const err = new Error('Forbidden. You do not have permission to create or modify Clinical (Stage 2) eye examinations.');
+      err.statusCode = 403;
+      throw err;
+    }
+  }
+
+  // 2. Check if modifying a clinical/completed exam
+  if (isUpdate && existingExam) {
+    if (existingExam.stage === 'CLINICAL' || existingExam.stage === 'COMPLETED') {
+      if (!clinicalPerm.canUpdate) {
+        const err = new Error('Forbidden. You do not have permission to modify eye examinations that are in the Clinical or Completed stage.');
+        err.statusCode = 403;
+        throw err;
+      }
+    }
+  }
+
+  // 3. Check preliminary permission if writing stage 1 fields
+  const hasStage1Fields =
+    body.chiefComplaint !== undefined ||
+    body.historyOfPresentIllness !== undefined ||
+    body.vaScale !== undefined ||
+    body.vaUnaidedOD !== undefined ||
+    body.vaBcvaOD !== undefined ||
+    body.refractionSphereOD !== undefined ||
+    body.iopOD !== undefined;
+
+  if (hasStage1Fields && !prelimPerm[action]) {
+    const err = new Error('Forbidden. You do not have permission to create or modify Preliminary (Stage 1) eye examinations.');
+    err.statusCode = 403;
+    throw err;
+  }
+};
+
+const redactClinicalFields = async (role, examOrExams) => {
+  if (role === 'SUPERADMIN' || !examOrExams) return examOrExams;
+
+  const permission = await prisma.rolePermission.findFirst({
+    where: { roleName: role, module: 'clinical_exams' }
+  });
+
+  if (permission && permission.canRead) {
+    return examOrExams;
+  }
+
+  // Redact clinical fields
+  const redact = (exam) => {
+    const obj = typeof exam.toJSON === 'function' ? exam.toJSON() : JSON.parse(JSON.stringify(exam));
+    delete obj.anteriorSegmentFindings;
+    delete obj.fundusFindings;
+    delete obj.diagnosis;
+    delete obj.plan;
+    return obj;
+  };
+
+  if (Array.isArray(examOrExams)) {
+    return examOrExams.map(redact);
+  } else {
+    return redact(examOrExams);
+  }
+};
+
 const isEyeExamStoreNotReadyError = (err) => {
   // P2021: table does not exist, P2022: column does not exist
   // This keeps the UI usable when eye-exam migrations are not applied yet.
@@ -83,7 +175,8 @@ export const getEyeExaminations = async (req, res, next) => {
       }),
     ]);
 
-    return sendPaginated(res, items, total, page, limit);
+    const redactedItems = await redactClinicalFields(req.user.role, items);
+    return sendPaginated(res, redactedItems, total, page, limit);
   } catch (err) {
     if (isEyeExamStoreNotReadyError(err)) {
       const { page, limit } = getPaginationParams(req.query);
@@ -107,7 +200,8 @@ export const getEyeExaminationById = async (req, res, next) => {
     });
 
     if (!exam) return res.status(404).json({ message: 'Eye examination not found' });
-    return res.json(exam);
+    const redactedExam = await redactClinicalFields(req.user.role, exam);
+    return res.json(redactedExam);
   } catch (err) {
     next(err);
   }
@@ -115,6 +209,7 @@ export const getEyeExaminationById = async (req, res, next) => {
 
 export const createEyeExamination = async (req, res, next) => {
   try {
+    await verifyStagePermissions(req.user.role, req.body, false);
     const branchId = resolveBranchIdForWrite(req, req.body.branchId);
     const {
       patientId,
@@ -190,9 +285,11 @@ export const createEyeExamination = async (req, res, next) => {
         plan: plan || null,
         followUpDate: followUpDate ? new Date(followUpDate) : null,
         nextVisitReason: nextVisitReason || null,
-        stage: req.user.role === 'DOCTOR' && req.user.specialization === 'OPTOMETRY'
-          ? 'PRELIMINARY'
-          : (req.body.stage || 'PRELIMINARY'),
+        stage: req.user.role === 'SUPERADMIN' || (await prisma.rolePermission.findFirst({
+          where: { roleName: req.user.role, module: 'clinical_exams' }
+        }))?.canCreate
+          ? (req.body.stage || 'PRELIMINARY')
+          : 'PRELIMINARY',
       },
       include: {
         patient: { select: { id: true, fullName: true, patientNumber: true } },
@@ -211,7 +308,8 @@ export const createEyeExamination = async (req, res, next) => {
 
     emitEvent('exam:created', created, branchId);
 
-    return res.status(201).json(created);
+    const redactedCreated = await redactClinicalFields(req.user.role, created);
+    return res.status(201).json(redactedCreated);
   } catch (err) {
     next(err);
   }
@@ -221,16 +319,13 @@ export const updateEyeExamination = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const isOptometrist = req.user.role === 'DOCTOR' && req.user.specialization === 'OPTOMETRY';
     const existing = await prisma.eyeExamination.findFirst({
       where: { id, ...getBranchFilter(req) },
       select: { id: true, branchId: true, stage: true, appointmentId: true },
     });
     if (!existing) return res.status(404).json({ message: 'Eye examination not found' });
 
-    if (isOptometrist && existing.stage !== 'PRELIMINARY') {
-      return res.status(403).json({ message: 'Forbidden. Optometrists can only modify examinations in the Preliminary stage.' });
-    }
+    await verifyStagePermissions(req.user.role, req.body, true, existing);
 
     const {
       patientId,
@@ -272,7 +367,13 @@ export const updateEyeExamination = async (req, res, next) => {
 
     let newStage = stage || existing.stage;
     
-    if (isOptometrist) {
+    const permissions = req.user.role === 'SUPERADMIN' ? [] : await prisma.rolePermission.findMany({
+      where: { roleName: req.user.role }
+    });
+    const clinicalPerm = permissions.find(p => p.module === 'clinical_exams');
+    const hasClinicalUpdate = req.user.role === 'SUPERADMIN' || (clinicalPerm && clinicalPerm.canUpdate);
+
+    if (!hasClinicalUpdate) {
       newStage = 'PRELIMINARY';
     } else {
       // Logic for transition:
@@ -350,7 +451,8 @@ export const updateEyeExamination = async (req, res, next) => {
 
     emitEvent('exam:updated', updated, updated.branchId);
 
-    return res.json(updated);
+    const redactedUpdated = await redactClinicalFields(req.user.role, updated);
+    return res.json(redactedUpdated);
   } catch (err) {
     next(err);
   }

@@ -110,10 +110,10 @@ export function DoctorDashboard() {
     useEffect(() => { if (user) fetchData() }, [user, fetchData])
 
     const stats = useMemo(() => ({
-        today:     (data?.myAppointmentsToday ?? 0) || 4,
-        pending:   (data?.myPendingToday ?? 0) || 2,
-        completed: (data?.myCompletedToday ?? 0) || 2,
-        patients:  (data?.myTotalPatients ?? 0) || 5,
+        today:     data?.myAppointmentsToday ?? 0,
+        pending:   data?.myPendingToday ?? 0,
+        completed: data?.myCompletedToday ?? 0,
+        patients:  data?.myTotalPatients ?? 0,
     }), [data])
 
     const schedule = useMemo(() => {
@@ -138,7 +138,7 @@ export function DoctorDashboard() {
                     eyeExaminationId: a.eyeExamination?.id || null,
                 }))
         }
-        return DEMO_SCHEDULE
+        return []
     }, [data])
 
     const rxRows = useMemo(() => {
@@ -149,7 +149,7 @@ export function DoctorDashboard() {
                 item: 'Medicine',
                 date: new Date(rx.createdAt).toLocaleDateString(),
             }))
-        return DEMO_RX
+        return []
     }, [data])
 
     const surgeries = useMemo(() => {
@@ -334,7 +334,7 @@ export function DoctorDashboard() {
                             </button>
                         </div>
                         <div className="px-4 py-2">
-                            {rxRows.map((rx: any, i: number) => (
+                            {rxRows.length > 0 ? rxRows.map((rx: any, i: number) => (
                                 <div key={rx.id} className="flex items-center gap-2.5 py-2 border-b last:border-0 border-slate-50 dark:border-slate-800/50">
                                     <div className={`h-7 w-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0 ${AV[(i+2) % AV.length]}`}>
                                         {rx.patient?.split(' ').map((n: string) => n[0]).join('').slice(0,2).toUpperCase()}
@@ -344,7 +344,9 @@ export function DoctorDashboard() {
                                     <span className="text-[13px] text-slate-500 dark:text-slate-400 truncate">{rx.item}</span>
                                     <span className="ml-auto text-[11px] text-slate-400 tabular-nums shrink-0">{rx.date}</span>
                                 </div>
-                            ))}
+                            )) : (
+                                <div className="py-8 text-center text-xs text-slate-450 italic">No prescriptions created today</div>
+                            )}
                         </div>
                     </div>
 

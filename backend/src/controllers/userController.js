@@ -3,6 +3,7 @@ import prisma from '../lib/prisma.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { sendOnboardingEmail } from '../services/emailService.js';
+import { logActivity, logAudit, LOG_MODULES, ACTIVITY_ACTIONS, AUDIT_ACTIONS, ENTITY_TYPES, sanitizeForAudit } from '../lib/logging/index.js';
 
 
 
@@ -244,6 +245,25 @@ export const createUser = async (req, res, next) => {
         }
 
         const { password: _, ...sanitizedUser } = newUser;
+
+        logActivity(req, {
+            branchId: finalBranchIds[0],
+            action: ACTIVITY_ACTIONS.CREATE,
+            module: LOG_MODULES.USERS,
+            entityType: ENTITY_TYPES.USER,
+            entityId: newUser.id,
+            details: `Created user ${newUser.fullName} (${newUser.role})`,
+        }).catch(() => {});
+        logAudit(req, {
+            branchId: finalBranchIds[0],
+            action: AUDIT_ACTIONS.CREATE,
+            module: LOG_MODULES.USERS,
+            entityType: ENTITY_TYPES.USER,
+            entityId: newUser.id,
+            summary: `Created user account`,
+            after: sanitizeForAudit(sanitizedUser),
+        }).catch(() => {});
+
         res.status(201).json({
             message: 'User created successfully',
             user: sanitizedUser,
@@ -384,6 +404,26 @@ export const updateUser = async (req, res, next) => {
         });
 
         const { password: _, ...sanitizedUser } = updatedUser;
+
+        logActivity(req, {
+            branchId: updatedUser.branchId,
+            action: ACTIVITY_ACTIONS.UPDATE,
+            module: LOG_MODULES.USERS,
+            entityType: ENTITY_TYPES.USER,
+            entityId: updatedUser.id,
+            details: `Updated user ${updatedUser.fullName}`,
+        }).catch(() => {});
+        logAudit(req, {
+            branchId: updatedUser.branchId,
+            action: AUDIT_ACTIONS.UPDATE,
+            module: LOG_MODULES.USERS,
+            entityType: ENTITY_TYPES.USER,
+            entityId: updatedUser.id,
+            summary: `Updated user account`,
+            before: sanitizeForAudit(existingUser),
+            after: sanitizeForAudit(sanitizedUser),
+        }).catch(() => {});
+
         res.status(200).json({ message: 'User updated successfully', user: sanitizedUser });
     } catch (error) {
         next(error);
@@ -400,6 +440,24 @@ export const deleteUser = async (req, res, next) => {
             error.statusCode = 404;
             throw error;
         }
+
+        logActivity(req, {
+            branchId: user.branchId,
+            action: ACTIVITY_ACTIONS.DELETE,
+            module: LOG_MODULES.USERS,
+            entityType: ENTITY_TYPES.USER,
+            entityId: user.id,
+            details: `Deleted user ${user.fullName}`,
+        }).catch(() => {});
+        logAudit(req, {
+            branchId: user.branchId,
+            action: AUDIT_ACTIONS.DELETE,
+            module: LOG_MODULES.USERS,
+            entityType: ENTITY_TYPES.USER,
+            entityId: user.id,
+            summary: `Deleted user account`,
+            before: sanitizeForAudit(user),
+        }).catch(() => {});
 
         await prisma.$transaction(async (tx) => {
             await tx.doctor.delete({ where: { userId: id } }).catch(() => { });

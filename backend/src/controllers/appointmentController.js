@@ -1,6 +1,7 @@
 import prisma from '../lib/prisma.js';
 import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
 import { emitEvent } from '../lib/socket.js';
+import { logActivity, logAudit, LOG_MODULES, ACTIVITY_ACTIONS, AUDIT_ACTIONS, ENTITY_TYPES, sanitizeForAudit } from '../lib/logging/index.js';
 
 // Generate professional, sequential booking number (e.g., BK-10001)
 const generateBookingNumber = async () => {
@@ -222,6 +223,25 @@ export const createAppointment = async (req, res, next) => {
         }
 
         emitEvent('appointment:created', appointment, activeBranchId);
+
+        logActivity(req, {
+            branchId: activeBranchId,
+            action: ACTIVITY_ACTIONS.CREATE,
+            module: LOG_MODULES.APPOINTMENTS,
+            entityType: ENTITY_TYPES.APPOINTMENT,
+            entityId: appointment.id,
+            details: `Created appointment ${appointment.bookingNumber || appointment.id}`,
+        }).catch(() => {});
+        logAudit(req, {
+            branchId: activeBranchId,
+            action: AUDIT_ACTIONS.CREATE,
+            module: LOG_MODULES.APPOINTMENTS,
+            entityType: ENTITY_TYPES.APPOINTMENT,
+            entityId: appointment.id,
+            summary: `Created appointment`,
+            after: sanitizeForAudit(appointment),
+        }).catch(() => {});
+
         res.status(201).json(appointment);
     } catch (error) {
         next(error);
@@ -280,7 +300,8 @@ export const getAppointments = async (req, res, next) => {
                     branch: { select: { branchName: true } },
                     createdBy: { select: { fullName: true } },
                     billings: { select: { id: true, finalAmount: true, status: true } },
-                    clinicalExamination: { include: { surgery: true } }
+                    clinicalExamination: { include: { surgery: true } },
+                    eyeExamination: { select: { id: true, stage: true } }
                 }
             }),
             prisma.appointment.count({ where: whereClause })
@@ -510,6 +531,26 @@ export const updateAppointment = async (req, res, next) => {
         }
 
         emitEvent('appointment:updated', appointment, appointment.branchId);
+
+        logActivity(req, {
+            branchId: appointment.branchId,
+            action: ACTIVITY_ACTIONS.UPDATE,
+            module: LOG_MODULES.APPOINTMENTS,
+            entityType: ENTITY_TYPES.APPOINTMENT,
+            entityId: appointment.id,
+            details: `Updated appointment ${appointment.bookingNumber || appointment.id}`,
+        }).catch(() => {});
+        logAudit(req, {
+            branchId: appointment.branchId,
+            action: AUDIT_ACTIONS.UPDATE,
+            module: LOG_MODULES.APPOINTMENTS,
+            entityType: ENTITY_TYPES.APPOINTMENT,
+            entityId: appointment.id,
+            summary: `Updated appointment`,
+            before: sanitizeForAudit(existing),
+            after: sanitizeForAudit(appointment),
+        }).catch(() => {});
+
         res.status(200).json(appointment);
     } catch (error) {
         next(error);
@@ -524,6 +565,24 @@ export const deleteAppointment = async (req, res, next) => {
         if (req.user.role !== 'SUPERADMIN' && existing.branchId !== req.user.branchId) {
             return res.status(403).json({ message: 'Forbidden' });
         }
+
+        logActivity(req, {
+            branchId: existing.branchId,
+            action: ACTIVITY_ACTIONS.DELETE,
+            module: LOG_MODULES.APPOINTMENTS,
+            entityType: ENTITY_TYPES.APPOINTMENT,
+            entityId: existing.id,
+            details: `Deleted appointment ${existing.bookingNumber || existing.id}`,
+        }).catch(() => {});
+        logAudit(req, {
+            branchId: existing.branchId,
+            action: AUDIT_ACTIONS.DELETE,
+            module: LOG_MODULES.APPOINTMENTS,
+            entityType: ENTITY_TYPES.APPOINTMENT,
+            entityId: existing.id,
+            summary: `Deleted appointment`,
+            before: sanitizeForAudit(existing),
+        }).catch(() => {});
 
         await prisma.appointment.delete({ where: { id: req.params.id } });
         emitEvent('appointment:deleted', { id: req.params.id }, existing.branchId);

@@ -189,7 +189,7 @@ export const getDoctorDashboard = async (req, res, next) => {
                 },
             }),
             prisma.prescription.findMany({
-                where: { appointment: docFilter },
+                where: { appointment: docFilter, createdAt: today },
                 orderBy: { createdAt: 'desc' },
                 take: 5,
                 include: { appointment: { include: { patient: { select: { fullName: true } } } } },
@@ -278,7 +278,7 @@ export const getPharmacistDashboard = async (req, res, next) => {
                 _sum: { finalAmount: true },
             }),
             prisma.prescription.findMany({
-                where: { ...branchFilter, itemType: 'PHARMACY' },
+                where: { ...branchFilter, itemType: 'PHARMACY', createdAt: today },
                 orderBy: { createdAt: 'desc' },
                 take: 8,
                 include: { appointment: { include: { patient: { select: { fullName: true } } } } },
@@ -336,7 +336,7 @@ export const getOpticianDashboard = async (req, res, next) => {
                 _sum: { finalAmount: true },
             }),
             prisma.opticalPrescription.findMany({
-                where: { ...branchFilter },
+                where: { ...branchFilter, createdAt: today },
                 orderBy: { createdAt: 'desc' },
                 take: 8,
                 include: { patient: { select: { fullName: true } } },

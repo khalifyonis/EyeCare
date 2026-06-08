@@ -5,13 +5,26 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import api from '@/lib/axios';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-import { Calendar as CalendarIcon, ChevronLeft, User as UserIcon, Scissors, Search, Clock, AlertCircle } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, User as UserIcon, Scissors, Search, Clock, AlertCircle, Pill, X, PlusCircle } from 'lucide-react';
+
+type MedicationItem = {
+  itemId: string;
+  name: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+  eye: 'OD' | 'OS' | 'OU' | 'NONE';
+  quantity?: number;
+  notes?: string;
+  category?: string;
+};
 
 type PatientOption = {
   id: string;
@@ -108,6 +121,36 @@ export default function ScheduleSurgeryPage() {
   const [notes, setNotes] = useState('');
   const [appointmentId, setAppointmentId] = useState<string | null>(null);
 
+  // Prescription states
+  const [medicines, setMedicines] = useState<any[]>([]);
+  const [prescriptions, setPrescriptions] = useState<MedicationItem[]>([]);
+
+  const emptyMedication = (): MedicationItem => ({ itemId: '', name: '', dosage: '', frequency: '', duration: '', eye: 'OU' });
+
+  const updateMedication = (index: number, key: keyof MedicationItem, value: any) => {
+    setPrescriptions((prev) =>
+      prev.map((item, itemIndex) => (itemIndex === index ? { ...item, [key]: value } : item))
+    );
+  };
+
+  const addMedication = () => {
+    setPrescriptions((prev) => [...prev, emptyMedication()]);
+  };
+
+  const removeMedication = (index: number) => {
+    setPrescriptions((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const buildStructuredInstruction = (data: { dosage: string; frequency: string; duration: string; eye: string; notes: string }) => {
+    const parts = [];
+    if (data.dosage) parts.push(`Dosage: ${data.dosage}`);
+    if (data.frequency) parts.push(`Frequency: ${data.frequency}`);
+    if (data.duration) parts.push(`Duration: ${data.duration}`);
+    if (data.eye && data.eye !== 'N/A' && data.eye !== 'NONE') parts.push(`Eye: ${data.eye}`);
+    if (data.notes) parts.push(`Notes: ${data.notes}`);
+    return parts.join(' | ');
+  };
+
   const now = new Date();
   const defaultDate = now.toISOString().split('T')[0];
   const defaultTime = now.toTimeString().split(' ')[0].slice(0, 5);
@@ -172,6 +215,13 @@ export default function ScheduleSurgeryPage() {
     fetchDoctors();
   }, [fetchDoctors]);
 
+  useEffect(() => {
+    api.get('/inventory/pharmacy?limit=1000').then(res => {
+      const items = res.data?.data || res.data || [];
+      setMedicines(Array.isArray(items) ? items : []);
+    }).catch(() => setMedicines([]));
+  }, []);
+
   const fetchPatients = useCallback(
     async (q: string) => {
       const query = q.trim();
@@ -233,6 +283,21 @@ export default function ScheduleSurgeryPage() {
 
     setSaving(true);
     try {
+      const rxPayload = prescriptions
+        .filter(med => med.itemId && med.name)
+        .map(med => ({
+          itemId: med.itemId,
+          itemName: med.name,
+          quantity: med.quantity || 1,
+          instructions: buildStructuredInstruction({
+            dosage: med.dosage,
+            frequency: med.frequency,
+            duration: med.duration,
+            eye: med.eye === 'NONE' ? 'N/A' : med.eye,
+            notes: med.notes || '',
+          })
+        }));
+
       const payload: any = {
         patientId: patient.id,
         appointmentId: appointmentId || undefined,
@@ -245,6 +310,7 @@ export default function ScheduleSurgeryPage() {
         time,
         status: 'completed',
         notes: notes.trim() || undefined,
+        prescriptions: rxPayload.length > 0 ? rxPayload : undefined,
       };
 
       if (showCataractDetails) {
@@ -446,6 +512,189 @@ export default function ScheduleSurgeryPage() {
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
         />
+      </div>
+
+      {/* Post-Operative Medications */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0EA5E9] text-white shadow-sm">
+              <Pill className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-gray-900">Post-Operative Medications</h3>
+              <p className="text-xs text-gray-500">Enable and prescribe post-operative medications</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-100">
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Enable Rx</span>
+              <button
+                type="button"
+                onClick={() => setPrescriptions(prev => prev.length === 0 ? [emptyMedication()] : [])}
+                className={cn(
+                  "relative h-5 w-10 rounded-full transition-colors",
+                  prescriptions.length > 0 ? "bg-[#0EA5E9]" : "bg-gray-200"
+                )}
+              >
+                <div className={cn(
+                  "absolute left-1 top-1 h-3 w-3 rounded-full bg-white transition-all shadow-sm",
+                  prescriptions.length > 0 ? "translate-x-5" : "translate-x-0"
+                )} />
+              </button>
+            </div>
+
+            <button
+              type="button"
+              disabled={prescriptions.length === 0}
+              onClick={addMedication}
+              className="flex items-center gap-2 rounded-lg bg-[#0EA5E9] px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-[#0284C7] transition-all disabled:opacity-30 disabled:grayscale"
+            >
+              <PlusCircle className="h-3.5 w-3.5" />
+              Add Medication
+            </button>
+          </div>
+        </div>
+
+        {prescriptions.length === 0 ? (
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-100 bg-white py-12 text-center">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-50 text-slate-400">
+              <Pill className="h-6 w-6" />
+            </div>
+            <h4 className="text-sm font-bold text-slate-900">No Medications Prescribed</h4>
+            <p className="mt-1 text-xs text-slate-500 max-w-[240px]">Use the toggle above to enable and start adding medications.</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {prescriptions.map((item, index) => (
+              <div key={`medication-${index}`} className="relative rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => removeMedication(index)}
+                  className="absolute right-4 top-4 text-slate-400 hover:text-red-500 transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+
+                <div className="grid grid-cols-1 gap-5">
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                    <div className="lg:col-span-2 space-y-1">
+                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Medicine Name</label>
+                      <select
+                        value={item.itemId}
+                        onChange={(e) => {
+                          const p = medicines.find((x) => x.id === e.target.value);
+                          const next = [...prescriptions];
+                          
+                          const fullName = (p?.itemName || '').toLowerCase();
+                          const type = (p?.itemType || '').toLowerCase();
+                          const cat = (p?.category || '').toLowerCase();
+                          const isTopical = [fullName, type, cat].some(s => 
+                            s.includes('drop') || 
+                            s.includes('ointment') || 
+                            s.includes('gel') || 
+                            s.includes('sol') || 
+                            s.includes('susp') ||
+                            s.includes('cream') ||
+                            s.includes('gtt') ||
+                            s.includes('inj')
+                          );
+
+                          next[index] = {
+                            ...next[index],
+                            itemId: p?.id || '',
+                            name: p?.itemName || p?.genericName || '',
+                            category: p?.category || p?.itemType || '',
+                            eye: isTopical ? 'OU' : 'NONE',
+                          };
+                          setPrescriptions(next);
+                        }}
+                        className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm focus:border-slate-400 focus:outline-none bg-white"
+                      >
+                        <option value="">Select from inventory</option>
+                        {medicines.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.itemName} {p.strength ? `(${p.strength})` : ''}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Quantity</label>
+                      <input
+                        type="number"
+                        value={item.quantity || 1}
+                        onChange={(e) => updateMedication(index, 'quantity', parseInt(e.target.value) || 0)}
+                        className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm focus:border-slate-400 focus:outline-none"
+                        placeholder="1"
+                        min="1"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                    <div className="space-y-1">
+                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Dosage</label>
+                      <input
+                        type="text"
+                        value={item.dosage}
+                        onChange={(e) => updateMedication(index, 'dosage', e.target.value)}
+                        className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm focus:border-slate-400 focus:outline-none"
+                        placeholder="e.g. 0.5%"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Frequency</label>
+                      <input
+                        type="text"
+                        value={item.frequency}
+                        onChange={(e) => updateMedication(index, 'frequency', e.target.value)}
+                        className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm focus:border-slate-400 focus:outline-none"
+                        placeholder="e.g. BD (Twice daily)"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Duration</label>
+                      <input
+                        type="text"
+                        value={item.duration}
+                        onChange={(e) => updateMedication(index, 'duration', e.target.value)}
+                        className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm focus:border-slate-400 focus:outline-none"
+                        placeholder="e.g. 7 days"
+                      />
+                    </div>
+                    {item.eye !== 'NONE' && (
+                      <div className="space-y-1">
+                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Eye</label>
+                        <select
+                          value={item.eye}
+                          onChange={(e) => updateMedication(index, 'eye', e.target.value as any)}
+                          className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm focus:border-slate-400 focus:outline-none bg-white"
+                        >
+                          <option value="OD">OD (Right Eye)</option>
+                          <option value="OS">OS (Left Eye)</option>
+                          <option value="OU">OU (Both Eyes)</option>
+                        </select>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Notes / Instructions</label>
+                    <textarea
+                      value={item.notes || ''}
+                      onChange={(e) => updateMedication(index, 'notes', e.target.value)}
+                      rows={2}
+                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none"
+                      placeholder="Additional advice for patient..."
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* D. Cataract Surgery Details (Conditional) */}

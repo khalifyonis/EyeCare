@@ -1,5 +1,5 @@
 import express from 'express';
-import { authenticate, authorize } from '../middlewares/authMiddleware.js';
+import { authenticate, checkPermission, checkAnyPermission } from '../middlewares/authMiddleware.js';
 import validate from '../middlewares/validate.js';
 import { createEyeExaminationSchema, updateEyeExaminationSchema } from '../middlewares/validationSchemas.js';
 import {
@@ -13,11 +13,11 @@ import {
 
 const router = express.Router();
 
-router.get('/stats', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), getEyeExaminationStats);
-router.get('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), getEyeExaminations);
-router.get('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'), getEyeExaminationById);
-router.post('/', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR'), validate(createEyeExaminationSchema), createEyeExamination);
-router.put('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR'), validate(updateEyeExaminationSchema), updateEyeExamination);
-router.delete('/:id', authenticate, authorize('ADMIN', 'SUPERADMIN', 'DOCTOR'), deleteEyeExamination);
+router.get('/stats', authenticate, checkAnyPermission(['preliminary_exams', 'clinical_exams'], 'canRead'), getEyeExaminationStats);
+router.get('/', authenticate, checkAnyPermission(['preliminary_exams', 'clinical_exams'], 'canRead'), getEyeExaminations);
+router.get('/:id', authenticate, checkAnyPermission(['preliminary_exams', 'clinical_exams'], 'canRead'), getEyeExaminationById);
+router.post('/', authenticate, checkAnyPermission(['preliminary_exams', 'clinical_exams'], 'canCreate'), validate(createEyeExaminationSchema), createEyeExamination);
+router.put('/:id', authenticate, checkAnyPermission(['preliminary_exams', 'clinical_exams'], 'canUpdate'), validate(updateEyeExaminationSchema), updateEyeExamination);
+router.delete('/:id', authenticate, checkPermission('clinical_exams', 'canDelete'), deleteEyeExamination);
 
 export default router;

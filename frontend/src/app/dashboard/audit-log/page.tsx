@@ -5,23 +5,26 @@ import api from '@/lib/axios';
 import { DataTable } from '@/components/ui/data-table';
 import { PageBreadcrumb } from '@/components/dashboard/page-breadcrumb';
 import { Button } from '@/components/ui/button';
-import { Activity, RefreshCcw, Download } from 'lucide-react';
+import { Shield, RefreshCcw, Download, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import type { ColumnDef } from '@tanstack/react-table';
-import type { ActivityLogRow, LogFilters, PaginatedResponse } from '@/lib/types/logs';
+import type { AuditLogRow, LogFilters, PaginatedResponse } from '@/lib/types/logs';
 import { ActionBadge } from '@/components/logs/action-badge';
+import { AuditDetailSheet } from '@/components/logs/audit-detail-sheet';
 import { LogFiltersBar, emptyLogFilters, type LogFilterState } from '@/components/logs/log-filters';
 import { formatLogDate, formatModuleLabel } from '@/lib/logging-utils';
 import { hasPermission } from '@/lib/permissions';
 
-export default function ActivityLogPage() {
-    const [rows, setRows] = useState<ActivityLogRow[]>([]);
+export default function AuditLogPage() {
+    const [rows, setRows] = useState<AuditLogRow[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const [filterOptions, setFilterOptions] = useState<LogFilters | null>(null);
     const [filters, setFilters] = useState<LogFilterState>(emptyLogFilters);
+    const [selectedLog, setSelectedLog] = useState<AuditLogRow | null>(null);
+    const [detailOpen, setDetailOpen] = useState(false);
     const limit = 20;
     const canRead = hasPermission('logs', 'canRead');
 
@@ -41,13 +44,13 @@ export default function ActivityLogPage() {
         if (!canRead) return;
         setLoading(true);
         try {
-            const res = await api.get('/activity-logs', { params: buildParams() });
-            const body = res.data as PaginatedResponse<ActivityLogRow>;
+            const res = await api.get('/audit-logs', { params: buildParams() });
+            const body = res.data as PaginatedResponse<AuditLogRow>;
             setRows(Array.isArray(body?.data) ? body.data : []);
             setTotal(body?.total ?? 0);
             setTotalPages(body?.totalPages ?? 1);
         } catch {
-            toast.error('Failed to load activity logs');
+            toast.error('Failed to load audit logs');
         } finally {
             setLoading(false);
         }
@@ -55,7 +58,7 @@ export default function ActivityLogPage() {
 
     const fetchFilters = async () => {
         try {
-            const res = await api.get('/activity-logs/filters');
+            const res = await api.get('/audit-logs/filters');
             setFilterOptions(res.data);
         } catch { /* optional */ }
     };
@@ -73,20 +76,25 @@ export default function ActivityLogPage() {
             const params = buildParams();
             delete params.page;
             delete params.limit;
-            const res = await api.get('/activity-logs/export', { params, responseType: 'blob' });
+            const res = await api.get('/audit-logs/export', { params, responseType: 'blob' });
             const url = window.URL.createObjectURL(new Blob([res.data]));
             const a = document.createElement('a');
             a.href = url;
-            a.download = `activity-logs-${new Date().toISOString().slice(0, 10)}.csv`;
+            a.download = `audit-logs-${new Date().toISOString().slice(0, 10)}.csv`;
             a.click();
             window.URL.revokeObjectURL(url);
-            toast.success('Activity logs exported');
+            toast.success('Audit logs exported');
         } catch {
             toast.error('Export failed');
         }
     };
 
-    const columns = useMemo<ColumnDef<ActivityLogRow>[]>(() => [
+    const openDetail = (log: AuditLogRow) => {
+        setSelectedLog(log);
+        setDetailOpen(true);
+    };
+
+    const columns = useMemo<ColumnDef<AuditLogRow>[]>(() => [
         {
             accessorKey: 'createdAt',
             header: 'Date & Time',
@@ -104,8 +112,8 @@ export default function ActivityLogPage() {
                     <span className="font-medium text-slate-900 dark:text-slate-100">
                         {row.original.user?.fullName || row.original.user?.username || '—'}
                     </span>
-                    {row.original.branch?.branchName && (
-                        <p className="text-[10px] text-slate-400">{row.original.branch.branchName}</p>
+                    {row.original.user?.role && (
+                        <p className="text-[10px] text-slate-400">{row.original.user.role}</p>
                     )}
                 </div>
             ),
@@ -133,19 +141,31 @@ export default function ActivityLogPage() {
             ),
         },
         {
-            accessorKey: 'details',
-            header: 'Details',
+            accessorKey: 'summary',
+            header: 'Summary',
             cell: ({ row }) => (
                 <span className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">
-                    {row.original.details || '—'}
+                    {row.original.summary || '—'}
                 </span>
             ),
         },
         {
-            accessorKey: 'ipAddress',
-            header: 'IP',
+            id: 'changes',
+            header: 'Changes',
+            cell: ({ row }) => {
+                const count = row.original.changedFields?.length || 0;
+                return count > 0 ? (
+                    <span className="text-xs font-medium text-amber-600">{count} field{count !== 1 ? 's' : ''}</span>
+                ) : <span className="text-xs text-slate-400">—</span>;
+            },
+        },
+        {
+            id: 'actions',
+            header: '',
             cell: ({ row }) => (
-                <span className="text-xs text-slate-400 font-mono">{row.original.ipAddress || '—'}</span>
+                <Button variant="ghost" size="sm" className="h-8" onClick={() => openDetail(row.original)}>
+                    <Eye className="h-4 w-4" />
+                </Button>
             ),
         },
     ], []);
@@ -153,7 +173,7 @@ export default function ActivityLogPage() {
     if (!canRead) {
         return (
             <div className="p-6">
-                <p className="text-slate-500">You do not have permission to view activity logs.</p>
+                <p className="text-slate-500">You do not have permission to view audit logs.</p>
             </div>
         );
     }
@@ -163,11 +183,11 @@ export default function ActivityLogPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-                        <Activity className="h-7 w-7 text-[#0EA5E9]" />
-                        Activity Logs
+                        <Shield className="h-7 w-7 text-violet-500" />
+                        Audit Trail
                     </h1>
-                    <PageBreadcrumb current="Activity Logs" />
-                    <p className="mt-1 text-sm text-slate-500">General user actions and system events across the platform.</p>
+                    <PageBreadcrumb current="Audit Trail" />
+                    <p className="mt-1 text-sm text-slate-500">Security-focused change history with before/after comparison.</p>
                 </div>
                 <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={handleExport} className="h-9">
@@ -188,7 +208,14 @@ export default function ActivityLogPage() {
             />
 
             <div className="min-w-0">
-                <DataTable columns={columns} data={rows} loading={loading} onRefresh={fetchLogs} itemLabel="logs" hideSearch />
+                <DataTable
+                    columns={columns}
+                    data={rows}
+                    loading={loading}
+                    onRefresh={fetchLogs}
+                    itemLabel="audit entries"
+                    hideSearch
+                />
             </div>
 
             {totalPages > 1 && (
@@ -200,6 +227,8 @@ export default function ActivityLogPage() {
                     </div>
                 </div>
             )}
+
+            <AuditDetailSheet log={selectedLog} open={detailOpen} onOpenChange={setDetailOpen} />
         </div>
     );
 }

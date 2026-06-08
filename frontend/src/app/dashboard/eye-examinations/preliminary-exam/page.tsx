@@ -37,6 +37,7 @@ import {
 import { ServerPagination } from '@/components/dashboard/server-pagination';
 import { Badge } from '@/components/ui/badge';
 import { readStoredUser, resolveRoleName } from '@/lib/auth';
+import { hasPermission } from '@/lib/permissions';
 
 interface Exam {
   id: string;
@@ -106,10 +107,33 @@ export default function PreliminaryExamPage() {
   const [totalPages, setTotalPages] = useState(1);
   const { socket } = useSocket();
 
+  // Checked-in queue states
+  const [todayQueue, setTodayQueue] = useState<any[]>([]);
+  const [queueLoading, setQueueLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchQueue = async () => {
+      setQueueLoading(true);
+      try {
+        const today = getLocalDateValue();
+        const res = await api.get('/appointments', { params: { date: today, status: 'RECEIVED', limit: 50 } });
+        const data = res.data?.data || res.data || [];
+        setTodayQueue(Array.isArray(data) ? data : []);
+      } catch {
+        setTodayQueue([]);
+      } finally {
+        setQueueLoading(false);
+      }
+    };
+    fetchQueue();
+    if (socket) {
+      socket.on('appointment:updated', fetchQueue);
+      return () => { socket.off('appointment:updated', fetchQueue); };
+    }
+  }, [socket]);
+
   const canWrite = useMemo(() => {
-    const user = readStoredUser();
-    const role = resolveRoleName(user);
-    return ['ADMIN', 'SUPERADMIN', 'DOCTOR'].includes(role);
+    return hasPermission('preliminary_exams', 'canCreate');
   }, []);
 
   const isOptometrist = useMemo(() => {
@@ -227,6 +251,48 @@ export default function PreliminaryExamPage() {
           )}
         </div>
       </div>
+
+      {/* Today's Checked-In Patients Queue */}
+      {todayQueue.length > 0 && (
+        <div className="px-6 pt-5 pb-1 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/20">
+          <h2 className="text-xs font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+            </span>
+            Checked-in Patients Today ({todayQueue.length})
+          </h2>
+          <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-thin">
+            {todayQueue.map((appt: any) => (
+              <button
+                key={appt.id}
+                onClick={() => {
+                  const pid = appt.patient?.id || appt.patientId;
+                  const pname = appt.patient?.fullName || '';
+                  router.push(`/dashboard/eye-examinations/new?stage=PRELIMINARY&patientId=${pid}&patientName=${encodeURIComponent(pname)}&appointmentId=${appt.id}`);
+                }}
+                className="flex-shrink-0 min-w-[220px] rounded-xl border border-sky-100 dark:border-sky-950 bg-gradient-to-br from-white to-sky-50/20 dark:from-slate-900 dark:to-sky-950/10 p-3.5 text-left hover:shadow-md hover:border-sky-300 dark:hover:border-sky-800 transition-all duration-200 group relative overflow-hidden"
+              >
+                <div className="absolute right-3 top-3 h-1.5 w-1.5 rounded-full bg-sky-500" />
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-sky-600 dark:group-hover:text-sky-450 transition-colors">
+                  {appt.patient?.fullName || 'Unknown Patient'}
+                </p>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 font-mono tracking-wider">
+                  {appt.patient?.patientNumber || 'PAT-PENDING'}
+                </p>
+                <div className="flex items-center justify-between mt-3">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-bold bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-450 border border-sky-100/50 dark:border-sky-900/30">
+                    RECEIVED
+                  </span>
+                  <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500">
+                    {new Date(appt.appointmentDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="p-6 space-y-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">

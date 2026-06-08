@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { readStoredUser, resolveRoleName } from '@/lib/auth';
+import { hasPermission } from '@/lib/permissions';
 
 interface ReportLayoutProps {
   title: string;
@@ -36,12 +37,12 @@ interface ReportLayoutProps {
 }
 
 const TABS = [
-  { label: 'Financial Reports', path: '/dashboard/reports/financial', icon: DollarSign, roles: ['ADMIN', 'SUPERADMIN'] },
-  { label: 'Clinical Analytics', path: '/dashboard/reports/clinical', icon: Activity, roles: ['ADMIN', 'SUPERADMIN', 'DOCTOR'] },
-  { label: 'Appointment Analytics', path: '/dashboard/reports/appointments', icon: Calendar, roles: ['ADMIN', 'SUPERADMIN', 'DOCTOR', 'RECEPTIONIST'] },
-  { label: 'Patient Analytics', path: '/dashboard/reports/patients', icon: Users, roles: ['ADMIN', 'SUPERADMIN', 'DOCTOR', 'RECEPTIONIST'] },
-  { label: 'Inventory Analytics', path: '/dashboard/reports/inventory', icon: Layers, roles: ['ADMIN', 'SUPERADMIN', 'PHARMACIST', 'OPTICIAN'] },
-  { label: 'Operational Analytics', path: '/dashboard/reports/operational', icon: TrendingUp, roles: ['ADMIN', 'SUPERADMIN'] },
+  { label: 'Financial Reports', path: '/dashboard/reports/financial', icon: DollarSign, module: 'reports_financial' },
+  { label: 'Clinical Analytics', path: '/dashboard/reports/clinical', icon: Activity, module: 'reports_clinical' },
+  { label: 'Appointment Analytics', path: '/dashboard/reports/appointments', icon: Calendar, module: 'reports_appointments' },
+  { label: 'Patient Analytics', path: '/dashboard/reports/patients', icon: Users, module: 'reports_patients' },
+  { label: 'Inventory Analytics', path: '/dashboard/reports/inventory', icon: Layers, module: 'reports_inventory' },
+  { label: 'Operational Analytics', path: '/dashboard/reports/operational', icon: TrendingUp, module: 'reports_operational' },
 ];
 
 export default function ReportLayout({
@@ -65,8 +66,8 @@ export default function ReportLayout({
   const role = useMemo(() => resolveRoleName(user), [user]);
 
   const filteredTabs = useMemo(() => {
-    return TABS.filter(tab => tab.roles.includes(role));
-  }, [role]);
+    return TABS.filter(tab => hasPermission(tab.module, 'canRead'));
+  }, []);
 
   const getSelectedRangeValue = () => {
     const todayStr = new Date().toISOString().slice(0, 10);

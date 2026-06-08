@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import prisma from '../lib/prisma.js';
 import bcrypt from 'bcrypt';
-import { createActivityLog } from '../lib/activityLog.js';
+import { logActivity, LOG_MODULES, ACTIVITY_ACTIONS, ENTITY_TYPES } from '../lib/logging/index.js';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
@@ -80,16 +80,15 @@ export const login = async (req, res, next) => {
     const branches = user.staffAssignments.map(sa => sa.branch);
     const { password: _, staffAssignments: ____, ...userDetails } = user;
 
-    if (user.branchId) {
-      createActivityLog({
-        branchId: user.branchId,
-        userId: user.id,
-        action: 'LOGIN',
-        entityType: 'User',
-        entityId: user.id,
-        details: 'Logged in',
-      }).catch(() => {});
-    }
+    logActivity(req, {
+      branchId: user.branchId || null,
+      userId: user.id,
+      action: ACTIVITY_ACTIONS.LOGIN,
+      module: LOG_MODULES.AUTH,
+      entityType: ENTITY_TYPES.USER,
+      entityId: user.id,
+      details: 'Logged in',
+    }).catch(() => {});
 
     res.status(200).json({
       message: 'Login successful',

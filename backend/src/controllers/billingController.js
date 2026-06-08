@@ -1,6 +1,6 @@
 import prisma from '../lib/prisma.js';
 import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
-import { createActivityLog } from '../lib/activityLog.js';
+import { logActivity, logAudit, LOG_MODULES, ACTIVITY_ACTIONS, AUDIT_ACTIONS, ENTITY_TYPES, sanitizeForAudit } from '../lib/logging/index.js';
 import { emitEvent } from '../lib/socket.js';
 
 const getBranchFilter = (req) => {
@@ -544,13 +544,22 @@ export const createBilling = async (req, res, next) => {
             }
         }
 
-        createActivityLog({
+        logActivity(req, {
             branchId: activeBranchId,
-            userId: req.user.id,
-            action: 'CREATED',
-            entityType: 'Billing',
+            action: ACTIVITY_ACTIONS.CREATE,
+            module: LOG_MODULES.BILLING,
+            entityType: ENTITY_TYPES.BILLING,
             entityId: billing.id,
-            details: `${serviceType} - ${String(billing.finalAmount)}`,
+            details: `Created ${serviceType} invoice - ${String(billing.finalAmount)}`,
+        }).catch(() => {});
+        logAudit(req, {
+            branchId: activeBranchId,
+            action: AUDIT_ACTIONS.CREATE,
+            module: LOG_MODULES.BILLING,
+            entityType: ENTITY_TYPES.BILLING,
+            entityId: billing.id,
+            summary: `Created billing record`,
+            after: sanitizeForAudit({ serviceType, finalAmount: billing.finalAmount, status: billing.status }),
         }).catch(() => {});
 
         emitEvent('billing:created', billing, activeBranchId);
@@ -799,6 +808,25 @@ export const updateBilling = async (req, res, next) => {
         emitEvent('billing:updated', billing, billing.branchId);
         emitEvent('inventory:updated', null, billing.branchId);
 
+        logActivity(req, {
+            branchId: billing.branchId,
+            action: ACTIVITY_ACTIONS.UPDATE,
+            module: LOG_MODULES.BILLING,
+            entityType: ENTITY_TYPES.BILLING,
+            entityId: billing.id,
+            details: `Updated billing - ${billing.serviceType}`,
+        }).catch(() => {});
+        logAudit(req, {
+            branchId: billing.branchId,
+            action: AUDIT_ACTIONS.UPDATE,
+            module: LOG_MODULES.BILLING,
+            entityType: ENTITY_TYPES.BILLING,
+            entityId: billing.id,
+            summary: `Updated billing record`,
+            before: sanitizeForAudit(existing),
+            after: sanitizeForAudit(billing),
+        }).catch(() => {});
+
         res.status(200).json(billing);
     } catch (error) {
         next(error);
@@ -855,13 +883,22 @@ export const deleteBilling = async (req, res, next) => {
         await prisma.pharmacyStockTransaction.updateMany({ where: { billingId: existing.id }, data: { billingId: null } });
         await prisma.opticalStockTransaction.updateMany({ where: { billingId: existing.id }, data: { billingId: null } });
 
-        createActivityLog({
+        logActivity(req, {
             branchId: existing.branchId,
-            userId: req.user.id,
-            action: 'DELETED',
-            entityType: 'Billing',
+            action: ACTIVITY_ACTIONS.DELETE,
+            module: LOG_MODULES.BILLING,
+            entityType: ENTITY_TYPES.BILLING,
             entityId: existing.id,
-            details: `${existing.serviceType} - ${String(existing.finalAmount)}`,
+            details: `Deleted ${existing.serviceType} - ${String(existing.finalAmount)}`,
+        }).catch(() => {});
+        logAudit(req, {
+            branchId: existing.branchId,
+            action: AUDIT_ACTIONS.DELETE,
+            module: LOG_MODULES.BILLING,
+            entityType: ENTITY_TYPES.BILLING,
+            entityId: existing.id,
+            summary: `Deleted billing record`,
+            before: sanitizeForAudit(existing),
         }).catch(() => {});
 
         await prisma.billing.delete({ where: { id: req.params.id } });

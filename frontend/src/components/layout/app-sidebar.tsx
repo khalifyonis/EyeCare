@@ -34,6 +34,8 @@ import {
     Store,
     ShoppingCart,
     ShieldCheck,
+    Shield,
+    ScrollText,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useParams, usePathname } from 'next/navigation'
@@ -114,6 +116,16 @@ const roleNavigation: Record<string, NavSection[]> = {
                 { title: 'Permissions', icon: ShieldCheck, url: '/dashboard/admin/permissions' },
                 { title: 'Doctors', icon: Stethoscope, url: '/dashboard/admin/doctors' },
                 { title: 'Branches', icon: LayoutDashboard, url: '/dashboard/admin/branches' },
+                {
+                    title: 'Logs & Compliance',
+                    icon: ScrollText,
+                    url: '/dashboard/admin/logs',
+                    subItems: [
+                        { title: 'Overview', url: '/dashboard/admin/logs' },
+                        { title: 'Activity Logs', url: '/dashboard/activity-log' },
+                        { title: 'Audit Trail', url: '/dashboard/audit-log' },
+                    ],
+                },
             ],
         },
         {
@@ -191,7 +203,6 @@ const roleNavigation: Record<string, NavSection[]> = {
         {
             section: 'SYSTEM',
             items: [
-                { title: 'Activity Logs', icon: Activity, url: '/dashboard/activity-log' },
                 { title: 'Tasks', icon: ClipboardList, url: '#', comingSoon: true },
                 { title: 'Notifications', icon: Mail, url: '#', comingSoon: true },
                 { title: 'Settings', icon: Settings, url: '#', comingSoon: true },
@@ -207,6 +218,16 @@ const roleNavigation: Record<string, NavSection[]> = {
                 { title: 'Permissions', icon: ShieldCheck, url: '/dashboard/admin/permissions' },
                 { title: 'Doctors', icon: Stethoscope, url: '/dashboard/admin/doctors' },
                 { title: 'Branches', icon: LayoutDashboard, url: '/dashboard/admin/branches' },
+                {
+                    title: 'Logs & Compliance',
+                    icon: ScrollText,
+                    url: '/dashboard/admin/logs',
+                    subItems: [
+                        { title: 'Overview', url: '/dashboard/admin/logs' },
+                        { title: 'Activity Logs', url: '/dashboard/activity-log' },
+                        { title: 'Audit Trail', url: '/dashboard/audit-log' },
+                    ],
+                },
             ],
         },
         {
@@ -284,7 +305,6 @@ const roleNavigation: Record<string, NavSection[]> = {
         {
             section: 'SYSTEM',
             items: [
-                { title: 'Activity Logs', icon: Activity, url: '/dashboard/activity-log' },
                 { title: 'Tasks', icon: ClipboardList, url: '#', comingSoon: true },
                 { title: 'Notifications', icon: Mail, url: '#', comingSoon: true },
                 { title: 'Settings', icon: Settings, url: '#', comingSoon: true },
@@ -656,16 +676,38 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         let moduleKey = ''
                         if (itemUrl.startsWith('/dashboard/patients')) moduleKey = 'patients'
                         else if (itemUrl.startsWith('/dashboard/appointments')) moduleKey = 'appointments'
-                        else if (itemUrl.startsWith('/dashboard/eye-examinations')) moduleKey = 'eye_exams'
+                        else if (itemUrl.startsWith('/dashboard/eye-examinations/preliminary') || itemUrl.startsWith('/dashboard/eye-examinations/new')) moduleKey = 'preliminary_exams'
+                        else if (itemUrl.startsWith('/dashboard/eye-examinations/clinical')) moduleKey = 'clinical_exams'
+                        else if (itemUrl.startsWith('/dashboard/eye-examinations')) {
+                            // Parent "Eye Examinations" menu: show if user has either preliminary or clinical read access
+                            const p1 = permissions.find((p: any) => p.module === 'preliminary_exams')
+                            const p2 = permissions.find((p: any) => p.module === 'clinical_exams')
+                            return !!(p1?.canRead || p2?.canRead)
+                        }
                         else if (itemUrl.startsWith('/dashboard/surgery')) moduleKey = 'surgery'
-                        else if (itemUrl.startsWith('/dashboard/prescription')) moduleKey = 'prescriptions'
-                        else if (itemUrl.startsWith('/dashboard/reports')) moduleKey = 'reports'
+                        else if (itemUrl.startsWith('/dashboard/prescription/medicine')) moduleKey = 'medicine_prescriptions'
+                        else if (itemUrl.startsWith('/dashboard/prescription/optical')) moduleKey = 'optical_prescriptions'
+                        else if (itemUrl.startsWith('/dashboard/prescription')) {
+                            // Parent "Prescriptions" menu: show if user has either medicine or optical read access
+                            const p1 = permissions.find((p: any) => p.module === 'medicine_prescriptions')
+                            const p2 = permissions.find((p: any) => p.module === 'optical_prescriptions')
+                            return !!(p1?.canRead || p2?.canRead)
+                        }
+                        else if (itemUrl.startsWith('/dashboard/reports')) {
+                            const p1 = permissions.find((p: any) => p.module === 'reports_financial')
+                            const p2 = permissions.find((p: any) => p.module === 'reports_clinical')
+                            const p3 = permissions.find((p: any) => p.module === 'reports_appointments')
+                            const p4 = permissions.find((p: any) => p.module === 'reports_patients')
+                            const p5 = permissions.find((p: any) => p.module === 'reports_inventory')
+                            const p6 = permissions.find((p: any) => p.module === 'reports_operational')
+                            return !!(p1?.canRead || p2?.canRead || p3?.canRead || p4?.canRead || p5?.canRead || p6?.canRead)
+                        }
                         else if (itemUrl.startsWith('/dashboard/pharmacy') || itemUrl.startsWith('/dashboard/inventory/pharmacy')) moduleKey = 'pharmacy'
                         else if (itemUrl.startsWith('/dashboard/optical-shop') || itemUrl.startsWith('/dashboard/inventory/optical')) moduleKey = 'optical'
                         else if (itemUrl.startsWith('/dashboard/billing')) moduleKey = 'billing'
                         else if (itemUrl.startsWith('/dashboard/admin/users') || itemUrl.startsWith('/dashboard/admin/doctors')) moduleKey = 'users'
                         else if (itemUrl.startsWith('/dashboard/admin/branches')) moduleKey = 'branches'
-                        else if (itemUrl.startsWith('/dashboard/activity-log')) moduleKey = 'logs'
+                        else if (itemUrl.startsWith('/dashboard/admin/logs') || itemUrl.startsWith('/dashboard/activity-log') || itemUrl.startsWith('/dashboard/audit-log')) moduleKey = 'logs'
                         else if (itemUrl.startsWith('/dashboard/admin/permissions')) moduleKey = 'users'
 
                         if (moduleKey) {
@@ -833,10 +875,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     <Settings className="mr-2 size-4" />
                                     Settings
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => router.push('/dashboard/activity-log')}>
-                                    <Activity className="mr-2 size-4" />
-                                    Activity Log
-                                </DropdownMenuItem>
+                                {isItemAllowed('/dashboard/admin/logs') && (
+                                    <DropdownMenuItem onClick={() => router.push('/dashboard/admin/logs')}>
+                                        <ScrollText className="mr-2 size-4" />
+                                        Logs & Compliance
+                                    </DropdownMenuItem>
+                                )}
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={handleLogout} className="text-red-400">
                                     <LogOut className="mr-2 size-4" />

@@ -30,7 +30,9 @@ export const ROUTE_ACCESS: AllowedRoute[] = [
     { prefix: '/dashboard/inventory/optical', roles: ['ADMIN', 'SUPERADMIN', 'ADMINISTRATOR', 'OPTICIAN'] },
     { prefix: '/dashboard/optical-shop', roles: ['ADMIN', 'SUPERADMIN', 'ADMINISTRATOR', 'OPTICIAN'] },
     { prefix: '/dashboard/suppliers', roles: ['ADMIN', 'SUPERADMIN', 'PHARMACIST', 'OPTICIAN'] },
+    { prefix: '/dashboard/admin/logs', roles: ['ADMIN', 'SUPERADMIN'] },
     { prefix: '/dashboard/activity-log', roles: ['ADMIN', 'SUPERADMIN'] },
+    { prefix: '/dashboard/audit-log', roles: ['ADMIN', 'SUPERADMIN'] },
     { prefix: '/dashboard/profile', roles: ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
     { prefix: '/dashboard/branch-switch', roles: ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
 ]
@@ -65,16 +67,42 @@ export function isPathAllowedForRole(pathname: string, userOrRole: any): boolean
                     let moduleKey = ''
                     if (pathname.startsWith('/dashboard/patients')) moduleKey = 'patients'
                     else if (pathname.startsWith('/dashboard/appointments')) moduleKey = 'appointments'
-                    else if (pathname.startsWith('/dashboard/eye-examinations')) moduleKey = 'eye_exams'
+                    else if (pathname.startsWith('/dashboard/eye-examinations/preliminary-exam') || pathname.startsWith('/dashboard/eye-examinations/preliminary')) moduleKey = 'preliminary_exams'
+                    else if (pathname.startsWith('/dashboard/eye-examinations/clinical')) moduleKey = 'clinical_exams'
+                    else if (pathname.startsWith('/dashboard/eye-examinations')) {
+                        const p1 = permissions.find((p: any) => p.module === 'preliminary_exams')
+                        const p2 = permissions.find((p: any) => p.module === 'clinical_exams')
+                        return !!(p1?.canRead || p2?.canRead)
+                    }
                     else if (pathname.startsWith('/dashboard/surgery')) moduleKey = 'surgery'
-                    else if (pathname.startsWith('/dashboard/prescription')) moduleKey = 'prescriptions'
-                    else if (pathname.startsWith('/dashboard/reports')) moduleKey = 'reports'
+                    else if (pathname.startsWith('/dashboard/prescription/medicine')) moduleKey = 'medicine_prescriptions'
+                    else if (pathname.startsWith('/dashboard/prescription/optical')) moduleKey = 'optical_prescriptions'
+                    else if (pathname.startsWith('/dashboard/prescription')) {
+                        const p1 = permissions.find((p: any) => p.module === 'medicine_prescriptions')
+                        const p2 = permissions.find((p: any) => p.module === 'optical_prescriptions')
+                        return !!(p1?.canRead || p2?.canRead)
+                    }
+                    else if (pathname.startsWith('/dashboard/reports/financial')) moduleKey = 'reports_financial'
+                    else if (pathname.startsWith('/dashboard/reports/clinical')) moduleKey = 'reports_clinical'
+                    else if (pathname.startsWith('/dashboard/reports/appointments')) moduleKey = 'reports_appointments'
+                    else if (pathname.startsWith('/dashboard/reports/patients')) moduleKey = 'reports_patients'
+                    else if (pathname.startsWith('/dashboard/reports/inventory')) moduleKey = 'reports_inventory'
+                    else if (pathname.startsWith('/dashboard/reports/operational')) moduleKey = 'reports_operational'
+                    else if (pathname.startsWith('/dashboard/reports')) {
+                        const p1 = permissions.find((p: any) => p.module === 'reports_financial')
+                        const p2 = permissions.find((p: any) => p.module === 'reports_clinical')
+                        const p3 = permissions.find((p: any) => p.module === 'reports_appointments')
+                        const p4 = permissions.find((p: any) => p.module === 'reports_patients')
+                        const p5 = permissions.find((p: any) => p.module === 'reports_inventory')
+                        const p6 = permissions.find((p: any) => p.module === 'reports_operational')
+                        return !!(p1?.canRead || p2?.canRead || p3?.canRead || p4?.canRead || p5?.canRead || p6?.canRead)
+                    }
                     else if (pathname.startsWith('/dashboard/pharmacy') || pathname.startsWith('/dashboard/inventory/pharmacy')) moduleKey = 'pharmacy'
                     else if (pathname.startsWith('/dashboard/optical-shop') || pathname.startsWith('/dashboard/inventory/optical')) moduleKey = 'optical'
                     else if (pathname.startsWith('/dashboard/billing')) moduleKey = 'billing'
                     else if (pathname.startsWith('/dashboard/admin/users') || pathname.startsWith('/dashboard/admin/doctors')) moduleKey = 'users'
                     else if (pathname.startsWith('/dashboard/admin/branches')) moduleKey = 'branches'
-                    else if (pathname.startsWith('/dashboard/activity-log')) moduleKey = 'logs'
+                    else if (pathname.startsWith('/dashboard/admin/logs') || pathname.startsWith('/dashboard/activity-log') || pathname.startsWith('/dashboard/audit-log')) moduleKey = 'logs'
                     else if (pathname.startsWith('/dashboard/admin/permissions')) moduleKey = 'users'
 
                     if (moduleKey) {

@@ -14,6 +14,7 @@ import {
   PlusCircle, Heart, UserX, Shield, Scissors
 } from 'lucide-react';
 import { readStoredUser, resolveRoleName } from '@/lib/auth';
+import { hasPermission } from '@/lib/permissions';
 
 /* ── Types ── */
 type UserSimple = {
@@ -340,7 +341,16 @@ export default function PatientProfilePage() {
     { id: 'surgeries', label: 'Surgeries', icon: Scissors },
     { id: 'appointments', label: 'Appointments', icon: CalendarDays },
     { id: 'billing', label: 'Billing & Invoices', icon: CreditCard },
-  ];
+  ].filter(tab => {
+    // Patient Info and Appointments are always visible
+    if (tab.id === 'info' || tab.id === 'appointments') return true;
+    if (tab.id === 'exams') return hasPermission('preliminary_exams', 'canRead') || hasPermission('clinical_exams', 'canRead');
+    if (tab.id === 'optical-rx') return hasPermission('optical_prescriptions', 'canRead');
+    if (tab.id === 'prescriptions') return hasPermission('medicine_prescriptions', 'canRead');
+    if (tab.id === 'surgeries') return hasPermission('surgery', 'canRead');
+    if (tab.id === 'billing') return hasPermission('billing', 'canRead');
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/40 pb-16">

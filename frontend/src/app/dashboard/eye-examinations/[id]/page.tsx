@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Activity, ArrowLeft, Calendar, ClipboardList, Eye, FileText, Glasses, Loader2, Pencil, Printer, TimerReset, Trash2, User } from 'lucide-react';
 import { toast } from 'sonner';
+import { hasPermission } from '@/lib/permissions';
 
 type AssessmentDiagnosis = {
   icdCode?: string;
@@ -150,6 +151,12 @@ export default function ViewEyeExamPage() {
   const stage = (exam.stage as string) || 'PRELIMINARY';
   const editLink = `/dashboard/eye-examinations/${String(id)}/edit?stage=${stage === 'COMPLETED' ? 'CLINICAL' : stage}`;
 
+  const canEditPreliminary = hasPermission('preliminary_exams', 'canUpdate');
+  const canEditClinical = hasPermission('clinical_exams', 'canUpdate');
+  const canDeleteExam = hasPermission('preliminary_exams', 'canDelete') || hasPermission('clinical_exams', 'canDelete');
+  const canReadClinical = hasPermission('clinical_exams', 'canRead');
+  const canEdit = stage === 'PRELIMINARY' ? canEditPreliminary : canEditClinical;
+
   const anterior = exam.anteriorSegmentFindings as any;
   const fundus = exam.fundusFindings as any;
 
@@ -191,16 +198,20 @@ export default function ViewEyeExamPage() {
               <Printer className="h-4 w-4" />
               Print
             </Button>
-            <Button asChild className="h-10 w-full rounded-lg px-4 text-sm font-medium sm:w-auto bg-[#0EA5E9] hover:bg-[#0284C7] text-white border-0">
-              <Link href={editLink}>
-                <Pencil className="h-4 w-4" />
-                Edit
-              </Link>
-            </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={deleting} className="h-10 w-full rounded-lg px-4 text-sm font-medium sm:w-auto">
-              <Trash2 className="h-4 w-4" />
-              {deleting ? 'Deleting…' : 'Delete'}
-            </Button>
+            {canEdit && (
+              <Button asChild className="h-10 w-full rounded-lg px-4 text-sm font-medium sm:w-auto bg-[#0EA5E9] hover:bg-[#0284C7] text-white border-0">
+                <Link href={editLink}>
+                  <Pencil className="h-4 w-4" />
+                  Edit
+                </Link>
+              </Button>
+            )}
+            {canDeleteExam && (
+              <Button variant="destructive" onClick={handleDelete} disabled={deleting} className="h-10 w-full rounded-lg px-4 text-sm font-medium sm:w-auto">
+                <Trash2 className="h-4 w-4" />
+                {deleting ? 'Deleting…' : 'Delete'}
+              </Button>
+            )}
           </div>
         </div>
 
@@ -336,7 +347,7 @@ export default function ViewEyeExamPage() {
         </div>
 
         {/* ── STAGE 2: CLINICAL ────────────────────────────────────── */}
-        {stage !== 'PRELIMINARY' && (
+        {stage !== 'PRELIMINARY' && canReadClinical && (
           <div className="space-y-5 pt-4">
             <div className="flex items-center gap-2 px-1">
               <Badge className="bg-amber-600 text-white border-0 h-6 w-6 flex items-center justify-center p-0 rounded-full font-bold">2</Badge>

@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { readStoredUser, resolveRoleName } from '@/lib/auth';
+import { hasPermission } from '@/lib/permissions';
 import {
   Search,
   Plus,
@@ -128,9 +129,7 @@ export default function EyeExaminationsPage() {
   const { socket } = useSocket();
 
   const canWrite = useMemo(() => {
-    const user = readStoredUser();
-    const role = resolveRoleName(user);
-    return ['ADMIN', 'SUPERADMIN', 'DOCTOR'].includes(role);
+    return hasPermission('preliminary_exams', 'canCreate') || hasPermission('clinical_exams', 'canCreate');
   }, []);
 
   const fetchStats = useCallback(async () => {

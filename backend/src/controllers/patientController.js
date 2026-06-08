@@ -1,6 +1,7 @@
 import prisma from '../lib/prisma.js';
 import moment from 'moment';
 import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
+import { logActivity, logAudit, LOG_MODULES, ACTIVITY_ACTIONS, AUDIT_ACTIONS, ENTITY_TYPES, sanitizeForAudit } from '../lib/logging/index.js';
 
 // Generate PAT-XXXXX style patient number
 async function generatePatientNumber() {
@@ -99,6 +100,24 @@ export const createPatient = async (req, res, next) => {
                 throw error;
             }
         }
+
+        logActivity(req, {
+            branchId: activeBranchId,
+            action: ACTIVITY_ACTIONS.CREATE,
+            module: LOG_MODULES.PATIENTS,
+            entityType: ENTITY_TYPES.PATIENT,
+            entityId: patient.id,
+            details: `Registered patient ${patient.fullName} (${patient.patientNumber})`,
+        }).catch(() => {});
+        logAudit(req, {
+            branchId: activeBranchId,
+            action: AUDIT_ACTIONS.CREATE,
+            module: LOG_MODULES.PATIENTS,
+            entityType: ENTITY_TYPES.PATIENT,
+            entityId: patient.id,
+            summary: `Created patient ${patient.patientNumber}`,
+            after: sanitizeForAudit(patient),
+        }).catch(() => {});
 
         res.status(201).json(patient);
     } catch (error) {
@@ -354,6 +373,9 @@ export const getPatientById = async (req, res, next) => {
 
 export const updatePatient = async (req, res, next) => {
     try {
+        const existing = await prisma.patient.findUnique({ where: { id: req.params.id } });
+        if (!existing) return res.status(404).json({ message: 'Patient not found' });
+
         const {
             fullName, firstName, lastName,
             phone, email, dateOfBirth, gender,
@@ -401,6 +423,26 @@ export const updatePatient = async (req, res, next) => {
                 branch: { select: { branchName: true } },
             },
         });
+
+        logActivity(req, {
+            branchId: patient.branchId,
+            action: ACTIVITY_ACTIONS.UPDATE,
+            module: LOG_MODULES.PATIENTS,
+            entityType: ENTITY_TYPES.PATIENT,
+            entityId: patient.id,
+            details: `Updated patient ${patient.fullName} (${patient.patientNumber})`,
+        }).catch(() => {});
+        logAudit(req, {
+            branchId: patient.branchId,
+            action: AUDIT_ACTIONS.UPDATE,
+            module: LOG_MODULES.PATIENTS,
+            entityType: ENTITY_TYPES.PATIENT,
+            entityId: patient.id,
+            summary: `Updated patient ${patient.patientNumber}`,
+            before: sanitizeForAudit(existing),
+            after: sanitizeForAudit(patient),
+        }).catch(() => {});
+
         res.status(200).json(patient);
     } catch (error) {
         next(error);
@@ -409,6 +451,27 @@ export const updatePatient = async (req, res, next) => {
 
 export const deletePatient = async (req, res, next) => {
     try {
+        const existing = await prisma.patient.findUnique({ where: { id: req.params.id } });
+        if (!existing) return res.status(404).json({ message: 'Patient not found' });
+
+        logActivity(req, {
+            branchId: existing.branchId,
+            action: ACTIVITY_ACTIONS.DELETE,
+            module: LOG_MODULES.PATIENTS,
+            entityType: ENTITY_TYPES.PATIENT,
+            entityId: existing.id,
+            details: `Deleted patient ${existing.fullName} (${existing.patientNumber})`,
+        }).catch(() => {});
+        logAudit(req, {
+            branchId: existing.branchId,
+            action: AUDIT_ACTIONS.DELETE,
+            module: LOG_MODULES.PATIENTS,
+            entityType: ENTITY_TYPES.PATIENT,
+            entityId: existing.id,
+            summary: `Deleted patient ${existing.patientNumber}`,
+            before: sanitizeForAudit(existing),
+        }).catch(() => {});
+
         await prisma.patient.delete({ where: { id: req.params.id } });
         res.status(200).json({ message: 'Patient deleted successfully' });
     } catch (error) {

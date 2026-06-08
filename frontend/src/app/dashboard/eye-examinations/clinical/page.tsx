@@ -22,6 +22,7 @@ import {
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { readStoredUser, resolveRoleName } from '@/lib/auth';
+import { hasPermission } from '@/lib/permissions';
 import {
   Table,
   TableBody,
@@ -105,13 +106,33 @@ export default function ClinicalExamPage() {
   const [totalPages, setTotalPages] = useState(1);
   const { socket } = useSocket();
 
+  // Checked-in/Examining queue states
+  const [todayQueue, setTodayQueue] = useState<any[]>([]);
+  const [queueLoading, setQueueLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchQueue = async () => {
+      setQueueLoading(true);
+      try {
+        const today = getLocalDateValue();
+        const res = await api.get('/appointments', { params: { date: today, status: 'EXAMINING', limit: 50 } });
+        const data = res.data?.data || res.data || [];
+        setTodayQueue(Array.isArray(data) ? data : []);
+      } catch {
+        setTodayQueue([]);
+      } finally {
+        setQueueLoading(false);
+      }
+    };
+    fetchQueue();
+    if (socket) {
+      socket.on('appointment:updated', fetchQueue);
+      return () => { socket.off('appointment:updated', fetchQueue); };
+    }
+  }, [socket]);
+
   const canWrite = useMemo(() => {
-    const user = readStoredUser();
-    const role = resolveRoleName(user);
-    // Optometrists should not have write access to clinical exams
-    const isOptometrist = role === 'DOCTOR' && user?.doctor?.specialization?.toUpperCase() === 'OPTOMETRY';
-    if (isOptometrist) return false;
-    return ['ADMIN', 'SUPERADMIN', 'DOCTOR'].includes(role);
+    return hasPermission('clinical_exams', 'canCreate');
   }, []);
 
   useEffect(() => {
@@ -217,6 +238,55 @@ export default function ClinicalExamPage() {
           )}
         </div>
       </div>
+
+      {/* Patients Ready for Doctor Today */}
+      {todayQueue.length > 0 && (
+        <div className="px-6 pt-5 pb-1 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/20">
+          <h2 className="text-xs font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+            </span>
+            Patients Ready for Doctor ({todayQueue.length})
+          </h2>
+          <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-thin">
+            {todayQueue.map((appt: any) => {
+              const hasExam = appt.eyeExamination?.id;
+              return (
+                <button
+                  key={appt.id}
+                  onClick={() => {
+                    if (hasExam) {
+                      router.push(`/dashboard/eye-examinations/${appt.eyeExamination.id}/edit?stage=CLINICAL`);
+                    } else {
+                      const pid = appt.patient?.id || appt.patientId;
+                      const pname = appt.patient?.fullName || '';
+                      router.push(`/dashboard/eye-examinations/new?stage=CLINICAL&patientId=${pid}&patientName=${encodeURIComponent(pname)}&appointmentId=${appt.id}`);
+                    }
+                  }}
+                  className="flex-shrink-0 min-w-[220px] rounded-xl border border-blue-100 dark:border-blue-950 bg-gradient-to-br from-white to-blue-50/20 dark:from-slate-900 dark:to-blue-950/10 p-3.5 text-left hover:shadow-md hover:border-blue-300 dark:hover:border-blue-800 transition-all duration-200 group relative overflow-hidden"
+                >
+                  <div className="absolute right-3 top-3 h-1.5 w-1.5 rounded-full bg-blue-500" />
+                  <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-blue-600 dark:group-hover:text-blue-450 transition-colors">
+                    {appt.patient?.fullName || 'Unknown Patient'}
+                  </p>
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 font-mono tracking-wider">
+                    {appt.patient?.patientNumber || 'PAT-PENDING'}
+                  </p>
+                  <div className="flex items-center justify-between mt-3">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-450 border border-blue-100/50 dark:border-blue-900/30">
+                      {hasExam ? 'CONTINUE EXAM' : 'NEW EXAM'}
+                    </span>
+                    <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500">
+                      {new Date(appt.appointmentDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="p-6 space-y-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center">

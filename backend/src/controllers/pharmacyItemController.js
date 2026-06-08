@@ -1,6 +1,7 @@
 import prisma from '../lib/prisma.js';
 import { getPaginationParams, sendPaginated } from '../lib/pagination.js';
 import { emitEvent } from '../lib/socket.js';
+import { logActivity, logAudit, LOG_MODULES, ACTIVITY_ACTIONS, AUDIT_ACTIONS, ENTITY_TYPES, sanitizeForAudit } from '../lib/logging/index.js';
 
 const getBranchFilter = (req) => {
     return (req.user.role === 'SUPERADMIN' || !req.user.branchId)
@@ -129,6 +130,25 @@ export const createPharmacyItem = async (req, res, next) => {
         });
 
         emitEvent('inventory:updated', item, branchId);
+
+        logActivity(req, {
+            branchId,
+            action: ACTIVITY_ACTIONS.CREATE,
+            module: LOG_MODULES.PHARMACY,
+            entityType: ENTITY_TYPES.PHARMACY_ITEM,
+            entityId: item.id,
+            details: `Added pharmacy item ${item.itemName}`,
+        }).catch(() => {});
+        logAudit(req, {
+            branchId,
+            action: AUDIT_ACTIONS.CREATE,
+            module: LOG_MODULES.PHARMACY,
+            entityType: ENTITY_TYPES.PHARMACY_ITEM,
+            entityId: item.id,
+            summary: `Created pharmacy item`,
+            after: sanitizeForAudit(item),
+        }).catch(() => {});
+
         res.status(201).json(item);
     } catch (error) {
         next(error);
@@ -179,6 +199,26 @@ export const updatePharmacyItem = async (req, res, next) => {
         });
 
         emitEvent('inventory:updated', item, item.branchId);
+
+        logActivity(req, {
+            branchId: item.branchId,
+            action: ACTIVITY_ACTIONS.UPDATE,
+            module: LOG_MODULES.PHARMACY,
+            entityType: ENTITY_TYPES.PHARMACY_ITEM,
+            entityId: item.id,
+            details: `Updated pharmacy item ${item.itemName}`,
+        }).catch(() => {});
+        logAudit(req, {
+            branchId: item.branchId,
+            action: AUDIT_ACTIONS.UPDATE,
+            module: LOG_MODULES.PHARMACY,
+            entityType: ENTITY_TYPES.PHARMACY_ITEM,
+            entityId: item.id,
+            summary: `Updated pharmacy item`,
+            before: sanitizeForAudit(existing),
+            after: sanitizeForAudit(item),
+        }).catch(() => {});
+
         res.status(200).json(item);
     } catch (error) {
         next(error);
@@ -192,6 +232,24 @@ export const deletePharmacyItem = async (req, res, next) => {
         if (req.user.role !== 'SUPERADMIN' && existing.branchId !== req.user.branchId) {
             return res.status(403).json({ message: 'Forbidden' });
         }
+        logActivity(req, {
+            branchId: existing.branchId,
+            action: ACTIVITY_ACTIONS.DELETE,
+            module: LOG_MODULES.PHARMACY,
+            entityType: ENTITY_TYPES.PHARMACY_ITEM,
+            entityId: existing.id,
+            details: `Deleted pharmacy item ${existing.itemName}`,
+        }).catch(() => {});
+        logAudit(req, {
+            branchId: existing.branchId,
+            action: AUDIT_ACTIONS.DELETE,
+            module: LOG_MODULES.PHARMACY,
+            entityType: ENTITY_TYPES.PHARMACY_ITEM,
+            entityId: existing.id,
+            summary: `Deleted pharmacy item`,
+            before: sanitizeForAudit(existing),
+        }).catch(() => {});
+
         await prisma.pharmacyItem.delete({ where: { id: req.params.id } });
         emitEvent('inventory:updated', { id: req.params.id }, existing.branchId);
         res.status(200).json({ message: 'Pharmacy item deleted successfully' });

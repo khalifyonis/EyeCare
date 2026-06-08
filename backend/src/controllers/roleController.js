@@ -56,9 +56,10 @@ export const createRole = async (req, res, next) => {
 
             // Automatically seed default blank permissions for all system modules
             const modules = [
-                'patients', 'appointments', 'eye_exams', 'surgery',
-                'prescriptions', 'reports', 'pharmacy', 'optical',
-                'billing', 'users', 'logs', 'branches'
+                'patients', 'appointments', 'preliminary_exams', 'clinical_exams', 'surgery',
+                'medicine_prescriptions', 'optical_prescriptions', 
+                'reports_financial', 'reports_clinical', 'reports_appointments', 'reports_patients', 'reports_inventory', 'reports_operational',
+                'pharmacy', 'optical', 'billing', 'users', 'logs', 'branches'
             ];
 
             await tx.rolePermission.createMany({

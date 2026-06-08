@@ -6,6 +6,7 @@ import Link from 'next/link'
 import api from '@/lib/axios'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+import { hasPermission } from '@/lib/permissions'
 import {
     ArrowLeft,
     Calendar,
@@ -108,6 +109,8 @@ export default function AppointmentDetailsPage() {
     const params = useParams<{ id: string }>()
     const id = params?.id
 
+    const canUpdate = hasPermission('appointments', 'canUpdate')
+
     const [loading, setLoading] = useState(true)
     const [appt, setAppt] = useState<Appointment | null>(null)
 
@@ -153,22 +156,24 @@ export default function AppointmentDetailsPage() {
                     <h2 className="text-xl font-bold tracking-tight text-slate-900">
                         Appointment: {patientName}
                     </h2>
-                    <div className="flex items-center gap-2">
-                        <Button
-                            onClick={() => router.push(`/dashboard/appointments/${id}/edit`)}
-                            className="bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-semibold gap-1.5"
-                        >
-                            <Pencil className="h-4 w-4" />
-                            Edit Appointment
-                        </Button>
-                        <Button
-                            onClick={() => router.push(`/dashboard/appointments/${id}/edit?mode=reschedule`)}
-                            className="bg-[#F97316] hover:bg-[#ea6a12] text-white font-semibold gap-1.5"
-                        >
-                            <Calendar className="h-4 w-4" />
-                            Reschedule
-                        </Button>
-                    </div>
+                    {canUpdate && (
+                        <div className="flex items-center gap-2">
+                            <Button
+                                onClick={() => router.push(`/dashboard/appointments/${id}/edit`)}
+                                className="bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-semibold gap-1.5"
+                            >
+                                <Pencil className="h-4 w-4" />
+                                Edit Appointment
+                            </Button>
+                            <Button
+                                onClick={() => router.push(`/dashboard/appointments/${id}/edit?mode=reschedule`)}
+                                className="bg-[#F97316] hover:bg-[#ea6a12] text-white font-semibold gap-1.5"
+                            >
+                                <Calendar className="h-4 w-4" />
+                                Reschedule
+                            </Button>
+                        </div>
+                    )}
                 </div>
 
                 {/* ── Content ── */}

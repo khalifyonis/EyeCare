@@ -42,6 +42,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
 import { Pencil, Calendar as CalendarIcon, Ban, Trash2 } from 'lucide-react';
+import { hasPermission } from '@/lib/permissions';
 import { ServerPagination } from '@/components/dashboard/server-pagination';
 import { Badge } from '@/components/ui/badge';
 
@@ -172,6 +173,10 @@ function SkeletonRow() {
 
 export default function AppointmentsPage() {
     const router = useRouter();
+
+    const canCreate = hasPermission('appointments', 'canCreate');
+    const canUpdate = hasPermission('appointments', 'canUpdate');
+    const canDelete = hasPermission('appointments', 'canDelete');
 
     const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [pagination, setPagination] = useState<PaginationMeta>({ total: 0, page: 1, limit: 20, pages: 1 });
@@ -346,13 +351,15 @@ export default function AppointmentsPage() {
                         <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">Appointments</h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Manage and schedule patient appointments</p>
                     </div>
-                    <Button
-                        onClick={() => router.push('/dashboard/appointments/new')}
-                        className="h-11 rounded-lg bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-semibold px-6 shadow-sm transition-all active:scale-95"
-                    >
-                        <Plus className="w-5 h-5 mr-2" />
-                        Add New Appointment
-                    </Button>
+                    {canCreate && (
+                        <Button
+                            onClick={() => router.push('/dashboard/appointments/new')}
+                            className="h-11 rounded-lg bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-semibold px-6 shadow-sm transition-all active:scale-95"
+                        >
+                            <Plus className="w-5 h-5 mr-2" />
+                            Add New Appointment
+                        </Button>
+                    )}
                 </div>
             </div>
 
@@ -448,14 +455,16 @@ export default function AppointmentsPage() {
                                                 <p className="text-sm font-semibold text-slate-500">No appointments found</p>
                                                 <p className="text-xs text-slate-400 mt-0.5">Try adjusting your filters or add a new appointment</p>
                                             </div>
-                                            <Button
-                                                size="sm"
-                                                className="mt-1 bg-[#0EA5E9] hover:bg-[#0c96d4] text-white"
-                                                onClick={() => router.push('/dashboard/appointments/new')}
-                                            >
-                                                <Plus className="h-3.5 w-3.5 mr-1.5" />
-                                                Add Appointment
-                                            </Button>
+                                             {canCreate && (
+                                                 <Button
+                                                     size="sm"
+                                                     className="mt-1 bg-[#0EA5E9] hover:bg-[#0c96d4] text-white"
+                                                     onClick={() => router.push('/dashboard/appointments/new')}
+                                                 >
+                                                     <Plus className="h-3.5 w-3.5 mr-1.5" />
+                                                     Add Appointment
+                                                 </Button>
+                                             )}
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -533,7 +542,7 @@ export default function AppointmentsPage() {
                                         <TableCell className="py-3 px-4">
                                             <div className="flex items-center gap-2">
                                                 {/* Check-In Button — only for today's PENDING/SCHEDULED appointments */}
-                                                {isToday(a.appointmentDate) && (a.status === 'PENDING' || a.status === 'SCHEDULED') && (
+                                                {canUpdate && isToday(a.appointmentDate) && (a.status === 'PENDING' || a.status === 'SCHEDULED') && (
                                                     <button
                                                         onClick={() => handleCheckIn(a.id, a.patient?.fullName || '')}
                                                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-all shadow-sm active:scale-95"
@@ -556,12 +565,14 @@ export default function AppointmentsPage() {
                                                 >
                                                     View
                                                 </button>
-                                                <button
-                                                    onClick={() => router.push(`/dashboard/appointments/${a.id}/edit`)}
-                                                    className="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline transition-colors"
-                                                >
-                                                    Edit
-                                                </button>
+                                                {canUpdate && (
+                                                    <button
+                                                        onClick={() => router.push(`/dashboard/appointments/${a.id}/edit`)}
+                                                        className="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline transition-colors"
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                )}
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
                                                         <Button variant="ghost" size="icon" className="h-7 w-7">
@@ -572,20 +583,24 @@ export default function AppointmentsPage() {
                                                         <DropdownMenuItem asChild className="cursor-pointer">
                                                             <Link href={`/dashboard/appointments/${a.id}`}>View Details</Link>
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem asChild className="cursor-pointer">
-                                                            <Link href={`/dashboard/appointments/${a.id}/edit`} className="flex items-center gap-2">
-                                                                <Pencil className="h-4 w-4" />
-                                                                Edit Appointment
-                                                            </Link>
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem asChild className="cursor-pointer">
-                                                            <Link href={`/dashboard/appointments/${a.id}/edit?mode=reschedule`} className="flex items-center gap-2">
-                                                                <CalendarIcon className="h-4 w-4" />
-                                                                Reschedule
-                                                            </Link>
-                                                        </DropdownMenuItem>
+                                                        {canUpdate && (
+                                                            <DropdownMenuItem asChild className="cursor-pointer">
+                                                                <Link href={`/dashboard/appointments/${a.id}/edit`} className="flex items-center gap-2">
+                                                                    <Pencil className="h-4 w-4" />
+                                                                    Edit Appointment
+                                                                </Link>
+                                                            </DropdownMenuItem>
+                                                        )}
+                                                        {canUpdate && (
+                                                            <DropdownMenuItem asChild className="cursor-pointer">
+                                                                <Link href={`/dashboard/appointments/${a.id}/edit?mode=reschedule`} className="flex items-center gap-2">
+                                                                    <CalendarIcon className="h-4 w-4" />
+                                                                    Reschedule
+                                                                </Link>
+                                                            </DropdownMenuItem>
+                                                        )}
                                                         {/* Check-In from dropdown too */}
-                                                        {isToday(a.appointmentDate) && (a.status === 'PENDING' || a.status === 'SCHEDULED') && (
+                                                        {canUpdate && isToday(a.appointmentDate) && (a.status === 'PENDING' || a.status === 'SCHEDULED') && (
                                                             <DropdownMenuItem
                                                                 onClick={() => handleCheckIn(a.id, a.patient?.fullName || '')}
                                                                 className="cursor-pointer text-amber-600 focus:text-amber-500 dark:focus:text-amber-400 focus:bg-amber-50 dark:focus:bg-amber-900/20"
@@ -594,20 +609,24 @@ export default function AppointmentsPage() {
                                                                 Check In (Mark Arrived)
                                                             </DropdownMenuItem>
                                                         )}
-                                                        <DropdownMenuItem
-                                                            onClick={() => handleCancel(a.id)}
-                                                            className="cursor-pointer text-red-600 focus:text-red-400 dark:focus:text-red-400 focus:bg-red-50 dark:focus:bg-red-900/20"
-                                                        >
-                                                            <Ban className="h-4 w-4 mr-2" />
-                                                            Cancel Appointment
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem
-                                                            onClick={() => handleDelete(a.id)}
-                                                            className="text-red-600 focus:text-red-400 dark:focus:text-red-400 focus:bg-red-50 dark:focus:bg-red-900/20 cursor-pointer"
-                                                        >
-                                                            <Trash2 className="h-4 w-4 mr-2" />
-                                                            Delete Appointment
-                                                        </DropdownMenuItem>
+                                                        {canUpdate && (
+                                                            <DropdownMenuItem
+                                                                onClick={() => handleCancel(a.id)}
+                                                                className="cursor-pointer text-red-600 focus:text-red-400 dark:focus:text-red-400 focus:bg-red-50 dark:focus:bg-red-900/20"
+                                                            >
+                                                                <Ban className="h-4 w-4 mr-2" />
+                                                                Cancel Appointment
+                                                            </DropdownMenuItem>
+                                                        )}
+                                                        {canDelete && (
+                                                            <DropdownMenuItem
+                                                                onClick={() => handleDelete(a.id)}
+                                                                className="text-red-600 focus:text-red-400 dark:focus:text-red-400 focus:bg-red-50 dark:focus:bg-red-900/20 cursor-pointer"
+                                                            >
+                                                                <Trash2 className="h-4 w-4 mr-2" />
+                                                                Delete Appointment
+                                                            </DropdownMenuItem>
+                                                        )}
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </div>

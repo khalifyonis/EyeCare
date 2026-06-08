@@ -140,12 +140,7 @@ export function ReceptionistDashboard() {
                             Welcome back to the front desk. Manage patient check-ins and bookings.
                         </p>
                     </div>
-                    {data && data.unpaidBillings > 0 && (
-                        <button onClick={() => router.push('/dashboard/billing')}
-                            className="flex items-center gap-1.5 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-3 py-1.5 text-[11px] font-bold text-red-600 dark:text-red-400 hover:bg-red-100 transition-colors animate-pulse">
-                            <AlertCircle className="h-3.5 w-3.5" /> {data.unpaidBillings} Unpaid Invoices
-                        </button>
-                    )}
+
                 </div>
 
                 {/* KPI Stat Cards — solid vibrant colored backgrounds */}
@@ -266,57 +261,59 @@ export function ReceptionistDashboard() {
                                 <Calendar className="h-4 w-4 text-[#0EA5E9]" /> Upcoming Appointments
                             </h2>
                             <div className="relative mt-2 flex-1">
-                                {/* Timeline Grid Background lines */}
-                                <div className="absolute left-16 top-0 bottom-0 right-0 grid grid-cols-4 border-l border-slate-100 dark:border-slate-800/40 pointer-events-none">
-                                    <div className="border-r border-slate-100 dark:border-slate-800/40" />
-                                    <div className="border-r border-slate-100 dark:border-slate-800/40" />
-                                    <div className="border-r border-slate-100 dark:border-slate-800/40" />
-                                    <div className="border-r border-slate-100 dark:border-slate-800/40" />
-                                </div>
-                                
-                                {/* Timeline Labels */}
-                                <div className="flex justify-between text-[10px] font-extrabold text-slate-400 dark:text-slate-500 pl-16 mb-4">
-                                    <span>10 AM</span>
-                                    <span>12 PM</span>
-                                    <span>2 PM</span>
-                                    <span>4 PM</span>
-                                </div>
+                                {data?.todayQueue?.length ? (
+                                    <>
+                                        {/* Timeline Grid Background lines */}
+                                        <div className="absolute left-16 top-0 bottom-0 right-0 grid grid-cols-4 border-l border-slate-100 dark:border-slate-800/40 pointer-events-none">
+                                            <div className="border-r border-slate-100 dark:border-slate-800/40" />
+                                            <div className="border-r border-slate-100 dark:border-slate-800/40" />
+                                            <div className="border-r border-slate-100 dark:border-slate-800/40" />
+                                            <div className="border-r border-slate-100 dark:border-slate-800/40" />
+                                        </div>
+                                        
+                                        {/* Timeline Labels */}
+                                        <div className="flex justify-between text-[10px] font-extrabold text-slate-400 dark:text-slate-500 pl-16 mb-4">
+                                            <span>10 AM</span>
+                                            <span>12 PM</span>
+                                            <span>2 PM</span>
+                                            <span>4 PM</span>
+                                        </div>
 
-                                {/* Timeline Slots */}
-                                <div className="space-y-4">
-                                    <div className="flex items-center">
-                                        <span className="w-14 text-xs font-bold text-slate-450 dark:text-slate-500 tabular-nums">10:00 AM</span>
-                                        <div className="flex-1 ml-2 relative h-8">
-                                            <div className="absolute left-[5%] w-[40%] h-full bg-[#0EA5E9]/10 border border-[#0EA5E9]/30 rounded-xl px-3 flex items-center shadow-sm">
-                                                <span className="text-[11px] font-bold text-[#0EA5E9] truncate">Sarah Omar (Checkup)</span>
-                                            </div>
+                                        {/* Timeline Slots */}
+                                        <div className="space-y-4">
+                                            {data.todayQueue.slice(0, 4).map((a: any, index: number) => {
+                                                const timeStr = new Date(a.appointmentDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                                const colors = [
+                                                    { bg: 'bg-[#0EA5E9]/10 border-[#0EA5E9]/30 text-[#0EA5E9]' },
+                                                    { bg: 'bg-[#6366F1]/10 border-[#6366F1]/30 text-[#6366F1]' },
+                                                    { bg: 'bg-[#10B981]/10 border-[#10B981]/30 text-[#10B981]' },
+                                                    { bg: 'bg-[#F97316]/10 border-[#F97316]/30 text-[#F97316]' },
+                                                ]
+                                                const style = colors[index % colors.length]
+                                                const lefts = ['5%', '25%', '40%', '15%']
+                                                const widths = ['40%', '35%', '45%', '50%']
+                                                const left = lefts[index % lefts.length]
+                                                const width = widths[index % widths.length]
+
+                                                return (
+                                                    <div key={a.id} className="flex items-center">
+                                                        <span className="w-14 text-xs font-bold text-slate-450 dark:text-slate-500 tabular-nums">{timeStr}</span>
+                                                        <div className="flex-1 ml-2 relative h-8">
+                                                            <div className={`absolute h-full rounded-xl px-3 flex items-center shadow-sm border ${style.bg}`} style={{ left, width }}>
+                                                                <span className="text-[11px] font-bold truncate">{a.patient?.fullName || 'Patient'} ({a.type || 'Checkup'})</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })}
                                         </div>
+                                    </>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center h-[200px] text-slate-400">
+                                        <Calendar className="h-8 w-8 opacity-45 mb-2 text-slate-300 dark:text-slate-700" />
+                                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">No upcoming appointments scheduled for today</p>
                                     </div>
-                                    <div className="flex items-center">
-                                        <span className="w-14 text-xs font-bold text-slate-450 dark:text-slate-500 tabular-nums">11:30 AM</span>
-                                        <div className="flex-1 ml-2 relative h-8">
-                                            <div className="absolute left-[30%] w-[35%] h-full bg-[#6366F1]/10 border border-[#6366F1]/30 rounded-xl px-3 flex items-center shadow-sm">
-                                                <span className="text-[11px] font-bold text-[#6366F1] truncate">Mohamed Hassan (Retina)</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <span className="w-14 text-xs font-bold text-slate-450 dark:text-slate-500 tabular-nums">01:30 PM</span>
-                                        <div className="flex-1 ml-2 relative h-8">
-                                            <div className="absolute left-[50%] w-[40%] h-full bg-[#10B981]/10 border border-[#10B981]/30 rounded-xl px-3 flex items-center shadow-sm">
-                                                <span className="text-[11px] font-bold text-[#10B981] truncate">Fatima Yusuf (Follow Up)</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <span className="w-14 text-xs font-bold text-slate-450 dark:text-slate-500 tabular-nums">03:00 PM</span>
-                                        <div className="flex-1 ml-2 relative h-8">
-                                            <div className="absolute left-[70%] w-[25%] h-full bg-[#F97316]/10 border border-[#F97316]/30 rounded-xl px-3 flex items-center shadow-sm">
-                                                <span className="text-[11px] font-bold text-[#F97316] truncate">Ahmed Ali (Vision)</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                )}
                             </div>
                         </div>
                     </div>

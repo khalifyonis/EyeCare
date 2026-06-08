@@ -240,11 +240,12 @@ export const createSurgery = async (req, res, next) => {
 
         // Workflow Linking: Ensure surgery is tied to an exam (and thus an appointment)
         let clinicalExamId = examId;
+        let finalAppointmentId = appointmentId;
 
-        if (!clinicalExamId && appointmentId) {
+        if (!clinicalExamId && finalAppointmentId) {
             // Find if an exam already exists for this appointment
             const existingExam = await prisma.clinicalExamination.findUnique({
-                where: { appointmentId }
+                where: { appointmentId: finalAppointmentId }
             });
 
             if (existingExam) {
@@ -252,7 +253,7 @@ export const createSurgery = async (req, res, next) => {
             } else {
                 // Fetch appointment to get its doctor for the "examinedBy" requirement
                 const appointment = await prisma.appointment.findUnique({
-                    where: { id: appointmentId },
+                    where: { id: finalAppointmentId },
                     select: { doctorId: true }
                 });
 
@@ -261,14 +262,43 @@ export const createSurgery = async (req, res, next) => {
                 // Create a shell clinical exam to bridge the Surgery to the Appointment
                 const newExam = await prisma.clinicalExamination.create({
                     data: {
-                        appointment: { connect: { id: appointmentId } },
+                        appointment: { connect: { id: finalAppointmentId } },
                         examinedBy: { connect: { id: appointment.doctorId } },
                         diagnosis: surgeryType ? `Scheduled for ${surgeryType}` : 'Scheduled Surgery',
                     }
                 });
                 clinicalExamId = newExam.id;
             }
+        } else if (!clinicalExamId && !finalAppointmentId) {
+            // Auto-create a shell Appointment and ClinicalExamination to anchor the Surgery and Prescriptions
+            const rand = Math.floor(1000 + Math.random() * 9000);
+            const bookingNumber = `SURG-${Date.now().toString().slice(-6)}-${rand}`;
+
+            const appointment = await prisma.appointment.create({
+                data: {
+                    appointmentDate: new Date(date),
+                    status: 'COMPLETED',
+                    branchId: activeBranchId,
+                    patientId,
+                    doctorId: surgeonId,
+                    createdById: req.user.id,
+                    type: 'surgery',
+                    eyeSide: normalizeEye(eye),
+                    bookingNumber,
+                }
+            });
+            finalAppointmentId = appointment.id;
+
+            const newExam = await prisma.clinicalExamination.create({
+                data: {
+                    appointment: { connect: { id: appointment.id } },
+                    examinedBy: { connect: { id: surgeonId } },
+                    diagnosis: surgeryType ? `Surgery: ${surgeryType}` : 'Surgery Procedure',
+                }
+            });
+            clinicalExamId = newExam.id;
         }
+
 
         // Validate clinical exam access
         if (clinicalExamId) {
@@ -346,6 +376,36 @@ export const createSurgery = async (req, res, next) => {
                     surgeryId: row.id,
                 },
             });
+        }
+
+        if (!finalAppointmentId && clinicalExamId) {
+            const exam = await prisma.clinicalExamination.findUnique({
+                where: { id: clinicalExamId },
+                select: { appointmentId: true }
+            });
+            if (exam) {
+                finalAppointmentId = exam.appointmentId;
+            }
+        }
+
+        if (req.body.prescriptions && Array.isArray(req.body.prescriptions)) {
+            for (const rx of req.body.prescriptions) {
+                if (rx.itemId && rx.quantity) {
+                    await prisma.prescription.create({
+                        data: {
+                            branchId: activeBranchId,
+                            clinicalExamId: clinicalExamId || null,
+                            appointmentId: finalAppointmentId || null,
+                            itemType: 'PHARMACY',
+                            itemId: rx.itemId,
+                            itemName: rx.itemName || null,
+                            quantity: Number(rx.quantity) || 1,
+                            instructions: rx.instructions || '',
+                            status: 'PENDING',
+                        }
+                    });
+                }
+            }
         }
 
         res.status(201).json(row);

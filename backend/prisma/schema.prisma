@@ -18,6 +18,7 @@ model Branch {
   createdAt            DateTime                   @default(now()) @map("created_at")
   updatedAt            DateTime                   @updatedAt @map("updated_at")
   activityLogs         ActivityLog[]
+  auditLogs            AuditLog[]
   appointments         Appointment[]
   billings             Billing[]
   doctors              Doctor[]
@@ -71,6 +72,7 @@ model User {
   updatedAt                   DateTime                   @updatedAt @map("updated_at")
   profileImage                String?                    @map("profile_image")
   activityLogs                ActivityLog[]
+  auditLogs                   AuditLog[]
   createdAppointments         Appointment[]              @relation("CreatedBy")
   createdBillings             Billing[]                  @relation("CreatedBy")
   doctor                      Doctor?
@@ -87,21 +89,54 @@ model User {
 
 model ActivityLog {
   id         String   @id @default(uuid())
-  branchId   String   @map("branch_id")
+  branchId   String?  @map("branch_id")
   userId     String   @map("user_id")
   action     String
+  module     String?
   entityType String   @map("entity_type")
   entityId   String?  @map("entity_id")
   details    String?
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
   createdAt  DateTime @default(now()) @map("created_at")
-  branch     Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  branch     Branch?  @relation(fields: [branchId], references: [id], onDelete: Cascade)
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([branchId])
   @@index([userId])
   @@index([createdAt])
   @@index([entityType])
+  @@index([module])
+  @@index([action])
   @@map("activity_logs")
+}
+
+model AuditLog {
+  id            String   @id @default(uuid())
+  branchId      String?  @map("branch_id")
+  userId        String   @map("user_id")
+  action        String
+  module        String?
+  entityType    String   @map("entity_type")
+  entityId      String?  @map("entity_id")
+  summary       String?
+  oldValues     Json?    @map("old_values")
+  newValues     Json?    @map("new_values")
+  changedFields Json?    @map("changed_fields")
+  ipAddress     String?  @map("ip_address")
+  userAgent     String?  @map("user_agent")
+  createdAt     DateTime @default(now()) @map("created_at")
+  branch        Branch?  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([branchId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([entityType])
+  @@index([entityId])
+  @@index([action])
+  @@index([module])
+  @@map("audit_logs")
 }
 
 model Doctor {
