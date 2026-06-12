@@ -14,6 +14,9 @@ export const ROUTE_ACCESS: AllowedRoute[] = [
     
     // Detailed Report Routes (Must be before general /dashboard/reports)
     { prefix: '/dashboard/reports/financial', roles: ['ADMIN', 'SUPERADMIN'] },
+    { prefix: '/dashboard/reports/income-by-service', roles: ['ADMIN', 'SUPERADMIN'] },
+    { prefix: '/dashboard/reports/doctor-performance', roles: ['ADMIN', 'SUPERADMIN', 'DOCTOR'] },
+    { prefix: '/dashboard/reports/branch-report', roles: ['ADMIN', 'SUPERADMIN'] },
     { prefix: '/dashboard/reports/operational', roles: ['ADMIN', 'SUPERADMIN'] },
     { prefix: '/dashboard/reports/clinical', roles: ['ADMIN', 'SUPERADMIN', 'DOCTOR'] },
     { prefix: '/dashboard/reports/inventory', roles: ['ADMIN', 'SUPERADMIN', 'PHARMACIST', 'OPTICIAN'] },
@@ -82,12 +85,12 @@ export function isPathAllowedForRole(pathname: string, userOrRole: any): boolean
                         const p2 = permissions.find((p: any) => p.module === 'optical_prescriptions')
                         return !!(p1?.canRead || p2?.canRead)
                     }
-                    else if (pathname.startsWith('/dashboard/reports/financial')) moduleKey = 'reports_financial'
-                    else if (pathname.startsWith('/dashboard/reports/clinical')) moduleKey = 'reports_clinical'
+                    else if (pathname.startsWith('/dashboard/reports/financial') || pathname.startsWith('/dashboard/reports/income-by-service')) moduleKey = 'reports_financial'
+                    else if (pathname.startsWith('/dashboard/reports/clinical') || pathname.startsWith('/dashboard/reports/doctor-performance')) moduleKey = 'reports_clinical'
                     else if (pathname.startsWith('/dashboard/reports/appointments')) moduleKey = 'reports_appointments'
                     else if (pathname.startsWith('/dashboard/reports/patients')) moduleKey = 'reports_patients'
                     else if (pathname.startsWith('/dashboard/reports/inventory')) moduleKey = 'reports_inventory'
-                    else if (pathname.startsWith('/dashboard/reports/operational')) moduleKey = 'reports_operational'
+                    else if (pathname.startsWith('/dashboard/reports/operational') || pathname.startsWith('/dashboard/reports/branch-report')) moduleKey = 'reports_operational'
                     else if (pathname.startsWith('/dashboard/reports')) {
                         const p1 = permissions.find((p: any) => p.module === 'reports_financial')
                         const p2 = permissions.find((p: any) => p.module === 'reports_clinical')

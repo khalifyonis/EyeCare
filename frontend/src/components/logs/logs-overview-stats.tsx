@@ -28,48 +28,71 @@ export function LogsOverviewStats({ data, loading }: LogsOverviewStatsProps) {
     return (
         <div className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Activity Logs</CardTitle>
-                        <Activity className="h-4 w-4 text-sky-500" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{data.activity.total.toLocaleString()}</div>
-                        <p className="text-xs text-slate-500">{data.activity.last7Days} in last 7 days</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Audit Logs</CardTitle>
-                        <Shield className="h-4 w-4 text-violet-500" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{data.audit.total.toLocaleString()}</div>
-                        <p className="text-xs text-slate-500">{data.audit.last7Days} in last 7 days</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Active Users (7d)</CardTitle>
-                        <Users className="h-4 w-4 text-emerald-500" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{data.topActiveUsers.length}</div>
-                        <p className="text-xs text-slate-500 truncate">
-                            Top: {data.topActiveUsers[0]?.user?.fullName || '—'}
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Compliance Events (7d)</CardTitle>
-                        <TrendingUp className="h-4 w-4 text-amber-500" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{data.audit.last7Days.toLocaleString()}</div>
-                        <p className="text-xs text-slate-500">Sensitive changes tracked</p>
-                    </CardContent>
-                </Card>
+                {/* Activity Logs — sky blue */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 p-5 text-white shadow-lg shadow-sky-500/25">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-sky-100">Activity Logs</p>
+                            <p className="mt-1 text-3xl font-bold tracking-tight">{data.activity.total.toLocaleString()}</p>
+                            <p className="mt-1 text-xs text-sky-200">{data.activity.last7Days} in last 7 days</p>
+                        </div>
+                        <div className="rounded-xl bg-white/20 p-2.5 backdrop-blur-sm">
+                            <Activity className="h-5 w-5 text-white" />
+                        </div>
+                    </div>
+                    <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-white/10" />
+                    <div className="absolute -bottom-8 -right-8 h-32 w-32 rounded-full bg-white/5" />
+                </div>
+
+                {/* Audit Logs — violet */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-500 to-purple-700 p-5 text-white shadow-lg shadow-violet-500/25">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-violet-100">Audit Trail</p>
+                            <p className="mt-1 text-3xl font-bold tracking-tight">{data.audit.total.toLocaleString()}</p>
+                            <p className="mt-1 text-xs text-violet-200">{data.audit.last7Days} in last 7 days</p>
+                        </div>
+                        <div className="rounded-xl bg-white/20 p-2.5 backdrop-blur-sm">
+                            <Shield className="h-5 w-5 text-white" />
+                        </div>
+                    </div>
+                    <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-white/10" />
+                    <div className="absolute -bottom-8 -right-8 h-32 w-32 rounded-full bg-white/5" />
+                </div>
+
+                {/* Active Users — emerald */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 p-5 text-white shadow-lg shadow-emerald-500/25">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-emerald-100">Active Users (7d)</p>
+                            <p className="mt-1 text-3xl font-bold tracking-tight">{data.topActiveUsers.length}</p>
+                            <p className="mt-1 text-xs text-emerald-200 truncate max-w-[140px]">
+                                Top: {data.topActiveUsers[0]?.user?.fullName || '—'}
+                            </p>
+                        </div>
+                        <div className="rounded-xl bg-white/20 p-2.5 backdrop-blur-sm">
+                            <Users className="h-5 w-5 text-white" />
+                        </div>
+                    </div>
+                    <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-white/10" />
+                    <div className="absolute -bottom-8 -right-8 h-32 w-32 rounded-full bg-white/5" />
+                </div>
+
+                {/* Compliance Events — amber */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 p-5 text-white shadow-lg shadow-amber-500/25">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-amber-100">Compliance Events (7d)</p>
+                            <p className="mt-1 text-3xl font-bold tracking-tight">{data.audit.last7Days.toLocaleString()}</p>
+                            <p className="mt-1 text-xs text-amber-200">Sensitive changes tracked</p>
+                        </div>
+                        <div className="rounded-xl bg-white/20 p-2.5 backdrop-blur-sm">
+                            <TrendingUp className="h-5 w-5 text-white" />
+                        </div>
+                    </div>
+                    <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-white/10" />
+                    <div className="absolute -bottom-8 -right-8 h-32 w-32 rounded-full bg-white/5" />
+                </div>
             </div>
 
             <div className="grid gap-4 lg:grid-cols-2">

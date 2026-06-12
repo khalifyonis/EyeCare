@@ -404,6 +404,387 @@ export const getInventoryReport = async (req, res, next) => {
     }
 };
 
+export const getIncomeByServiceReport = async (req, res, next) => {
+    try {
+        const { from, to, branchId: qBranch } = req.query;
+        const branchFilter = getBranchFilter(req);
+        if (req.user.role === 'SUPERADMIN' && qBranch) branchFilter.branchId = qBranch;
+        const dateFilter = getDateFilter(from, to);
+
+        const billings = await prisma.billing.findMany({
+            where: { ...branchFilter, ...dateFilter },
+            select: {
+                id: true,
+                createdAt: true,
+                status: true,
+                finalAmount: true,
+                totalAmount: true,
+                discount: true,
+                serviceType: true,
+                paymentMethod: true,
+                patient: { select: { fullName: true, patientNumber: true } },
+                appointment: { select: { doctor: { select: { user: { select: { fullName: true } } } } } },
+                surgery: { select: { surgeon: { select: { user: { select: { fullName: true } } } } } },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+
+        const serviceGroups = {
+            APPOINTMENT: { label: 'Appointments', count: 0, revenue: 0, outstanding: 0, rows: [] },
+            SURGERY: { label: 'Surgeries', count: 0, revenue: 0, outstanding: 0, rows: [] },
+            PHARMACY: { label: 'Medicines (Pharmacy)', count: 0, revenue: 0, outstanding: 0, rows: [] },
+            OPTICAL: { label: 'Optical Services', count: 0, revenue: 0, outstanding: 0, rows: [] },
+        };
+
+        let totalRevenue = 0;
+        let totalOutstanding = 0;
+        let totalInvoices = 0;
+
+        for (const b of billings) {
+            const amount = Number(b.finalAmount) || 0;
+            const grp = serviceGroups[b.serviceType] || serviceGroups.APPOINTMENT;
+            grp.count++;
+            totalInvoices++;
+            if (b.status === 'PAID') {
+                grp.revenue += amount;
+                totalRevenue += amount;
+            } else if (b.status === 'UNPAID' || b.status === 'PARTIALLY_PAID') {
+                grp.outstanding += amount;
+                totalOutstanding += amount;
+            }
+            grp.rows.push(b);
+        }
+
+        const chart1 = Object.entries(serviceGroups).map(([key, g]) => ({
+            name: g.label,
+            revenue: g.revenue,
+            outstanding: g.outstanding,
+            count: g.count,
+        }));
+
+        const chart2 = Object.entries(serviceGroups)
+            .filter(([, g]) => g.revenue > 0)
+            .map(([, g]) => ({ name: g.label, value: g.revenue }));
+
+        const dailyRevenue = {};
+        for (const b of billings) {
+            if (b.status === 'PAID') {
+                const dateStr = b.createdAt.toISOString().slice(0, 10);
+                dailyRevenue[dateStr] = (dailyRevenue[dateStr] || 0) + (Number(b.finalAmount) || 0);
+            }
+        }
+        const trendChart = Object.keys(dailyRevenue).sort().map(d => ({ name: d, value: dailyRevenue[d] }));
+
+        const summary = Object.entries(serviceGroups).map(([key, g]) => ({
+            serviceType: key,
+            label: g.label,
+            count: g.count,
+            revenue: g.revenue,
+            outstanding: g.outstanding,
+            share: totalRevenue > 0 ? ((g.revenue / totalRevenue) * 100).toFixed(1) : '0',
+        }));
+
+        res.json({
+            kpis: { totalRevenue, totalOutstanding, totalInvoices, totalServices: Object.keys(serviceGroups).length },
+            chart1,
+            chart2,
+            trendChart,
+            summary,
+            tableData: billings,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getDoctorPerformanceReport = async (req, res, next) => {
+    try {
+        const { from, to, doctorId } = req.query;
+        const branchFilter = getBranchFilter(req);
+        const dateFilter = getDateFilter(from, to);
+        const appointmentDateFilter = getDateFilter(from, to, 'appointmentDate');
+        const surgeryDateFilter = getDateFilter(from, to, 'date');
+
+        const doctorWhere = {
+            ...branchFilter,
+            ...(doctorId ? { id: doctorId } : {}),
+        };
+
+        const [doctors, appointments, surgeries, exams, clinicalExams] = await Promise.all([
+            prisma.doctor.findMany({
+                where: doctorWhere,
+                include: { user: { select: { id: true, fullName: true, role: true } }, branch: { select: { branchName: true } } },
+            }),
+            prisma.appointment.findMany({
+                where: { ...branchFilter, ...appointmentDateFilter, ...(doctorId ? { doctorId } : {}) },
+                select: { id: true, doctorId: true, status: true, patientId: true, billings: { select: { finalAmount: true, status: true, serviceType: true } } },
+            }),
+            prisma.surgery.findMany({
+                where: { ...branchFilter, ...surgeryDateFilter, ...(doctorId ? { surgeonId: doctorId } : {}) },
+                select: { id: true, surgeonId: true, status: true, patientId: true, surgeryType: true, cost: true, billings: { select: { finalAmount: true, status: true } } },
+            }),
+            prisma.eyeExamination.findMany({
+                where: { ...branchFilter, ...dateFilter, ...(doctorId ? { doctorId } : {}) },
+                select: { id: true, doctorId: true, patientId: true, stage: true },
+            }),
+            prisma.clinicalExamination.findMany({
+                where: { ...branchFilter, ...dateFilter, ...(doctorId ? { examinedById: doctorId } : {}) },
+                select: { id: true, examinedById: true, patientId: true },
+            }),
+        ]);
+
+        const performanceMap = {};
+        for (const doc of doctors) {
+            performanceMap[doc.id] = {
+                doctorId: doc.id,
+                name: doc.user.fullName,
+                specialization: doc.specialization,
+                branch: doc.branch?.branchName || '—',
+                appointments: 0,
+                completedAppointments: 0,
+                surgeries: 0,
+                completedSurgeries: 0,
+                exams: 0,
+                clinicalExams: 0,
+                uniquePatients: new Set(),
+                revenue: 0,
+                outstanding: 0,
+                surgeryTypes: {},
+            };
+        }
+
+        for (const a of appointments) {
+            const perf = performanceMap[a.doctorId];
+            if (!perf) continue;
+            perf.appointments++;
+            if (a.status === 'COMPLETED' || a.status === 'DONE') perf.completedAppointments++;
+            perf.uniquePatients.add(a.patientId);
+            for (const b of a.billings) {
+                const amt = Number(b.finalAmount) || 0;
+                if (b.status === 'PAID') perf.revenue += amt;
+                else if (b.status === 'UNPAID' || b.status === 'PARTIALLY_PAID') perf.outstanding += amt;
+            }
+        }
+
+        for (const s of surgeries) {
+            const perf = performanceMap[s.surgeonId];
+            if (!perf) continue;
+            perf.surgeries++;
+            if (s.status === 'completed' || s.status === 'COMPLETED') perf.completedSurgeries++;
+            perf.uniquePatients.add(s.patientId);
+            perf.surgeryTypes[s.surgeryType] = (perf.surgeryTypes[s.surgeryType] || 0) + 1;
+            for (const b of s.billings) {
+                const amt = Number(b.finalAmount) || 0;
+                if (b.status === 'PAID') perf.revenue += amt;
+                else if (b.status === 'UNPAID' || b.status === 'PARTIALLY_PAID') perf.outstanding += amt;
+            }
+        }
+
+        for (const e of exams) {
+            const perf = performanceMap[e.doctorId];
+            if (!perf) continue;
+            perf.exams++;
+            perf.uniquePatients.add(e.patientId);
+        }
+
+        for (const ce of clinicalExams) {
+            const perf = performanceMap[ce.examinedById];
+            if (!perf) continue;
+            perf.clinicalExams++;
+            perf.uniquePatients.add(ce.patientId);
+        }
+
+        const tableData = Object.values(performanceMap).map(p => ({
+            ...p,
+            uniquePatients: p.uniquePatients.size,
+        }));
+
+        const chart1 = tableData.map(d => ({ name: d.name, appointments: d.appointments, surgeries: d.surgeries, exams: d.exams }));
+        const chart2 = tableData.map(d => ({ name: d.name, value: d.revenue }));
+
+        const kpis = {
+            totalDoctors: tableData.length,
+            totalAppointments: tableData.reduce((s, d) => s + d.appointments, 0),
+            totalSurgeries: tableData.reduce((s, d) => s + d.surgeries, 0),
+            totalRevenue: tableData.reduce((s, d) => s + d.revenue, 0),
+        };
+
+        res.json({ kpis, chart1, chart2, tableData, doctors: doctors.map(d => ({ id: d.id, name: d.user.fullName })) });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getBranchReport = async (req, res, next) => {
+    try {
+        const { from, to } = req.query;
+        const branchFilter = getBranchFilter(req);
+        const dateFilter = getDateFilter(from, to);
+        const appointmentDateFilter = getDateFilter(from, to, 'appointmentDate');
+        const surgeryDateFilter = getDateFilter(from, to, 'date');
+
+        const branches = await prisma.branch.findMany({
+            where: req.user.role === 'SUPERADMIN' ? {} : { id: req.user.branchId },
+            select: { id: true, branchName: true, isActive: true },
+        });
+
+        const branchIds = branches.map(b => b.id);
+        const bFilter = branchIds.length ? { branchId: { in: branchIds } } : {};
+
+        const [billings, appointments, surgeries, patients, exams] = await Promise.all([
+            prisma.billing.findMany({
+                where: { ...bFilter, ...dateFilter },
+                select: { branchId: true, finalAmount: true, status: true, serviceType: true },
+            }),
+            prisma.appointment.findMany({
+                where: { ...bFilter, ...appointmentDateFilter },
+                select: { branchId: true, status: true },
+            }),
+            prisma.surgery.findMany({
+                where: { ...bFilter, ...surgeryDateFilter },
+                select: { branchId: true, status: true, surgeryType: true },
+            }),
+            prisma.patient.findMany({
+                where: { ...bFilter, ...dateFilter },
+                select: { branchId: true },
+            }),
+            prisma.eyeExamination.findMany({
+                where: { ...bFilter, ...dateFilter },
+                select: { branchId: true },
+            }),
+        ]);
+
+        const branchMap = {};
+        for (const b of branches) {
+            branchMap[b.id] = {
+                branchId: b.id,
+                branchName: b.branchName,
+                isActive: b.isActive,
+                revenue: 0,
+                outstanding: 0,
+                totalInvoices: 0,
+                appointments: 0,
+                surgeries: 0,
+                patients: 0,
+                exams: 0,
+            };
+        }
+
+        for (const billing of billings) {
+            const bm = branchMap[billing.branchId];
+            if (!bm) continue;
+            const amt = Number(billing.finalAmount) || 0;
+            bm.totalInvoices++;
+            if (billing.status === 'PAID') bm.revenue += amt;
+            else if (billing.status === 'UNPAID' || billing.status === 'PARTIALLY_PAID') bm.outstanding += amt;
+        }
+
+        for (const a of appointments) { if (branchMap[a.branchId]) branchMap[a.branchId].appointments++; }
+        for (const s of surgeries) { if (branchMap[s.branchId]) branchMap[s.branchId].surgeries++; }
+        for (const p of patients) { if (branchMap[p.branchId]) branchMap[p.branchId].patients++; }
+        for (const e of exams) { if (branchMap[e.branchId]) branchMap[e.branchId].exams++; }
+
+        const tableData = Object.values(branchMap);
+
+        const kpis = {
+            totalBranches: tableData.length,
+            totalRevenue: tableData.reduce((s, b) => s + b.revenue, 0),
+            totalAppointments: tableData.reduce((s, b) => s + b.appointments, 0),
+            totalPatients: tableData.reduce((s, b) => s + b.patients, 0),
+        };
+
+        const chart1 = tableData.map(b => ({ name: b.branchName, revenue: b.revenue, appointments: b.appointments }));
+        const chart2 = tableData.map(b => ({ name: b.branchName, value: b.revenue }));
+
+        res.json({ kpis, chart1, chart2, tableData });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getFinancialReportEnhanced = async (req, res, next) => {
+    try {
+        const { from, to, doctorId, userId, paymentMethod, status: statusFilter } = req.query;
+        const branchFilter = getBranchFilter(req);
+        const dateFilter = getDateFilter(from, to);
+
+        const where = { ...branchFilter, ...dateFilter };
+        if (paymentMethod) where.paymentMethod = paymentMethod;
+        if (statusFilter) where.status = statusFilter;
+        if (userId) where.createdById = userId;
+
+        const billings = await prisma.billing.findMany({
+            where,
+            select: {
+                id: true,
+                createdAt: true,
+                status: true,
+                finalAmount: true,
+                serviceType: true,
+                invoiceNumber: true,
+                patient: { select: { fullName: true, patientNumber: true } },
+                appointment: { select: { doctor: { select: { id: true, user: { select: { fullName: true } } } } } },
+                surgery: { select: { surgeon: { select: { id: true, user: { select: { fullName: true } } } } } },
+                discount: true,
+                totalAmount: true,
+                paymentMethod: true,
+                createdBy: { select: { id: true, fullName: true } },
+                branch: { select: { branchName: true } },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+
+        let filtered = billings;
+        if (doctorId) {
+            filtered = filtered.filter(b => {
+                const apptDoctor = b.appointment?.doctor?.id;
+                const surgDoctor = b.surgery?.surgeon?.id;
+                return apptDoctor === doctorId || surgDoctor === doctorId;
+            });
+        }
+
+        const kpis = { totalRevenue: 0, outstanding: 0, totalInvoices: filtered.length, avgInvoice: 0 };
+        const revenueByDate = {};
+        const revenueByService = {};
+        const revenueByPaymentMethod = {};
+        let totalPaid = 0, countPaid = 0;
+
+        for (const b of filtered) {
+            const amount = Number(b.finalAmount) || 0;
+            if (b.status === 'PAID') {
+                kpis.totalRevenue += amount;
+                totalPaid += amount;
+                countPaid++;
+                const dateStr = b.createdAt.toISOString().slice(0, 10);
+                revenueByDate[dateStr] = (revenueByDate[dateStr] || 0) + amount;
+                revenueByService[b.serviceType] = (revenueByService[b.serviceType] || 0) + amount;
+                const pm = b.paymentMethod || 'Unspecified';
+                revenueByPaymentMethod[pm] = (revenueByPaymentMethod[pm] || 0) + amount;
+            } else if (b.status === 'UNPAID' || b.status === 'PARTIALLY_PAID') {
+                kpis.outstanding += amount;
+            }
+        }
+
+        kpis.avgInvoice = countPaid > 0 ? totalPaid / countPaid : 0;
+        const chart1 = Object.keys(revenueByDate).sort().map(d => ({ name: d, value: revenueByDate[d] }));
+        const chart2 = Object.keys(revenueByService).map(s => ({ name: s, value: revenueByService[s] }));
+        const chart3 = Object.keys(revenueByPaymentMethod).map(m => ({ name: m, value: revenueByPaymentMethod[m] }));
+
+        const doctors = await prisma.doctor.findMany({
+            where: branchFilter,
+            select: { id: true, user: { select: { fullName: true } } },
+        });
+        const users = await prisma.user.findMany({
+            where: branchFilter,
+            select: { id: true, fullName: true, role: true },
+        });
+
+        res.json({ kpis, chart1, chart2, chart3, tableData: filtered, doctors, users });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const getOperationalReport = async (req, res, next) => {
     try {
         const { from, to } = req.query;

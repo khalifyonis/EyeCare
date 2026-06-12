@@ -37,12 +37,15 @@ interface ReportLayoutProps {
 }
 
 const TABS = [
-  { label: 'Financial Reports', path: '/dashboard/reports/financial', icon: DollarSign, module: 'reports_financial' },
-  { label: 'Clinical Analytics', path: '/dashboard/reports/clinical', icon: Activity, module: 'reports_clinical' },
-  { label: 'Appointment Analytics', path: '/dashboard/reports/appointments', icon: Calendar, module: 'reports_appointments' },
-  { label: 'Patient Analytics', path: '/dashboard/reports/patients', icon: Users, module: 'reports_patients' },
-  { label: 'Inventory Analytics', path: '/dashboard/reports/inventory', icon: Layers, module: 'reports_inventory' },
-  { label: 'Operational Analytics', path: '/dashboard/reports/operational', icon: TrendingUp, module: 'reports_operational' },
+  { label: 'Financial', path: '/dashboard/reports/financial', icon: DollarSign, module: 'reports_financial' },
+  { label: 'Income by Service', path: '/dashboard/reports/income-by-service', icon: TrendingUp, module: 'reports_financial' },
+  { label: 'Doctor Performance', path: '/dashboard/reports/doctor-performance', icon: Users, module: 'reports_clinical' },
+  { label: 'Branch Report', path: '/dashboard/reports/branch-report', icon: Layers, module: 'reports_operational' },
+  { label: 'Clinical', path: '/dashboard/reports/clinical', icon: Activity, module: 'reports_clinical' },
+  { label: 'Appointments', path: '/dashboard/reports/appointments', icon: Calendar, module: 'reports_appointments' },
+  { label: 'Patients', path: '/dashboard/reports/patients', icon: Users, module: 'reports_patients' },
+  { label: 'Inventory', path: '/dashboard/reports/inventory', icon: Layers, module: 'reports_inventory' },
+  { label: 'Operational', path: '/dashboard/reports/operational', icon: TrendingUp, module: 'reports_operational' },
 ];
 
 export default function ReportLayout({
@@ -117,9 +120,23 @@ export default function ReportLayout({
 
   return (
     <div className="w-full flex flex-col p-4 sm:p-5 md:p-6 lg:p-8 space-y-5 animate-in fade-in duration-300">
+
+      {/* Print-only Header */}
+      <div className="print-header" style={{ display: 'none' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <h1 style={{ fontSize: '20pt', fontWeight: 700, color: '#0f172a', margin: 0 }}>AL-IXSAAN Eye Care</h1>
+            <h2 style={{ fontSize: '13pt', fontWeight: 600, color: '#0EA5E9', margin: '4pt 0 0 0' }}>{title}</h2>
+          </div>
+          <div style={{ textAlign: 'right', fontSize: '9pt', color: '#64748b' }}>
+            <p style={{ margin: 0 }}>Generated: {new Date().toLocaleString()}</p>
+            {(from || to) && <p style={{ margin: '2pt 0 0 0' }}>Period: {from || 'All Time'} — {to || 'Today'}</p>}
+          </div>
+        </div>
+      </div>
       
       {/* Breadcrumbs and Title */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-4 border-b border-slate-200 dark:border-slate-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-4 border-b border-slate-200 dark:border-slate-800/80 print-hide">
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white">
             {title}
@@ -129,7 +146,7 @@ export default function ReportLayout({
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex flex-nowrap overflow-x-auto gap-1 sm:gap-2 pb-px scrollbar-none border-b border-slate-200 dark:border-slate-800 -mx-1 px-1 overflow-y-visible">
+      <div className="flex flex-nowrap overflow-x-auto gap-1 sm:gap-2 pb-px scrollbar-none border-b border-slate-200 dark:border-slate-800 -mx-1 px-1 overflow-y-visible print-hide">
         {filteredTabs.map((tab) => {
           const isActive = pathname === tab.path;
           const Icon = tab.icon;
@@ -152,7 +169,7 @@ export default function ReportLayout({
       </div>
 
       {/* Filters Bar — Clean solid row like sample */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 shadow-sm print-hide">
         <select
           value={getSelectedRangeValue()}
           onChange={(e) => {
@@ -206,8 +223,13 @@ export default function ReportLayout({
         {children}
       </div>
 
+      {/* Print Footer */}
+      <div className="print-footer" style={{ display: 'none' }}>
+        <span>AL-IXSAAN Eye Care Management System — Confidential</span>
+      </div>
+
       {/* Actions Footer — Clean inline, no background box, sits at bottom of content */}
-      <div className="w-full pt-5 mt-4 border-t border-slate-200 dark:border-slate-800">
+      <div className="w-full pt-5 mt-4 border-t border-slate-200 dark:border-slate-800 print-hide">
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <Button
             size="sm"

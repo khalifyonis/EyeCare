@@ -7,6 +7,8 @@ import { jsPDF } from 'jspdf';
 import {
   LineChart,
   Line,
+  BarChart,
+  Bar,
   PieChart as RePieChart,
   Pie,
   Cell,
@@ -15,15 +17,18 @@ import {
   CartesianGrid,
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
+  Legend,
 } from 'recharts';
 import { 
   DollarSign, 
   FileText, 
   TrendingUp, 
   AlertTriangle,
-  Loader2 
+  Loader2,
+  Filter,
 } from 'lucide-react';
 import { StatsCard } from '@/components/dashboard/stats-card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ReportLayout from '../_components/report-layout';
 
 type FinancialData = {
@@ -35,6 +40,7 @@ type FinancialData = {
   };
   chart1: Array<{ name: string; value: number }>;
   chart2: Array<{ name: string; value: number }>;
+  chart3?: Array<{ name: string; value: number }>;
   tableData: Array<{
     id: string;
     createdAt: string;
@@ -45,8 +51,14 @@ type FinancialData = {
     serviceType: string;
     invoiceNumber: string | null;
     paymentMethod: string | null;
-    patient: { fullName: string } | null;
+    patient: { fullName: string; patientNumber?: string } | null;
+    appointment?: { doctor?: { id: string; user?: { fullName: string } } } | null;
+    surgery?: { surgeon?: { id: string; user?: { fullName: string } } } | null;
+    createdBy?: { id: string; fullName: string } | null;
+    branch?: { branchName: string } | null;
   }>;
+  doctors?: { id: string; user: { fullName: string } }[];
+  users?: { id: string; fullName: string; role: string }[];
 };
 
 const COLORS = ['#0EA5E9', '#8B5CF6', '#F97316', '#10B981', '#EF4444'];
@@ -54,6 +66,10 @@ const COLORS = ['#0EA5E9', '#8B5CF6', '#F97316', '#10B981', '#EF4444'];
 export default function FinancialReportPage() {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
+  const [doctorId, setDoctorId] = useState('all');
+  const [userId, setUserId] = useState('all');
+  const [paymentMethod, setPaymentMethod] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [data, setData] = useState<FinancialData | null>(null);
   const [loading, setLoading] = useState(false);
   const [exportingPdf, setExportingPdf] = useState(false);
@@ -64,7 +80,11 @@ export default function FinancialReportPage() {
       const params = new URLSearchParams();
       if (from) params.set('from', from);
       if (to) params.set('to', to);
-      const res = await api.get(`/reports/financial?${params.toString()}`);
+      if (doctorId !== 'all') params.set('doctorId', doctorId);
+      if (userId !== 'all') params.set('userId', userId);
+      if (paymentMethod !== 'all') params.set('paymentMethod', paymentMethod);
+      if (statusFilter !== 'all') params.set('status', statusFilter);
+      const res = await api.get(`/reports/financial-enhanced?${params.toString()}`);
       setData(res.data);
     } catch {
       toast.error('Failed to load financial report data');
@@ -72,7 +92,7 @@ export default function FinancialReportPage() {
     } finally {
       setLoading(false);
     }
-  }, [from, to]);
+  }, [from, to, doctorId, userId, paymentMethod, statusFilter]);
 
   const exportPdf = async () => {
     if (!data) return;
@@ -204,6 +224,64 @@ export default function FinancialReportPage() {
       exportingPdf={exportingPdf}
       hasData={!!data}
     >
+      {/* Advanced Filters */}
+      <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+          <Filter className="h-3.5 w-3.5" />
+          Advanced Filters
+        </div>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="h-8 w-[150px] text-xs border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+            <SelectValue placeholder="All Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="PAID">Paid</SelectItem>
+            <SelectItem value="UNPAID">Unpaid</SelectItem>
+            <SelectItem value="PARTIALLY_PAID">Partially Paid</SelectItem>
+            <SelectItem value="DRAFT">Draft</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+          <SelectTrigger className="h-8 w-[160px] text-xs border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+            <SelectValue placeholder="Payment Method" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Methods</SelectItem>
+            <SelectItem value="CASH">Cash</SelectItem>
+            <SelectItem value="CARD">Card</SelectItem>
+            <SelectItem value="BANK_TRANSFER">Bank Transfer</SelectItem>
+            <SelectItem value="INSURANCE">Insurance</SelectItem>
+          </SelectContent>
+        </Select>
+        {data?.doctors && data.doctors.length > 0 && (
+          <Select value={doctorId} onValueChange={setDoctorId}>
+            <SelectTrigger className="h-8 w-[180px] text-xs border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+              <SelectValue placeholder="All Doctors" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Doctors</SelectItem>
+              {data.doctors.map(d => (
+                <SelectItem key={d.id} value={d.id}>{d.user.fullName}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+        {data?.users && data.users.length > 0 && (
+          <Select value={userId} onValueChange={setUserId}>
+            <SelectTrigger className="h-8 w-[180px] text-xs border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+              <SelectValue placeholder="All Staff" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Staff</SelectItem>
+              {data.users.map(u => (
+                <SelectItem key={u.id} value={u.id}>{u.fullName}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      </div>
+
       {loading ? (
         <div className="flex h-64 items-center justify-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
           <div className="flex flex-col items-center gap-3">
@@ -346,6 +424,26 @@ export default function FinancialReportPage() {
             </div>
           </div>
 
+          {/* Payment Method Chart */}
+          {data.chart3 && data.chart3.length > 0 && (
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm p-5">
+              <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4">Revenue by Payment Method</h2>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={data.chart3}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                  <YAxis tick={{ fontSize: 10 }} />
+                  <RechartsTooltip formatter={(v: any) => [`$${Number(v).toFixed(2)}`, 'Revenue']} />
+                  <Bar dataKey="value" name="Revenue" fill="#0EA5E9" radius={[4, 4, 0, 0]}>
+                    {data.chart3.map((_, i) => (
+                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
           {/* Detailed Invoices Datatable */}
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-800">
@@ -358,7 +456,9 @@ export default function FinancialReportPage() {
                     <th className="px-5 py-3 text-left">Invoice No</th>
                     <th className="px-5 py-3 text-left">Date</th>
                     <th className="px-5 py-3 text-left">Patient</th>
+                    <th className="px-5 py-3 text-left">Doctor</th>
                     <th className="px-5 py-3 text-left">Service Type</th>
+                    <th className="px-5 py-3 text-left">Payment</th>
                     <th className="px-5 py-3 text-right">Discount</th>
                     <th className="px-5 py-3 text-right">Total</th>
                     <th className="px-5 py-3 text-right">Final Amount</th>
@@ -374,13 +474,15 @@ export default function FinancialReportPage() {
                           : row.status === 'UNPAID'
                           ? 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300 border-red-200 dark:border-red-700'
                           : 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 border-amber-200 dark:border-amber-700';
-
+                      const doctorName = row.appointment?.doctor?.user?.fullName || row.surgery?.surgeon?.user?.fullName || '—';
                       return (
                         <tr key={row.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-900/40 transition-colors">
                           <td className="px-5 py-3 font-semibold text-slate-700 dark:text-slate-100">{row.invoiceNumber || '—'}</td>
                           <td className="px-5 py-3 text-slate-500 dark:text-slate-400">{new Date(row.createdAt).toLocaleDateString()}</td>
                           <td className="px-5 py-3 text-slate-700 dark:text-slate-200 font-medium">{row.patient?.fullName || 'Unknown'}</td>
+                          <td className="px-5 py-3 text-slate-500 dark:text-slate-400 text-xs">{doctorName}</td>
                           <td className="px-5 py-3 text-slate-500 dark:text-slate-400 font-medium uppercase">{row.serviceType}</td>
+                          <td className="px-5 py-3 text-slate-500 dark:text-slate-400 text-xs">{row.paymentMethod || '—'}</td>
                           <td className="px-5 py-3 text-right text-slate-500 dark:text-slate-400 tabular-nums">${Number(row.discount).toFixed(2)}</td>
                           <td className="px-5 py-3 text-right text-slate-500 dark:text-slate-400 tabular-nums">${Number(row.totalAmount).toFixed(2)}</td>
                           <td className="px-5 py-3 text-right text-slate-800 dark:text-slate-100 font-bold tabular-nums">${Number(row.finalAmount).toFixed(2)}</td>
@@ -394,7 +496,7 @@ export default function FinancialReportPage() {
                     })
                   ) : (
                     <tr>
-                      <td colSpan={8} className="px-5 py-8 text-center text-sm text-slate-400">
+                      <td colSpan={10} className="px-5 py-8 text-center text-sm text-slate-400">
                         No financial records found for this period.
                       </td>
                     </tr>

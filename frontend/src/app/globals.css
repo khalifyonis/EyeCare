@@ -364,3 +364,157 @@
     background: #cbd5e1;
   }
 }
+
+/* ─── Professional Print Styles ──────────────────────────────────────────── */
+@media print {
+  /* Hide navigation, sidebar, actions */
+  nav,
+  aside,
+  header,
+  .sidebar,
+  [data-sidebar],
+  [class*="sidebar"],
+  .print-hide,
+  button,
+  [role="navigation"],
+  [role="toolbar"],
+  .no-print {
+    display: none !important;
+  }
+
+  /* Reset page to full width */
+  body,
+  html {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt !important;
+    line-height: 1.5 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Main content takes full width */
+  main,
+  [class*="content"],
+  .print-area,
+  #print-area {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 15mm 12mm 15mm 12mm;
+    size: A4 portrait;
+  }
+
+  /* Report print header - shown only during print */
+  .print-header {
+    display: block !important;
+    padding-bottom: 12pt;
+    margin-bottom: 16pt;
+    border-bottom: 2pt solid #0EA5E9;
+  }
+
+  .print-footer {
+    display: block !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    font-size: 8pt;
+    color: #64748b;
+    border-top: 1pt solid #e2e8f0;
+    padding-top: 6pt;
+    text-align: center;
+  }
+
+  /* Table styles for print */
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    font-size: 9pt !important;
+  }
+
+  th {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+    font-weight: 700 !important;
+    padding: 5pt 8pt !important;
+    border: 0.5pt solid #cbd5e1 !important;
+    text-align: left !important;
+  }
+
+  td {
+    padding: 4pt 8pt !important;
+    border: 0.5pt solid #e2e8f0 !important;
+    vertical-align: top !important;
+  }
+
+  tr:nth-child(even) td {
+    background-color: #f8fafc !important;
+  }
+
+  /* KPI card print layout */
+  .kpi-print-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 8pt !important;
+    margin-bottom: 16pt !important;
+  }
+
+  .kpi-print-card {
+    border: 1pt solid #e2e8f0 !important;
+    border-radius: 4pt !important;
+    padding: 8pt !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Charts: hide recharts, show print-only data summary */
+  .recharts-wrapper,
+  .recharts-responsive-container {
+    display: none !important;
+  }
+
+  .print-chart-summary {
+    display: block !important;
+  }
+
+  /* Avoid page breaks inside rows */
+  tr {
+    page-break-inside: avoid !important;
+  }
+
+  /* Section headings */
+  h1 { font-size: 18pt !important; }
+  h2 { font-size: 14pt !important; }
+  h3 { font-size: 12pt !important; }
+
+  /* Color badges visible in print */
+  [class*="bg-emerald"],
+  [class*="bg-sky"],
+  [class*="bg-red"],
+  [class*="bg-amber"],
+  [class*="bg-violet"] {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Cards should have borders instead of shadows */
+  [class*="shadow"] {
+    box-shadow: none !important;
+    border: 0.5pt solid #e2e8f0 !important;
+  }
+}
+
+/* Print header/footer hidden on screen */
+.print-header,
+.print-footer {
+  display: none;
+}
+
+.print-chart-summary {
+  display: none;
+}
