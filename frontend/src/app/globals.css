@@ -367,41 +367,56 @@
 
 /* ─── Professional Print Styles ──────────────────────────────────────────── */
 @media print {
-  /* Hide navigation, sidebar, actions */
-  nav,
-  aside,
-  header,
-  .sidebar,
-  [data-sidebar],
-  [class*="sidebar"],
+  /* ── 1. Hide sidebar, header bar, nav ── */
+  [data-sidebar="sidebar"],
+  [data-sidebar="trigger"],
+  [data-sidebar="rail"],
   .print-hide,
-  button,
-  [role="navigation"],
-  [role="toolbar"],
   .no-print {
     display: none !important;
   }
 
-  /* Reset page to full width */
-  body,
-  html {
+  /* Hide the sticky top header bar of the dashboard */
+  .sticky,
+  header {
+    display: none !important;
+  }
+
+  /* ── 2. Reset page geometry ── */
+  html, body {
     background: white !important;
     color: black !important;
     font-size: 11pt !important;
     line-height: 1.5 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
   }
 
-  /* Main content takes full width */
+  /* ── 3. Remove all overflow/height restrictions from layout wrappers ── */
   main,
-  [class*="content"],
-  .print-area,
-  #print-area {
+  div,
+  section,
+  article {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  /* ── 4. Hide the sidebar spacer div (the group peer div) ── */
+  .group.peer {
+    display: none !important;
+  }
+
+  /* ── 5. Main content fills full page ── */
+  main {
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
+    flex: 1 !important;
   }
 
   /* Page margins */

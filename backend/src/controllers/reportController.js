@@ -533,6 +533,11 @@ export const getDoctorPerformanceReport = async (req, res, next) => {
             ...(doctorId ? { id: doctorId } : {}),
         };
 
+        // Build a date filter for clinical examinations using examinedAt field
+        const clinicalDateFilter = (from && to)
+            ? { examinedAt: { gte: new Date(new Date(from).setHours(0, 0, 0, 0)), lte: new Date(new Date(to).setHours(23, 59, 59, 999)) } }
+            : {};
+
         const [doctors, appointments, surgeries, exams, clinicalExams] = await Promise.all([
             prisma.doctor.findMany({
                 where: doctorWhere,
@@ -548,11 +553,12 @@ export const getDoctorPerformanceReport = async (req, res, next) => {
             }),
             prisma.eyeExamination.findMany({
                 where: { ...branchFilter, ...dateFilter, ...(doctorId ? { doctorId } : {}) },
-                select: { id: true, doctorId: true, patientId: true, stage: true },
+                select: { id: true, doctorId: true, patientId: true },
             }),
+            // ClinicalExamination has no branchId; filter only by date and doctor
             prisma.clinicalExamination.findMany({
-                where: { ...branchFilter, ...dateFilter, ...(doctorId ? { examinedById: doctorId } : {}) },
-                select: { id: true, examinedById: true, patientId: true },
+                where: { ...clinicalDateFilter, ...(doctorId ? { examinedById: doctorId } : {}) },
+                select: { id: true, examinedById: true, appointmentId: true },
             }),
         ]);
 
@@ -614,7 +620,8 @@ export const getDoctorPerformanceReport = async (req, res, next) => {
             const perf = performanceMap[ce.examinedById];
             if (!perf) continue;
             perf.clinicalExams++;
-            perf.uniquePatients.add(ce.patientId);
+            // patientId is not directly on ClinicalExamination; track via appointmentId instead
+            if (ce.appointmentId) perf.uniquePatients.add(`ce-${ce.appointmentId}`);
         }
 
         const tableData = Object.values(performanceMap).map(p => ({
