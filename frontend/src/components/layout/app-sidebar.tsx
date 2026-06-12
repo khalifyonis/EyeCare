@@ -36,6 +36,7 @@ import {
     ShieldCheck,
     Shield,
     ScrollText,
+    TrendingUp,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useParams, usePathname } from 'next/navigation'
@@ -167,7 +168,23 @@ const roleNavigation: Record<string, NavSection[]> = {
                         { title: 'Medicine Prescriptions', url: '/dashboard/prescription/medicine' },
                     ],
                 },
-                { title: 'Medical Reports', icon: BarChart3, url: '/dashboard/reports' },
+                {
+                    title: 'Medical Reports',
+                    icon: BarChart3,
+                    url: '/dashboard/reports',
+                    subItems: [
+                        { title: 'Financial Summary', url: '/dashboard/reports/financial', icon: Receipt },
+                        { title: 'Revenue Trend', url: '/dashboard/reports/revenue-trend', icon: TrendingUp },
+                        { title: 'Income by Service', url: '/dashboard/reports/income-by-service', icon: ArrowDownToLine },
+                        { title: 'Doctor Performance', url: '/dashboard/reports/doctor-performance', icon: Stethoscope },
+                        { title: 'Branch Report', url: '/dashboard/reports/branch-report', icon: Building2 },
+                        { title: 'Clinical Analytics', url: '/dashboard/reports/clinical', icon: Activity },
+                        { title: 'Appointments', url: '/dashboard/reports/appointments', icon: Calendar },
+                        { title: 'Patients', url: '/dashboard/reports/patients', icon: Users },
+                        { title: 'Inventory', url: '/dashboard/reports/inventory', icon: Package },
+                        { title: 'Operational', url: '/dashboard/reports/operational', icon: Settings },
+                    ],
+                },
             ],
         },
         {
@@ -269,7 +286,23 @@ const roleNavigation: Record<string, NavSection[]> = {
                         { title: 'Medicine Prescriptions', url: '/dashboard/prescription/medicine' },
                     ],
                 },
-                { title: 'Medical Reports', icon: BarChart3, url: '/dashboard/reports' },
+                {
+                    title: 'Medical Reports',
+                    icon: BarChart3,
+                    url: '/dashboard/reports',
+                    subItems: [
+                        { title: 'Financial Summary', url: '/dashboard/reports/financial', icon: Receipt },
+                        { title: 'Revenue Trend', url: '/dashboard/reports/revenue-trend', icon: TrendingUp },
+                        { title: 'Income by Service', url: '/dashboard/reports/income-by-service', icon: ArrowDownToLine },
+                        { title: 'Doctor Performance', url: '/dashboard/reports/doctor-performance', icon: Stethoscope },
+                        { title: 'Branch Report', url: '/dashboard/reports/branch-report', icon: Building2 },
+                        { title: 'Clinical Analytics', url: '/dashboard/reports/clinical', icon: Activity },
+                        { title: 'Appointments', url: '/dashboard/reports/appointments', icon: Calendar },
+                        { title: 'Patients', url: '/dashboard/reports/patients', icon: Users },
+                        { title: 'Inventory', url: '/dashboard/reports/inventory', icon: Package },
+                        { title: 'Operational', url: '/dashboard/reports/operational', icon: Settings },
+                    ],
+                },
             ],
         },
         {
@@ -361,7 +394,19 @@ const roleNavigation: Record<string, NavSection[]> = {
                         { title: 'Medicine Prescriptions', url: '/dashboard/prescription/medicine' },
                     ],
                 },
-                { title: 'Reports', icon: BarChart3, url: '/dashboard/reports' },
+                {
+                    title: 'Reports',
+                    icon: BarChart3,
+                    url: '/dashboard/reports',
+                    subItems: [
+                        { title: 'Financial Summary', url: '/dashboard/reports/financial', icon: Receipt },
+                        { title: 'Income by Service', url: '/dashboard/reports/income-by-service', icon: ArrowDownToLine },
+                        { title: 'Doctor Performance', url: '/dashboard/reports/doctor-performance', icon: Stethoscope },
+                        { title: 'Clinical Analytics', url: '/dashboard/reports/clinical', icon: Activity },
+                        { title: 'Appointments', url: '/dashboard/reports/appointments', icon: Calendar },
+                        { title: 'Patients', url: '/dashboard/reports/patients', icon: Users },
+                    ],
+                },
             ],
         },
     ],
@@ -405,7 +450,19 @@ const roleNavigation: Record<string, NavSection[]> = {
         {
             section: 'REPORTS',
             items: [
-                { title: 'Reports', icon: BarChart3, url: '/dashboard/reports' },
+                {
+                    title: 'Reports',
+                    icon: BarChart3,
+                    url: '/dashboard/reports',
+                    subItems: [
+                        { title: 'Financial Summary', url: '/dashboard/reports/financial', icon: Receipt },
+                        { title: 'Income by Service', url: '/dashboard/reports/income-by-service', icon: ArrowDownToLine },
+                        { title: 'Doctor Performance', url: '/dashboard/reports/doctor-performance', icon: Stethoscope },
+                        { title: 'Clinical Analytics', url: '/dashboard/reports/clinical', icon: Activity },
+                        { title: 'Appointments', url: '/dashboard/reports/appointments', icon: Calendar },
+                        { title: 'Patients', url: '/dashboard/reports/patients', icon: Users },
+                    ],
+                },
             ],
         },
     ],
@@ -450,7 +507,19 @@ const roleNavigation: Record<string, NavSection[]> = {
         {
             section: 'REPORTS',
             items: [
-                { title: 'Reports', icon: BarChart3, url: '/dashboard/reports' },
+                {
+                    title: 'Reports',
+                    icon: BarChart3,
+                    url: '/dashboard/reports',
+                    subItems: [
+                        { title: 'Financial Summary', url: '/dashboard/reports/financial', icon: Receipt },
+                        { title: 'Income by Service', url: '/dashboard/reports/income-by-service', icon: ArrowDownToLine },
+                        { title: 'Doctor Performance', url: '/dashboard/reports/doctor-performance', icon: Stethoscope },
+                        { title: 'Clinical Analytics', url: '/dashboard/reports/clinical', icon: Activity },
+                        { title: 'Appointments', url: '/dashboard/reports/appointments', icon: Calendar },
+                        { title: 'Patients', url: '/dashboard/reports/patients', icon: Users },
+                    ],
+                },
             ],
         },
     ],
@@ -489,7 +558,19 @@ const roleNavigation: Record<string, NavSection[]> = {
         {
             section: 'REPORTS',
             items: [
-                { title: 'Reports', icon: BarChart3, url: '/dashboard/reports' },
+                {
+                    title: 'Reports',
+                    icon: BarChart3,
+                    url: '/dashboard/reports',
+                    subItems: [
+                        { title: 'Financial Summary', url: '/dashboard/reports/financial', icon: Receipt },
+                        { title: 'Income by Service', url: '/dashboard/reports/income-by-service', icon: ArrowDownToLine },
+                        { title: 'Doctor Performance', url: '/dashboard/reports/doctor-performance', icon: Stethoscope },
+                        { title: 'Clinical Analytics', url: '/dashboard/reports/clinical', icon: Activity },
+                        { title: 'Appointments', url: '/dashboard/reports/appointments', icon: Calendar },
+                        { title: 'Patients', url: '/dashboard/reports/patients', icon: Users },
+                    ],
+                },
             ],
         },
     ],

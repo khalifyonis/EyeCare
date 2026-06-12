@@ -21,9 +21,10 @@ import {
   DollarSign, 
   AlertTriangle, 
   Clock, 
-  Loader2 
+  Loader2,
+  Filter,
 } from 'lucide-react';
-import { StatsCard } from '@/components/dashboard/stats-card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ReportLayout from '../_components/report-layout';
 
 type InventoryData = {
@@ -263,46 +264,43 @@ export default function InventoryReportPage() {
       ) : data ? (
         <div className="space-y-6">
 
-          {/* Inventory Category Dropdown */}
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Category</span>
-            <select
-              value={inventoryType}
-              onChange={(e) => setInventoryType(e.target.value as 'all' | 'optical' | 'pharmacy')}
-              className="h-9 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 text-xs font-semibold text-slate-700 dark:text-slate-200 focus:border-[#0EA5E9] focus:outline-none cursor-pointer hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-sm"
-            >
-              <option value="all">All Stock</option>
-              <option value="optical">Optical Shop</option>
-              <option value="pharmacy">Pharmacy</option>
-            </select>
+          {/* Filter Bar */}
+          <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+              <Filter className="h-3.5 w-3.5" />
+              Category
+            </div>
+            <Select value={inventoryType} onValueChange={(v) => setInventoryType(v as any)}>
+              <SelectTrigger className="h-8 w-[160px] text-xs border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                <SelectValue placeholder="All Stock" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Stock</SelectItem>
+                <SelectItem value="optical">Optical Shop</SelectItem>
+                <SelectItem value="pharmacy">Pharmacy</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          
-          {/* KPI Cards */}
+
+          {/* Premium KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatsCard
-              title="Total Stock Items"
-              value={String(kpis.totalItems)}
-              icon={Package}
-              color="blue"
-            />
-            <StatsCard
-              title="Total Stock Value"
-              value={`$${kpis.stockValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-              icon={DollarSign}
-              color="emerald"
-            />
-            <StatsCard
-              title="Low Stock Alerts"
-              value={String(kpis.lowStockAlerts)}
-              icon={AlertTriangle}
-              color="amber"
-            />
-            <StatsCard
-              title="Expiring Soon (90d)"
-              value={String(kpis.expiringSoon)}
-              icon={Clock}
-              color="rose"
-            />
+            {[
+              { label: 'Total Stock Items', value: kpis.totalItems.toLocaleString(), icon: Package, color: 'from-sky-500 to-blue-600 shadow-sky-500/25' },
+              { label: 'Total Stock Value', value: `$${kpis.stockValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, icon: DollarSign, color: 'from-emerald-500 to-teal-600 shadow-emerald-500/25' },
+              { label: 'Low Stock Alerts', value: kpis.lowStockAlerts.toLocaleString(), icon: AlertTriangle, color: 'from-amber-500 to-orange-600 shadow-amber-500/25' },
+              { label: 'Expiring Soon (90d)', value: kpis.expiringSoon.toLocaleString(), icon: Clock, color: 'from-red-500 to-rose-600 shadow-red-500/25' },
+            ].map(k => (
+              <div key={k.label} className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${k.color} p-5 text-white shadow-lg`}>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium opacity-90">{k.label}</p>
+                    <p className="mt-1 text-2xl font-bold">{k.value}</p>
+                  </div>
+                  <div className="rounded-xl bg-white/20 p-2.5"><k.icon className="h-5 w-5" /></div>
+                </div>
+                <div className="absolute -bottom-4 -right-4 h-20 w-20 rounded-full bg-white/10" />
+              </div>
+            ))}
           </div>
 
           {/* Charts Row */}

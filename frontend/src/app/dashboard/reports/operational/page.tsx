@@ -23,7 +23,6 @@ import {
   Users, 
   Loader2 
 } from 'lucide-react';
-import { StatsCard } from '@/components/dashboard/stats-card';
 import ReportLayout from '../_components/report-layout';
 
 type OperationalData = {
@@ -206,32 +205,25 @@ export default function OperationalReportPage() {
       ) : data ? (
         <div className="space-y-6">
           
-          {/* KPI Cards */}
+          {/* Premium KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatsCard
-              title="Avg Appointments/Day"
-              value={data.kpis.avgAppointmentsPerDay.toFixed(1)}
-              icon={TrendingUp}
-              color="blue"
-            />
-            <StatsCard
-              title="Follow-Up Compliance"
-              value={`${data.kpis.followUpCompliance.toFixed(1)}%`}
-              icon={CheckCircle}
-              color="emerald"
-            />
-            <StatsCard
-              title="Overdue Follow-Ups"
-              value={String(data.kpis.overdueFollowUps)}
-              icon={AlertTriangle}
-              color="rose"
-            />
-            <StatsCard
-              title="Active Doctors"
-              value={String(data.kpis.activeDoctors)}
-              icon={Users}
-              color="purple"
-            />
+            {[
+              { label: 'Avg Appointments/Day', value: data.kpis.avgAppointmentsPerDay.toFixed(1), icon: TrendingUp, color: 'from-sky-500 to-blue-600 shadow-sky-500/25' },
+              { label: 'Follow-Up Compliance', value: `${data.kpis.followUpCompliance.toFixed(1)}%`, icon: CheckCircle, color: 'from-emerald-500 to-teal-600 shadow-emerald-500/25' },
+              { label: 'Overdue Follow-Ups', value: data.kpis.overdueFollowUps.toLocaleString(), icon: AlertTriangle, color: 'from-red-500 to-rose-600 shadow-red-500/25' },
+              { label: 'Active Doctors', value: data.kpis.activeDoctors.toLocaleString(), icon: Users, color: 'from-violet-500 to-purple-600 shadow-violet-500/25' },
+            ].map(k => (
+              <div key={k.label} className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${k.color} p-5 text-white shadow-lg`}>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium opacity-90">{k.label}</p>
+                    <p className="mt-1 text-2xl font-bold">{k.value}</p>
+                  </div>
+                  <div className="rounded-xl bg-white/20 p-2.5"><k.icon className="h-5 w-5" /></div>
+                </div>
+                <div className="absolute -bottom-4 -right-4 h-20 w-20 rounded-full bg-white/10" />
+              </div>
+            ))}
           </div>
 
           {/* Charts Row */}

@@ -10,6 +10,7 @@ import {
     getIncomeByServiceReport,
     getDoctorPerformanceReport,
     getBranchReport,
+    getRevenueTrendReport,
 } from '../controllers/reportController.js';
 import { authenticate, checkPermission } from '../middlewares/authMiddleware.js';
 
@@ -25,5 +26,6 @@ router.get('/operational', authenticate, checkPermission('reports_operational', 
 router.get('/income-by-service', authenticate, checkPermission('reports_financial', 'canRead'), getIncomeByServiceReport);
 router.get('/doctor-performance', authenticate, checkPermission('reports_clinical', 'canRead'), getDoctorPerformanceReport);
 router.get('/branch-report', authenticate, checkPermission('reports_operational', 'canRead'), getBranchReport);
+router.get('/revenue-trend', authenticate, checkPermission('reports_financial', 'canRead'), getRevenueTrendReport);
 
 export default router;

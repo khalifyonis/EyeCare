@@ -63,26 +63,34 @@ const ROLE_STATIC_ASSETS: Record<string, { title: string; color: string; icon: a
     },
 };
 
-const MODULE_LABELS: Record<string, { title: string; desc: string }> = {
-    patients: { title: 'Patients Module', desc: 'Patient profiles, registrations, and medical history logs' },
-    appointments: { title: 'Appointments Module', desc: 'Scheduling calendar, check-ins, and arrival tracking' },
-    preliminary_exams: { title: 'Preliminary Examinations', desc: 'Stage 1 eye exams: visual acuity, IOP, refraction, and chief complaints' },
-    clinical_exams: { title: 'Clinical Examinations', desc: 'Stage 2 clinical exams: anterior segment, fundus, diagnosis, and treatment plans' },
-    surgery: { title: 'Eye Surgery Module', desc: 'Surgical bookings, schedule times, operating rooms, and surgeon allocations' },
-    medicine_prescriptions: { title: 'Medicine Prescriptions', desc: 'Pharmaceutical medicine prescriptions, dosages, and dispensing records' },
-    optical_prescriptions: { title: 'Optical Prescriptions', desc: 'Optical frame/lens prescriptions, PD measurements, and lens specifications' },
-    reports_financial: { title: 'Financial Reports', desc: 'Revenue analytics, payment methods, and billing stats' },
-    reports_clinical: { title: 'Clinical Reports', desc: 'Disease statistics, check-up outcomes, and clinical logs' },
-    reports_appointments: { title: 'Appointment Reports', desc: 'Booking counts, cancellation logs, and arrival tracking statistics' },
-    reports_patients: { title: 'Patient Reports', desc: 'New registration cohorts, demographic breakdowns, and logs' },
-    reports_inventory: { title: 'Inventory Reports', desc: 'Pharmacy and optical stock levels, reorder alerts, and usage' },
-    reports_operational: { title: 'Operational Reports', desc: 'Clinic statistics, staff logs, and general operating speed metrics' },
-    pharmacy: { title: 'Pharmacy Inventory', desc: 'Medicines catalog, batch stock level tracking, and OTC sales' },
-    optical: { title: 'Optical Shop Inventory', desc: 'Frames catalog, lens counts, order tracking, and stock refills' },
-    billing: { title: 'Billing & Invoices', desc: 'Service bills, payments invoices, payment methods, and receipt printing' },
-    users: { title: 'Staff & Users Management', desc: 'System log-ins, role changes, multi-branch allocations, and doctor specialties' },
-    logs: { title: 'Logs & Compliance', desc: 'Activity logs, audit trail, change history, exports, and compliance monitoring' },
-    branches: { title: 'Branches & Clinic Settings', desc: 'Clinic details, phone lines, active/inactive states, and addresses' },
+const MODULE_LABELS: Record<string, { title: string; desc: string; group: string }> = {
+    patients: { title: 'Patients', desc: 'Patient profiles, registrations, and medical history', group: 'CLINICAL' },
+    appointments: { title: 'Appointments', desc: 'Scheduling calendar, check-ins, and arrival tracking', group: 'CLINICAL' },
+    preliminary_exams: { title: 'Preliminary Examinations', desc: 'Stage 1 eye exams: visual acuity, IOP, and refraction', group: 'CLINICAL' },
+    clinical_exams: { title: 'Clinical Examinations', desc: 'Stage 2 exams: anterior segment, fundus, diagnosis', group: 'CLINICAL' },
+    surgery: { title: 'Eye Surgery', desc: 'Surgical bookings, operating rooms, and surgeon allocations', group: 'CLINICAL' },
+    medicine_prescriptions: { title: 'Medicine Prescriptions', desc: 'Pharmaceutical prescriptions, dosages, and dispensing', group: 'CLINICAL' },
+    optical_prescriptions: { title: 'Optical Prescriptions', desc: 'Optical frame/lens prescriptions and lens specs', group: 'CLINICAL' },
+    pharmacy: { title: 'Pharmacy Inventory', desc: 'Medicines catalog, batch stock tracking, and OTC sales', group: 'INVENTORY' },
+    optical: { title: 'Optical Shop', desc: 'Frames catalog, lens counts, order tracking, and restocking', group: 'INVENTORY' },
+    billing: { title: 'Billing & Invoices', desc: 'Service invoices, payments, payment methods, and receipts', group: 'FINANCE' },
+    reports_financial: { title: 'Financial Reports', desc: 'Revenue analytics, income by service, payment stats', group: 'REPORTS' },
+    reports_clinical: { title: 'Clinical Reports', desc: 'Doctor performance, exam outcomes, and clinical analytics', group: 'REPORTS' },
+    reports_appointments: { title: 'Appointment Reports', desc: 'Booking counts, cancellation logs, and arrival stats', group: 'REPORTS' },
+    reports_patients: { title: 'Patient Reports', desc: 'New registrations, demographics, and patient analytics', group: 'REPORTS' },
+    reports_inventory: { title: 'Inventory Reports', desc: 'Stock levels, reorder alerts, and expiry tracking', group: 'REPORTS' },
+    reports_operational: { title: 'Operational Reports', desc: 'Branch reports, staff logs, and operational metrics', group: 'REPORTS' },
+    users: { title: 'Staff & Users', desc: 'Staff logins, role assignments, and multi-branch allocation', group: 'ADMINISTRATION' },
+    logs: { title: 'Logs & Compliance', desc: 'Activity logs, audit trail, change history, and compliance', group: 'ADMINISTRATION' },
+    branches: { title: 'Branches & Settings', desc: 'Clinic details, phone lines, active/inactive status', group: 'ADMINISTRATION' },
+};
+
+const MODULE_GROUPS: Record<string, { label: string; color: string }> = {
+    CLINICAL: { label: 'Clinical Operations', color: 'from-emerald-500/10 to-teal-500/10 border-emerald-200 dark:border-emerald-900/30' },
+    INVENTORY: { label: 'Inventory Management', color: 'from-sky-500/10 to-blue-500/10 border-sky-200 dark:border-sky-900/30' },
+    FINANCE: { label: 'Finance & Billing', color: 'from-amber-500/10 to-orange-500/10 border-amber-200 dark:border-amber-900/30' },
+    REPORTS: { label: 'Reports & Analytics', color: 'from-violet-500/10 to-purple-500/10 border-violet-200 dark:border-violet-900/30' },
+    ADMINISTRATION: { label: 'Administration', color: 'from-rose-500/10 to-red-500/10 border-rose-200 dark:border-rose-900/30' },
 };
 
 export default function PermissionsPage() {
@@ -384,10 +392,77 @@ export default function PermissionsPage() {
                                 </div>
                             </div>
 
-                            {/* Permissions List */}
-                            <div className="divide-y divide-slate-150 dark:divide-slate-800/80">
-                                {Object.keys(MODULE_LABELS).map((moduleKey) => {
-                                    const moduleData = MODULE_LABELS[moduleKey];
+                            {/* Permissions List — grouped by module category */}
+                            <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
+                                {/* Column headers */}
+                                <div className="hidden md:flex items-center justify-between px-5 py-3 bg-slate-50 dark:bg-slate-900/30">
+                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Module</span>
+                                    <div className="grid grid-cols-4 gap-8 pr-1">
+                                        {['Read', 'Create', 'Update', 'Delete'].map(h => (
+                                            <span key={h} className="text-[10px] font-bold text-slate-400 uppercase tracking-widest w-9 text-center">{h}</span>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {Object.entries(MODULE_GROUPS).map(([groupKey, groupMeta]) => {
+                                    const groupModules = Object.entries(MODULE_LABELS).filter(([, m]) => m.group === groupKey);
+                                    return (
+                                        <div key={groupKey}>
+                                            {/* Group Header */}
+                                            <div className={`px-5 py-2.5 bg-gradient-to-r ${groupMeta.color} border-b border-slate-100 dark:border-slate-800`}>
+                                                <span className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest">{groupMeta.label}</span>
+                                            </div>
+                                            {groupModules.map(([moduleKey, moduleData]) => {
+                                    const permRecord = currentRolePerms.find(p => p.module === moduleKey) || {
+                                        canRead: isSuperadminSelected,
+                                        canCreate: isSuperadminSelected,
+                                        canUpdate: isSuperadminSelected,
+                                        canDelete: isSuperadminSelected,
+                                    };
+                                    const enabledCount = [permRecord.canRead, permRecord.canCreate, permRecord.canUpdate, permRecord.canDelete].filter(Boolean).length;
+
+                                    return (
+                                        <div key={moduleKey} className="px-5 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50/60 dark:hover:bg-slate-900/10 transition-colors">
+                                            <div className="space-y-0.5 flex-1 min-w-0">
+                                                <div className="flex items-center gap-2">
+                                                    <h3 className="font-bold text-slate-800 dark:text-slate-200 text-sm">{moduleData.title}</h3>
+                                                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${enabledCount === 4 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : enabledCount === 0 ? 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'}`}>
+                                                        {enabledCount === 4 ? 'Full Access' : enabledCount === 0 ? 'No Access' : `${enabledCount}/4`}
+                                                    </span>
+                                                </div>
+                                                <p className="text-xs text-slate-400 dark:text-slate-500 leading-normal">{moduleData.desc}</p>
+                                            </div>
+
+                                            {/* Toggle Switches */}
+                                            <div className="grid grid-cols-4 gap-4 sm:gap-6 md:gap-8 justify-items-center bg-slate-50/50 dark:bg-slate-900/30 border border-slate-100 dark:border-slate-800 rounded-2xl p-3 md:bg-transparent md:border-none md:p-0">
+                                                {(['canRead', 'canCreate', 'canUpdate', 'canDelete'] as const).map((field, i) => {
+                                                    const labels = ['Read', 'Create', 'Update', 'Delete'];
+                                                    const colors = ['bg-sky-500', 'bg-emerald-500', 'bg-amber-500', 'bg-red-500'];
+                                                    const isOn = permRecord[field];
+                                                    return (
+                                                        <div key={field} className="flex flex-col items-center gap-1">
+                                                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest md:hidden">{labels[i]}</span>
+                                                            <button
+                                                                type="button"
+                                                                disabled={isSuperadminSelected}
+                                                                onClick={() => handleToggle(moduleKey, field)}
+                                                                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#0EA5E9] disabled:opacity-50 disabled:cursor-default ${isOn ? colors[i] : 'bg-slate-200 dark:bg-slate-700'}`}
+                                                            >
+                                                                <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isOn ? 'translate-x-4' : 'translate-x-0'}`} />
+                                                            </button>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                                        </div>
+                                    );
+                                })}
+
+                                {/* Legacy: any modules not in groups */}
+                                {Object.entries(MODULE_LABELS).filter(([, m]) => !MODULE_GROUPS[m.group]).map(([moduleKey, moduleData]) => {
                                     const permRecord = currentRolePerms.find(p => p.module === moduleKey) || {
                                         canRead: isSuperadminSelected,
                                         canCreate: isSuperadminSelected,

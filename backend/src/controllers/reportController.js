@@ -101,27 +101,30 @@ export const getFinancialReport = async (req, res, next) => {
 
 export const getClinicalReport = async (req, res, next) => {
     try {
-        const { from, to } = req.query;
+        const { from, to, doctorId, type: typeFilter } = req.query;
         const branchFilter = getBranchFilter(req);
         const dateFilter = getDateFilter(from, to);
 
-        const [exams, surgeries, prescriptions, followUps] = await Promise.all([
-            prisma.eyeExamination.findMany({
-                where: { ...branchFilter, ...dateFilter },
-                include: { patient: { select: { fullName: true } }, doctor: { select: { user: { select: { fullName: true } } } } },
+        const examWhere = { ...branchFilter, ...dateFilter, ...(doctorId ? { doctorId } : {}) };
+        const surgWhere = { ...branchFilter, ...getDateFilter(from, to, 'date'), ...(doctorId ? { surgeonId: doctorId } : {}) };
+
+        const [exams, surgeries, prescriptions, followUps, doctors] = await Promise.all([
+            typeFilter === 'surgeries' ? Promise.resolve([]) : prisma.eyeExamination.findMany({
+                where: examWhere,
+                include: { patient: { select: { fullName: true } }, doctor: { select: { id: true, user: { select: { fullName: true } } } } },
                 orderBy: { createdAt: 'desc' }
             }),
-            prisma.surgery.findMany({
-                where: { ...branchFilter, ...getDateFilter(from, to, 'date') },
-                include: { patient: { select: { fullName: true } }, surgeon: { select: { user: { select: { fullName: true } } } } },
+            typeFilter === 'exams' ? Promise.resolve([]) : prisma.surgery.findMany({
+                where: surgWhere,
+                include: { patient: { select: { fullName: true } }, surgeon: { select: { id: true, user: { select: { fullName: true } } } } },
                 orderBy: { date: 'desc' }
             }),
-            prisma.prescription.count({
-                where: { ...branchFilter, ...dateFilter }
+            prisma.prescription.count({ where: { ...branchFilter, ...dateFilter } }),
+            prisma.followUp.findMany({ where: { ...branchFilter, ...dateFilter } }),
+            prisma.doctor.findMany({
+                where: branchFilter,
+                select: { id: true, user: { select: { fullName: true } } },
             }),
-            prisma.followUp.findMany({
-                where: { ...branchFilter, ...dateFilter }
-            })
         ]);
 
         const kpis = {
@@ -180,7 +183,7 @@ export const getClinicalReport = async (req, res, next) => {
             }))
         ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-        res.json({ kpis, chart1, chart2, tableData });
+        res.json({ kpis, chart1, chart2, tableData, doctors });
     } catch (error) {
         next(error);
     }
@@ -188,24 +191,39 @@ export const getClinicalReport = async (req, res, next) => {
 
 export const getAppointmentReport = async (req, res, next) => {
     try {
-        const { from, to } = req.query;
+        const { from, to, doctorId, status: statusFilter } = req.query;
         const branchFilter = getBranchFilter(req);
         const dateFilter = getDateFilter(from, to, 'appointmentDate');
 
-        const appointments = await prisma.appointment.findMany({
-            where: { ...branchFilter, ...dateFilter },
-            include: {
-                patient: { select: { fullName: true } },
-                doctor: { select: { user: { select: { fullName: true } } } }
-            },
-            orderBy: { appointmentDate: 'desc' }
-        });
+        const apptWhere = {
+            ...branchFilter,
+            ...dateFilter,
+            ...(doctorId ? { doctorId } : {}),
+            ...(statusFilter ? { status: statusFilter } : {}),
+        };
+
+        const [appointments, doctors] = await Promise.all([
+            prisma.appointment.findMany({
+                where: apptWhere,
+                include: {
+                    patient: { select: { fullName: true, patientNumber: true } },
+                    doctor: { select: { id: true, user: { select: { fullName: true } } } },
+                    billings: { select: { finalAmount: true, status: true } },
+                },
+                orderBy: { appointmentDate: 'desc' },
+            }),
+            prisma.doctor.findMany({
+                where: branchFilter,
+                select: { id: true, user: { select: { fullName: true } } },
+            }),
+        ]);
 
         const kpis = {
             totalAppointments: appointments.length,
             completionRate: 0,
             cancellationRate: 0,
             avgPerDay: 0,
+            totalRevenue: 0,
         };
 
         const days = getDaysInRange(from, to);
@@ -220,6 +238,9 @@ export const getAppointmentReport = async (req, res, next) => {
         for (const a of appointments) {
             if (a.status === 'COMPLETED') completed++;
             if (a.status === 'CANCELLED') cancelled++;
+            for (const b of (a.billings || [])) {
+                if (b.status === 'PAID') kpis.totalRevenue += Number(b.finalAmount) || 0;
+            }
 
             const dateStr = a.appointmentDate.toISOString().slice(0, 10);
             trendByDate[dateStr] = trendByDate[dateStr] || { name: dateStr, total: 0, completed: 0, cancelled: 0 };
@@ -236,7 +257,7 @@ export const getAppointmentReport = async (req, res, next) => {
         const chart1 = Object.values(trendByDate).sort((a, b) => a.name.localeCompare(b.name));
         const chart2 = Object.keys(statusDist).map(status => ({ name: status, value: statusDist[status] }));
 
-        res.json({ kpis, chart1, chart2, tableData: appointments });
+        res.json({ kpis, chart1, chart2, tableData: appointments, doctors });
     } catch (error) {
         next(error);
     }
@@ -244,17 +265,19 @@ export const getAppointmentReport = async (req, res, next) => {
 
 export const getPatientReport = async (req, res, next) => {
     try {
-        const { from, to } = req.query;
+        const { from, to, gender: genderFilter } = req.query;
         const branchFilter = getBranchFilter(req);
         const dateFilter = getDateFilter(from, to);
 
+        const genderWhere = genderFilter ? { gender: { equals: genderFilter, mode: 'insensitive' } } : {};
+
         const allPatients = await prisma.patient.findMany({
-            where: { ...branchFilter },
+            where: { ...branchFilter, ...genderWhere },
             select: { id: true, createdAt: true, gender: true, dateOfBirth: true }
         });
 
         const newPatients = await prisma.patient.findMany({
-            where: { ...branchFilter, ...dateFilter },
+            where: { ...branchFilter, ...dateFilter, ...genderWhere },
             orderBy: { createdAt: 'desc' }
         });
 
@@ -834,6 +857,88 @@ export const getOperationalReport = async (req, res, next) => {
         const chart2 = Object.keys(statusDist).map(status => ({ name: status, value: statusDist[status] }));
 
         res.json({ kpis, chart1, chart2, tableData: followUps });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// ─── Revenue Trend Report ──────────────────────────────────────────────────────
+export const getRevenueTrendReport = async (req, res, next) => {
+    try {
+        const { from, to, groupBy = 'day', branchId: qBranch } = req.query;
+        const branchFilter = getBranchFilter(req);
+        if (qBranch) branchFilter.branchId = qBranch;
+        const dateFilter = getDateFilter(from, to);
+
+        const billings = await prisma.billing.findMany({
+            where: { ...branchFilter, ...dateFilter },
+            select: {
+                createdAt: true,
+                finalAmount: true,
+                totalAmount: true,
+                discount: true,
+                status: true,
+                serviceType: true,
+                paymentMethod: true,
+            },
+        });
+
+        const paid = billings.filter(b => b.status === 'PAID');
+        const totalRevenue = paid.reduce((s, b) => s + Number(b.finalAmount), 0);
+        const totalBilled = billings.reduce((s, b) => s + Number(b.totalAmount), 0);
+        const totalDiscount = billings.reduce((s, b) => s + Number(b.discount || 0), 0);
+        const outstanding = billings.filter(b => b.status === 'UNPAID').reduce((s, b) => s + Number(b.finalAmount), 0);
+
+        // Group revenue by time period
+        const trendMap = {};
+        for (const b of paid) {
+            const d = new Date(b.createdAt);
+            let key;
+            if (groupBy === 'month') {
+                key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            } else if (groupBy === 'year') {
+                key = String(d.getFullYear());
+            } else {
+                key = d.toISOString().slice(0, 10);
+            }
+            if (!trendMap[key]) trendMap[key] = { name: key, revenue: 0, transactions: 0 };
+            trendMap[key].revenue += Number(b.finalAmount);
+            trendMap[key].transactions++;
+        }
+        const trendChart = Object.values(trendMap).sort((a, b) => a.name.localeCompare(b.name));
+
+        // Revenue by service type
+        const serviceMap = {};
+        for (const b of paid) {
+            const svc = b.serviceType || 'OTHER';
+            if (!serviceMap[svc]) serviceMap[svc] = { name: svc, revenue: 0, count: 0 };
+            serviceMap[svc].revenue += Number(b.finalAmount);
+            serviceMap[svc].count++;
+        }
+        const serviceChart = Object.values(serviceMap).sort((a, b) => b.revenue - a.revenue);
+
+        // Revenue by payment method
+        const methodMap = {};
+        for (const b of paid) {
+            const m = b.paymentMethod || 'UNKNOWN';
+            if (!methodMap[m]) methodMap[m] = { name: m, revenue: 0, count: 0 };
+            methodMap[m].revenue += Number(b.finalAmount);
+            methodMap[m].count++;
+        }
+        const methodChart = Object.values(methodMap).sort((a, b) => b.revenue - a.revenue);
+
+        // KPIs
+        const kpis = {
+            totalRevenue,
+            totalBilled,
+            totalDiscount,
+            outstanding,
+            totalTransactions: billings.length,
+            paidTransactions: paid.length,
+            collectionRate: billings.length > 0 ? (paid.length / billings.length) * 100 : 0,
+        };
+
+        res.json({ kpis, trendChart, serviceChart, methodChart, groupBy });
     } catch (error) {
         next(error);
     }

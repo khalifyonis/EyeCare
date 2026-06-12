@@ -22,11 +22,13 @@ import {
 import { 
   Activity, 
   Scissors, 
-  FileSpreadsheet, 
   RotateCcw,
-  Loader2
+  Loader2,
+  Filter,
+  Users,
+  ClipboardList,
 } from 'lucide-react';
-import { StatsCard } from '@/components/dashboard/stats-card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ReportLayout from '../_components/report-layout';
 
 type ClinicalData = {
@@ -47,6 +49,7 @@ type ClinicalData = {
     details: string;
     status: string;
   }>;
+  doctors?: { id: string; user: { fullName: string } }[];
 };
 
 const COLORS = ['#0EA5E9', '#8B5CF6', '#F97316', '#10B981', '#EF4444'];
@@ -58,6 +61,7 @@ export default function ClinicalReportPage() {
   const [loading, setLoading] = useState(false);
   const [exportingPdf, setExportingPdf] = useState(false);
   const [clinicalType, setClinicalType] = useState<'all' | 'exams' | 'surgeries'>('all');
+  const [doctorId, setDoctorId] = useState('all');
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -65,6 +69,8 @@ export default function ClinicalReportPage() {
       const params = new URLSearchParams();
       if (from) params.set('from', from);
       if (to) params.set('to', to);
+      if (clinicalType !== 'all') params.set('type', clinicalType);
+      if (doctorId !== 'all') params.set('doctorId', doctorId);
       const res = await api.get(`/reports/clinical?${params.toString()}`);
       setData(res.data);
     } catch {
@@ -73,7 +79,7 @@ export default function ClinicalReportPage() {
     } finally {
       setLoading(false);
     }
-  }, [from, to]);
+  }, [from, to, clinicalType, doctorId]);
 
   // Filter table data in memory
   const getFilteredTableData = () => {
@@ -231,49 +237,56 @@ export default function ClinicalReportPage() {
       ) : data ? (
         <div className="space-y-6 animate-in fade-in duration-300">
           
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Report Type</span>
-            <select
-              value={clinicalType}
-              onChange={(e) => setClinicalType(e.target.value as any)}
-              className="h-9 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 text-xs font-semibold text-slate-700 dark:text-slate-200 focus:border-[#0EA5E9] focus:outline-none cursor-pointer hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-sm"
-            >
-              <option value="all">All Clinical</option>
-              <option value="exams">Eye Examinations</option>
-              <option value="surgeries">Surgeries</option>
-            </select>
+          {/* Filter bar */}
+          <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+              <Filter className="h-3.5 w-3.5" />
+              Filters
+            </div>
+            <Select value={clinicalType} onValueChange={(v) => setClinicalType(v as any)}>
+              <SelectTrigger className="h-8 w-[170px] text-xs border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                <SelectValue placeholder="Report Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Clinical</SelectItem>
+                <SelectItem value="exams">Eye Examinations</SelectItem>
+                <SelectItem value="surgeries">Surgeries</SelectItem>
+              </SelectContent>
+            </Select>
+            {data.doctors && data.doctors.length > 0 && (
+              <Select value={doctorId} onValueChange={setDoctorId}>
+                <SelectTrigger className="h-8 w-[180px] text-xs border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                  <SelectValue placeholder="All Doctors" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Doctors</SelectItem>
+                  {data.doctors.map(d => (
+                    <SelectItem key={d.id} value={d.id}>{d.user.fullName}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
-          {/* KPI Cards */}
+          {/* Premium KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {(clinicalType === 'all' || clinicalType === 'exams') && (
-              <StatsCard
-                title="Total Examinations"
-                value={String(data.kpis.totalExaminations)}
-                icon={Activity}
-                color="emerald"
-              />
-            )}
-            {(clinicalType === 'all' || clinicalType === 'surgeries') && (
-              <StatsCard
-                title="Completed Surgeries"
-                value={String(data.kpis.surgeriesDone)}
-                icon={Scissors}
-                color="blue"
-              />
-            )}
-            <StatsCard
-              title="Prescriptions Issued"
-              value={String(data.kpis.prescriptions)}
-              icon={FileSpreadsheet}
-              color="purple"
-            />
-            <StatsCard
-              title="Follow-up Rate"
-              value={`${data.kpis.followUpRate.toFixed(1)}%`}
-              icon={RotateCcw}
-              color="amber"
-            />
+            {[
+              { show: clinicalType !== 'surgeries', label: 'Eye Examinations', value: data.kpis.totalExaminations, icon: Activity, color: 'from-emerald-500 to-teal-600 shadow-emerald-500/25' },
+              { show: clinicalType !== 'exams', label: 'Surgeries Done', value: data.kpis.surgeriesDone, icon: Scissors, color: 'from-violet-500 to-purple-600 shadow-violet-500/25' },
+              { show: true, label: 'Prescriptions', value: data.kpis.prescriptions, icon: ClipboardList, color: 'from-sky-500 to-blue-600 shadow-sky-500/25' },
+              { show: true, label: 'Follow-up Rate', value: `${data.kpis.followUpRate.toFixed(1)}%`, icon: RotateCcw, color: 'from-amber-500 to-orange-600 shadow-amber-500/25' },
+            ].filter(k => k.show).map(k => (
+              <div key={k.label} className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${k.color} p-5 text-white shadow-lg`}>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium opacity-90">{k.label}</p>
+                    <p className="mt-1 text-2xl font-bold">{typeof k.value === 'number' ? k.value.toLocaleString() : k.value}</p>
+                  </div>
+                  <div className="rounded-xl bg-white/20 p-2.5"><k.icon className="h-5 w-5" /></div>
+                </div>
+                <div className="absolute -bottom-4 -right-4 h-20 w-20 rounded-full bg-white/10" />
+              </div>
+            ))}
           </div>
 
           {/* Charts Row */}

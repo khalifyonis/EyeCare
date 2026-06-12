@@ -38,14 +38,15 @@ interface ReportLayoutProps {
 
 const TABS = [
   { label: 'Financial', path: '/dashboard/reports/financial', icon: DollarSign, module: 'reports_financial' },
-  { label: 'Income by Service', path: '/dashboard/reports/income-by-service', icon: TrendingUp, module: 'reports_financial' },
+  { label: 'Revenue Trend', path: '/dashboard/reports/revenue-trend', icon: TrendingUp, module: 'reports_financial' },
+  { label: 'Income by Service', path: '/dashboard/reports/income-by-service', icon: Layers, module: 'reports_financial' },
   { label: 'Doctor Performance', path: '/dashboard/reports/doctor-performance', icon: Users, module: 'reports_clinical' },
   { label: 'Branch Report', path: '/dashboard/reports/branch-report', icon: Layers, module: 'reports_operational' },
   { label: 'Clinical', path: '/dashboard/reports/clinical', icon: Activity, module: 'reports_clinical' },
   { label: 'Appointments', path: '/dashboard/reports/appointments', icon: Calendar, module: 'reports_appointments' },
   { label: 'Patients', path: '/dashboard/reports/patients', icon: Users, module: 'reports_patients' },
-  { label: 'Inventory', path: '/dashboard/reports/inventory', icon: Layers, module: 'reports_inventory' },
-  { label: 'Operational', path: '/dashboard/reports/operational', icon: TrendingUp, module: 'reports_operational' },
+  { label: 'Inventory', path: '/dashboard/reports/inventory', icon: Package, module: 'reports_inventory' },
+  { label: 'Operational', path: '/dashboard/reports/operational', icon: Activity, module: 'reports_operational' },
 ];
 
 export default function ReportLayout({

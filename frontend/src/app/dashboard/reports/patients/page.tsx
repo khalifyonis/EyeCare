@@ -24,9 +24,10 @@ import {
   UserPlus, 
   Calendar,
   Users2,
-  Loader2
+  Loader2,
+  Filter,
 } from 'lucide-react';
-import { StatsCard } from '@/components/dashboard/stats-card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ReportLayout from '../_components/report-layout';
 
 type PatientData = {
@@ -56,6 +57,7 @@ const COLORS = ['#0EA5E9', '#8B5CF6', '#10B981', '#F97316', '#EF4444'];
 export default function PatientReportPage() {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
+  const [genderFilter, setGenderFilter] = useState('all');
   const [data, setData] = useState<PatientData | null>(null);
   const [loading, setLoading] = useState(false);
   const [exportingPdf, setExportingPdf] = useState(false);
@@ -66,6 +68,7 @@ export default function PatientReportPage() {
       const params = new URLSearchParams();
       if (from) params.set('from', from);
       if (to) params.set('to', to);
+      if (genderFilter !== 'all') params.set('gender', genderFilter);
       const res = await api.get(`/reports/patients?${params.toString()}`);
       setData(res.data);
     } catch {
@@ -74,7 +77,7 @@ export default function PatientReportPage() {
     } finally {
       setLoading(false);
     }
-  }, [from, to]);
+  }, [from, to, genderFilter]);
 
   const exportPdf = async () => {
     if (!data) return;
@@ -202,6 +205,24 @@ export default function PatientReportPage() {
       exportingPdf={exportingPdf}
       hasData={!!data}
     >
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+          <Filter className="h-3.5 w-3.5" />
+          Filters
+        </div>
+        <Select value={genderFilter} onValueChange={setGenderFilter}>
+          <SelectTrigger className="h-8 w-[150px] text-xs border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+            <SelectValue placeholder="All Genders" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Genders</SelectItem>
+            <SelectItem value="MALE">Male</SelectItem>
+            <SelectItem value="FEMALE">Female</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       {loading ? (
         <div className="flex h-64 items-center justify-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
           <div className="flex flex-col items-center gap-3">
@@ -211,33 +232,26 @@ export default function PatientReportPage() {
         </div>
       ) : data ? (
         <div className="space-y-6">
-          
-          {/* KPI Cards */}
+
+          {/* Premium KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatsCard
-              title="Total Database Patients"
-              value={String(data.kpis.totalPatients)}
-              icon={Users}
-              color="emerald"
-            />
-            <StatsCard
-              title="New In Period"
-              value={String(data.kpis.newInPeriod)}
-              icon={UserPlus}
-              color="blue"
-            />
-            <StatsCard
-              title="Gender Dist (M/F)"
-              value={data.kpis.genderDist}
-              icon={Users2}
-              color="purple"
-            />
-            <StatsCard
-              title="Average Age"
-              value={`${data.kpis.avgAge} Yrs`}
-              icon={Calendar}
-              color="amber"
-            />
+            {[
+              { label: 'Total Patients', value: data.kpis.totalPatients.toLocaleString(), icon: Users, color: 'from-emerald-500 to-teal-600 shadow-emerald-500/25' },
+              { label: 'New in Period', value: data.kpis.newInPeriod.toLocaleString(), icon: UserPlus, color: 'from-sky-500 to-blue-600 shadow-sky-500/25' },
+              { label: 'Gender (M / F)', value: data.kpis.genderDist, icon: Users2, color: 'from-violet-500 to-purple-600 shadow-violet-500/25' },
+              { label: 'Average Age', value: `${data.kpis.avgAge} yrs`, icon: Calendar, color: 'from-amber-500 to-orange-600 shadow-amber-500/25' },
+            ].map(k => (
+              <div key={k.label} className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${k.color} p-5 text-white shadow-lg`}>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium opacity-90">{k.label}</p>
+                    <p className="mt-1 text-2xl font-bold">{k.value}</p>
+                  </div>
+                  <div className="rounded-xl bg-white/20 p-2.5"><k.icon className="h-5 w-5" /></div>
+                </div>
+                <div className="absolute -bottom-4 -right-4 h-20 w-20 rounded-full bg-white/10" />
+              </div>
+            ))}
           </div>
 
           {/* Charts Row */}
