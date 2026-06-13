@@ -248,14 +248,6 @@ export default function OpticalPrescriptionsPage() {
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Optical Prescriptions</h1>
                     <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Manage optical prescriptions</p>
                 </div>
-                {canManage && (
-                    <Button asChild className="bg-[#0EA5E9] hover:bg-[#0284C7] text-white h-10 rounded-lg px-5">
-                        <Link href="/dashboard/prescription/optical/new">
-                            <Plus className="h-4 w-4" />
-                            New Prescription
-                        </Link>
-                    </Button>
-                )}
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

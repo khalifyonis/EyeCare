@@ -22,8 +22,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ServerPagination } from '@/components/dashboard/server-pagination';
 import { OpticalKpiCard } from '../../optical-shop/_components/optical-kpi-card';
-import { Search, Plus, MoreVertical, Trash2, FileText, CheckCircle2, Clock3, CalendarDays, ShoppingCart, Eye, Pencil } from 'lucide-react';
-import { readStoredUser, resolveRoleName } from '@/lib/auth';
+import { Search, MoreVertical, Trash2, FileText, CheckCircle2, Clock3, CalendarDays, ShoppingCart, Eye, Pencil } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -161,18 +160,6 @@ function parseDurationDays(durationText: string): number | null {
 
 export default function MedicinePrescriptionsPage() {
   const router = useRouter();
-  const role = useMemo(() => resolveRoleName(readStoredUser()), []);
-  
-  const isOptometrist = useMemo(() => {
-    const user = readStoredUser();
-    return resolveRoleName(user) === 'DOCTOR' && (user?.doctor as { specialization?: string })?.specialization?.toUpperCase() === 'OPTOMETRY';
-  }, []);
-
-  const canManage = useMemo(() => {
-    if (role === 'PHARMACIST') return false; // Pharmacists can only view and dispense
-    if (isOptometrist) return false; // Optometrists cannot prescribe medicines
-    return ['ADMIN', 'SUPERADMIN', 'DOCTOR'].includes(role);
-  }, [role, isOptometrist]);
 
   const [rows, setRows] = useState<MedicinePrescription[]>([]);
   const [items, setItems] = useState<PharmacyItem[]>([]);
@@ -430,7 +417,7 @@ export default function MedicinePrescriptionsPage() {
       </TableRow>
     );
     });
-  }, [loading, pagedRows, canManage, handleDelete, handleDispenseClick]);
+  }, [loading, pagedRows, handleDelete, handleDispenseClick]);
 
   return (
     <div className="w-full min-w-0 p-4 sm:p-5 md:p-6 lg:p-8 space-y-6 animate-in fade-in duration-300">
@@ -439,14 +426,6 @@ export default function MedicinePrescriptionsPage() {
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Medicine Prescriptions</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Manage medicine prescriptions with clear treatment details</p>
         </div>
-        {canManage && (
-          <Button asChild className="bg-[#0EA5E9] hover:bg-[#0284C7] text-white h-10 rounded-lg px-5">
-            <Link href="/dashboard/prescription/medicine/new">
-              <Plus className="h-4 w-4" />
-              New Medicine Prescription
-            </Link>
-          </Button>
-        )}
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
