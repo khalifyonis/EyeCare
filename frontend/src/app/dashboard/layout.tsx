@@ -3,7 +3,7 @@
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/layout/app-sidebar'
 import { Separator } from '@/components/ui/separator'
-import { Bell, Search, Moon, Sun, Maximize } from 'lucide-react'
+import { Search, Moon, Sun, Maximize } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useSocket } from '@/contexts/socket-context'
@@ -11,7 +11,8 @@ import { useTheme } from '@/components/theme-provider'
 import api from '@/lib/axios'
 import { toast } from 'sonner'
 import { clearSession, getDefaultDashboardPath, readStoredUser, resolveRoleName, type StoredUser } from '@/lib/auth'
-import { isPathAllowedForRole } from '@/lib/permissions'
+import { usePermission } from '@/contexts/permission-context'
+import { NotificationBell } from '@/components/layout/notification-bell'
 
 const ROLE_TITLES: Record<string, string> = {
     DOCTOR: 'Ophthalmologist',
@@ -37,38 +38,29 @@ export default function DashboardLayout({
     const router = useRouter()
     const pathname = usePathname()
     const [searchFocused, setSearchFocused] = useState(false)
-    const [authReady, setAuthReady] = useState(false)
-    const [headerUser, setHeaderUser] = useState<StoredUser | null>(null)
+    const { permissions, isAllowed, refresh: refreshPermissions } = usePermission()
     const { theme, toggleTheme } = useTheme()
     const { socket } = useSocket()
 
-    // ── 1) Verify session and load user (once); then enforce role for current path ──
+    const [headerUser, setHeaderUser] = useState<StoredUser | null>(null)
+    const [authReady, setAuthReady] = useState(false)
+
+    // ── 1) Verify session and load user ──
     useEffect(() => {
         let cancelled = false
         const setReady = () => {
             if (!cancelled) setAuthReady(true)
         }
 
-        const resolveCurrentPath = () => ((typeof window !== 'undefined' ? window.location.pathname : '/dashboard') || '/dashboard')
-
         const safetyTimer = window.setTimeout(() => {
             if (cancelled) return
-
             const fallbackUser = readStoredUser()
             if (fallbackUser) {
                 setHeaderUser(fallbackUser)
-                const fallbackRole = resolveRoleName(fallbackUser)
-                const currentPath = resolveCurrentPath()
-
-                if (fallbackUser && !isPathAllowedForRole(currentPath, fallbackUser)) {
-                    router.replace(getDefaultDashboardPath(fallbackRole))
-                }
-
-                toast.error('Session check timed out. Loaded using local session.')
+                refreshPermissions() // Sync permissions from local
                 setReady()
                 return
             }
-
             clearSession()
             router.replace('/login')
             setReady()
@@ -82,11 +74,8 @@ export default function DashboardLayout({
             setReady()
             return
         }
-        if (!document.cookie.includes('token=')) {
-            document.cookie = `token=${token}; path=/; max-age=604800; SameSite=Lax`
-        }
 
-        const verifyAndGuard = async () => {
+        const verifySession = async () => {
             try {
                 const response = await api.get('/auth/me', { timeout: 7000 })
                 const userData = {
@@ -95,15 +84,12 @@ export default function DashboardLayout({
                 }
                 localStorage.setItem('user', JSON.stringify(userData))
                 setHeaderUser(userData as StoredUser)
-                const role = resolveRoleName(userData)
-                const currentPath = (typeof window !== 'undefined' ? window.location.pathname : '/dashboard') || '/dashboard'
 
-                if (!isPathAllowedForRole(currentPath, userData)) {
-                    toast.error('You do not have permission to view this page.')
-                    router.replace(getDefaultDashboardPath(role))
-                    setReady()
-                    return
-                }
+                // Refresh permissions to ensure context is up to date
+                const permsRes = await api.get('/permissions/mine')
+                localStorage.setItem('permissions', JSON.stringify(permsRes.data))
+                refreshPermissions()
+
                 setReady()
             } catch (error: unknown) {
                 const status = getHttpStatus(error)
@@ -119,16 +105,8 @@ export default function DashboardLayout({
                         setReady()
                         return
                     }
-
                     setHeaderUser(fallbackUser)
-                    const fallbackRole = resolveRoleName(fallbackUser)
-                    const currentPath = (typeof window !== 'undefined' ? window.location.pathname : '/dashboard') || '/dashboard'
-
-                    if (!isPathAllowedForRole(currentPath, fallbackUser)) {
-                        router.replace(getDefaultDashboardPath(fallbackRole))
-                    }
-
-                    toast.error('Session check failed. Recovered using stored session.')
+                    refreshPermissions()
                     setReady()
                 }
             } finally {
@@ -136,13 +114,13 @@ export default function DashboardLayout({
             }
         }
 
-        verifyAndGuard()
+        verifySession()
 
         return () => {
             cancelled = true
             window.clearTimeout(safetyTimer)
         }
-    }, [router])
+    }, [router, refreshPermissions])
 
     // ── 1.5) Real-time: Join branch and role rooms ──
     useEffect(() => {
@@ -170,24 +148,19 @@ export default function DashboardLayout({
         }
     }, [socket, headerUser])
 
-    // ── 2) On pathname change: re-check role access (user already in localStorage) ──
+    // ── 2) On pathname change: re-check permissions ──
     useEffect(() => {
-        if (!authReady) return
+        if (!authReady || !headerUser) return
+
         const currentPath = pathname || '/dashboard'
-        let user: unknown = null
-        try {
-            const raw = localStorage.getItem('user')
-            if (raw) user = JSON.parse(raw)
-        } catch {
-            return
-        }
-        const role = resolveRoleName(user)
-        if (!role || !currentPath.startsWith('/dashboard')) return
-        if (!isPathAllowedForRole(currentPath, user)) {
+        if (!currentPath.startsWith('/dashboard')) return
+
+        if (!isAllowed(currentPath)) {
             toast.error('You do not have permission to view this page.')
+            const role = resolveRoleName(headerUser)
             router.replace(getDefaultDashboardPath(role))
         }
-    }, [pathname, authReady, router])
+    }, [pathname, authReady, headerUser, isAllowed, router])
 
     const toggleFullscreen = () => {
         if (!document.fullscreenElement) {
@@ -206,7 +179,7 @@ export default function DashboardLayout({
             <div className="flex h-dvh w-full items-center justify-center bg-background">
                 <div className="flex flex-col items-center gap-4">
                     <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#0EA5E9] border-t-transparent" />
-                    <p className="text-sm font-medium text-muted-foreground">Checking access...</p>
+                    <p className="text-sm font-medium text-muted-foreground">Loading...</p>
                 </div>
             </div>
         )
@@ -250,15 +223,7 @@ export default function DashboardLayout({
                                 <Moon className="h-4 w-4" />
                             )}
                         </button>
-                        <button
-                            className="relative flex h-8 w-8 items-center justify-center rounded-lg hover:bg-muted transition-colors text-muted-foreground"
-                            title="Notifications"
-                        >
-                            <Bell className="h-4 w-4" />
-                            <span className="absolute right-1.5 top-1.5 flex h-2 w-2 rounded-full bg-red-500">
-                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
-                            </span>
-                        </button>
+                        <NotificationBell />
 
                         {headerUser && (
                             <>

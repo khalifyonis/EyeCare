@@ -1,0 +1,190 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "primaryColor": "#DDD6FE",
+    "primaryTextColor": "#1E293B",
+    "primaryBorderColor": "#C4B5FD",
+    "lineColor": "#64748B",
+    "secondaryColor": "#FFFFFF",
+    "tertiaryColor": "#FFFFFF",
+    "mainBkg": "#FFFFFF",
+    "nodeBorder": "#C4B5FD",
+    "clusterBkg": "#FFFFFF",
+    "clusterBorder": "#C4B5FD",
+    "titleColor": "#1E293B",
+    "edgeLabelBackground": "#FFFFFF"
+  },
+  "er": {
+    "layoutDirection": "TB",
+    "minEntityWidth": 140,
+    "minEntityHeight": 80,
+    "entityPadding": 6,
+    "stroke": "#C4B5FD",
+    "fill": "#FFFFFF",
+    "fontSize": 10
+  }
+}}%%
+erDiagram
+    direction TB
+
+    roles {
+        uuid id PK
+        string name
+        string description
+        timestamp created_at
+    }
+    permissions {
+        uuid id PK
+        uuid role_id FK
+        string module
+        boolean can_read
+        boolean can_create
+        boolean can_update
+        boolean can_delete
+    }
+    clinic_branch {
+        uuid id PK
+        string branch_name
+        string address
+        string phone
+        boolean is_active
+        timestamp created_at
+    }
+    users {
+        uuid id PK
+        uuid branch_id FK
+        uuid role_id FK
+        string username
+        string password
+        string full_name
+        timestamp created_at
+    }
+    doctors {
+        uuid id PK
+        uuid user_id FK
+        uuid branch_id FK
+        string specialization
+        string license_number
+        timestamp created_at
+    }
+    patients {
+        uuid id PK
+        uuid branch_id FK
+        uuid assigned_doctor_id FK
+        string patient_number
+        string full_name
+        string phone
+        date date_of_birth
+        string gender
+        timestamp created_at
+    }
+    pharmacy_items {
+        uuid id PK
+        uuid branch_id FK
+        string item_name
+        string category
+        int stock_quantity
+        decimal selling_price
+        date expiry_date
+    }
+    optical_items {
+        uuid id PK
+        uuid branch_id FK
+        string item_name
+        string item_type
+        int stock_quantity
+        decimal selling_price
+    }
+    appointments {
+        uuid id PK
+        uuid patient_id FK
+        uuid doctor_id FK
+        uuid branch_id FK
+        uuid created_by FK
+        timestamp appointment_date
+        string status
+        string booking_number
+        timestamp created_at
+    }
+    exam_preliminary {
+        uuid id PK
+        uuid appointment_id FK
+        uuid patient_id FK
+        uuid doctor_id FK
+        text chief_complaint
+        int va_od
+        int va_os
+        timestamp created_at
+    }
+    exam_clinical {
+        uuid id PK
+        uuid appointment_id FK
+        uuid patient_id FK
+        text diagnosis
+        text management_plan
+        timestamp examined_at
+    }
+    medicine_prescriptions {
+        uuid id PK
+        uuid appointment_id FK
+        uuid clinical_exam_id FK
+        uuid pharmacy_item_id FK
+        string item_name
+        int quantity
+        text instructions
+        string status
+        timestamp created_at
+    }
+    optical_prescriptions {
+        uuid id PK
+        uuid patient_id FK
+        uuid frame_item_id FK
+        uuid lens_item_id FK
+        string od_sphere
+        string os_sphere
+        string status
+        timestamp created_at
+    }
+    billing {
+        uuid id PK
+        uuid patient_id FK
+        uuid appointment_id FK
+        uuid medicine_prescription_id FK
+        uuid optical_prescription_id FK
+        decimal total_amount
+        decimal paid_amount
+        string status
+        string payment_method
+        timestamp created_at
+    }
+
+    roles ||--o{ permissions : "configures"
+    roles ||--o{ users : "assigns"
+    clinic_branch ||--o{ users : "employs"
+    clinic_branch ||--o{ patients : "registers"
+    clinic_branch ||--o{ pharmacy_items : "stocks"
+    clinic_branch ||--o{ optical_items : "stocks"
+
+    users ||--|| doctors : "is_a"
+    users ||--o{ patients : "registers"
+    users ||--o{ appointments : "schedules"
+
+    doctors ||--o{ patients : "cares_for"
+    doctors ||--o{ appointments : "attends"
+    doctors ||--o{ exam_preliminary : "performs"
+
+    patients ||--o{ appointments : "requests"
+    patients ||--o{ optical_prescriptions : "receives"
+
+    appointments ||--o| exam_preliminary : "preliminary"
+    exam_preliminary ||--o| exam_clinical : "clinical"
+    exam_clinical ||--o{ medicine_prescriptions : "prescribes"
+
+    pharmacy_items ||--o{ medicine_prescriptions : "dispenses"
+    optical_items ||--o{ optical_prescriptions : "lens"
+
+    appointments ||--o{ billing : "bill"
+    medicine_prescriptions ||--o{ billing : "pharmacy"
+    optical_prescriptions ||--o{ billing : "optical"
+    patients ||--o{ billing : "pays_for"
+    users ||--o{ billing : "processes"

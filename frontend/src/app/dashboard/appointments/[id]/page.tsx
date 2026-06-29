@@ -6,7 +6,7 @@ import Link from 'next/link'
 import api from '@/lib/axios'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
-import { hasPermission } from '@/lib/permissions'
+import { usePermission } from '@/contexts/permission-context';
 import {
     ArrowLeft,
     Calendar,
@@ -31,10 +31,10 @@ type Appointment = {
     location?: string | null
     notes?: string | null
     eyeSide?: string | null
-    patient?: { 
-        id: string; 
-        fullName?: string | null; 
-        email?: string | null; 
+    patient?: {
+        id: string;
+        fullName?: string | null;
+        email?: string | null;
         phone?: string | null;
         emergencyContactName?: string | null;
         emergencyContactPhone?: string | null;
@@ -109,7 +109,8 @@ export default function AppointmentDetailsPage() {
     const params = useParams<{ id: string }>()
     const id = params?.id
 
-    const canUpdate = hasPermission('appointments', 'canUpdate')
+    const { can } = usePermission();
+    const canUpdate = can('appointments', 'canUpdate');
 
     const [loading, setLoading] = useState(true)
     const [appt, setAppt] = useState<Appointment | null>(null)
@@ -203,14 +204,14 @@ export default function AppointmentDetailsPage() {
                                     <InfoRow icon={Stethoscope} label="Doctor" value={`Dr. ${doctorName}`} />
                                     <InfoRow icon={Calendar} label="Date" value={formatDate(appt.appointmentDate)} />
                                     {appt.eyeSide && (
-                                        <InfoRow 
-                                            icon={AlertCircle} 
-                                            label="Eye Side" 
+                                        <InfoRow
+                                            icon={AlertCircle}
+                                            label="Eye Side"
                                             value={
                                                 <span className="font-bold text-[#0EA5E9]">
                                                     {appt.eyeSide === 'OD' ? 'Right Eye (OD)' : appt.eyeSide === 'OS' ? 'Left Eye (OS)' : 'Both Eyes (OU)'}
                                                 </span>
-                                            } 
+                                            }
                                         />
                                     )}
                                 </div>

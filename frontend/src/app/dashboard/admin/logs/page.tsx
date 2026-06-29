@@ -10,12 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Activity, Shield, ArrowRight, ScrollText } from 'lucide-react';
 import { toast } from 'sonner';
 import type { LogsOverview } from '@/lib/types/logs';
-import { hasPermission } from '@/lib/permissions';
+import { usePermission } from '@/contexts/permission-context';
 
 export default function AdminLogsPage() {
     const [overview, setOverview] = useState<LogsOverview | null>(null);
     const [loading, setLoading] = useState(true);
-    const canRead = hasPermission('logs', 'canRead');
+    const { can } = usePermission();
+    const canRead = can('logs', 'canRead');
 
     useEffect(() => {
         if (!canRead) return;

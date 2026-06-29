@@ -13,7 +13,7 @@ import { ActionBadge } from '@/components/logs/action-badge';
 import { AuditDetailSheet } from '@/components/logs/audit-detail-sheet';
 import { LogFiltersBar, emptyLogFilters, type LogFilterState } from '@/components/logs/log-filters';
 import { formatLogDate, formatModuleLabel } from '@/lib/logging-utils';
-import { hasPermission } from '@/lib/permissions';
+import { usePermission } from '@/contexts/permission-context';
 
 export default function AuditLogPage() {
     const [rows, setRows] = useState<AuditLogRow[]>([]);
@@ -26,7 +26,8 @@ export default function AuditLogPage() {
     const [selectedLog, setSelectedLog] = useState<AuditLogRow | null>(null);
     const [detailOpen, setDetailOpen] = useState(false);
     const limit = 20;
-    const canRead = hasPermission('logs', 'canRead');
+    const { can } = usePermission();
+    const canRead = can('logs', 'canRead');
 
     const buildParams = useCallback(() => {
         const params: Record<string, string | number> = { page, limit };

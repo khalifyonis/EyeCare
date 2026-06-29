@@ -8,9 +8,14 @@
         "dev": "node scripts/dev.js",
         "restart": "npm run dev",
         "ports:free": "node scripts/kill-ports.js --yes",
-        "install-all": "npm install --prefix backend && npm install --prefix frontend"
+        "install-all": "npm install --prefix backend && npm install --prefix frontend",
+        "chapter5:docx": "node scripts/generate-chapter5-docx.js",
+        "chapter6-7:docx": "node scripts/generate-chapter6-7-docx.js",
+        "preface:docx": "node scripts/generate-preface-docx.js",
+        "chapter4:docx": "node scripts/generate-chapter4-docx.js"
     },
     "devDependencies": {
+        "docx": "^9.7.1",
         "playwright": "^1.58.2"
     }
 }

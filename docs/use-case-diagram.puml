@@ -1,0 +1,76 @@
+@startuml EyeCare_UseCase_Diagram
+' Source of truth: scripts/use-case-diagram-data.js
+' Export PNG: node scripts/render-use-case-png.js
+' Quadrant layout — no title bar
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam linetype ortho
+skinparam ArrowThickness 1.2
+skinparam actorStyle awesome
+skinparam usecase {
+  RoundCorner 20
+  BorderColor #1e293b
+  BackgroundColor #FFFFFF
+}
+
+actor "Receptionist" as RC
+actor "Pharmacist" as PH
+actor "Optician" as OP
+
+actor "Super Admin" as SA
+actor "Administrator" as AD
+actor "Doctor" as DR
+
+rectangle " " as SYS #FFFFFF {
+  together {
+    usecase "Register Patient" as UC_RC1
+    usecase "Manage Users" as UC_AD1
+    usecase "Manage Branches" as UC_SA1
+    usecase "Manage Role Permissions" as UC_SA2
+  }
+  together {
+    usecase "Schedule Appointment" as UC_RC2
+    usecase "Manage Doctors" as UC_AD2
+    usecase "View Reports" as UC_AD3
+    usecase "Activity & Audit Logs" as UC_SA3
+  }
+  together {
+    usecase "View Prescription" as UC_OP1
+    usecase "Manage Optical Inventory" as UC_OP2
+    usecase "Dispense Optical Products" as UC_OP3
+    usecase "Billing" as UC_RC3
+  }
+  together {
+    usecase "View Dashboard" as UC_DR1
+    usecase "Conduct Examination" as UC_DR2
+    usecase "Manage Prescriptions" as UC_DR3
+    usecase "Dispense Medicine" as UC_PH1
+    usecase "Manage Pharmacy Inventory" as UC_PH2
+    usecase "Pharmacy Sales" as UC_PH3
+  }
+}
+
+RC -- UC_RC1
+RC -- UC_RC2
+RC -- UC_RC3
+AD -- UC_AD1
+AD -- UC_AD2
+AD -- UC_AD3
+SA -- UC_SA1
+SA -- UC_SA2
+SA -- UC_SA3
+OP -- UC_OP1
+OP -- UC_OP2
+OP -- UC_OP3
+DR -- UC_DR1
+DR -- UC_DR2
+DR -- UC_DR3
+PH -- UC_PH1
+PH -- UC_PH2
+PH -- UC_PH3
+
+UC_PH1 ..> UC_RC3 : <<include>>
+UC_OP3 ..> UC_RC3 : <<include>>
+
+@enduml

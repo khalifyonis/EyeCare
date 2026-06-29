@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import api from '@/lib/axios'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -54,11 +55,16 @@ function toMoney(value: number) {
 }
 
 export default function FrameInventoryPage() {
+  const searchParams = useSearchParams()
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [brandFilter, setBrandFilter] = useState('all')
   const [stockFilter, setStockFilter] = useState('all')
   const [rows, setRows] = useState<OpticalItem[]>([])
+
+  useEffect(() => {
+    if (searchParams.get('view') === 'lowstock') setStockFilter('low-stock')
+  }, [searchParams])
 
   const load = useCallback(async () => {
     setLoading(true)

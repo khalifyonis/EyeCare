@@ -21,8 +21,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { readStoredUser, resolveRoleName } from '@/lib/auth';
-import { hasPermission } from '@/lib/permissions';
+import { usePermission } from '@/contexts/permission-context';
 import {
   Table,
   TableBody,
@@ -131,12 +130,14 @@ export default function ClinicalExamPage() {
     }
   }, [socket]);
 
+  const { can } = usePermission();
+
   const canWrite = useMemo(() => {
-    return hasPermission('clinical_exams', 'canCreate');
-  }, []);
+    return can('clinical_exams', 'canCreate');
+  }, [can]);
 
   useEffect(() => {
-    api.get('/doctors').then(res => setDoctors(res.data)).catch(() => {});
+    api.get('/doctors').then(res => setDoctors(res.data)).catch(() => { });
   }, []);
 
   const fetchExams = useCallback(async () => {
@@ -155,7 +156,7 @@ export default function ClinicalExamPage() {
       if (doctorFilter !== 'all') params.doctorId = doctorFilter;
       if (dateFrom) params.from = dateFrom;
       if (dateTo) params.to = dateTo;
-      
+
       if (!search && doctorFilter === 'all' && statusFilter === 'all' && !dateFrom && !dateTo) {
         params.date = getLocalDateValue();
       }

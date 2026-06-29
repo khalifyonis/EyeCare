@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, sans-serif;
+    background: #ffffff;
+    padding: 16px;
+    color: #1e293b;
+  }
+  .canvas {
+    position: relative;
+    width: 980px;
+    height: 720px;
+    margin: 0 auto;
+    background: #ffffff;
+  }
+  .system {
+    position: absolute;
+    left: 120px;
+    right: 120px;
+    top: 10px;
+    bottom: 10px;
+    border: 2px solid #1e293b;
+    background: #ffffff;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+  .quad {
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: space-evenly;
+    align-items: center;
+    border: 1px solid #cbd5e1;
+    min-height: 0;
+  }
+  .quad.tl { border-top: none; border-left: none; }
+  .quad.tr { border-top: none; border-right: none; }
+  .quad.bl { border-bottom: none; border-left: none; }
+  .quad.br { border-bottom: none; border-right: none; }
+  .uc {
+    background: #ffffff;
+    border: 1.5px solid #1e293b;
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 10px;
+    line-height: 1.2;
+    text-align: center;
+    width: 168px;
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .actor-wrap {
+    position: absolute;
+    width: 108px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+  .actor-wrap.left { left: 0; }
+  .actor-wrap.right { right: 0; }
+  .actor-wrap[data-slot="0"] { top: 108px; height: 150px; }
+  .actor-wrap[data-slot="1"] { top: 288px; height: 150px; }
+  .actor-wrap[data-slot="2"] { top: 468px; height: 150px; }
+  .actor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .actor .head {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid #1e293b; background: #ffffff;
+  }
+  .actor .body {
+    width: 2px; height: 18px; background: #1e293b;
+  }
+  .actor .legs {
+    width: 18px; height: 2px; background: #1e293b;
+    position: relative;
+  }
+  .actor .legs::before, .actor .legs::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    width: 2px; height: 10px; background: #1e293b;
+  }
+  .actor .legs::before { left: 2px; transform: rotate(20deg); transform-origin: top; }
+  .actor .legs::after { right: 2px; transform: rotate(-20deg); transform-origin: top; }
+  .actor .name {
+    font-size: 11px; font-weight: 700; text-align: center;
+    line-height: 1.15; max-width: 100px; margin-top: 4px;
+  }
+  svg.links {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 3;
+  }
+  .inc-label { font-size: 8px; fill: #475569; font-family: Arial, sans-serif; }
+</style></head>
+<body>
+  <div class="canvas" id="canvas">
+    <div class="actor-wrap left" data-slot="0">
+    <div class="actor" id="actor-AD">
+      <div class="head"></div>
+      <div class="body"></div>
+      <div class="legs"></div>
+      <div class="name">Administrator</div>
+    </div>
+  </div><div class="actor-wrap left" data-slot="1">
+    <div class="actor" id="actor-SA">
+      <div class="head"></div>
+      <div class="body"></div>
+      <div class="legs"></div>
+      <div class="name">Super Admin</div>
+    </div>
+  </div><div class="actor-wrap left" data-slot="2">
+    <div class="actor" id="actor-OP">
+      <div class="head"></div>
+      <div class="body"></div>
+      <div class="legs"></div>
+      <div class="name">Optician</div>
+    </div>
+  </div><div class="actor-wrap right" data-slot="0">
+    <div class="actor" id="actor-RC">
+      <div class="head"></div>
+      <div class="body"></div>
+      <div class="legs"></div>
+      <div class="name">Receptionist</div>
+    </div>
+  </div><div class="actor-wrap right" data-slot="1">
+    <div class="actor" id="actor-DR">
+      <div class="head"></div>
+      <div class="body"></div>
+      <div class="legs"></div>
+      <div class="name">Doctor</div>
+    </div>
+  </div><div class="actor-wrap right" data-slot="2">
+    <div class="actor" id="actor-PH">
+      <div class="head"></div>
+      <div class="body"></div>
+      <div class="legs"></div>
+      <div class="name">Pharmacist</div>
+    </div>
+  </div>
+    <div class="system" id="system"><div class="quad tl"><div class="uc" id="UC_RC1" data-actor="RC">Register Patient</div><div class="uc" id="UC_AD1" data-actor="AD">Manage Users</div><div class="uc" id="UC_SA1" data-actor="SA">Manage Branches</div><div class="uc" id="UC_SA2" data-actor="SA">Manage Role Permissions</div></div><div class="quad tr"><div class="uc" id="UC_RC2" data-actor="RC">Schedule Appointment</div><div class="uc" id="UC_AD2" data-actor="AD">Manage Doctors</div><div class="uc" id="UC_AD3" data-actor="AD">View Reports</div><div class="uc" id="UC_SA3" data-actor="SA">Activity & Audit Logs</div></div><div class="quad bl"><div class="uc" id="UC_OP1" data-actor="OP">View Prescription</div><div class="uc" id="UC_OP2" data-actor="OP">Manage Optical Inventory</div><div class="uc" id="UC_OP3" data-actor="OP">Dispense Optical Products</div></div><div class="quad br"><div class="uc" id="UC_DR1" data-actor="DR">View Dashboard</div><div class="uc" id="UC_DR2" data-actor="DR">Conduct Examination</div><div class="uc" id="UC_DR3" data-actor="DR">Manage Prescriptions</div><div class="uc" id="UC_RC3" data-actor="RC">Billing</div><div class="uc" id="UC_PH1" data-actor="PH">Dispense Medicine</div><div class="uc" id="UC_PH2" data-actor="PH">Manage Pharmacy Inventory</div><div class="uc" id="UC_PH3" data-actor="PH">Pharmacy Sales</div></div></div>
+    <svg class="links" id="links"></svg>
+  </div>
+  <script>
+    const actors = [{"id":"AD","side":"left","useCases":["UC_AD1","UC_AD2","UC_AD3"]},{"id":"SA","side":"left","useCases":["UC_SA1","UC_SA2","UC_SA3"]},{"id":"OP","side":"left","useCases":["UC_OP1","UC_OP2","UC_OP3"]},{"id":"RC","side":"right","useCases":["UC_RC1","UC_RC2","UC_RC3"]},{"id":"DR","side":"right","useCases":["UC_DR1","UC_DR2","UC_DR3"]},{"id":"PH","side":"right","useCases":["UC_PH1","UC_PH2","UC_PH3"]}];
+    const includes = [["UC_PH1","UC_RC3"],["UC_OP3","UC_RC3"]];
+    const canvas = document.getElementById('canvas');
+    const svg = document.getElementById('links');
+    const cRect = canvas.getBoundingClientRect();
+
+    function box(id) {
+      const el = document.getElementById(id);
+      const r = el.getBoundingClientRect();
+      return {
+        left: r.left - cRect.left,
+        right: r.right - cRect.left,
+        top: r.top - cRect.top,
+        bottom: r.bottom - cRect.top,
+        cx: r.left - cRect.left + r.width / 2,
+        cy: r.top - cRect.top + r.height / 2,
+      };
+    }
+
+    function seg(x1, y1, x2, y2, dashed) {
+      const p = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      p.setAttribute('x1', x1); p.setAttribute('y1', y1);
+      p.setAttribute('x2', x2); p.setAttribute('y2', y2);
+      p.setAttribute('stroke', '#1e293b');
+      p.setAttribute('stroke-width', '1.2');
+      if (dashed) p.setAttribute('stroke-dasharray', '5 4');
+      svg.appendChild(p);
+    }
+
+    function actorLine(actorId, ucId, side) {
+      const actor = box('actor-' + actorId);
+      const uc = box(ucId);
+      const fromX = side === 'left' ? actor.right : actor.left;
+      const toX = side === 'left' ? uc.left - 2 : uc.right + 2;
+      const midX = side === 'left' ? fromX + 14 : fromX - 14;
+      seg(fromX, actor.cy, midX, actor.cy);
+      seg(midX, actor.cy, midX, uc.cy);
+      seg(midX, uc.cy, toX, uc.cy);
+    }
+
+    function includeArrow(fromId, toId) {
+      const a = box(fromId);
+      const b = box(toId);
+      const goLeft = a.cx > b.cx;
+      const stub = 12;
+      const midX = goLeft ? Math.min(a.left, b.left) - stub : Math.max(a.right, b.right) + stub;
+      seg(a.cx, a.bottom, a.cx, a.bottom + 10, true);
+      seg(a.cx, a.bottom + 10, midX, a.bottom + 10, true);
+      seg(midX, a.bottom + 10, midX, b.cy, true);
+      seg(midX, b.cy, b.left - 2, b.cy, true);
+      const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t.setAttribute('x', midX - 6);
+      t.setAttribute('y', (a.bottom + b.cy) / 2);
+      t.setAttribute('text-anchor', 'end');
+      t.setAttribute('class', 'inc-label');
+      t.textContent = '<<include>>';
+      svg.appendChild(t);
+    }
+
+    actors.forEach((a) => {
+      a.useCases.forEach((ucId) => actorLine(a.id, ucId, a.side));
+    });
+    includes.forEach(([from, to]) => includeArrow(from, to));
+  </script>
+</body></html>

@@ -1,0 +1,240 @@
+@startuml EyeCare_Core_ERD_Thesis_Monochrome
+' Thesis ERD — top-down vertical flow, 15 active tables, fully connected
+' Optimized for clean academic publication & MS Word printing (Monochrome B&W style)
+' Using modern CSS styles for padding to avoid warnings and compact rank layout for readability
+!theme plain
+hide circle
+skinparam monochrome true
+skinparam linetype ortho
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam classFontSize 10
+skinparam ArrowColor #000000
+skinparam ArrowFontSize 9
+
+<style>
+class {
+  Padding 6
+  RoundCorner 6
+}
+</style>
+
+title EyeCare Clinic Management System\nEntity Relationship Diagram (June 2026)
+
+top to bottom direction
+
+' ═══════════════════════════════════════════════════════════════════════
+' RANK 1 — ADMINISTRATION & USERS
+' ═══════════════════════════════════════════════════════════════════════
+together {
+  class "clinic_branch" as T01 {
+    <b>PK</b> id : UUID
+    ----
+    branch_name : string
+    address : string
+    phone : string
+    is_active : boolean
+  }
+  class "custom_roles" as T02 {
+    <b>PK</b> id : UUID
+    ----
+    name : string (UK)
+    description : string
+    is_system : boolean
+  }
+  class "role_permissions" as T03 {
+    <b>PK</b> id : UUID
+    <b>FK</b> role_name
+    ----
+    module : string (UK)
+    can_read : boolean
+    can_create : boolean
+    can_update : boolean
+    can_delete : boolean
+  }
+  class "users" as T04 {
+    <b>PK</b> id : UUID
+    <b>FK</b> branch_id
+    <b>FK</b> role
+    ----
+    username : string (UK)
+    full_name : string
+    is_active : boolean
+  }
+  class "doctors" as T05 {
+    <b>PK</b> id : UUID
+    <b>FK</b> user_id
+    <b>FK</b> branch_id
+    ----
+    specialization : Specialization
+    license_number : string (UK)
+  }
+}
+
+' ═══════════════════════════════════════════════════════════════════════
+' RANK 2 — PATIENTS & APPOINTMENTS
+' ═══════════════════════════════════════════════════════════════════════
+together {
+  class "patients" as T06 {
+    <b>PK</b> id : UUID
+    <b>FK</b> branch_id
+    <b>FK</b> assigned_doctor_id
+    ----
+    patient_number : string (UK)
+    full_name : string
+    phone : string (UK)
+    date_of_birth : date
+    gender : string
+  }
+  class "appointments" as T07 {
+    <b>PK</b> id : UUID
+    <b>FK</b> patient_id
+    <b>FK</b> doctor_id
+    <b>FK</b> branch_id
+    ----
+    appointment_date : timestamp
+    status : AppointmentStatus
+    booking_number : string (UK)
+  }
+}
+
+' ═══════════════════════════════════════════════════════════════════════
+' RANK 3 — CLINICAL EXAMINATIONS & SURGERIES
+' ═══════════════════════════════════════════════════════════════════════
+together {
+  class "eye_examinations" as T08 {
+    <b>PK</b> id : UUID
+    <b>FK</b> appointment_id (UK)
+    <b>FK</b> patient_id
+    <b>FK</b> doctor_id
+    <b>FK</b> branch_id
+    ----
+    stage : ExaminationStage
+    chief_complaint : string
+    diagnosis : string
+  }
+  class "clinical_examinations" as T09 {
+    <b>PK</b> id : UUID
+    <b>FK</b> appointment_id (UK)
+    <b>FK</b> examined_by
+    ----
+    sph_right : decimal
+    cyl_right : decimal
+    diagnosis : string
+    management_plan : string
+  }
+  class "surgeries" as T10 {
+    <b>PK</b> id : UUID
+    <b>FK</b> patient_id
+    <b>FK</b> surgeon_id
+    <b>FK</b> branch_id
+    <b>FK</b> exam_id (UK)
+    ----
+    surgery_type : string
+    surgery_date : date
+    status : string
+    cost : decimal
+  }
+}
+
+' ═══════════════════════════════════════════════════════════════════════
+' RANK 4 — PRESCRIPTIONS & INVENTORY
+' ═══════════════════════════════════════════════════════════════════════
+together {
+  class "pharmacy_items" as T13 {
+    <b>PK</b> id : UUID
+    <b>FK</b> branch_id
+    ----
+    item_name : string
+    category : string
+    stock_quantity : int
+    selling_price : decimal
+  }
+  class "optical_items" as T14 {
+    <b>PK</b> id : UUID
+    <b>FK</b> branch_id
+    ----
+    item_name : string
+    item_type : string
+    stock_quantity : int
+    selling_price : decimal
+  }
+  class "prescriptions" as T11 {
+    <b>PK</b> id : UUID
+    <b>FK</b> appointment_id
+    <b>FK</b> clinical_exam_id
+    <b>FK</b> eye_exam_id
+    <b>FK</b> branch_id
+    ----
+    item_name : string
+    quantity : int
+    instructions : text
+    status : PrescriptionStatus
+  }
+  class "optical_prescriptions" as T12 {
+    <b>PK</b> id : UUID
+    <b>FK</b> patient_id
+    <b>FK</b> branch_id
+    <b>FK</b> created_by_id
+    <b>FK</b> frame_item_id
+    <b>FK</b> lens_item_id
+    ----
+    type : OpticalPrescriptionType
+    status : OpticalPrescriptionStatus
+  }
+}
+
+' ═══════════════════════════════════════════════════════════════════════
+' RANK 5 — BILLING
+' ═══════════════════════════════════════════════════════════════════════
+class "billing" as T15 {
+  <b>PK</b> id : UUID
+  <b>FK</b> patient_id
+  <b>FK</b> branch_id
+  <b>FK</b> appointment_id
+  <b>FK</b> surgery_id
+  <b>FK</b> prescription_id
+  <b>FK</b> optical_prescription_id
+  ----
+  service_type : ServiceType
+  final_amount : decimal
+  status : BillingStatus
+}
+
+' Admin & Role Connections
+T02 "1" ||--o{ "N" T03 : "defines"
+T02 "1" ||--o{ "N" T04 : "assigns"
+T01 "1" ||--o{ "N" T04 : "employs"
+
+' Users & Doctors
+T04 "1" ||--o| "0..1" T05 : "profile"
+T05 "1" ||--o{ "N" T07 : "attends"
+T06 "1" ||--o{ "N" T07 : "schedules"
+
+' Appointment to Exams
+T07 "1" ||--o| "0..1" T08 : "preliminary"
+T07 "1" ||--o| "0..1" T09 : "clinical"
+
+' Exams to surgeries/prescriptions
+T09 "1" ||--o| "0..1" T10 : "schedules"
+T09 "1" ||--o{ "N" T11 : "prescribes"
+T08 "1" ||--o{ "N" T11 : "prescribes"
+
+' Inventory relationships
+T13 "1" ||--o{ "N" T11 : "stock"
+T14 "1" ||--o{ "N" T12 : "stock"
+T06 "1" ||--o{ "N" T12 : "receives"
+
+' Billing downstream
+T07 "1" ||--o{ "N" T15 : "bills"
+T10 "1" ||--o{ "N" T15 : "bills"
+T11 "1" ||--o{ "N" T15 : "bills"
+T12 "1" ||--o{ "N" T15 : "bills"
+
+' ── Layout Ranks Helper (Keeps the vertical length compact) ──
+T01 -[hidden]down- T06
+T06 -[hidden]down- T08
+T08 -[hidden]down- T11
+T11 -[hidden]down- T15
+
+@enduml

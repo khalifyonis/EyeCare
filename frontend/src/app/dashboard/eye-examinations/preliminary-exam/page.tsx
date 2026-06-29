@@ -36,8 +36,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ServerPagination } from '@/components/dashboard/server-pagination';
 import { Badge } from '@/components/ui/badge';
-import { readStoredUser, resolveRoleName } from '@/lib/auth';
-import { hasPermission } from '@/lib/permissions';
+import { usePermission } from '@/contexts/permission-context';
+import { resolveRoleName } from '@/lib/auth';
 
 interface Exam {
   id: string;
@@ -132,18 +132,19 @@ export default function PreliminaryExamPage() {
     }
   }, [socket]);
 
+  const { can, user: currentUser } = usePermission();
+
   const canWrite = useMemo(() => {
-    return hasPermission('preliminary_exams', 'canCreate');
-  }, []);
+    return can('preliminary_exams', 'canCreate');
+  }, [can]);
 
   const isOptometrist = useMemo(() => {
-    const user = readStoredUser();
-    const role = resolveRoleName(user);
-    return role === 'DOCTOR' && user?.doctor?.specialization?.toUpperCase() === 'OPTOMETRY';
-  }, []);
+    const role = resolveRoleName(currentUser);
+    return role === 'DOCTOR' && currentUser?.doctor?.specialization?.toUpperCase() === 'OPTOMETRY';
+  }, [currentUser]);
 
   useEffect(() => {
-    api.get('/doctors').then(res => setDoctors(res.data)).catch(() => {});
+    api.get('/doctors').then(res => setDoctors(res.data)).catch(() => { });
   }, []);
 
   const fetchExams = useCallback(async () => {
@@ -158,7 +159,7 @@ export default function PreliminaryExamPage() {
       if (doctorFilter !== 'all') params.doctorId = doctorFilter;
       if (dateFrom) params.from = dateFrom;
       if (dateTo) params.to = dateTo;
-      
+
       if (!search && doctorFilter === 'all' && !dateFrom && !dateTo) {
         params.date = getLocalDateValue();
       }

@@ -1,0 +1,199 @@
+// EyeCare ERD — top-to-bottom layout
+// Designed to fit MS Word thesis formatting (Monochrome, Black & White)
+
+notation crows-feet
+typeface clean
+styleMode plain
+colorMode plain
+direction down
+
+// ── KOR: Administration ──────────────────────────────────
+clinic_branch [color: white] {
+  id uuid pk
+  branch_name string
+  address string
+  phone string
+  is_active boolean
+  created_at timestamp
+}
+
+custom_roles [color: white] {
+  id uuid pk
+  name string uk
+  description string
+  is_system boolean
+}
+
+role_permissions [color: white] {
+  id uuid pk
+  role_name string fk
+  module string
+  can_read boolean
+  can_create boolean
+  can_update boolean
+  can_delete boolean
+}
+
+users [color: white] {
+  id uuid pk
+  branch_id uuid fk
+  username string
+  email string
+  password string
+  role string fk
+  full_name string
+  created_at timestamp
+}
+
+doctors [color: white] {
+  id uuid pk
+  user_id uuid fk
+  branch_id uuid fk
+  specialization string
+  license_number string
+  created_at timestamp
+}
+
+// ── Patients & inventory ────────────────────────────────
+patients [color: white] {
+  id uuid pk
+  branch_id uuid fk
+  assigned_doctor_id uuid fk
+  patient_number string
+  full_name string
+  phone string
+  date_of_birth date
+  gender string
+  created_at timestamp
+}
+
+pharmacy_items [color: white] {
+  id uuid pk
+  branch_id uuid fk
+  item_name string
+  category string
+  stock_quantity int
+  selling_price decimal
+  expiry_date date
+}
+
+optical_items [color: white] {
+  id uuid pk
+  branch_id uuid fk
+  item_name string
+  item_type string
+  stock_quantity int
+  selling_price decimal
+}
+
+// ── Clinical flow (hoos) ────────────────────────────────
+appointments [color: white] {
+  id uuid pk
+  patient_id uuid fk
+  doctor_id uuid fk
+  branch_id uuid fk
+  created_by uuid fk
+  appointment_date timestamp
+  status string
+  booking_number string
+  created_at timestamp
+}
+
+eye_examinations [color: white] {
+  id uuid pk
+  appointment_id uuid fk
+  patient_id uuid fk
+  doctor_id uuid fk
+  branch_id uuid fk
+  stage string
+  chief_complaint text
+  iop_od int
+  iop_os int
+  created_at timestamp
+}
+
+clinical_examinations [color: white] {
+  id uuid pk
+  appointment_id uuid fk
+  examined_by uuid fk
+  diagnosis text
+  management_plan text
+  examined_at timestamp
+}
+
+surgeries [color: white] {
+  id uuid pk
+  patient_id uuid fk
+  surgeon_id uuid fk
+  branch_id uuid fk
+  exam_id uuid fk
+  surgery_type string
+  surgery_date date
+  cost decimal
+  status string
+}
+
+prescriptions [color: white] {
+  id uuid pk
+  appointment_id uuid fk
+  clinical_exam_id uuid fk
+  eye_exam_id uuid fk
+  branch_id uuid fk
+  item_name string
+  quantity int
+  instructions text
+  status string
+  created_at timestamp
+}
+
+optical_prescriptions [color: white] {
+  id uuid pk
+  patient_id uuid fk
+  branch_id uuid fk
+  created_by_id uuid fk
+  frame_item_id uuid fk
+  lens_item_id uuid fk
+  type string
+  status string
+  created_at timestamp
+}
+
+// ── HOOS: Billing ───────────────────────────────────────
+billing [color: white] {
+  id uuid pk
+  patient_id uuid fk
+  branch_id uuid fk
+  appointment_id uuid fk
+  surgery_id uuid fk
+  prescription_id uuid fk
+  optical_prescription_id uuid fk
+  service_type string
+  final_amount decimal
+  status string
+  created_at timestamp
+}
+
+// Relationships (Optimized to prevent crossing lines)
+custom_roles.name < role_permissions.role_name : "defines"
+custom_roles.name < users.role : "assigns"
+clinic_branch.id < users.branch_id : "employs"
+
+users.id - doctors.user_id : "profile"
+doctors.id < appointments.doctor_id : "attends"
+patients.id < appointments.patient_id : "schedules"
+
+appointments.id < eye_examinations.appointment_id : "preliminary"
+appointments.id < clinical_examinations.appointment_id : "clinical"
+
+clinical_examinations.id < surgeries.exam_id : "schedules"
+clinical_examinations.id < prescriptions.clinical_exam_id : "prescribes"
+eye_examinations.id < prescriptions.eye_exam_id : "prescribes"
+
+pharmacy_items.id < prescriptions.itemId : "stock"
+optical_items.id < optical_prescriptions.frame_item_id : "stock"
+patients.id < optical_prescriptions.patient_id : "receives"
+
+appointments.id < billing.appointment_id : "bills"
+surgeries.id < billing.surgery_id : "bills"
+prescriptions.id < billing.prescription_id : "bills"
+optical_prescriptions.id < billing.optical_prescription_id : "bills"

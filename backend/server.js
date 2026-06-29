@@ -25,6 +25,7 @@ import auditLogRoutes from './src/routes/auditLogRoutes.js';
 import reportRoutes from './src/routes/reportRoutes.js';
 import permissionRoutes from './src/routes/permissionRoutes.js';
 import roleRoutes from './src/routes/roleRoutes.js';
+import notificationRoutes from './src/routes/notificationRoutes.js';
 import errorMiddleware from './src/middlewares/errorMiddleware.js';
 
 // Keep process alive on uncaught errors (log and continue)
@@ -68,6 +69,7 @@ app.use('/api/audit-logs', auditLogRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/permissions', permissionRoutes);
 app.use('/api/roles', roleRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Health check
 app.get('/', (req, res) => {

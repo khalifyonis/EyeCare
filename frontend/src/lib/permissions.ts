@@ -1,172 +1,146 @@
 import { getDefaultDashboardPath, resolveRoleName } from '@/lib/auth'
 
+/**
+ * Professional Permission Architecture
+ * Maps dashboard route prefixes to their corresponding backend modules.
+ * This avoids giant if/else chains and makes the system easily extensible.
+ */
+export const MODULE_ACCESS_MAP: Record<string, string> = {
+    '/dashboard/patients': 'patients',
+    '/dashboard/appointments': 'appointments',
+    '/dashboard/eye-examinations/preliminary': 'preliminary_exams',
+    '/dashboard/eye-examinations/clinical': 'clinical_exams',
+    '/dashboard/surgery': 'surgery',
+    '/dashboard/prescription/medicine': 'medicine_prescriptions',
+    '/dashboard/prescription/optical': 'optical_prescriptions',
+    '/dashboard/reports/financial': 'reports_financial',
+    '/dashboard/reports/revenue-trend': 'reports_financial',
+    '/dashboard/reports/income-by-service': 'reports_financial',
+    '/dashboard/reports/clinical': 'reports_clinical',
+    '/dashboard/reports/doctor-performance': 'reports_clinical',
+    '/dashboard/reports/appointments': 'reports_appointments',
+    '/dashboard/reports/patients': 'reports_patients',
+    '/dashboard/reports/inventory': 'reports_inventory',
+    '/dashboard/reports/operational': 'reports_operational',
+    '/dashboard/reports/branch-report': 'reports_operational',
+    '/dashboard/pharmacy': 'pharmacy',
+    '/dashboard/inventory/pharmacy': 'pharmacy',
+    '/dashboard/optical-shop': 'optical',
+    '/dashboard/inventory/optical': 'optical',
+    '/dashboard/billing': 'billing',
+    '/dashboard/admin/users': 'users',
+    '/dashboard/admin/branches': 'branches',
+    '/dashboard/admin/logs': 'logs',
+    '/dashboard/activity-log': 'logs',
+    '/dashboard/audit-log': 'logs',
+    '/dashboard/admin/permissions': 'users',
+}
+
+// Routes that just require any dashboard access or are non-module specific
+const OPEN_DASHBOARD_ROUTES = [
+    '/dashboard/profile',
+    '/dashboard/branch-switch',
+    '/dashboard/admin',
+    '/dashboard/doctor',
+    '/dashboard/receptionist',
+    '/dashboard/pharmacist',
+    '/dashboard/optician'
+]
+
 export type AllowedRoute = { prefix: string; roles: string[] }
 
+/**
+ * Static Role-based Route Access (Fallback)
+ */
 export const ROUTE_ACCESS: AllowedRoute[] = [
-    { prefix: '/dashboard/admin', roles: ['ADMIN', 'SUPERADMIN', 'ADMINISTRATOR'] },
+    { prefix: '/dashboard/admin', roles: ['ADMIN', 'SUPERADMIN'] },
     { prefix: '/dashboard/doctor', roles: ['DOCTOR'] },
     { prefix: '/dashboard/receptionist', roles: ['RECEPTIONIST'] },
     { prefix: '/dashboard/pharmacist', roles: ['PHARMACIST'] },
     { prefix: '/dashboard/optician', roles: ['OPTICIAN'] },
-
-    { prefix: '/dashboard/patients', roles: ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
-    { prefix: '/dashboard/appointments', roles: ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
-    
-    // Detailed Report Routes (Must be before general /dashboard/reports)
-    { prefix: '/dashboard/reports/financial', roles: ['ADMIN', 'SUPERADMIN'] },
-    { prefix: '/dashboard/reports/revenue-trend', roles: ['ADMIN', 'SUPERADMIN'] },
-    { prefix: '/dashboard/reports/income-by-service', roles: ['ADMIN', 'SUPERADMIN'] },
-    { prefix: '/dashboard/reports/doctor-performance', roles: ['ADMIN', 'SUPERADMIN', 'DOCTOR'] },
-    { prefix: '/dashboard/reports/branch-report', roles: ['ADMIN', 'SUPERADMIN'] },
-    { prefix: '/dashboard/reports/operational', roles: ['ADMIN', 'SUPERADMIN'] },
-    { prefix: '/dashboard/reports/clinical', roles: ['ADMIN', 'SUPERADMIN', 'DOCTOR'] },
-    { prefix: '/dashboard/reports/inventory', roles: ['ADMIN', 'SUPERADMIN', 'PHARMACIST', 'OPTICIAN'] },
-    { prefix: '/dashboard/reports', roles: ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
-    
-    { prefix: '/dashboard/eye-examinations', roles: ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
-    { prefix: '/dashboard/surgery', roles: ['ADMIN', 'SUPERADMIN', 'DOCTOR'] },
-    { prefix: '/dashboard/prescription/optical', roles: ['ADMIN', 'SUPERADMIN', 'ADMINISTRATOR', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
-    { prefix: '/dashboard/prescription/medicine', roles: ['ADMIN', 'SUPERADMIN', 'ADMINISTRATOR', 'RECEPTIONIST', 'DOCTOR', 'PHARMACIST'] },
-    { prefix: '/dashboard/prescription', roles: ['ADMIN', 'SUPERADMIN', 'ADMINISTRATOR', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
-    { prefix: '/dashboard/billing', roles: ['ADMIN', 'SUPERADMIN', 'ADMINISTRATOR', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
-    { prefix: '/dashboard/pharmacy', roles: ['ADMIN', 'SUPERADMIN', 'ADMINISTRATOR', 'PHARMACIST'] },
-    { prefix: '/dashboard/inventory/pharmacy', roles: ['ADMIN', 'SUPERADMIN', 'PHARMACIST'] },
-    { prefix: '/dashboard/inventory/optical', roles: ['ADMIN', 'SUPERADMIN', 'ADMINISTRATOR', 'OPTICIAN'] },
-    { prefix: '/dashboard/optical-shop', roles: ['ADMIN', 'SUPERADMIN', 'ADMINISTRATOR', 'OPTICIAN'] },
-    { prefix: '/dashboard/suppliers', roles: ['ADMIN', 'SUPERADMIN', 'PHARMACIST', 'OPTICIAN'] },
-    { prefix: '/dashboard/admin/logs', roles: ['ADMIN', 'SUPERADMIN'] },
-    { prefix: '/dashboard/activity-log', roles: ['ADMIN', 'SUPERADMIN'] },
-    { prefix: '/dashboard/audit-log', roles: ['ADMIN', 'SUPERADMIN'] },
-    { prefix: '/dashboard/profile', roles: ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
-    { prefix: '/dashboard/branch-switch', roles: ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST', 'DOCTOR', 'OPTICIAN', 'PHARMACIST'] },
 ]
 
-export function isPathAllowedForRole(pathname: string, userOrRole: any): boolean {
+export interface Permission {
+    module: string
+    canRead: boolean
+    canCreate: boolean
+    canUpdate: boolean
+    canDelete: boolean
+}
+
+/**
+ * Core Permission Logic
+ * Checks if a set of permissions allows a specific action on a module.
+ */
+export function can(permissions: Permission[] | null, module: string, action: keyof Omit<Permission, 'module'> = 'canRead'): boolean {
+    if (!permissions || !Array.isArray(permissions)) return false
+    const perm = permissions.find(p => p.module === module)
+    return perm ? !!perm[action] : false
+}
+
+/**
+ * Route Guard Logic
+ * Determines if a user can access a specific URL based on their role and dynamic permissions.
+ */
+export function isPathAllowedForRole(pathname: string, user: any, dynamicPermissions: Permission[] | null = null): boolean {
+    // Non-dashboard routes are always allowed
     if (!pathname.startsWith('/dashboard')) return true
+
+    // Core dashboard landing page is allowed for any authenticated user
     if (pathname === '/dashboard') return true
 
-    let role = ''
-    let specialization = ''
-
-    if (userOrRole && typeof userOrRole === 'object') {
-        role = resolveRoleName(userOrRole)
-        specialization = userOrRole?.doctor?.specialization || ''
-    } else {
-        role = String(userOrRole || '')
-    }
-
-    const normalizedRole = (role || '').toUpperCase()
-    if (!normalizedRole) return false
+    const role = resolveRoleName(user).toUpperCase()
+    if (!role) return false
 
     // SUPERADMIN bypasses all checks
-    if (normalizedRole === 'SUPERADMIN') return true
+    if (role === 'SUPERADMIN') return true
 
-    // Check dynamic DB permissions from localStorage
-    if (typeof window !== 'undefined') {
-        const rawPerms = localStorage.getItem('permissions')
-        if (rawPerms) {
-            try {
-                const permissions = JSON.parse(rawPerms)
-                if (Array.isArray(permissions)) {
-                    let moduleKey = ''
-                    if (pathname.startsWith('/dashboard/patients')) moduleKey = 'patients'
-                    else if (pathname.startsWith('/dashboard/appointments')) moduleKey = 'appointments'
-                    else if (pathname.startsWith('/dashboard/eye-examinations/preliminary-exam') || pathname.startsWith('/dashboard/eye-examinations/preliminary')) moduleKey = 'preliminary_exams'
-                    else if (pathname.startsWith('/dashboard/eye-examinations/clinical')) moduleKey = 'clinical_exams'
-                    else if (pathname.startsWith('/dashboard/eye-examinations')) {
-                        const p1 = permissions.find((p: any) => p.module === 'preliminary_exams')
-                        const p2 = permissions.find((p: any) => p.module === 'clinical_exams')
-                        return !!(p1?.canRead || p2?.canRead)
-                    }
-                    else if (pathname.startsWith('/dashboard/surgery')) moduleKey = 'surgery'
-                    else if (pathname.startsWith('/dashboard/prescription/medicine')) moduleKey = 'medicine_prescriptions'
-                    else if (pathname.startsWith('/dashboard/prescription/optical')) moduleKey = 'optical_prescriptions'
-                    else if (pathname.startsWith('/dashboard/prescription')) {
-                        const p1 = permissions.find((p: any) => p.module === 'medicine_prescriptions')
-                        const p2 = permissions.find((p: any) => p.module === 'optical_prescriptions')
-                        return !!(p1?.canRead || p2?.canRead)
-                    }
-                    else if (pathname.startsWith('/dashboard/reports/financial') || pathname.startsWith('/dashboard/reports/revenue-trend') || pathname.startsWith('/dashboard/reports/income-by-service')) moduleKey = 'reports_financial'
-                    else if (pathname.startsWith('/dashboard/reports/clinical') || pathname.startsWith('/dashboard/reports/doctor-performance')) moduleKey = 'reports_clinical'
-                    else if (pathname.startsWith('/dashboard/reports/appointments')) moduleKey = 'reports_appointments'
-                    else if (pathname.startsWith('/dashboard/reports/patients')) moduleKey = 'reports_patients'
-                    else if (pathname.startsWith('/dashboard/reports/inventory')) moduleKey = 'reports_inventory'
-                    else if (pathname.startsWith('/dashboard/reports/operational') || pathname.startsWith('/dashboard/reports/branch-report')) moduleKey = 'reports_operational'
-                    else if (pathname.startsWith('/dashboard/reports')) {
-                        const p1 = permissions.find((p: any) => p.module === 'reports_financial')
-                        const p2 = permissions.find((p: any) => p.module === 'reports_clinical')
-                        const p3 = permissions.find((p: any) => p.module === 'reports_appointments')
-                        const p4 = permissions.find((p: any) => p.module === 'reports_patients')
-                        const p5 = permissions.find((p: any) => p.module === 'reports_inventory')
-                        const p6 = permissions.find((p: any) => p.module === 'reports_operational')
-                        return !!(p1?.canRead || p2?.canRead || p3?.canRead || p4?.canRead || p5?.canRead || p6?.canRead)
-                    }
-                    else if (pathname.startsWith('/dashboard/pharmacy') || pathname.startsWith('/dashboard/inventory/pharmacy')) moduleKey = 'pharmacy'
-                    else if (pathname.startsWith('/dashboard/optical-shop') || pathname.startsWith('/dashboard/inventory/optical')) moduleKey = 'optical'
-                    else if (pathname.startsWith('/dashboard/billing')) moduleKey = 'billing'
-                    else if (pathname.startsWith('/dashboard/admin/users') || pathname.startsWith('/dashboard/admin/doctors')) moduleKey = 'users'
-                    else if (pathname.startsWith('/dashboard/admin/branches')) moduleKey = 'branches'
-                    else if (pathname.startsWith('/dashboard/admin/logs') || pathname.startsWith('/dashboard/activity-log') || pathname.startsWith('/dashboard/audit-log')) moduleKey = 'logs'
-                    else if (pathname.startsWith('/dashboard/admin/permissions')) moduleKey = 'users'
+    // 1. Check Open Routes
+    if (OPEN_DASHBOARD_ROUTES.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+        return true
+    }
 
-                    if (moduleKey) {
-                        const perm = permissions.find((p: any) => p.module === moduleKey)
-                        if (perm) {
-                            return !!perm.canRead
-                        }
-                        return false // Confirmed module but denied
-                    }
-                }
-            } catch (e) {
-                console.error('Failed to parse dynamic permissions:', e)
-            }
+    // 2. Check Dynamic Module Permissions (Preferred)
+    const moduleKey = Object.entries(MODULE_ACCESS_MAP)
+        .sort((a, b) => b[0].length - a[0].length) // Match longest path first
+        .find(([path]) => pathname.startsWith(path))?.[1]
+
+    if (moduleKey && dynamicPermissions) {
+        // Special case: Eye Examinations / Prescriptions general access
+        if (pathname === '/dashboard/eye-examinations' || pathname === '/dashboard/prescription' || pathname === '/dashboard/reports') {
+            const subModules = Object.entries(MODULE_ACCESS_MAP)
+                .filter(([path]) => path.startsWith(pathname))
+                .map(([, mod]) => mod)
+            return subModules.some(mod => can(dynamicPermissions, mod, 'canRead'))
+        }
+
+        if (!can(dynamicPermissions, moduleKey, 'canRead')) {
+            return false
         }
     }
 
-    // Fallback: Specialized Optometrist check
-    const isOptometrist = normalizedRole === 'DOCTOR' && specialization.toUpperCase() === 'OPTOMETRY'
-    if (isOptometrist) {
-        if (pathname.startsWith('/dashboard/surgery')) return false
-        if (pathname.startsWith('/dashboard/prescription/medicine')) return false
-        if (pathname.startsWith('/dashboard/eye-examinations/clinical')) return false
-        if (pathname.startsWith('/dashboard/inventory/pharmacy')) return false
-        if (pathname.startsWith('/dashboard/pharmacy')) return false
+    // 3. Specialized Role Restrictions (ABAC)
+    const specialization = user?.doctor?.specialization?.toUpperCase() || ''
+    if (role === 'DOCTOR' && specialization === 'OPTOMETRY') {
+        const restrictedPaths = [
+            '/dashboard/surgery',
+            '/dashboard/prescription/medicine',
+            '/dashboard/eye-examinations/clinical',
+            '/dashboard/inventory/pharmacy',
+            '/dashboard/pharmacy'
+        ]
+        if (restrictedPaths.some(p => pathname.startsWith(p))) return false
     }
 
-    const matched = ROUTE_ACCESS.find(({ prefix }) => pathname === prefix || pathname.startsWith(prefix + '/'))
-    if (!matched) return false
+    // 4. Static Role Fallback
+    const matchedStatic = ROUTE_ACCESS.find(({ prefix }) => pathname === prefix || pathname.startsWith(prefix + '/'))
+    if (matchedStatic) {
+        return matchedStatic.roles.includes(role)
+    }
 
-    return matched.roles.includes(normalizedRole)
+    return true // Default allow if authenticated and no restriction found
 }
 
-export function hasPermission(module: string, action: 'canRead' | 'canCreate' | 'canUpdate' | 'canDelete'): boolean {
-    if (typeof window === 'undefined') return true
-
-    try {
-        const rawUser = localStorage.getItem('user')
-        if (rawUser) {
-            const user = JSON.parse(rawUser)
-            const role = resolveRoleName(user)
-            if (role === 'SUPERADMIN') return true
-        }
-    } catch {}
-
-    const rawPerms = localStorage.getItem('permissions')
-    if (!rawPerms) return true // Default to true if not loaded yet to avoid flashing UI elements
-
-    try {
-        const permissions = JSON.parse(rawPerms)
-        if (Array.isArray(permissions)) {
-            const perm = permissions.find((p: any) => p.module === module)
-            if (perm) {
-                return !!perm[action]
-            }
-        }
-    } catch {
-        return false
-    }
-    return false
-}
 
 export function getRoleRedirectPath(role: string) {
     return getDefaultDashboardPath(role)

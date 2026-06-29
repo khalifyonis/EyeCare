@@ -4,7 +4,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import api from '@/lib/axios';
 import { toast } from 'sonner';
 
@@ -144,6 +144,7 @@ async function downloadJson(filename: string, data: unknown) {
 
 export default function OpticalPrescriptionsPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const role = useMemo(() => resolveRoleName(readStoredUser()), []);
     const canManage = useMemo(() => {
         if (role === 'OPTICIAN') return false; // Opticians can only view and dispense
@@ -157,6 +158,7 @@ export default function OpticalPrescriptionsPage() {
     const [pageSize, setPageSize] = useState(20);
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
+    const [viewAll, setViewAll] = useState(false);
 
     const [rows, setRows] = useState<OpticalPrescription[]>([]);
     const [stats, setStats] = useState<Stats>({ total: 0, active: 0, dispensed: 0, issuedToday: 0 });
@@ -164,6 +166,15 @@ export default function OpticalPrescriptionsPage() {
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
+
+    useEffect(() => {
+        const view = searchParams.get('view');
+        const statusParam = (searchParams.get('status') || '').toUpperCase();
+        if (view === 'all') setViewAll(true);
+        if (statusParam === 'ACTIVE' || statusParam === 'DISPENSED' || statusParam === 'FILLED') {
+            setStatus(statusParam === 'FILLED' ? 'ACTIVE' : statusParam);
+        }
+    }, [searchParams]);
 
     const fetchStats = useCallback(async () => {
         try {
@@ -183,7 +194,7 @@ export default function OpticalPrescriptionsPage() {
             params.type = type;
             if (dateFrom) params.from = dateFrom;
             if (dateTo) params.to = dateTo;
-            if (!dateFrom && !dateTo) {
+            if (!viewAll && !dateFrom && !dateTo) {
                 params.todayOnly = '1';
             }
             const res = await api.get('/prescriptions', { params });
@@ -199,7 +210,7 @@ export default function OpticalPrescriptionsPage() {
         } finally {
             setLoading(false);
         }
-    }, [search, status, type, page, pageSize, dateFrom, dateTo]);
+    }, [search, status, type, page, pageSize, dateFrom, dateTo, viewAll]);
 
     useEffect(() => {
         fetchStats();

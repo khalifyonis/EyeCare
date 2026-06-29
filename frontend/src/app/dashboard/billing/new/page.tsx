@@ -96,7 +96,7 @@ export default function NewBillingPage() {
   const [tax, setTax] = useState('0');
   const [discount, setDiscount] = useState('0');
   const [dueDate, setDueDate] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [prescriptionId, setPrescriptionId] = useState<string | null>(null);
 
   const [lineItems, setLineItems] = useState<LineItem[]>([
@@ -180,27 +180,27 @@ export default function NewBillingPage() {
 
         // Add line item
         if (serviceType === 'PHARMACY') {
-           // Try to find the item in our already loaded pharmacy items for the most up-to-date price
-           const catalogItem = pharmacyItems.find(i => i.id === data.itemId);
-           const itemName = catalogItem?.label || data.itemName || 'Medicine';
-           const unitPrice = catalogItem?.unitPrice || data.item?.sellingPrice || 0;
+          // Try to find the item in our already loaded pharmacy items for the most up-to-date price
+          const catalogItem = pharmacyItems.find(i => i.id === data.itemId);
+          const itemName = catalogItem?.label || data.itemName || 'Medicine';
+          const unitPrice = catalogItem?.unitPrice || data.item?.sellingPrice || 0;
 
-           setLineItems([{
-             id: 'presc-item',
-             description: itemName,
-             itemId: data.itemId || data.item?.id,
-             quantity: String(data.quantity || 1),
-             unitPrice: String(unitPrice)
-           }]);
+          setLineItems([{
+            id: 'presc-item',
+            description: itemName,
+            itemId: data.itemId || data.item?.id,
+            quantity: String(data.quantity || 1),
+            unitPrice: String(unitPrice)
+          }]);
         } else if (serviceType === 'OPTICAL') {
-           const frameName = data.frameItem?.itemName || 'Optical Frame';
-           setLineItems([{
-             id: 'presc-frame',
-             description: `Frame: ${frameName}`,
-             itemId: data.frameItem?.id,
-             quantity: '1',
-             unitPrice: String(data.frameItem?.sellingPrice || 0)
-           }]);
+          const frameName = data.frameItem?.itemName || 'Optical Frame';
+          setLineItems([{
+            id: 'presc-frame',
+            description: `Frame: ${frameName}`,
+            itemId: data.frameItem?.id,
+            quantity: '1',
+            unitPrice: String(data.frameItem?.sellingPrice || 0)
+          }]);
         }
       } catch {
         toast.error('Failed to load prescription data');
@@ -392,7 +392,7 @@ export default function NewBillingPage() {
                       ))}
                     </datalist>
                   </div>
-                  
+
                   <div className="space-y-1 text-center">
                     <label className="text-[10px] font-bold text-slate-400 uppercase md:hidden">Quantity</label>
                     <Input
@@ -463,13 +463,14 @@ export default function NewBillingPage() {
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-200">Payment Method</label>
-              <Input
-                value={paymentMethod}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-                className="mt-1 h-11"
-                placeholder="Cash, Card, Transfer"
-              />
+              <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                <SelectTrigger className="mt-1 h-11 rounded-lg border-slate-200 dark:border-slate-800">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Cash">Cash</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label className="text-sm font-medium text-slate-700 dark:text-slate-200">Due Date</label>

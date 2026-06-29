@@ -1,0 +1,262 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram id="erd" name="EyeCare ERD">
+    <mxGraphModel dx="1422" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1400" pageHeight="1800" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- ============ ROW 1: custom_roles + clinic_branch ============ -->
+
+        <mxCell id="t_cr" value="custom_roles" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=12;fillColor=#E8DEF8;strokeColor=#7C3AED;rounded=1;html=1;collapsible=0;swimlaneLine=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="195" height="86" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_cr" value="id  uuid  PK&#xa;name  string  UK&#xa;description  string&#xa;is_system  boolean" style="text;strokeColor=#7C3AED;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=10;fontFamily=Consolas;html=0;" vertex="1" parent="t_cr">
+          <mxGeometry y="26" width="195" height="60" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t_cb" value="clinic_branch" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=12;fillColor=#E8DEF8;strokeColor=#7C3AED;rounded=1;html=1;collapsible=0;swimlaneLine=1;" vertex="1" parent="1">
+          <mxGeometry x="420" y="20" width="210" height="114" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_cb" value="id  uuid  PK&#xa;branch_name  string&#xa;address  string&#xa;phone  string&#xa;is_active  boolean&#xa;created_at  timestamp" style="text;strokeColor=#7C3AED;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=10;fontFamily=Consolas;html=0;" vertex="1" parent="t_cb">
+          <mxGeometry y="26" width="210" height="88" as="geometry"/>
+        </mxCell>
+
+        <!-- ============ ROW 2: role_permissions + users ============ -->
+
+        <mxCell id="t_rp" value="role_permissions" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=12;fillColor=#E8DEF8;strokeColor=#7C3AED;rounded=1;html=1;collapsible=0;swimlaneLine=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="175" width="210" height="128" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_rp" value="id  uuid  PK&#xa;role_name  string  FK&#xa;module  string&#xa;can_read  boolean&#xa;can_create  boolean&#xa;can_update  boolean&#xa;can_delete  boolean" style="text;strokeColor=#7C3AED;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=10;fontFamily=Consolas;html=0;" vertex="1" parent="t_rp">
+          <mxGeometry y="26" width="210" height="102" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t_us" value="users" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=12;fillColor=#DBEAFE;strokeColor=#2563EB;rounded=1;html=1;collapsible=0;swimlaneLine=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="175" width="220" height="142" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_us" value="id  uuid  PK&#xa;branch_id  uuid  FK&#xa;username  string&#xa;email  string&#xa;password  string&#xa;role  string  FK&#xa;full_name  string&#xa;created_at  timestamp" style="text;strokeColor=#2563EB;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=10;fontFamily=Consolas;html=0;" vertex="1" parent="t_us">
+          <mxGeometry y="26" width="220" height="116" as="geometry"/>
+        </mxCell>
+
+        <!-- ============ ROW 3: doctors ============ -->
+
+        <mxCell id="t_dc" value="doctors" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=12;fillColor=#DBEAFE;strokeColor=#2563EB;rounded=1;html=1;collapsible=0;swimlaneLine=1;" vertex="1" parent="1">
+          <mxGeometry x="410" y="360" width="220" height="114" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_dc" value="id  uuid  PK&#xa;user_id  uuid  FK&#xa;branch_id  uuid  FK&#xa;specialization  string&#xa;license_number  string&#xa;created_at  timestamp" style="text;strokeColor=#2563EB;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=10;fontFamily=Consolas;html=0;" vertex="1" parent="t_dc">
+          <mxGeometry y="26" width="220" height="88" as="geometry"/>
+        </mxCell>
+
+        <!-- ============ ROW 4: optical_items + patients + pharmacy_items ============ -->
+
+        <mxCell id="t_oi" value="optical_items" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=12;fillColor=#FEF3C7;strokeColor=#D97706;rounded=1;html=1;collapsible=0;swimlaneLine=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="520" width="205" height="114" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_oi" value="id  uuid  PK&#xa;branch_id  uuid  FK&#xa;item_name  string&#xa;item_type  string&#xa;stock_quantity  int&#xa;selling_price  decimal" style="text;strokeColor=#D97706;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=10;fontFamily=Consolas;html=0;" vertex="1" parent="t_oi">
+          <mxGeometry y="26" width="205" height="88" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t_pt" value="patients" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=12;fillColor=#DBEAFE;strokeColor=#2563EB;rounded=1;html=1;collapsible=0;swimlaneLine=1;" vertex="1" parent="1">
+          <mxGeometry x="275" y="520" width="245" height="156" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_pt" value="id  uuid  PK&#xa;branch_id  uuid  FK&#xa;assigned_doctor_id  uuid  FK&#xa;patient_number  string&#xa;full_name  string&#xa;phone  string&#xa;date_of_birth  date&#xa;gender  string&#xa;created_at  timestamp" style="text;strokeColor=#2563EB;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=10;fontFamily=Consolas;html=0;" vertex="1" parent="t_pt">
+          <mxGeometry y="26" width="245" height="130" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t_pi" value="pharmacy_items" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=12;fillColor=#FEF3C7;strokeColor=#D97706;rounded=1;html=1;collapsible=0;swimlaneLine=1;" vertex="1" parent="1">
+          <mxGeometry x="570" y="520" width="215" height="128" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_pi" value="id  uuid  PK&#xa;branch_id  uuid  FK&#xa;item_name  string&#xa;category  string&#xa;stock_quantity  int&#xa;selling_price  decimal&#xa;expiry_date  date" style="text;strokeColor=#D97706;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=10;fontFamily=Consolas;html=0;" vertex="1" parent="t_pi">
+          <mxGeometry y="26" width="215" height="102" as="geometry"/>
+        </mxCell>
+
+        <!-- ============ ROW 5: appointments ============ -->
+
+        <mxCell id="t_ap" value="appointments" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=12;fillColor=#D1FAE5;strokeColor=#059669;rounded=1;html=1;collapsible=0;swimlaneLine=1;" vertex="1" parent="1">
+          <mxGeometry x="265" y="720" width="255" height="156" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_ap" value="id  uuid  PK&#xa;patient_id  uuid  FK&#xa;doctor_id  uuid  FK&#xa;branch_id  uuid  FK&#xa;created_by  uuid  FK&#xa;appointment_date  timestamp&#xa;status  string&#xa;booking_number  string&#xa;created_at  timestamp" style="text;strokeColor=#059669;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=10;fontFamily=Consolas;html=0;" vertex="1" parent="t_ap">
+          <mxGeometry y="26" width="255" height="130" as="geometry"/>
+        </mxCell>
+
+        <!-- ============ ROW 6: optical_prescriptions + exam_preliminary ============ -->
+
+        <mxCell id="t_op" value="optical_prescriptions" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=12;fillColor=#D1FAE5;strokeColor=#059669;rounded=1;html=1;collapsible=0;swimlaneLine=1;" vertex="1" parent="1">
+          <mxGeometry x="10" y="920" width="240" height="142" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_op" value="id  uuid  PK&#xa;patient_id  uuid  FK&#xa;frame_item_id  uuid  FK&#xa;lens_item_id  uuid  FK&#xa;od_sphere  string&#xa;os_sphere  string&#xa;status  string&#xa;created_at  timestamp" style="text;strokeColor=#059669;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=10;fontFamily=Consolas;html=0;" vertex="1" parent="t_op">
+          <mxGeometry y="26" width="240" height="116" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t_ep" value="exam_preliminary" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=12;fillColor=#D1FAE5;strokeColor=#059669;rounded=1;html=1;collapsible=0;swimlaneLine=1;" vertex="1" parent="1">
+          <mxGeometry x="310" y="920" width="245" height="156" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_ep" value="id  uuid  PK&#xa;appointment_id  uuid  FK&#xa;patient_id  uuid  FK&#xa;doctor_id  uuid  FK&#xa;stage  string&#xa;chief_complaint  text&#xa;iop_od  int&#xa;iop_os  int&#xa;created_at  timestamp" style="text;strokeColor=#059669;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=10;fontFamily=Consolas;html=0;" vertex="1" parent="t_ep">
+          <mxGeometry y="26" width="245" height="130" as="geometry"/>
+        </mxCell>
+
+        <!-- ============ ROW 7: exam_clinical + medicine_prescriptions ============ -->
+
+        <mxCell id="t_ec" value="exam_clinical" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=12;fillColor=#D1FAE5;strokeColor=#059669;rounded=1;html=1;collapsible=0;swimlaneLine=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="1120" width="240" height="128" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_ec" value="id  uuid  PK&#xa;appointment_id  uuid  FK&#xa;preliminary_id  uuid  FK&#xa;examined_by  uuid  FK&#xa;diagnosis  text&#xa;management_plan  text&#xa;examined_at  timestamp" style="text;strokeColor=#059669;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=10;fontFamily=Consolas;html=0;" vertex="1" parent="t_ec">
+          <mxGeometry y="26" width="240" height="102" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="t_mp" value="medicine_prescriptions" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=12;fillColor=#D1FAE5;strokeColor=#059669;rounded=1;html=1;collapsible=0;swimlaneLine=1;" vertex="1" parent="1">
+          <mxGeometry x="555" y="1120" width="260" height="156" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_mp" value="id  uuid  PK&#xa;appointment_id  uuid  FK&#xa;clinical_exam_id  uuid  FK&#xa;pharmacy_item_id  uuid  FK&#xa;item_name  string&#xa;quantity  int&#xa;instructions  text&#xa;status  string&#xa;created_at  timestamp" style="text;strokeColor=#059669;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=10;fontFamily=Consolas;html=0;" vertex="1" parent="t_mp">
+          <mxGeometry y="26" width="260" height="130" as="geometry"/>
+        </mxCell>
+
+        <!-- ============ ROW 8: billing ============ -->
+
+        <mxCell id="t_bl" value="billing" style="swimlane;fontStyle=1;align=center;startSize=26;fontSize=12;fillColor=#FECACA;strokeColor=#DC2626;rounded=1;html=1;collapsible=0;swimlaneLine=1;" vertex="1" parent="1">
+          <mxGeometry x="255" y="1320" width="290" height="240" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_bl" value="id  uuid  PK&#xa;patient_id  uuid  FK&#xa;appointment_id  uuid  FK&#xa;medicine_prescription_id  uuid  FK&#xa;optical_prescription_id  uuid  FK&#xa;service_type  string&#xa;item_type  string&#xa;quantity  int&#xa;unit_price  decimal&#xa;line_total  decimal&#xa;total_amount  decimal&#xa;final_amount  decimal&#xa;status  string&#xa;payment_method  string&#xa;created_at  timestamp" style="text;strokeColor=#DC2626;fillColor=none;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=10;fontFamily=Consolas;html=0;" vertex="1" parent="t_bl">
+          <mxGeometry y="26" width="290" height="214" as="geometry"/>
+        </mxCell>
+
+        <!-- ==================== RELATIONSHIPS ==================== -->
+
+        <!-- custom_roles -> role_permissions : defines permissions -->
+        <mxCell id="e1" value="defines permissions" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_cr" target="t_rp" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- custom_roles -> users : assigns role -->
+        <mxCell id="e2" value="assigns role" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_cr" target="t_us" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- clinic_branch -> users : employs -->
+        <mxCell id="e3" value="employs" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_cb" target="t_us" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- clinic_branch -> patients : registers -->
+        <mxCell id="e4" value="registers" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_cb" target="t_pt" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- clinic_branch -> pharmacy_items : stocks -->
+        <mxCell id="e5" value="stocks" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_cb" target="t_pi" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- clinic_branch -> optical_items : stocks -->
+        <mxCell id="e6" value="stocks" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_cb" target="t_oi" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- users -> doctors : is (1-to-1) -->
+        <mxCell id="e7" value="is" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmandOne;endFill=0;startSize=10;endSize=10;" edge="1" source="t_us" target="t_dc" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- users -> appointments : books -->
+        <mxCell id="e8" value="books" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_us" target="t_ap" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- doctors -> patients : assigns -->
+        <mxCell id="e9" value="assigns" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_dc" target="t_pt" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- doctors -> appointments : attends -->
+        <mxCell id="e10" value="attends" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_dc" target="t_ap" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- doctors -> exam_preliminary : examines -->
+        <mxCell id="e11" value="examines" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_dc" target="t_ep" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- doctors -> exam_clinical : examines -->
+        <mxCell id="e12" value="examines" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_dc" target="t_ec" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- patients -> appointments : requests -->
+        <mxCell id="e13" value="requests" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_pt" target="t_ap" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- patients -> exam_preliminary : undergoes -->
+        <mxCell id="e14" value="undergoes" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_pt" target="t_ep" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- patients -> optical_prescriptions : receives -->
+        <mxCell id="e15" value="receives" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_pt" target="t_op" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- patients -> billing : billed -->
+        <mxCell id="e16" value="billed" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_pt" target="t_bl" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- appointments -> exam_preliminary : preliminary -->
+        <mxCell id="e17" value="preliminary" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_ap" target="t_ep" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- appointments -> exam_clinical : clinical -->
+        <mxCell id="e18" value="clinical" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_ap" target="t_ec" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- appointments -> medicine_prescriptions : prescribes -->
+        <mxCell id="e19" value="prescribes" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_ap" target="t_mp" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- appointments -> billing : generates -->
+        <mxCell id="e20" value="generates" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_ap" target="t_bl" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- exam_preliminary -> exam_clinical : proceeds to -->
+        <mxCell id="e21" value="proceeds to" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_ep" target="t_ec" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- exam_clinical -> medicine_prescriptions : prescribes -->
+        <mxCell id="e22" value="prescribes" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_ec" target="t_mp" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- pharmacy_items -> medicine_prescriptions : dispenses -->
+        <mxCell id="e23" value="dispenses" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_pi" target="t_mp" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- optical_items -> optical_prescriptions : frame -->
+        <mxCell id="e24" value="frame" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_oi" target="t_op" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- optical_items -> optical_prescriptions : lens -->
+        <mxCell id="e25" value="lens" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_oi" target="t_op" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- medicine_prescriptions -> billing : charges -->
+        <mxCell id="e26" value="charges" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_mp" target="t_bl" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- optical_prescriptions -> billing : charges -->
+        <mxCell id="e27" value="charges" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;fontSize=8;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=ERmandOne;startFill=0;endArrow=ERmany;endFill=0;startSize=10;endSize=10;" edge="1" source="t_op" target="t_bl" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

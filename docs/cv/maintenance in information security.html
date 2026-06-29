@@ -1,0 +1,519 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Information Security Maintenance Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: #f1f5f9; display: grid; gap: 40px; grid-template-columns: 1fr; place-items: center; padding: 40px 0; font-family: 'Inter', sans-serif; color: #1e293b; }
+        .slide-container { width: 1280px; height: 720px; background: #ffffff; overflow: hidden; position: relative; display: flex; flex-direction: column; padding: 60px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); border-radius: 4px; }
+        .slide-container::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 30px 30px; opacity: 0.3; z-index: 0; }
+        .slide-container > * { z-index: 1; position: relative; } 
+        h1, h2, h3 { font-family: 'Poppins', sans-serif; font-weight: 700; color: #0f172a; }
+        .slide-title { font-size: 44px; margin-bottom: 30px; border-left: 8px solid #06b6d4; padding-left: 25px; text-transform: capitalize; max-width: 1000px; }
+        p, li { font-size: 20px; line-height: 1.6; color: #475569; margin-bottom: 15px; }
+        strong { color: #0f172a; font-weight: 600; }
+        .content-area { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; width: 100%; }
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; width: 100%; }
+        .tiled-content { display: flex; gap: 30px; width: 100%; justify-content: space-between; }
+        .tile { flex: 1; background: #f8fafc; padding: 40px; border-radius: 12px; border-top: 5px solid #06b6d4; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .tile .icon { font-size: 40px; color: #06b6d4; margin-bottom: 20px; }
+        .tile h3 { font-size: 24px; margin-bottom: 15px; color: #334155; }
+        .tile p { font-size: 17px; line-height: 1.5; margin: 0; }
+        .image-wrapper { width: 100%; height: 450px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .image-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .timeline-layout { position: relative; display: flex; justify-content: space-between; align-items: flex-start; padding-top: 40px; height: 100%; }
+        .timeline-line { position: absolute; top: 65px; left: 0; width: 100%; height: 4px; background: #e2e8f0; z-index: 0; }
+        .timeline-item { width: 22%; text-align: center; position: relative; z-index: 1; background: #ffffff; padding: 20px 10px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; }
+        .timeline-item h3 { margin-top: 25px; margin-bottom: 10px; }
+        .step-badge { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: #06b6d4; color: #ffffff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; border: 4px solid #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .table-layout table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; }
+        .table-layout th { background: #0f172a; color: #fff; padding: 20px; text-align: left; font-size: 18px; }
+        .table-layout td { padding: 20px; border-bottom: 1px solid #e2e8f0; font-size: 17px; }
+        .title-layout { text-align: center; }
+        .title-layout h1 { font-size: 72px; margin-bottom: 20px; color: #0f172a; }
+        .title-layout .subtitle { font-size: 28px; color: #64748b; font-weight: 300; }
+        .title-layout .footer-info { margin-top: 100px; font-size: 18px; color: #94a3b8; }
+        .highlight-numbers-layout { display: flex; align-items: center; justify-content: space-around; width: 100%; }
+        .stat-item { text-align: center; }
+        .stat-number { font-size: 100px; font-weight: 700; color: #06b6d4; line-height: 1; }
+        .stat-label { font-size: 24px; color: #475569; font-weight: 500; }
+        .bullet-list ul { list-style: none; }
+        .bullet-list li { position: relative; padding-left: 45px; margin-bottom: 25px; }
+        .bullet-list i { position: absolute; left: 0; top: 5px; color: #06b6d4; font-size: 24px; }
+    </style>
+</head>
+<body>
+
+<div class="slide-container" id="slide1" style="background-image: url('cyber_bg.jpg'); background-size: cover; background-position: center; background-color: #0f172a;">
+    <div class="content-area title-layout">
+        <h1 style="color: white;">Information Security Maintenance</h1>
+        <p class="subtitle" style="color: white;">Ensuring Continuous Protection Through Effective Security Maintenance</p>
+    </div>
+</div>
+
+<div class="slide-container" id="slide2">
+    <h2 class="slide-title">Presentation Agenda</h2>
+    <div class="content-area">
+        <div class="timeline-layout">
+            <div class="timeline-line"></div>
+            <div class="timeline-item">
+                <div class="step-badge">01</div>
+                <h3>Security Basics</h3>
+                <p>Learn basic security maintenance rules, lifecycle steps, and daily data protection.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="step-badge">02</div>
+                <h3>Daily Operations</h3>
+                <p>Review standard patch schedules, vulnerability scanners, and user access checkups.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="step-badge">03</div>
+                <h3>Resilience Plans</h3>
+                <p>See how to test file backups, review security logs, and run an incident response framework.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="step-badge">04</div>
+                <h3>Best Practices</h3>
+                <p>Discover easy automation tips, legacy system challenges, and real-world workflows.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide3">
+    <h2 class="slide-title">Learning Objectives</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div>
+                <h3 style="margin-bottom: 15px; color: #0891b2;"><i class="fa-solid fa-book-open"></i> Core Knowledge Goals</h3>
+                <p style="font-size: 18px; margin-bottom: 25px;">Understand fundamental rules of cybersecurity maintenance as an ongoing shield rather than a one-time project.</p>
+                <ul style="list-style-type: none; padding-left: 0;">
+                    <li style="font-size: 16px; margin-bottom: 12px;"><i class="fa-solid fa-check" style="color: #06b6d4;"></i> <strong>Define Maintenance:</strong> Master what it means and why systems need permanent updates.</li>
+                    <li style="font-size: 16px; margin-bottom: 12px;"><i class="fa-solid fa-check" style="color: #06b6d4;"></i> <strong>Identify Key Activities:</strong> Know the regular tasks needed to keep bad actors out.</li>
+                    <li style="font-size: 16px; margin-bottom: 12px;"><i class="fa-solid fa-check" style="color: #06b6d4;"></i> <strong>Analyze Threat Vectors:</strong> Learn how to spot system entry points before hackers do.</li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="margin-bottom: 15px; color: #0891b2;"><i class="fa-solid fa-laptop-code"></i> Practical Application Goals</h3>
+                <p style="font-size: 18px; margin-bottom: 25px;">Learn how to use these ideas to protect real business networks and improve overall security schedules within your team.</p>
+                <ul style="list-style-type: none; padding-left: 0;">
+                    <li style="font-size: 16px; margin-bottom: 12px;"><i class="fa-solid fa-arrow-right" style="color: #06b6d4;"></i> <strong>Build Update Calendars:</strong> Create solid schedules for installing computer patches.</li>
+                    <li style="font-size: 16px; margin-bottom: 12px;"><i class="fa-solid fa-arrow-right" style="color: #06b6d4;"></i> <strong>Test Recovery Systems:</strong> Plan regular drills to ensure backup data works properly.</li>
+                    <li style="font-size: 16px; margin-bottom: 12px;"><i class="fa-solid fa-arrow-right" style="color: #06b6d4;"></i> <strong>Utilize Automation:</strong> Leverage software tools to scan systems without manual effort.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide4">
+    <h2 class="slide-title">What Is Security Maintenance?</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div>
+                <h3 style="margin-bottom: 15px; color: #334155;">Security is a Process, Not a Product</h3>
+                <p>Information security maintenance means the permanent, daily work we do to check, look after, and improve our computer security setups over time.</p>
+                <p>Just like a physical building needs lock repairs and regular inspections, computer systems need continuous care to stay safe.</p>
+                <p>Many systems grow weak because new viruses appear every day, software gets old, and workplace networks change. Active maintenance stops these minor technical bugs from turning into dangerous network breaches.</p>
+            </div>
+            <div class="tile" style="border-top: 5px solid #0891b2; background: #fafafa;">
+                <h3 style="margin-bottom: 20px; color: #0f172a;"><i class="fa-solid fa-shield-halved" style="color: #06b6d4;"></i> Protecting the CIA Triad</h3>
+                <p style="font-size: 16px; margin-bottom: 12px;"><strong>Confidentiality (Secrets):</strong> Checking accounts regularly stops unauthorized eyes from reading private files.</p>
+                <p style="font-size: 16px; margin-bottom: 12px;"><strong>Integrity (Accuracy):</strong> Checking configuration files makes sure data is not altered by mistakes or bad actors.</p>
+                <p style="font-size: 16px; margin-bottom: 0;"><strong>Availability (Access):</strong> Patching old bugs keeps servers online so the team can work without crashes.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide5">
+    <h2 class="slide-title">The Security Lifecycle</h2>
+    <div class="content-area">
+        <div class="timeline-layout">
+            <div class="timeline-line"></div>
+            <div class="timeline-item">
+                <div class="step-badge" style="background-color: #475569;">1</div>
+                <h3>Planning Phase</h3>
+                <p>Identify company computer assets and mount basic rules to protect them from common risks.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="step-badge" style="background-color: #475569;">2</div>
+                <h3>Implementation</h3>
+                <p>Deploy security defenses like firewalls, anti-virus tools, and strict user account logins.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="step-badge" style="background-color: #475569;">3</div>
+                <h3>Monitoring</h3>
+                <p>Scan system traffic and save activity logs to spot any strange behavior instantly.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="step-badge" style="background-color: #06b6d4;">4</div>
+                <h3>Maintenance</h3>
+                <p>Update system software, test backups, and tweak security policies to block new, rising threats.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide6">
+    <h2 class="slide-title">Why Regular Care Is Essential</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div class="highlight-numbers-layout" style="flex-direction: column; gap: 30px;">
+                <div class="stat-item">
+                    <div class="stat-number">60%</div>
+                    <div class="stat-label">Breaches Due to Missing Patches</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">90%</div>
+                    <div class="stat-label">Lower Risk with Regular Scans</div>
+                </div>
+            </div>
+            <div>
+                <h3 style="margin-bottom: 15px; color: #334155;">The Importance of Continuous Care</h3>
+                <p>Cyber attackers do not stop. They constantly scan the web searching for unpatched doors to break into company networks.</p>
+                <p>Statistics show that the majority of digital security leaks happen because an organization forgot to install a simple, existing update.</p>
+                <p>By keeping systems updated, you protect private customer secrets, follow state laws, and build deep trust. Solid maintenance saves business money by avoiding system recovery expenses and expensive network downtime.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide7">
+    <h2 class="slide-title">Major Maintenance Work</h2>
+    <div class="content-area">
+        <div class="tiled-content">
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-code-commit"></i></div>
+                <h3>Software Patching</h3>
+                <p>Deploying hotfixes on computers and network gear to close safety vulnerabilities before hackers exploit them.</p>
+            </div>
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-users-gear"></i></div>
+                <h3>Account Audits</h3>
+                <p>Reviewing employee permissions to delete old accounts and restrict active staff to files they need for daily work.</p>
+            </div>
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                <h3>Backup Verifications</h3>
+                <p>Running regular copy tests on offline servers to verify that company files can be recovered during emergencies.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide8">
+    <h2 class="slide-title">Patch Management Guide</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div>
+                <h3 style="margin-bottom: 15px; color: #334155;">Fixing System Vulnerabilities</h3>
+                <p>A security patch is a software update released by developers to fix an identified security flaw.</p>
+                <p>Managing these updates involves a clear cycle of testing, deploying, and checking outcomes.</p>
+                <p>To patch safely without crashing your business network, IT departments must test new updates on a small group of computer systems first.</p>
+                <p>They must also plan regular deployment times during quiet hours and keep active rollback steps ready to undo changes if something breaks.</p>
+            </div>
+            <div class="image-wrapper">
+                <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80" alt="Server Datacenter Infrastructure">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide9">
+    <h2 class="slide-title">Vulnerability Management</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div>
+                <h3 style="margin-bottom: 10px; color: #0891b2;">Finding Network Weak Spots</h3>
+                <p style="font-size: 18px;">We use specialized scanning software to check all devices for outdated code, blank passwords, and wrong settings. This functions like walking around a corporate facility to verify that every lock is functional.</p>
+                <ul style="list-style-type: none; padding-left: 0; margin-bottom: 25px;">
+                    <li><i class="fa-solid fa-magnifying-glass" style="color: #06b6d4;"></i> <strong>Automated Scanning:</strong> Run software scans weekly on servers.</li>
+                    <li><i class="fa-solid fa-gauge-high" style="color: #06b6d4;"></i> <strong>Risk Classification:</strong> Rate vulnerabilities to identify dangerous flaws.</li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="margin-bottom: 10px; color: #0891b2;">Fixing Identified Flaws</h3>
+                <p style="font-size: 18px;">After scanning reveals security issues, the IT team must prioritize which ones to fix first based on official databases like the Common Vulnerabilities list (CVE).</p>
+                <ul style="list-style-type: none; padding-left: 0;">
+                    <li><i class="fa-solid fa-bolt" style="color: #06b6d4;"></i> <strong>Deploy Remediation:</strong> Fix critical bugs immediately with hotfixes.</li>
+                    <li><i class="fa-solid fa-circle-check" style="color: #06b6d4;"></i> <strong>Verification Runs:</strong> Scan again to guarantee the door is locked.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide10">
+    <h2 class="slide-title">Access Control Review</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div>
+                <h3 style="margin-bottom: 15px; color: #334155;">Managing Company Digital Keys</h3>
+                <p>Keeping track of who holds permissions to access corporate records is an important part of security maintenance.</p>
+                <p>Over time, staff change projects, switch roles, or leave the business. If the IT team does not clean these accounts, old logins pose huge risks.</p>
+                <p>Under the <strong>Least Privilege Rule</strong>, employees only get access to files that are necessary for their current daily work.</p>
+                <p>Regular sweeps delete old accounts, verify active users, and enforce multifactor sign-ins (MFA) to stop password theft.</p>
+            </div>
+            <div class="image-wrapper">
+                <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=600&q=80" alt="Secure Digital Fingerprint Recognition">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide11">
+    <h2 class="slide-title">Backup & Recovery Setup</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div class="tile">
+                <h3 style="color: #0f172a; margin-bottom: 15px;"><i class="fa-solid fa-boxes-stacked" style="color: #06b6d4;"></i> The Standard 3-2-1 Rule</h3>
+                <p>To safeguard files from ransomware or hardware damage, maintain clean data backups. A reliable system uses simple rules:</p>
+                <ul style="list-style-type: none; padding-left: 0; font-size: 16px;">
+                    <li style="margin-bottom: 8px;"><i class="fa-solid fa-square-check" style="color: #06b6d4;"></i> Save <strong>3 separate copies</strong> of important data.</li>
+                    <li style="margin-bottom: 8px;"><i class="fa-solid fa-square-check" style="color: #06b6d4;"></i> Use <strong>2 different storage media</strong> (like local disks and cloud).</li>
+                    <li><i class="fa-solid fa-square-check" style="color: #06b6d4;"></i> Keep at least <strong>1 copy completely offsite</strong> or offline.</li>
+                </ul>
+            </div>
+            <div class="tile">
+                <h3 style="color: #0f172a; margin-bottom: 15px;"><i class="fa-solid fa-rotate" style="color: #06b6d4;"></i> Active Recovery Testing</h3>
+                <p>A backup copy is only helpful if you can retrieve it when servers crash. Regular recovery tests verify files are not corrupted.</p>
+                <p>Set clear targets for how fast you must recover (RTO) and verify these plans using simple dry-run restoration drills twice a year to maintain readiness.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide12">
+    <h2 class="slide-title">Network Monitoring & Logs</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div>
+                <h3 style="margin-bottom: 15px; color: #334155;">Tracking System Activity</h3>
+                <p>Modern computers and routers generate security logs. Logs are simply written records that explain who accessed a system and what changes they performed. Continuous monitoring involves collecting and reviewing these logs to spot issues.</p>
+                <p>Using SIEM software helps by sorting millions of minor log lines automatically. This software alerts security teams only when it detects dangerous actions, such as an unknown login from another country at midnight.</p>
+            </div>
+            <div class="image-wrapper">
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80" alt="Bright screen showing network logs and monitoring charts">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide13">
+    <h2 class="slide-title">Incident Response Steps</h2>
+    <div class="content-area">
+        <div class="timeline-layout">
+            <div class="timeline-line"></div>
+            <div class="timeline-item">
+                <div class="step-badge">1</div>
+                <h3>Preparation</h3>
+                <p>Draft response guides (playbooks) and train team members before any malware outbreak happens.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="step-badge">2</div>
+                <h3>Detection</h3>
+                <p>Use logs to identify active network hacks and locate infected corporate laptops immediately.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="step-badge">3</div>
+                <h3>Containment</h3>
+                <p>Disconnect infected hardware from the office network to isolate threat spread and recover clean files.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="step-badge">4</div>
+                <h3>Lessons Learned</h3>
+                <p>Study the incident to fix firewalls and upgrade guidelines so the mistake is not repeated.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide14">
+    <h2 class="slide-title">Security Compliance Rules</h2>
+    <div class="content-area">
+        <div class="table-layout">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Compliance Standard</th>
+                        <th>Required Maintenance Rule</th>
+                        <th>Evidence for Audits</th>
+                        <th>Required Frequency</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>ISO 27001</strong></td>
+                        <td>Scan systems for vulnerabilities regularly.</td>
+                        <td>Scan reports and update logs</td>
+                        <td style="color: #06b6d4; font-weight: 600;">Annual Review</td>
+                    </tr>
+                    <tr>
+                        <td><strong>NIST Framework</strong></td>
+                        <td>Document all systems and keep software current.</td>
+                        <td>Asset inventory lists</td>
+                        <td style="color: #06b6d4; font-weight: 600;">Continuous Check</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PCI-DSS (Payments)</strong></td>
+                        <td>Install updates for critical systems within 30 days.</td>
+                        <td>Installation logs and receipts</td>
+                        <td style="color: #06b6d4; font-weight: 600;">Every 30 Days</td>
+                    </tr>
+                    <tr>
+                        <td><strong>HIPAA (Healthcare)</strong></td>
+                        <td>Audit login logs to protect patient records.</td>
+                        <td>Account access records</td>
+                        <td style="color: #06b6d4; font-weight: 600;">Annual Audit</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="margin-top: 25px; font-size: 16px; text-align: center; color: #64748b;">Keeping clean files proves to auditors that your company runs active maintenance. Good documentation prevents high state fines and preserves company reputation.</p>
+    </div>
+</div>
+
+<div class="slide-container" id="slide15">
+    <h2 class="slide-title">Automation In Security</h2>
+    <div class="content-area">
+        <div class="tiled-content">
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <h3>Automated Updates</h3>
+                <p>Configure background programs to download and install security updates automatically, avoiding manual delays.</p>
+            </div>
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-bell"></i></div>
+                <h3>Smart Alerts</h3>
+                <p>Filter minor computer events out so that cybersecurity staff are only notified when a serious breach occurs.</p>
+            </div>
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-robot"></i></div>
+                <h3>Autonomous Block</h3>
+                <p>Allow network firewalls to block suspicious IP addresses immediately during off-hours, without waiting for human approval.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide16">
+    <h2 class="slide-title">Maintenance Challenges</h2>
+    <div class="content-area">
+        <div class="table-layout">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Security Challenge</th>
+                        <th>Direct Business Impact</th>
+                        <th>Practical & Easy Solution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong style="color: #e11d48;">Legacy Systems</strong></td>
+                        <td>Old systems cannot support modern updates and are left vulnerable.</td>
+                        <td>Isolate old devices on separate, secure network zones.</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: #d97706;">Budget Limits</strong></td>
+                        <td>Small teams cannot afford premium licenses or hire analysts.</td>
+                        <td>Use reliable free open-source tools and focus on key risks.</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: #2563eb;">Human Mistake</strong></td>
+                        <td>Staff use weak passwords or click on phishing emails.</td>
+                        <td>Run quick monthly safety briefings and implement easy password tools.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="margin-top: 25px; font-size: 16px; text-align: center; color: #64748b;">Managing these key blockers is necessary. A small business with a simple, consistent plan can easily outperform a large company with a messy process.</p>
+    </div>
+</div>
+
+<div class="slide-container" id="slide17">
+    <h2 class="slide-title">Best Security Practices</h2>
+    <div class="content-area">
+        <p style="font-size: 22px; margin-bottom: 30px; font-weight: 500;">By practicing basic, daily habits, any organization can drastically improve its defense levels without wasting expensive resources.</p>
+        <div class="two-column" style="align-items: start;">
+            <div class="bullet-list">
+                <ul>
+                    <li><i class="fa-solid fa-calendar-days"></i> <strong>Set Schedules:</strong> Run security inspections on a steady calendar.</li>
+                    <li><i class="fa-solid fa-shield-virus"></i> <strong>Scan Weekly:</strong> Catch newly discovered software bugs early.</li>
+                    <li><i class="fa-solid fa-graduation-cap"></i> <strong>Train Personnel:</strong> Teach your team to identify phishing emails.</li>
+                </ul>
+            </div>
+            <div class="bullet-list">
+                <ul>
+                    <li><i class="fa-solid fa-file-shield"></i> <strong>Save Log Files:</strong> Record all changes to fix future computer errors.</li>
+                    <li><i class="fa-solid fa-server"></i> <strong>Test Backups:</strong> Try restoring backup files twice a year.</li>
+                    <li><i class="fa-solid fa-network-wired"></i> <strong>Map Your Assets:</strong> Keep a clean list of every device on your network.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide18">
+    <h2 class="slide-title">Practical Security Workflow</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div>
+                <h3 style="margin-bottom: 15px; color: #334155;">The Standard Operations Path</h3>
+                <p>Maintaining security follows a clear path of simple, repeatable steps to locate and resolve technical problems before bad actors can find them.</p>
+                <p>The workflow begins with <strong>Discovery</strong> to list all devices. Next, we run <strong>Vulnerability Scans</strong> to spot bugs, followed by <strong>Risk Analysis</strong> to prioritize fixes. We then execute <strong>Patch Deployment</strong> and run a <strong>Verification</strong> scan to prove the bug is gone. Finally, we move to <strong>Monitoring and Documentation</strong> to log our success.</p>
+            </div>
+            <div class="image-wrapper">
+                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80" alt="Workflow Analysis Metric Charts Dashboard">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide19">
+    <h2 class="slide-title">Future Security Trends</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-robot"></i></div>
+                <h3>Artificial Intelligence</h3>
+                <p style="font-size: 18px;">Artificial intelligence (AI) is assisting security systems to repair themselves. In the near future, security programs will detect code vulnerabilities and deploy hotfixes within seconds, without requiring manual labor.</p>
+            </div>
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-key"></i></div>
+                <h3>Zero Trust Architecture</h3>
+                <p style="font-size: 18px;">The legacy rule of "trust everyone inside our office firewall" is gone. Future networks will use Zero Trust rules. This means the network verifies credentials and requests login checks every time a user requests a file.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide20">
+    <div class="content-area title-layout">
+        <h1 style="font-size: 64px; color: #0891b2; margin-bottom: 25px;">Secure, Update, Succeed</h1>
+        <p style="font-size: 22px; max-width: 900px; margin: 0 auto 50px auto; line-height: 1.6; color: #475569;">Information security maintenance is an ongoing cycle of protective care. By running weekly scans, installing software updates, and regularly testing restoration steps, you can shield your business and preserve client trust.</p>
+        
+        <div style="background: #f8fafc; padding: 30px; border-radius: 12px; display: inline-block; border: 1px solid #e2e8f0; min-width: 500px;">
+            <h3 style="color: #0f172a; margin-bottom: 10px;">Thank You for Attending</h3>
+            <p style="font-size: 18px; color: #06b6d4; margin-bottom: 15px; font-weight: 500;">Have questions? Let's discuss!</p>
+        </div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide21">
+    <div class="content-area title-layout">
+        <h1 style="font-size: 64px; color: #0891b2; margin-bottom: 25px;">Thank You for Attending</h1>
+        <p style="font-size: 22px; max-width: 900px; margin: 0 auto 50px auto; line-height: 1.6; color: #475569;">Have questions? Let's discuss!</p>
+    </div>
+</div>
+
+</body>
+</html>

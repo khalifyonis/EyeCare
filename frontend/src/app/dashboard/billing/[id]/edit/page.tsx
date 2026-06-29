@@ -109,7 +109,7 @@ export default function EditBillingPage() {
   const [opticalItems, setOpticalItems] = useState<ItemOption[]>([]);
 
   const [status, setStatus] = useState('UNPAID');
-  const [paymentMethod, setPaymentMethod] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [dueDate, setDueDate] = useState('');
   const [tax, setTax] = useState('0');
   const [discount, setDiscount] = useState('0');
@@ -199,12 +199,12 @@ export default function EditBillingPage() {
 
         const mappedItems = Array.isArray(row.lineItems) && row.lineItems.length > 0
           ? row.lineItems.map((li, index) => ({
-              id: li.id || `${index + 1}`,
-              itemId: li.itemId || '',
-              description: li.description || '',
-              quantity: String(Number(li.quantity || 1)),
-              unitPrice: String(Number(li.unitPrice || 0)),
-            }))
+            id: li.id || `${index + 1}`,
+            itemId: li.itemId || '',
+            description: li.description || '',
+            quantity: String(Number(li.quantity || 1)),
+            unitPrice: String(Number(li.unitPrice || 0)),
+          }))
           : [{ id: '1', description: '', quantity: '1', unitPrice: '0' }];
         setLineItems(mappedItems);
 
@@ -397,7 +397,14 @@ export default function EditBillingPage() {
           </div>
           <div>
             <label className="text-sm font-medium text-slate-700 dark:text-slate-200">Payment Method</label>
-            <Input value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="mt-1 h-11" />
+            <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+              <SelectTrigger className="mt-1 h-11 rounded-lg border-slate-200 dark:border-slate-800">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Cash">Cash</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <label className="text-sm font-medium text-slate-700 dark:text-slate-200">Due Date</label>

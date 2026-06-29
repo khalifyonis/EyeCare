@@ -11,10 +11,14 @@ import {
   User, Phone, Mail, MapPin, FileText,
   Eye, Stethoscope, CalendarDays, AlertTriangle, Pill,
   Activity, Glasses, CreditCard, Clock, DollarSign,
-  PlusCircle, Heart, UserX, Shield, Scissors
+  PlusCircle, Heart, UserX, Shield, Scissors,
+  Download,
 } from 'lucide-react';
-import { readStoredUser, resolveRoleName } from '@/lib/auth';
-import { hasPermission } from '@/lib/permissions';
+import { resolveRoleName } from '@/lib/auth';
+import { usePermission } from '@/contexts/permission-context';
+import {
+  downloadPatientMedicalRecord,
+} from '@/lib/patient-report';
 
 /* ── Types ── */
 type UserSimple = {
@@ -231,8 +235,10 @@ export default function PatientProfilePage() {
   const [patient, setPatient] = useState<PatientData | null>(null);
   const [loading, setLoading] = useState(true);
   const [sideTab, setSideTab] = useState('info');
+  const [exportingReport, setExportingReport] = useState(false);
 
-  const role = resolveRoleName(readStoredUser());
+  const { can, user } = usePermission();
+  const role = resolveRoleName(user);
   const canManage = ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST'].includes(role);
 
   useEffect(() => {
@@ -319,6 +325,19 @@ export default function PatientProfilePage() {
   const surgeries = patient.surgeries || [];
   const billings = patient.billings || [];
 
+  const downloadRecord = async () => {
+    setExportingReport(true);
+    try {
+      await downloadPatientMedicalRecord(id);
+      toast.success('Complete medical record downloaded');
+    } catch (err) {
+      console.error('PDF generation failed:', err);
+      toast.error('Failed to download medical record');
+    } finally {
+      setExportingReport(false);
+    }
+  };
+
   // Vitals extracted from latest ER examination
   const latestER = appointments.find(a => a.erExamination)?.erExamination;
 
@@ -344,11 +363,11 @@ export default function PatientProfilePage() {
   ].filter(tab => {
     // Patient Info and Appointments are always visible
     if (tab.id === 'info' || tab.id === 'appointments') return true;
-    if (tab.id === 'exams') return hasPermission('preliminary_exams', 'canRead') || hasPermission('clinical_exams', 'canRead');
-    if (tab.id === 'optical-rx') return hasPermission('optical_prescriptions', 'canRead');
-    if (tab.id === 'prescriptions') return hasPermission('medicine_prescriptions', 'canRead');
-    if (tab.id === 'surgeries') return hasPermission('surgery', 'canRead');
-    if (tab.id === 'billing') return hasPermission('billing', 'canRead');
+    if (tab.id === 'exams') return can('preliminary_exams', 'canRead') || can('clinical_exams', 'canRead');
+    if (tab.id === 'optical-rx') return can('optical_prescriptions', 'canRead');
+    if (tab.id === 'prescriptions') return can('medicine_prescriptions', 'canRead');
+    if (tab.id === 'surgeries') return can('surgery', 'canRead');
+    if (tab.id === 'billing') return can('billing', 'canRead');
     return true;
   });
 
@@ -379,6 +398,15 @@ export default function PatientProfilePage() {
           </div>
 
           <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              disabled={exportingReport}
+              onClick={downloadRecord}
+              className="gap-2 border-[#0EA5E9]/30 bg-[#0EA5E9]/5 hover:bg-[#0EA5E9]/10 text-[#0EA5E9]"
+            >
+              {exportingReport ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+              Download
+            </Button>
             <Button
               variant="outline"
               onClick={() => router.push(`/dashboard/appointments/new?patientId=${id}`)}
@@ -420,22 +448,20 @@ export default function PatientProfilePage() {
                   <button
                     key={t.id}
                     onClick={() => setSideTab(t.id)}
-                    className={`flex items-center justify-between gap-2.5 rounded-lg px-3.5 py-3 text-sm font-semibold transition-all w-full text-left whitespace-nowrap lg:whitespace-normal shrink-0 lg:shrink-1 ${
-                      sideTab === t.id
-                        ? 'bg-blue-50 text-[#0EA5E9] dark:bg-blue-950/30'
-                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/40 dark:hover:text-slate-200'
-                    }`}
+                    className={`flex items-center justify-between gap-2.5 rounded-lg px-3.5 py-3 text-sm font-semibold transition-all w-full text-left whitespace-nowrap lg:whitespace-normal shrink-0 lg:shrink-1 ${sideTab === t.id
+                      ? 'bg-blue-50 text-[#0EA5E9] dark:bg-blue-950/30'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/40 dark:hover:text-slate-200'
+                      }`}
                   >
                     <div className="flex items-center gap-2.5">
                       <t.icon className={`h-4.5 w-4.5 ${sideTab === t.id ? 'text-[#0EA5E9]' : 'text-slate-400'}`} />
                       <span>{t.label}</span>
                     </div>
                     {count > 0 && (
-                      <span className={`inline-flex items-center justify-center rounded-full px-2 py-0.5 text-[11px] font-bold ${
-                        sideTab === t.id
-                          ? 'bg-[#0EA5E9] text-white'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                      }`}>
+                      <span className={`inline-flex items-center justify-center rounded-full px-2 py-0.5 text-[11px] font-bold ${sideTab === t.id
+                        ? 'bg-[#0EA5E9] text-white'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                        }`}>
                         {count}
                       </span>
                     )}
@@ -451,7 +477,7 @@ export default function PatientProfilePage() {
             {/* ── Patient Info Tab ── */}
             {sideTab === 'info' && (
               <div className="space-y-6">
-                
+
                 {/* Personal Information + Medical History side-by-side */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -572,26 +598,24 @@ export default function PatientProfilePage() {
                                   <td className="px-6 py-4 whitespace-nowrap text-xs font-semibold text-slate-600 dark:text-slate-400">{fmtDate(apt.appointmentDate)}</td>
                                   <td className="px-6 py-4 font-semibold text-slate-950 dark:text-white max-w-[240px] truncate">{diag}</td>
                                   <td className="px-6 py-4">
-                                    <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-bold ${
-                                      severity === 'High'
-                                        ? 'bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200/50'
-                                        : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/50'
-                                    }`}>
+                                    <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-bold ${severity === 'High'
+                                      ? 'bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-400 border border-rose-200/50'
+                                      : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/50'
+                                      }`}>
                                       {severity}
                                     </span>
                                   </td>
                                   <td className="px-6 py-4 text-xs font-mono font-bold text-slate-500">{appointments.length - idx}</td>
                                   <td className="px-6 py-4">
-                                    <span className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
-                                      apt.status === 'COMPLETED'
-                                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/50'
-                                        : 'bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200/50'
-                                    }`}>
+                                    <span className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-bold ${apt.status === 'COMPLETED'
+                                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/50'
+                                      : 'bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200/50'
+                                      }`}>
                                       {apt.status === 'COMPLETED' ? 'Cured' : 'Under Treatment'}
                                     </span>
                                   </td>
                                   <td className="px-6 py-4 text-right">
-                                    <button 
+                                    <button
                                       onClick={() => setSideTab('exams')}
                                       className="inline-flex items-center gap-1 text-xs font-bold text-[#0EA5E9] hover:underline"
                                     >

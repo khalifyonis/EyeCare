@@ -59,8 +59,12 @@ export const listBillings = async (req, res, next) => {
                 status: { not: 'PAID' },
                 dueDate: { lt: new Date() }
             };
+        } else if (status === 'OUTSTANDING') {
+            statusFilterObj = {
+                status: { in: ['UNPAID', 'PARTIAL', 'PARTIALLY_PAID'] },
+            };
         } else if (status !== 'all') {
-            statusFilterObj = { status };
+            statusFilterObj = { status: status === 'PARTIAL' ? 'PARTIALLY_PAID' : status };
         }
 
         const whereClause = {

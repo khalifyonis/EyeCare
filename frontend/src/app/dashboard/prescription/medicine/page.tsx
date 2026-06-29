@@ -4,7 +4,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import api from '@/lib/axios';
 import { toast } from 'sonner';
 
@@ -160,6 +160,7 @@ function parseDurationDays(durationText: string): number | null {
 
 export default function MedicinePrescriptionsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [rows, setRows] = useState<MedicinePrescription[]>([]);
   const [items, setItems] = useState<PharmacyItem[]>([]);
@@ -171,23 +172,33 @@ export default function MedicinePrescriptionsPage() {
   const [dateTo, setDateTo] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [dispenseFilter, setDispenseFilter] = useState<'all' | 'PENDING' | 'DISPENSED'>('all');
+  const [viewAll, setViewAll] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
 
-  const fetchRows = useCallback(async (searchTerm = '', dateTerm = '') => {
+  useEffect(() => {
+    const view = searchParams.get('view');
+    const status = (searchParams.get('status') || '').toUpperCase();
+    if (view === 'all') setViewAll(true);
+    if (status === 'PENDING' || status === 'DISPENSED') setDispenseFilter(status);
+  }, [searchParams]);
+
+  const fetchRows = useCallback(async () => {
     setLoading(true);
     try {
       const params: Record<string, string> = {};
-      if (searchTerm.trim()) params.search = searchTerm.trim();
+      if (search.trim()) params.search = search.trim();
       if (dateFrom) params.from = dateFrom;
       if (dateTo) params.to = dateTo;
-      if (!dateFrom && !dateTo) {
+      if (!viewAll && !dateFrom && !dateTo) {
         const d = new Date();
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
         const day = String(d.getDate()).padStart(2, '0');
         params.date = `${year}-${month}-${day}`;
       }
+      if (dispenseFilter !== 'all') params.status = dispenseFilter;
       const res = await api.get('/prescription-items', { params });
       setRows(Array.isArray(res.data) ? (res.data as MedicinePrescription[]) : []);
     } catch {
@@ -196,7 +207,7 @@ export default function MedicinePrescriptionsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [search, dateFrom, dateTo, viewAll, dispenseFilter]);
 
   const fetchItems = useCallback(async () => {
     try {
@@ -217,10 +228,10 @@ export default function MedicinePrescriptionsPage() {
 
   useEffect(() => {
     const t = setTimeout(() => {
-      void fetchRows(search, '');
+      void fetchRows();
     }, 250);
     return () => clearTimeout(t);
-  }, [search, dateFrom, dateTo, fetchRows]);
+  }, [fetchRows]);
 
   useEffect(() => {
     void fetchItems();
@@ -231,11 +242,11 @@ export default function MedicinePrescriptionsPage() {
     try {
       await api.delete(`/prescription-items/${id}`);
       toast.success('Medicine prescription deleted');
-      await fetchRows(search);
+      await fetchRows();
     } catch {
       toast.error('Failed to delete medicine prescription');
     }
-  }, [fetchRows, search]);
+  }, [fetchRows]);
   
   const handleDispenseClick = useCallback((presc: any) => {
     router.push(`/dashboard/billing/new?serviceType=PHARMACY&prescriptionId=${presc.row.id}`);
@@ -301,7 +312,7 @@ export default function MedicinePrescriptionsPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, dateFrom, dateTo, typeFilter, statusFilter, pageSize]);
+  }, [search, dateFrom, dateTo, typeFilter, statusFilter, dispenseFilter, pageSize]);
 
   const pagedRows = useMemo(() => {
     const start = (page - 1) * pageSize;
@@ -449,6 +460,17 @@ export default function MedicinePrescriptionsPage() {
               {medicineTypes.map((type) => (
                 <SelectItem key={type} value={type}>{type}</SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={dispenseFilter} onValueChange={(v) => setDispenseFilter(v as 'all' | 'PENDING' | 'DISPENSED')}>
+            <SelectTrigger className="h-10 w-full sm:w-[160px] border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+              <SelectValue placeholder="All dispense" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All dispense</SelectItem>
+              <SelectItem value="PENDING">Pending</SelectItem>
+              <SelectItem value="DISPENSED">Dispensed</SelectItem>
             </SelectContent>
           </Select>
 

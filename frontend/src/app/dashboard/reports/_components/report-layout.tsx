@@ -3,11 +3,11 @@ import { useRouter, usePathname } from 'next/navigation';
 import { PageBreadcrumb } from '@/components/dashboard/page-breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
-  FileDown, 
-  Loader2, 
-  Printer, 
-  FileSpreadsheet, 
+import {
+  FileDown,
+  Loader2,
+  Printer,
+  FileSpreadsheet,
   Package,
   DollarSign,
   TrendingUp,
@@ -18,8 +18,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { readStoredUser, resolveRoleName } from '@/lib/auth';
-import { hasPermission } from '@/lib/permissions';
+import { usePermission } from '@/contexts/permission-context';
 
 interface ReportLayoutProps {
   title: string;
@@ -58,7 +57,7 @@ export default function ReportLayout({
   onRefresh,
   exportPdf,
   exportCsv,
-  print,
+  print: _print,
   exportingPdf,
   hasData,
   children
@@ -66,12 +65,11 @@ export default function ReportLayout({
   const router = useRouter();
   const pathname = usePathname();
 
-  const user = useMemo(() => readStoredUser(), []);
-  const role = useMemo(() => resolveRoleName(user), [user]);
+  const { can } = usePermission();
 
   const filteredTabs = useMemo(() => {
-    return TABS.filter(tab => hasPermission(tab.module, 'canRead'));
-  }, []);
+    return TABS.filter(tab => can(tab.module, 'canRead'));
+  }, [can]);
 
   const getSelectedRangeValue = () => {
     const todayStr = new Date().toISOString().slice(0, 10);
@@ -119,8 +117,60 @@ export default function ReportLayout({
     }
   }, [from, to, onRefresh]);
 
+  const handlePrintReport = () => {
+    const root = document.querySelector('[data-report-layout]');
+    const hidden: { el: HTMLElement; display: string }[] = [];
+
+    const hideEl = (el: HTMLElement) => {
+      if (hidden.some((h) => h.el === el)) return;
+      hidden.push({ el, display: el.style.display });
+      el.style.setProperty('display', 'none', 'important');
+    };
+
+    document.body.setAttribute('data-printing-report', 'true');
+
+    if (root) {
+      root.querySelectorAll('.report-no-print, .report-kpis, .report-charts, .report-tools').forEach((node) => {
+        hideEl(node as HTMLElement);
+      });
+
+      root.querySelectorAll('.grid').forEach((grid) => {
+        const el = grid as HTMLElement;
+        if (
+          el.querySelector('.bg-gradient-to-br') ||
+          el.querySelector('.recharts-responsive-container') ||
+          el.classList.contains('report-kpis') ||
+          el.classList.contains('report-charts')
+        ) {
+          hideEl(el);
+        }
+      });
+
+      root.querySelectorAll('.rounded-2xl, .rounded-xl').forEach((card) => {
+        const el = card as HTMLElement;
+        if (el.querySelector('.recharts-responsive-container') && !el.closest('.report-print-area')) {
+          hideEl(el);
+        }
+      });
+    }
+
+    const restore = () => {
+      hidden.forEach(({ el, display }) => {
+        if (display) el.style.display = display;
+        else el.style.removeProperty('display');
+      });
+      document.body.removeAttribute('data-printing-report');
+      window.removeEventListener('afterprint', restore);
+    };
+
+    window.addEventListener('afterprint', restore);
+    setTimeout(restore, 3000);
+
+    window.print();
+  };
+
   return (
-    <div className="w-full flex flex-col p-4 sm:p-5 md:p-6 lg:p-8 space-y-5 animate-in fade-in duration-300">
+    <div data-report-layout className="w-full flex flex-col p-4 sm:p-5 md:p-6 lg:p-8 space-y-5 animate-in fade-in duration-300">
 
       {/* Print-only Header */}
       <div className="print-header" style={{ display: 'none' }}>
@@ -135,7 +185,7 @@ export default function ReportLayout({
           </div>
         </div>
       </div>
-      
+
       {/* Breadcrumbs and Title */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-4 border-b border-slate-200 dark:border-slate-800/80 print-hide">
         <div>
@@ -258,7 +308,7 @@ export default function ReportLayout({
             variant="outline"
             size="sm"
             className="h-8 sm:h-9 rounded-lg text-[11px] sm:text-xs font-semibold border-slate-200 dark:border-slate-700 transition-all active:scale-95"
-            onClick={print}
+            onClick={handlePrintReport}
             disabled={!hasData}
           >
             <Printer className="w-3.5 h-3.5 mr-1.5" />

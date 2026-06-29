@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import api from '@/lib/axios';
 import { useSocket } from '@/contexts/socket-context';
 import { Button } from '@/components/ui/button';
@@ -91,6 +92,7 @@ function getLocalDateValue(): string {
 }
 
 export default function BillingPage() {
+    const searchParams = useSearchParams();
     const [role, setRole] = useState('');
     const [rows, setRows] = useState<BillingRow[]>([]);
     const [stats, setStats] = useState<BillingStats>({
@@ -104,6 +106,7 @@ export default function BillingPage() {
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [dateFilter, setDateFilter] = useState('');
+    const [viewAll, setViewAll] = useState(false);
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
@@ -113,6 +116,15 @@ export default function BillingPage() {
     useEffect(() => {
         setRole(resolveRoleName(readStoredUser()));
     }, []);
+
+    useEffect(() => {
+        const view = searchParams.get('view');
+        const status = (searchParams.get('status') || '').toUpperCase();
+        if (view === 'all') setViewAll(true);
+        if (status === 'UNPAID' || status === 'PARTIAL' || status === 'PAID' || status === 'OUTSTANDING') {
+            setStatusFilter(status === 'PARTIAL' ? 'PARTIAL' : status);
+        }
+    }, [searchParams]);
 
     const canManage = useMemo(
         () => ['ADMIN', 'SUPERADMIN', 'RECEPTIONIST'].includes(role),
@@ -137,8 +149,7 @@ export default function BillingPage() {
                 if (status !== 'all') params.set('status', status);
                 if (date) {
                     params.set('date', date);
-                } else if (!searchTerm) {
-                    // Today-first rule
+                } else if (!viewAll && !searchTerm) {
                     params.set('date', getLocalDateValue());
                 }
                 params.set('page', String(pageNum));
@@ -160,7 +171,7 @@ export default function BillingPage() {
                 setLoading(false);
             }
         },
-        [pageSize]
+        [pageSize, viewAll]
     );
 
     useEffect(() => {
@@ -248,6 +259,7 @@ export default function BillingPage() {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All Status</SelectItem>
+                            <SelectItem value="OUTSTANDING">Outstanding</SelectItem>
                             <SelectItem value="UNPAID">Unpaid</SelectItem>
                             <SelectItem value="PARTIAL">Partially Paid</SelectItem>
                             <SelectItem value="PAID">Paid</SelectItem>

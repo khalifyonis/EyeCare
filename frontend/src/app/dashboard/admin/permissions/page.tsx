@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import api from '@/lib/axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,10 +8,29 @@ import { Textarea } from '@/components/ui/textarea';
 import { PageBreadcrumb } from '@/components/dashboard/page-breadcrumb';
 import {
     ShieldCheck, Save, RefreshCw, Stethoscope, UserCog,
-    Pill, Glasses, Users, Trash2, Plus, Loader2, Lock, HelpCircle
+    Pill, Glasses, Users, Trash2, Plus, Loader2, Lock, HelpCircle,
+    ArrowLeft, CheckSquare, Square, MoreHorizontal, Eye, Edit2, ShieldAlert,
+    Check, X, ChevronRight, Search
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 
+/* ── Types ── */
 interface CustomRole {
     id: string;
     name: string;
@@ -29,85 +48,107 @@ interface ModulePermission {
 }
 
 type GroupedPermissions = Record<string, ModulePermission[]>;
+type ViewMode = 'list' | 'edit';
 
+/* ── Constants ── */
 const ROLE_STATIC_ASSETS: Record<string, { title: string; color: string; icon: any }> = {
     SUPERADMIN: {
         title: 'Super Admin',
-        color: 'from-rose-500 to-red-600 shadow-rose-500/20',
+        color: 'from-rose-500 to-red-600',
         icon: ShieldCheck,
     },
     ADMIN: {
         title: 'Administrator',
-        color: 'from-[#0ea5e9] to-blue-600 shadow-blue-500/20',
+        color: 'from-blue-500 to-indigo-600',
         icon: UserCog,
     },
     DOCTOR: {
-        title: 'Ophthalmologist / Doctor',
-        color: 'from-emerald-500 to-teal-600 shadow-emerald-500/20',
+        title: 'Doctor',
+        color: 'from-emerald-500 to-teal-600',
         icon: Stethoscope,
     },
     RECEPTIONIST: {
         title: 'Receptionist',
-        color: 'from-amber-500 to-orange-600 shadow-amber-500/20',
+        color: 'from-amber-500 to-orange-600',
         icon: Users,
     },
     PHARMACIST: {
         title: 'Pharmacist',
-        color: 'from-pink-500 to-purple-600 shadow-pink-500/20',
+        color: 'from-pink-500 to-purple-600',
         icon: Pill,
     },
     OPTICIAN: {
         title: 'Optician',
-        color: 'from-cyan-500 to-teal-600 shadow-cyan-500/20',
+        color: 'from-cyan-500 to-blue-500',
         icon: Glasses,
     },
 };
 
 const MODULE_LABELS: Record<string, { title: string; desc: string; group: string }> = {
-    patients: { title: 'Patients', desc: 'Patient profiles, registrations, and medical history', group: 'CLINICAL' },
-    appointments: { title: 'Appointments', desc: 'Scheduling calendar, check-ins, and arrival tracking', group: 'CLINICAL' },
-    preliminary_exams: { title: 'Preliminary Examinations', desc: 'Stage 1 eye exams: visual acuity, IOP, and refraction', group: 'CLINICAL' },
-    clinical_exams: { title: 'Clinical Examinations', desc: 'Stage 2 exams: anterior segment, fundus, diagnosis', group: 'CLINICAL' },
-    surgery: { title: 'Eye Surgery', desc: 'Surgical bookings, operating rooms, and surgeon allocations', group: 'CLINICAL' },
-    medicine_prescriptions: { title: 'Medicine Prescriptions', desc: 'Pharmaceutical prescriptions, dosages, and dispensing', group: 'CLINICAL' },
-    optical_prescriptions: { title: 'Optical Prescriptions', desc: 'Optical frame/lens prescriptions and lens specs', group: 'CLINICAL' },
-    pharmacy: { title: 'Pharmacy Inventory', desc: 'Medicines catalog, batch stock tracking, and OTC sales', group: 'INVENTORY' },
-    optical: { title: 'Optical Shop', desc: 'Frames catalog, lens counts, order tracking, and restocking', group: 'INVENTORY' },
-    billing: { title: 'Billing & Invoices', desc: 'Service invoices, payments, payment methods, and receipts', group: 'FINANCE' },
-    reports_financial: { title: 'Financial Reports', desc: 'Revenue analytics, income by service, payment stats', group: 'REPORTS' },
-    reports_clinical: { title: 'Clinical Reports', desc: 'Doctor performance, exam outcomes, and clinical analytics', group: 'REPORTS' },
-    reports_appointments: { title: 'Appointment Reports', desc: 'Booking counts, cancellation logs, and arrival stats', group: 'REPORTS' },
-    reports_patients: { title: 'Patient Reports', desc: 'New registrations, demographics, and patient analytics', group: 'REPORTS' },
-    reports_inventory: { title: 'Inventory Reports', desc: 'Stock levels, reorder alerts, and expiry tracking', group: 'REPORTS' },
-    reports_operational: { title: 'Operational Reports', desc: 'Branch reports, staff logs, and operational metrics', group: 'REPORTS' },
-    users: { title: 'Staff & Users', desc: 'Staff logins, role assignments, and multi-branch allocation', group: 'ADMINISTRATION' },
-    logs: { title: 'Logs & Compliance', desc: 'Activity logs, audit trail, change history, and compliance', group: 'ADMINISTRATION' },
-    branches: { title: 'Branches & Settings', desc: 'Clinic details, phone lines, active/inactive status', group: 'ADMINISTRATION' },
+    patients: { title: 'Patients', desc: 'Patient profiles and medical history', group: 'CLINICAL' },
+    appointments: { title: 'Appointments', desc: 'Scheduling and check-ins', group: 'CLINICAL' },
+    preliminary_exams: { title: 'Preliminary Exams', desc: 'Stage 1: Refraction & VA', group: 'CLINICAL' },
+    clinical_exams: { title: 'Clinical Exams', desc: 'Stage 2: Fundus & Diagnosis', group: 'CLINICAL' },
+    surgery: { title: 'Eye Surgery', desc: 'Surgical bookings and records', group: 'CLINICAL' },
+    medicine_prescriptions: { title: 'Medicine Prescriptions', desc: 'Drug orders and dosages', group: 'CLINICAL' },
+    optical_prescriptions: { title: 'Optical Prescriptions', desc: 'Glasses and lens specs', group: 'CLINICAL' },
+    pharmacy: { title: 'Pharmacy', desc: 'Inventory and OTC sales', group: 'INVENTORY' },
+    optical: { title: 'Optical Shop', desc: 'Frames and order tracking', group: 'INVENTORY' },
+    billing: { title: 'Billing', desc: 'Invoices and payments', group: 'FINANCE' },
+    reports_financial: { title: 'Financial Reports', desc: 'Revenue and income analytics', group: 'REPORTS' },
+    reports_clinical: { title: 'Clinical Reports', desc: 'Exam outcomes and performance', group: 'REPORTS' },
+    reports_appointments: { title: 'Appointment Reports', desc: 'Booking and arrival stats', group: 'REPORTS' },
+    reports_patients: { title: 'Patient Reports', desc: 'Demographics and growth', group: 'REPORTS' },
+    reports_inventory: { title: 'Inventory Reports', desc: 'Stock and expiry tracking', group: 'REPORTS' },
+    reports_operational: { title: 'Operational Reports', desc: 'Branch and staff metrics', group: 'REPORTS' },
+    users: { title: 'Staff', desc: 'User accounts and roles', group: 'ADMINISTRATION' },
+    logs: { title: 'Logs', desc: 'Audit trails and history', group: 'ADMINISTRATION' },
+    branches: { title: 'Branches', desc: 'Clinic settings and locations', group: 'ADMINISTRATION' },
 };
 
-const MODULE_GROUPS: Record<string, { label: string; color: string }> = {
-    CLINICAL: { label: 'Clinical Operations', color: 'from-emerald-500/10 to-teal-500/10 border-emerald-200 dark:border-emerald-900/30' },
-    INVENTORY: { label: 'Inventory Management', color: 'from-sky-500/10 to-blue-500/10 border-sky-200 dark:border-sky-900/30' },
-    FINANCE: { label: 'Finance & Billing', color: 'from-amber-500/10 to-orange-500/10 border-amber-200 dark:border-amber-900/30' },
-    REPORTS: { label: 'Reports & Analytics', color: 'from-violet-500/10 to-purple-500/10 border-violet-200 dark:border-violet-900/30' },
-    ADMINISTRATION: { label: 'Administration', color: 'from-rose-500/10 to-red-500/10 border-rose-200 dark:border-rose-900/30' },
+const MODULE_GROUPS: Record<string, { label: string; icon: any }> = {
+    CLINICAL: { label: 'Clinical Operations', icon: Stethoscope },
+    INVENTORY: { label: 'Inventory', icon: Pill },
+    FINANCE: { label: 'Finance', icon: ShieldCheck },
+    REPORTS: { label: 'Reports', icon: Eye },
+    ADMINISTRATION: { label: 'Administration', icon: UserCog },
 };
 
+/* ── UI Components ── */
+const Panel = ({ children, className }: { children: React.ReactNode; className?: string }) => (
+    <div className={cn("bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl", className)}>
+        {children}
+    </div>
+);
+
+const Badge = ({ children, className, variant = 'default' }: { children: React.ReactNode; className?: string; variant?: 'default' | 'outline' }) => (
+    <span className={cn(
+        "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider",
+        variant === 'default' ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" : "border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400",
+        className
+    )}>
+        {children}
+    </span>
+);
+
+/* ── Main Page ── */
 export default function PermissionsPage() {
     const [roles, setRoles] = useState<CustomRole[]>([]);
     const [permissions, setPermissions] = useState<GroupedPermissions>({});
     const [selectedRole, setSelectedRole] = useState<string>('ADMIN');
+    const [viewMode, setViewMode] = useState<ViewMode>('list');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [deleting, setDeleting] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
-    // Modal / Creation State
+    // Modal State
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [newRoleName, setNewRoleName] = useState('');
     const [newRoleDesc, setNewRoleDesc] = useState('');
     const [creatingRole, setCreatingRole] = useState(false);
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
         try {
             const [rolesRes, permsRes] = await Promise.all([
@@ -116,45 +157,61 @@ export default function PermissionsPage() {
             ]);
             setRoles(rolesRes.data);
             setPermissions(permsRes.data);
-            
-            // Check if selectedRole still exists, otherwise default to first available
+
             const exists = rolesRes.data.some((r: any) => r.name === selectedRole);
             if (!exists && rolesRes.data.length > 0) {
                 setSelectedRole(rolesRes.data[0].name);
             }
-        } catch (error) {
-            toast.error('Failed to load roles and permissions matrix');
+        } catch {
+            toast.error('Failed to load permissions');
         } finally {
             setLoading(false);
         }
-    };
+    }, [selectedRole]);
 
     useEffect(() => {
         fetchData();
     }, []);
 
-    const handleToggle = (module: string, action: 'canRead' | 'canCreate' | 'canUpdate' | 'canDelete') => {
+    const handleCheckToggle = (module: string, action: 'canRead' | 'canCreate' | 'canUpdate' | 'canDelete') => {
         if (selectedRole === 'SUPERADMIN') return;
+        setPermissions(prev => {
+            const rolePerms = [...(prev[selectedRole] || [])];
+            const idx = rolePerms.findIndex(p => p.module === module);
+            if (idx > -1) {
+                rolePerms[idx] = { ...rolePerms[idx], [action]: !rolePerms[idx][action] };
+            }
+            return { ...prev, [selectedRole]: rolePerms };
+        });
+    };
 
+    const handleGrantAllForModule = (module: string, grant: boolean = true) => {
+        if (selectedRole === 'SUPERADMIN') return;
         setPermissions(prev => {
             const rolePerms = [...(prev[selectedRole] || [])];
             const idx = rolePerms.findIndex(p => p.module === module);
             if (idx > -1) {
                 rolePerms[idx] = {
                     ...rolePerms[idx],
-                    [action]: !rolePerms[idx][action],
+                    canRead: grant, canCreate: grant, canUpdate: grant, canDelete: grant
                 };
             }
-            return {
-                ...prev,
-                [selectedRole]: rolePerms,
-            };
+            return { ...prev, [selectedRole]: rolePerms };
+        });
+    };
+
+    const handleGrantAllForRole = (grant: boolean) => {
+        setPermissions(prev => {
+            const rolePerms = (prev[selectedRole] || []).map(p => ({
+                ...p,
+                canRead: grant, canCreate: grant, canUpdate: grant, canDelete: grant
+            }));
+            return { ...prev, [selectedRole]: rolePerms };
         });
     };
 
     const handleSave = async () => {
         if (selectedRole === 'SUPERADMIN') return;
-
         setSaving(true);
         try {
             const rolePerms = permissions[selectedRole] || [];
@@ -162,24 +219,18 @@ export default function PermissionsPage() {
                 role: selectedRole,
                 permissions: rolePerms,
             });
-            toast.success(`Permissions for ${ROLE_STATIC_ASSETS[selectedRole]?.title || selectedRole} saved successfully!`);
+            toast.success(`Updated ${selectedRole} permissions`);
 
-            // If editing own role, refresh stored session permissions
+            // Sync own session
             const rawUser = localStorage.getItem('user');
-            if (rawUser) {
-                try {
-                    const user = JSON.parse(rawUser);
-                    if (user.role === selectedRole) {
-                        const refreshRes = await api.get('/permissions/mine');
-                        localStorage.setItem('permissions', JSON.stringify(refreshRes.data));
-                        window.dispatchEvent(new Event('storage'));
-                    }
-                } catch (e) {
-                    console.error('Failed to sync permissions:', e);
-                }
+            if (rawUser && JSON.parse(rawUser).role === selectedRole) {
+                const perms = await api.get('/permissions/mine');
+                localStorage.setItem('permissions', JSON.stringify(perms.data));
+                window.dispatchEvent(new Event('storage'));
             }
-        } catch (error) {
-            toast.error('Failed to save permissions');
+            setViewMode('list');
+        } catch {
+            toast.error('Failed to save changes');
         } finally {
             setSaving(false);
         }
@@ -187,450 +238,277 @@ export default function PermissionsPage() {
 
     const handleCreateRole = async (e: React.FormEvent) => {
         e.preventDefault();
-        const formattedName = newRoleName.trim().toUpperCase().replace(/\s+/g, '_');
-
-        if (!formattedName) {
-            toast.error('Role name is required');
-            return;
-        }
-
-        if (!/^[A-Z0-9_]+$/.test(formattedName)) {
-            toast.error('Role name can only contain letters, numbers, and underscores');
-            return;
-        }
+        const name = newRoleName.trim().toUpperCase().replace(/\s+/g, '_');
+        if (!name) return toast.error('Name required');
 
         setCreatingRole(true);
         try {
-            const res = await api.post('/roles', {
-                name: formattedName,
-                description: newRoleDesc.trim(),
-            });
-
-            toast.success('Custom role created successfully!');
+            await api.post('/roles', { name, description: newRoleDesc.trim() });
+            toast.success('Role created');
             setShowCreateModal(false);
             setNewRoleName('');
             setNewRoleDesc('');
-            
-            // Reload roles and permissions
             await fetchData();
-            setSelectedRole(formattedName);
+            setSelectedRole(name);
+            setViewMode('edit');
         } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Failed to create role');
+            toast.error(error.response?.data?.message || 'Error');
         } finally {
             setCreatingRole(false);
         }
     };
 
-    const handleDeleteRole = async () => {
-        const activeRoleObj = roles.find(r => r.name === selectedRole);
-        if (!activeRoleObj || selectedRole === 'SUPERADMIN') return;
-
-        if (!confirm(`Are you sure you want to delete the custom role "${selectedRole}"? This action cannot be undone.`)) {
-            return;
-        }
+    const handleDeleteRole = async (roleName: string) => {
+        const role = roles.find(r => r.name === roleName);
+        if (!role || role.isSystem) return;
+        if (!confirm(`Delete ${roleName}?`)) return;
 
         setDeleting(true);
         try {
-            await api.delete(`/roles/${activeRoleObj.id}`);
-            toast.success(`Role "${selectedRole}" has been deleted.`);
-            
-            // Fallback selection to ADMIN
+            await api.delete(`/roles/${role.id}`);
+            toast.success('Role deleted');
             setSelectedRole('ADMIN');
             await fetchData();
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Failed to delete role');
+        } catch {
+            toast.error('Failed to delete');
         } finally {
             setDeleting(false);
         }
     };
 
-    const currentRolePerms = permissions[selectedRole] || [];
-    const activeRoleObj = roles.find(r => r.name === selectedRole);
-    const isSuperadminSelected = selectedRole === 'SUPERADMIN';
-    const isSystemRole = activeRoleObj?.isSystem ?? true;
-    
-    // Icon and styles configuration
-    const roleAssets = ROLE_STATIC_ASSETS[selectedRole] || {
-        title: selectedRole.replace(/_/g, ' '),
-        color: 'from-blue-500 to-indigo-600 shadow-indigo-500/20',
-        icon: ShieldCheck,
-    };
-    const RoleIcon = roleAssets.icon;
+    const filteredRoles = useMemo(() =>
+        roles.filter(r =>
+            r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (r.description || '').toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        , [roles, searchQuery]);
 
+    const activeRole = roles.find(r => r.name === selectedRole);
+
+    /* ── Main Render ── */
     return (
-        <div className="w-full min-w-0 p-4 sm:p-5 md:p-6 lg:p-8 space-y-6 animate-in fade-in duration-300">
-            
-            {/* Page Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Roles & Permissions</h1>
-                    <PageBreadcrumb current="Permissions" />
-                </div>
-                <div className="flex gap-2">
-                    <Button
-                        onClick={() => setShowCreateModal(true)}
-                        className="bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 font-bold px-4 rounded-xl shadow-sm transition-all"
-                    >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Create Role
-                    </Button>
-                    {!isSuperadminSelected && (
-                        <Button
-                            onClick={handleSave}
-                            disabled={saving || loading}
-                            className="bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold shadow-lg shadow-blue-500/20 px-6 rounded-xl transition-all active:scale-[0.98]"
-                        >
-                            {saving ? (
-                                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                            ) : (
-                                <Save className="w-4 h-4 mr-2" />
-                            )}
-                            Save Changes
+        <div className="w-full min-w-0 animate-in fade-in duration-300">
+            {viewMode === 'list' ? (
+                <div className="p-4 sm:p-5 md:p-6 lg:p-8 space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Roles Management</h1>
+                            <PageBreadcrumb current="Permissions" />
+                        </div>
+                        <Button onClick={() => setShowCreateModal(true)} className="bg-[#0EA5E9] hover:bg-[#0c96d4] text-white rounded-xl shadow-lg shadow-blue-500/20 px-6 font-bold">
+                            <Plus className="size-4 mr-2" /> Create Role
                         </Button>
-                    )}
+                    </div>
+
+                    <div className="relative max-w-sm">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                        <Input
+                            placeholder="Search roles..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pl-9 rounded-xl border-slate-200 dark:border-slate-800"
+                        />
+                    </div>
+
+                    <Panel className="overflow-hidden shadow-sm">
+                        {loading ? (
+                            <div className="p-20 flex flex-col items-center gap-3">
+                                <Loader2 className="size-8 animate-spin text-[#0EA5E9]" />
+                                <p className="text-sm font-medium text-slate-400">Loading roles...</p>
+                            </div>
+                        ) : (
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-50/50">
+                                        <TableHead className="w-[200px] font-bold text-[11px] uppercase tracking-wider">Role</TableHead>
+                                        <TableHead className="font-bold text-[11px] uppercase tracking-wider">Description</TableHead>
+                                        <TableHead className="font-bold text-[11px] uppercase tracking-wider">Type</TableHead>
+                                        <TableHead className="text-right font-bold text-[11px] uppercase tracking-wider">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {filteredRoles.map(r => (
+                                        <TableRow key={r.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
+                                            <TableCell className="font-bold text-sm">
+                                                <div className="flex items-center gap-3">
+                                                    <div className={cn(
+                                                        "size-8 rounded-lg flex items-center justify-center text-white bg-gradient-to-br",
+                                                        ROLE_STATIC_ASSETS[r.name]?.color || "from-slate-500 to-slate-700"
+                                                    )}>
+                                                        {React.createElement(ROLE_STATIC_ASSETS[r.name]?.icon || ShieldCheck, { className: "size-4" })}
+                                                    </div>
+                                                    {ROLE_STATIC_ASSETS[r.name]?.title || r.name}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-xs text-slate-500 italic max-w-md truncate">
+                                                {r.description || 'Custom configured staff role.'}
+                                            </TableCell>
+                                            <TableCell>
+                                                {r.isSystem ? <Badge variant="outline">System</Badge> : <Badge>Custom</Badge>}
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex justify-end gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-8 rounded-lg text-[#0EA5E9] hover:text-[#0EA5E9] hover:bg-[#0EA5E9]/10 font-bold"
+                                                        onClick={() => { setSelectedRole(r.name); setViewMode('edit'); }}
+                                                    >
+                                                        <Edit2 className="size-3.5 mr-2" /> Edit Permissions
+                                                    </Button>
+                                                    {!r.isSystem && (
+                                                        <Button variant="ghost" size="sm" className="h-8 w-8 text-rose-500 hover:bg-rose-50" onClick={() => handleDeleteRole(r.name)}>
+                                                            <Trash2 className="size-4" />
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        )}
+                    </Panel>
                 </div>
-            </div>
-
-            {/* Layout: Sidebar Roles | Permissions Table */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                
-                {/* Roles Selector Sidebar */}
-                <div className="lg:col-span-4 space-y-3">
-                    <h2 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest px-1">Clinic User Roles</h2>
-                    <div className="space-y-2.5">
-                        {roles.map((roleObj) => {
-                            const isSelected = selectedRole === roleObj.name;
-                            const staticAsset = ROLE_STATIC_ASSETS[roleObj.name] || {
-                                title: roleObj.name.replace(/_/g, ' '),
-                                color: 'from-blue-500 to-indigo-600 shadow-indigo-500/20',
-                                icon: ShieldCheck,
-                            };
-                            const IconComponent = staticAsset.icon;
-                            return (
-                                <div
-                                    key={roleObj.id}
-                                    onClick={() => setSelectedRole(roleObj.name)}
-                                    className={`group cursor-pointer rounded-2xl border p-4 transition-all duration-300 relative overflow-hidden ${
-                                        isSelected
-                                            ? 'bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-900/40 border-slate-200 dark:border-slate-800 shadow-md ring-1 ring-slate-100 dark:ring-slate-950'
-                                            : 'bg-white/40 dark:bg-slate-900/10 border-slate-150 dark:border-slate-800/60 hover:bg-white dark:hover:bg-slate-900/30 hover:border-slate-300 dark:hover:border-slate-700'
-                                    }`}
-                                >
-                                    {/* Left Accent Bar */}
-                                    <div className={`absolute left-0 top-0 bottom-0 w-[4px] transition-all duration-300 ${
-                                        isSelected ? 'bg-[#0EA5E9]' : 'bg-transparent group-hover:bg-slate-300 dark:group-hover:bg-slate-700'
-                                    }`} />
-
-                                    <div className="flex gap-3.5 items-start">
-                                        <div className={`rounded-xl p-2.5 bg-gradient-to-br text-white shadow-md ${staticAsset.color} shrink-0`}>
-                                            <IconComponent className="w-5 h-5" />
-                                        </div>
-                                        <div className="space-y-0.5 min-w-0 flex-1">
-                                            <div className="flex justify-between items-center">
-                                                <h3 className="font-bold text-slate-800 dark:text-slate-100 text-[15px] truncate mr-2">{staticAsset.title}</h3>
-                                                {roleObj.isSystem ? (
-                                                    <span className="text-[9px] uppercase tracking-wider font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 dark:text-slate-500 px-1.5 py-0.5 rounded shrink-0">System</span>
-                                                ) : (
-                                                    <span className="text-[9px] uppercase tracking-wider font-bold text-[#0EA5E9] bg-sky-50 dark:bg-sky-950/40 px-1.5 py-0.5 rounded shrink-0">Custom</span>
-                                                )}
-                                            </div>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-normal line-clamp-2 mt-0.5">{roleObj.description || 'Custom configured staff role.'}</p>
-                                        </div>
-                                    </div>
+            ) : (
+                <div className="p-4 sm:p-5 md:p-6 lg:p-8 space-y-6 animate-in slide-in-from-right-4 duration-500">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                            <Button variant="ghost" size="icon" onClick={() => setViewMode('list')} className="rounded-full hover:bg-slate-100">
+                                <ArrowLeft className="size-5" />
+                            </Button>
+                            <div>
+                                <div className="flex items-center gap-3">
+                                    <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Edit Permissions</h1>
+                                    <Badge className={cn("bg-gradient-to-r text-white border-none px-3", ROLE_STATIC_ASSETS[selectedRole]?.color)}>
+                                        {ROLE_STATIC_ASSETS[selectedRole]?.title || selectedRole}
+                                    </Badge>
                                 </div>
+                                <p className="text-sm text-slate-500">Configure access levels for each system module</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            {selectedRole !== 'SUPERADMIN' && (
+                                <>
+                                    <Button variant="outline" onClick={() => handleGrantAllForRole(false)} className="rounded-xl font-bold border-rose-200 text-rose-600 hover:bg-rose-50">Revoke All</Button>
+                                    <Button variant="outline" onClick={() => handleGrantAllForRole(true)} className="rounded-xl font-bold border-emerald-200 text-emerald-600 hover:bg-emerald-50">Grant All</Button>
+                                    <Button onClick={handleSave} disabled={saving} className="bg-[#0EA5E9] hover:bg-[#0c96d4] text-white rounded-xl font-bold px-6">
+                                        {saving ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Save className="size-4 mr-2" />} Save Changes
+                                    </Button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+                    {selectedRole === 'SUPERADMIN' && (
+                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3 text-amber-800">
+                            <ShieldAlert className="size-5 shrink-0" />
+                            <p className="text-sm font-medium">Super Admin permissions are hardcoded system-wide and cannot be modified.</p>
+                        </div>
+                    )}
+
+                    <div className="grid grid-cols-1 gap-6">
+                        {Object.entries(MODULE_GROUPS).map(([groupKey, group]) => {
+                            const groupModules = Object.entries(MODULE_LABELS).filter(([, m]) => m.group === groupKey);
+                            const currPerms = permissions[selectedRole] || [];
+                            return (
+                                <Panel key={groupKey} className="overflow-hidden">
+                                    <div className="bg-slate-50/80 dark:bg-slate-900/50 px-6 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                                        <div className="flex items-center gap-2.5">
+                                            {React.createElement(group.icon, { className: "size-4 text-slate-400" })}
+                                            <h3 className="text-xs font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">{group.label}</h3>
+                                        </div>
+                                        {selectedRole !== 'SUPERADMIN' && (
+                                            <div className="flex gap-3">
+                                                <button onClick={() => groupModules.forEach(([mk]) => handleGrantAllForModule(mk, true))} className="text-[10px] font-bold text-[#0EA5E9] hover:underline uppercase tracking-tighter">Grant Section</button>
+                                                <button onClick={() => groupModules.forEach(([mk]) => handleGrantAllForModule(mk, false))} className="text-[10px] font-bold text-slate-400 hover:underline uppercase tracking-tighter">Clear Section</button>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                                        <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 bg-white dark:bg-slate-900">
+                                            <div className="col-span-6">Module</div>
+                                            <div className="col-span-1 text-center">Read</div>
+                                            <div className="col-span-1 text-center">Create</div>
+                                            <div className="col-span-1 text-center">Update</div>
+                                            <div className="col-span-1 text-center">Delete</div>
+                                            <div className="col-span-2 text-center">Actions</div>
+                                        </div>
+                                        {groupModules.map(([mk, meta]) => {
+                                            const p = currPerms.find(x => x.module === mk) || { canRead: true, canCreate: true, canUpdate: true, canDelete: true };
+                                            const allChecked = p.canRead && p.canCreate && p.canUpdate && p.canDelete;
+                                            return (
+                                                <div key={mk} className="grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-slate-50/30 transition-colors">
+                                                    <div className="col-span-1 md:col-span-6 space-y-0.5">
+                                                        <h4 className="text-sm font-bold text-slate-900 dark:text-white">{meta.title}</h4>
+                                                        <p className="text-xs text-slate-500">{meta.desc}</p>
+                                                    </div>
+                                                    {(['canRead', 'canCreate', 'canUpdate', 'canDelete'] as const).map(action => (
+                                                        <div key={action} className="col-span-1 flex justify-center items-center">
+                                                            <Checkbox
+                                                                disabled={selectedRole === 'SUPERADMIN'}
+                                                                checked={selectedRole === 'SUPERADMIN' ? true : p[action]}
+                                                                onChange={() => handleCheckToggle(mk, action)}
+                                                                className="size-5 rounded-md"
+                                                            />
+                                                        </div>
+                                                    ))}
+                                                    <div className="col-span-2 flex justify-center">
+                                                        {selectedRole !== 'SUPERADMIN' && (
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() => handleGrantAllForModule(mk, !allChecked)}
+                                                                className={cn(
+                                                                    "h-7 text-[10px] font-bold uppercase rounded-lg px-2",
+                                                                    allChecked ? "text-slate-400" : "text-[#0EA5E9]"
+                                                                )}
+                                                            >
+                                                                {allChecked ? 'Clear' : 'Select All'}
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </Panel>
                             );
                         })}
                     </div>
                 </div>
+            )}
 
-                {/* Permissions Table Matrix */}
-                <div className="lg:col-span-8">
-                    {loading ? (
-                        <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 flex flex-col items-center justify-center gap-3">
-                            <RefreshCw className="w-8 h-8 text-[#0EA5E9] animate-spin" />
-                            <p className="text-slate-500 text-sm font-semibold">Loading permissions data...</p>
-                        </div>
-                    ) : (
-                        <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-sm overflow-hidden animate-in fade-in duration-500">
-                            
-                            {/* Role Banner */}
-                            <div className="bg-slate-50 dark:bg-slate-900/70 border-b border-slate-200 dark:border-slate-800 px-6 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                <div className="flex items-center gap-3">
-                                    <div className={`rounded-xl p-2 bg-gradient-to-br text-white shadow ${roleAssets.color}`}>
-                                        <RoleIcon className="w-4 h-4" />
-                                    </div>
-                                    <div>
-                                        <h2 className="font-bold text-slate-900 dark:text-slate-100 text-base">
-                                            {roleAssets.title} Permissions Matrix
-                                        </h2>
-                                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                                            {isSuperadminSelected ? 'All options locked to Read/Write' : 'Configure functional rights'}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    {isSuperadminSelected && (
-                                        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-900/20 rounded-full text-xs font-bold">
-                                            <Lock className="w-3.5 h-3.5" /> Read-Only System Matrix
-                                        </div>
-                                    )}
-                                    {!isSuperadminSelected && (
-                                        <Button
-                                            onClick={handleDeleteRole}
-                                            disabled={deleting}
-                                            variant="destructive"
-                                            className="h-8 px-3 rounded-lg text-xs font-bold bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/30 dark:hover:bg-rose-950/50 text-red-600 dark:text-red-400 border border-red-200/50 hover:border-red-300"
-                                        >
-                                            {deleting ? (
-                                                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                                            ) : (
-                                                <Trash2 className="w-3 h-3 mr-1" />
-                                            )}
-                                            Delete Role
-                                        </Button>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Permissions List — grouped by module category */}
-                            <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
-                                {/* Column headers */}
-                                <div className="hidden md:flex items-center justify-between px-5 py-3 bg-slate-50 dark:bg-slate-900/30">
-                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Module</span>
-                                    <div className="grid grid-cols-4 gap-8 pr-1">
-                                        {['Read', 'Create', 'Update', 'Delete'].map(h => (
-                                            <span key={h} className="text-[10px] font-bold text-slate-400 uppercase tracking-widest w-9 text-center">{h}</span>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {Object.entries(MODULE_GROUPS).map(([groupKey, groupMeta]) => {
-                                    const groupModules = Object.entries(MODULE_LABELS).filter(([, m]) => m.group === groupKey);
-                                    return (
-                                        <div key={groupKey}>
-                                            {/* Group Header */}
-                                            <div className={`px-5 py-2.5 bg-gradient-to-r ${groupMeta.color} border-b border-slate-100 dark:border-slate-800`}>
-                                                <span className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest">{groupMeta.label}</span>
-                                            </div>
-                                            {groupModules.map(([moduleKey, moduleData]) => {
-                                    const permRecord = currentRolePerms.find(p => p.module === moduleKey) || {
-                                        canRead: isSuperadminSelected,
-                                        canCreate: isSuperadminSelected,
-                                        canUpdate: isSuperadminSelected,
-                                        canDelete: isSuperadminSelected,
-                                    };
-                                    const enabledCount = [permRecord.canRead, permRecord.canCreate, permRecord.canUpdate, permRecord.canDelete].filter(Boolean).length;
-
-                                    return (
-                                        <div key={moduleKey} className="px-5 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50/60 dark:hover:bg-slate-900/10 transition-colors">
-                                            <div className="space-y-0.5 flex-1 min-w-0">
-                                                <div className="flex items-center gap-2">
-                                                    <h3 className="font-bold text-slate-800 dark:text-slate-200 text-sm">{moduleData.title}</h3>
-                                                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${enabledCount === 4 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : enabledCount === 0 ? 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'}`}>
-                                                        {enabledCount === 4 ? 'Full Access' : enabledCount === 0 ? 'No Access' : `${enabledCount}/4`}
-                                                    </span>
-                                                </div>
-                                                <p className="text-xs text-slate-400 dark:text-slate-500 leading-normal">{moduleData.desc}</p>
-                                            </div>
-
-                                            {/* Toggle Switches */}
-                                            <div className="grid grid-cols-4 gap-4 sm:gap-6 md:gap-8 justify-items-center bg-slate-50/50 dark:bg-slate-900/30 border border-slate-100 dark:border-slate-800 rounded-2xl p-3 md:bg-transparent md:border-none md:p-0">
-                                                {(['canRead', 'canCreate', 'canUpdate', 'canDelete'] as const).map((field, i) => {
-                                                    const labels = ['Read', 'Create', 'Update', 'Delete'];
-                                                    const colors = ['bg-sky-500', 'bg-emerald-500', 'bg-amber-500', 'bg-red-500'];
-                                                    const isOn = permRecord[field];
-                                                    return (
-                                                        <div key={field} className="flex flex-col items-center gap-1">
-                                                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest md:hidden">{labels[i]}</span>
-                                                            <button
-                                                                type="button"
-                                                                disabled={isSuperadminSelected}
-                                                                onClick={() => handleToggle(moduleKey, field)}
-                                                                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#0EA5E9] disabled:opacity-50 disabled:cursor-default ${isOn ? colors[i] : 'bg-slate-200 dark:bg-slate-700'}`}
-                                                            >
-                                                                <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isOn ? 'translate-x-4' : 'translate-x-0'}`} />
-                                                            </button>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                                        </div>
-                                    );
-                                })}
-
-                                {/* Legacy: any modules not in groups */}
-                                {Object.entries(MODULE_LABELS).filter(([, m]) => !MODULE_GROUPS[m.group]).map(([moduleKey, moduleData]) => {
-                                    const permRecord = currentRolePerms.find(p => p.module === moduleKey) || {
-                                        canRead: isSuperadminSelected,
-                                        canCreate: isSuperadminSelected,
-                                        canUpdate: isSuperadminSelected,
-                                        canDelete: isSuperadminSelected,
-                                    };
-
-                                    return (
-                                        <div key={moduleKey} className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50/40 dark:hover:bg-slate-900/10 transition-colors">
-                                            <div className="space-y-0.5 max-w-sm">
-                                                <h3 className="font-bold text-slate-800 dark:text-slate-200 text-sm tracking-tight">{moduleData.title}</h3>
-                                                <p className="text-xs text-slate-400 dark:text-slate-500 leading-normal">{moduleData.desc}</p>
-                                            </div>
-
-                                            {/* Checklist Switches */}
-                                            <div className="grid grid-cols-4 gap-4 sm:gap-6 md:gap-8 justify-items-center bg-slate-50/50 dark:bg-slate-900/30 border border-slate-100 dark:border-slate-800 rounded-2xl p-3 md:bg-transparent md:border-none md:p-0">
-                                                {/* Read */}
-                                                <div className="flex flex-col items-center gap-1">
-                                                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Read</span>
-                                                    <button
-                                                        type="button"
-                                                        disabled={isSuperadminSelected}
-                                                        onClick={() => handleToggle(moduleKey, 'canRead')}
-                                                        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#0EA5E9] disabled:opacity-50 disabled:cursor-default ${
-                                                            permRecord.canRead ? 'bg-[#0EA5E9]' : 'bg-slate-200 dark:bg-slate-700'
-                                                        }`}
-                                                    >
-                                                        <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                                            permRecord.canRead ? 'translate-x-4' : 'translate-x-0'
-                                                        }`} />
-                                                    </button>
-                                                </div>
-
-                                                {/* Create */}
-                                                <div className="flex flex-col items-center gap-1">
-                                                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Create</span>
-                                                    <button
-                                                        type="button"
-                                                        disabled={isSuperadminSelected}
-                                                        onClick={() => handleToggle(moduleKey, 'canCreate')}
-                                                        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#0EA5E9] disabled:opacity-50 disabled:cursor-default ${
-                                                            permRecord.canCreate ? 'bg-[#0EA5E9]' : 'bg-slate-200 dark:bg-slate-700'
-                                                        }`}
-                                                    >
-                                                        <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                                            permRecord.canCreate ? 'translate-x-4' : 'translate-x-0'
-                                                        }`} />
-                                                    </button>
-                                                </div>
-
-                                                {/* Update */}
-                                                <div className="flex flex-col items-center gap-1">
-                                                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Update</span>
-                                                    <button
-                                                        type="button"
-                                                        disabled={isSuperadminSelected}
-                                                        onClick={() => handleToggle(moduleKey, 'canUpdate')}
-                                                        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#0EA5E9] disabled:opacity-50 disabled:cursor-default ${
-                                                            permRecord.canUpdate ? 'bg-[#0EA5E9]' : 'bg-slate-200 dark:bg-slate-700'
-                                                        }`}
-                                                    >
-                                                        <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                                            permRecord.canUpdate ? 'translate-x-4' : 'translate-x-0'
-                                                        }`} />
-                                                    </button>
-                                                </div>
-
-                                                {/* Delete */}
-                                                <div className="flex flex-col items-center gap-1">
-                                                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Delete</span>
-                                                    <button
-                                                        type="button"
-                                                        disabled={isSuperadminSelected}
-                                                        onClick={() => handleToggle(moduleKey, 'canDelete')}
-                                                        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#0EA5E9] disabled:opacity-50 disabled:cursor-default ${
-                                                            permRecord.canDelete ? 'bg-[#0EA5E9]' : 'bg-slate-200 dark:bg-slate-700'
-                                                        }`}
-                                                    >
-                                                        <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                                            permRecord.canDelete ? 'translate-x-4' : 'translate-x-0'
-                                                        }`} />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-
-                            {/* Help Banner */}
-                            <div className="bg-blue-50/40 dark:bg-blue-950/10 border-t border-slate-200 dark:border-slate-800 p-4 sm:px-6 flex items-start gap-3">
-                                <HelpCircle className="w-5 h-5 text-blue-500 dark:text-blue-400 shrink-0 mt-0.5" />
-                                <div className="space-y-1">
-                                    <h4 className="font-semibold text-blue-900 dark:text-blue-200 text-xs">Helpful Hint</h4>
-                                    <p className="text-[11px] text-blue-700/80 dark:text-blue-400 leading-normal">
-                                        Modifying role permissions affects all active clinic staff belonging to that role group. Changes apply dynamically upon save, but logged-in staff might need to refresh their window or log back in if they have cached views open.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-            </div>
-
-            {/* Custom Dialog for Creating Roles */}
+            {/* Create Role Modal is always rendered in fixed position */}
             {showCreateModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl max-w-md w-full overflow-hidden animate-in zoom-in-95 duration-200">
-                        
-                        <div className="px-6 py-5 border-b border-slate-150 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 flex items-center gap-3">
-                            <div className="bg-[#0EA5E9]/10 rounded-xl p-2 shrink-0">
-                                <Plus className="w-5 h-5 text-[#0EA5E9]" />
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <Panel className="max-w-md w-full overflow-hidden shadow-2xl animate-in zoom-in-95">
+                        <div className="px-6 py-5 border-b border-slate-100 bg-slate-50 flex items-center gap-3">
+                            <div className="size-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
+                                <Plus className="size-6" />
                             </div>
                             <div>
-                                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">Create Custom Role</h3>
-                                <p className="text-xs text-slate-500">Define a new functional group for clinic staff</p>
+                                <h3 className="font-bold text-slate-900">Create Custom Role</h3>
+                                <p className="text-xs text-slate-500">Define a new staff permission group</p>
                             </div>
                         </div>
-
-                        <form onSubmit={handleCreateRole} className="p-6 space-y-4">
+                        <form onSubmit={handleCreateRole} className="p-6 space-y-5">
                             <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Role Name</label>
-                                <Input
-                                    placeholder="e.g. LAB_TECHNICIAN"
-                                    value={newRoleName}
-                                    onChange={(e) => setNewRoleName(e.target.value)}
-                                    required
-                                    className="h-10 rounded-xl border-slate-200 dark:border-slate-700 focus-visible:ring-[#0EA5E9] text-sm uppercase placeholder:normal-case"
-                                />
-                                <p className="text-[10px] text-slate-400">Uppercase letters, numbers, and underscores only.</p>
+                                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Role Name</label>
+                                <Input value={newRoleName} onChange={e => setNewRoleName(e.target.value)} placeholder="e.g. LAB_MANAGER" className="h-11 rounded-xl uppercase" required />
                             </div>
-
                             <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Description</label>
-                                <Textarea
-                                    placeholder="Enter what this role will be responsible for..."
-                                    value={newRoleDesc}
-                                    onChange={(e) => setNewRoleDesc(e.target.value)}
-                                    rows={3}
-                                    className="rounded-xl border-slate-200 dark:border-slate-700 focus-visible:ring-[#0EA5E9] text-sm"
-                                />
+                                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Description</label>
+                                <Textarea value={newRoleDesc} onChange={e => setNewRoleDesc(e.target.value)} placeholder="What is this role for?" rows={3} className="rounded-xl resize-none" />
                             </div>
-
-                            <div className="pt-2 flex justify-end gap-3">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => setShowCreateModal(false)}
-                                    className="h-10 px-5 rounded-xl text-sm font-medium border-slate-200 dark:border-slate-700 text-slate-600 hover:bg-slate-50"
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    disabled={creatingRole}
-                                    className="h-10 px-6 bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold rounded-xl text-sm shadow-sm transition-all"
-                                >
-                                    {creatingRole ? (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                        'Create Role'
-                                    )}
+                            <div className="flex justify-end gap-3 pt-2">
+                                <Button type="button" variant="ghost" onClick={() => setShowCreateModal(false)} className="rounded-xl font-bold">Cancel</Button>
+                                <Button type="submit" disabled={creatingRole} className="bg-[#0EA5E9] hover:bg-[#0c96d4] text-white rounded-xl px-6 font-bold shadow-lg shadow-blue-500/20">
+                                    {creatingRole ? <Loader2 className="size-4 animate-spin" /> : 'Create Role'}
                                 </Button>
                             </div>
                         </form>
-
-                    </div>
+                    </Panel>
                 </div>
             )}
         </div>

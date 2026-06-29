@@ -1,0 +1,180 @@
+@startuml EyeCare_ERD_TopDown
+' Thesis ERD — TOP to BOTTOM
+' Monochrome theme optimized for MS Word publication
+' Using modern CSS styles for padding to avoid warnings and compact rank layout for readability
+hide circle
+skinparam monochrome true
+skinparam linetype ortho
+skinparam shadowing false
+skinparam defaultFontSize 10
+skinparam ArrowColor #000000
+skinparam ArrowFontColor #000000
+skinparam ArrowFontSize 9
+
+<style>
+class {
+  Padding 6
+  RoundCorner 6
+}
+</style>
+
+title EyeCare Management System\nEntity Relationship Diagram
+
+top to bottom direction
+
+together {
+  entity "clinic_branch" as E01 {
+    * id : uuid <<PK>>
+    --
+    branch_name : string
+    address : string
+    phone : string
+  }
+  entity "custom_roles" as E02 {
+    * id : uuid <<PK>>
+    --
+    name : string <<UK>>
+    description : string
+  }
+  entity "role_permissions" as E03 {
+    * id : uuid <<PK>>
+    --
+    role_name : string <<FK>>
+    module : string
+    can_read : boolean
+  }
+  entity "users" as E04 {
+    * id : uuid <<PK>>
+    --
+    branch_id : uuid <<FK>>
+    role : string <<FK>>
+    username : string
+    full_name : string
+  }
+  entity "doctors" as E05 {
+    * id : uuid <<PK>>
+    --
+    user_id : uuid <<FK>>
+    specialization : string
+  }
+}
+
+together {
+  entity "patients" as E06 {
+    * id : uuid <<PK>>
+    --
+    branch_id : uuid <<FK>>
+    patient_number : string
+    full_name : string
+    phone : string
+  }
+  entity "appointments" as E09 {
+    * id : uuid <<PK>>
+    --
+    patient_id : uuid <<FK>>
+    doctor_id : uuid <<FK>>
+    appointment_date : timestamp
+    status : string
+  }
+}
+
+together {
+  entity "eye_examinations" as E10 {
+    * id : uuid <<PK>>
+    --
+    appointment_id : uuid <<FK>>
+    chief_complaint : text
+    iop_od : int
+    iop_os : int
+  }
+  entity "clinical_examinations" as E11 {
+    * id : uuid <<PK>>
+    --
+    appointment_id : uuid <<FK>>
+    examined_by : uuid <<FK>>
+    diagnosis : text
+    management_plan : text
+  }
+  entity "surgeries" as E15 {
+    * id : uuid <<PK>>
+    --
+    patient_id : uuid <<FK>>
+    surgeon_id : uuid <<FK>>
+    exam_id : uuid <<FK>>
+    surgery_type : string
+  }
+}
+
+together {
+  entity "pharmacy_items" as E07 {
+    * id : uuid <<PK>>
+    --
+    branch_id : uuid <<FK>>
+    item_name : string
+    stock_quantity : int
+  }
+  entity "optical_items" as E08 {
+    * id : uuid <<PK>>
+    --
+    branch_id : uuid <<FK>>
+    item_name : string
+    item_type : string
+  }
+  entity "prescriptions" as E12 {
+    * id : uuid <<PK>>
+    --
+    appointment_id : uuid <<FK>>
+    clinical_exam_id : uuid <<FK>>
+    item_name : string
+    quantity : int
+    status : string
+  }
+  entity "optical_prescriptions" as E13 {
+    * id : uuid <<PK>>
+    --
+    patient_id : uuid <<FK>>
+    od_sphere : string
+    os_sphere : string
+    status : string
+  }
+}
+
+entity "billing" as E14 {
+  * id : uuid <<PK>>
+  --
+  patient_id : uuid <<FK>>
+  appointment_id : uuid <<FK>>
+  total_amount : decimal
+  final_amount : decimal
+  status : string
+}
+
+E01 -[hidden]down- E06
+E06 -[hidden]down- E10
+E10 -[hidden]down- E12
+E12 -[hidden]down- E14
+
+E02 ||--o{ E03 : defines
+E02 ||--o{ E04 : assigns
+E01 ||--o{ E04 : employs
+E04 ||--o| E05 : "profile"
+E05 ||--o{ E09 : attends
+E06 ||--o{ E09 : schedules
+
+E09 ||--o| E10 : preliminary
+E09 ||--o| E11 : clinical
+
+E11 ||--o| E15 : schedules
+E11 ||--o{ E12 : prescribes
+E10 ||--o{ E12 : prescribes
+
+E07 ||--o{ E12 : stock
+E08 ||--o{ E13 : stock
+E06 ||--o{ E13 : receives
+
+E09 ||--o{ E14 : bills
+E15 ||--o{ E14 : bills
+E12 ||--o{ E14 : bills
+E13 ||--o{ E14 : bills
+
+@enduml

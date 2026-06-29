@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import api from '@/lib/axios'
 import { Button } from '@/components/ui/button'
@@ -43,6 +43,7 @@ function money(value?: number | string | null) {
 
 export default function PharmacyInventoryPremiumPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [loading, setLoading] = useState(true)
   const [rows, setRows] = useState<PharmacyItem[]>([])
   const [stats, setStats] = useState({ total: 0, lowStock: 0, outOfStock: 0, expiringSoon: 0 })
@@ -55,6 +56,10 @@ export default function PharmacyInventoryPremiumPage() {
   const [pageSize, setPageSize] = useState(20)
   const [total, setTotal] = useState(0)
   const [totalPages, setTotalPages] = useState(1)
+
+  useEffect(() => {
+    if (searchParams.get('view') === 'lowstock') setLowStock('low')
+  }, [searchParams])
 
   const fetchStats = useCallback(async () => {
     try {

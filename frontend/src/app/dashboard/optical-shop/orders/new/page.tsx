@@ -560,9 +560,6 @@ export default function NewOpticalOrderPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="cash">Cash</SelectItem>
-                      <SelectItem value="card">Card</SelectItem>
-                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                      <SelectItem value="mobile_wallet">Mobile Wallet</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

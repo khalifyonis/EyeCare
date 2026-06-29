@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { hasPermission } from '@/lib/permissions';
+import { usePermission } from '@/contexts/permission-context';
 
 const REPORT_TABS = [
   { path: '/dashboard/reports/financial', module: 'reports_financial' },
@@ -16,14 +16,16 @@ const REPORT_TABS = [
 export default function ReportsPage() {
   const router = useRouter();
 
+  const { can } = usePermission();
+
   useEffect(() => {
-    const allowed = REPORT_TABS.find(tab => hasPermission(tab.module, 'canRead'));
+    const allowed = REPORT_TABS.find(tab => can(tab.module, 'canRead'));
     if (allowed) {
       router.replace(allowed.path);
     } else {
       router.replace('/dashboard');
     }
-  }, [router]);
+  }, [router, can]);
 
   return (
     <div className="flex h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">

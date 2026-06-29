@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSocket } from '@/contexts/socket-context';
 import api from '@/lib/axios';
 import { Button } from '@/components/ui/button';
@@ -42,7 +42,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
 import { Pencil, Calendar as CalendarIcon, Ban, Trash2 } from 'lucide-react';
-import { hasPermission } from '@/lib/permissions';
+import { usePermission } from '@/contexts/permission-context';
 import { ServerPagination } from '@/components/dashboard/server-pagination';
 import { Badge } from '@/components/ui/badge';
 
@@ -173,10 +173,13 @@ function SkeletonRow() {
 
 export default function AppointmentsPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
 
-    const canCreate = hasPermission('appointments', 'canCreate');
-    const canUpdate = hasPermission('appointments', 'canUpdate');
-    const canDelete = hasPermission('appointments', 'canDelete');
+    const { can } = usePermission();
+
+    const canCreate = can('appointments', 'canCreate');
+    const canUpdate = can('appointments', 'canUpdate');
+    const canDelete = can('appointments', 'canDelete');
 
     const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [pagination, setPagination] = useState<PaginationMeta>({ total: 0, page: 1, limit: 20, pages: 1 });
@@ -192,10 +195,21 @@ export default function AppointmentsPage() {
     const [pageSize, setPageSize] = useState(20);
     const { socket } = useSocket();
 
+    useEffect(() => {
+        const dateParam = searchParams.get('date');
+        const statusParam = searchParams.get('status');
+        if (dateParam === 'today') {
+            const today = getLocalDateValue();
+            setDateFrom(today);
+            setDateTo(today);
+        }
+        if (statusParam) setStatusFilter(statusParam);
+    }, [searchParams]);
+
     /* ── Fetch ─────────────────────────────────────────────── */
 
     useEffect(() => {
-        api.get('/doctors').then(res => setDoctors(res.data)).catch(() => {});
+        api.get('/doctors').then(res => setDoctors(res.data)).catch(() => { });
     }, []);
 
     const buildParams = useCallback(() => {
@@ -237,7 +251,7 @@ export default function AppointmentsPage() {
     const fetchAppointments = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await api.get('/appointments', { 
+            const res = await api.get('/appointments', {
                 params: buildParams(),
                 headers: {
                     'Cache-Control': 'no-cache',
@@ -255,7 +269,7 @@ export default function AppointmentsPage() {
     // Silent fetch — no loading skeleton, no flickering (for polling & socket events)
     const silentFetch = useCallback(async () => {
         try {
-            const res = await api.get('/appointments', { 
+            const res = await api.get('/appointments', {
                 params: buildParams(),
                 headers: {
                     'Cache-Control': 'no-cache',
@@ -455,16 +469,16 @@ export default function AppointmentsPage() {
                                                 <p className="text-sm font-semibold text-slate-500">No appointments found</p>
                                                 <p className="text-xs text-slate-400 mt-0.5">Try adjusting your filters or add a new appointment</p>
                                             </div>
-                                             {canCreate && (
-                                                 <Button
-                                                     size="sm"
-                                                     className="mt-1 bg-[#0EA5E9] hover:bg-[#0c96d4] text-white"
-                                                     onClick={() => router.push('/dashboard/appointments/new')}
-                                                 >
-                                                     <Plus className="h-3.5 w-3.5 mr-1.5" />
-                                                     Add Appointment
-                                                 </Button>
-                                             )}
+                                            {canCreate && (
+                                                <Button
+                                                    size="sm"
+                                                    className="mt-1 bg-[#0EA5E9] hover:bg-[#0c96d4] text-white"
+                                                    onClick={() => router.push('/dashboard/appointments/new')}
+                                                >
+                                                    <Plus className="h-3.5 w-3.5 mr-1.5" />
+                                                    Add Appointment
+                                                </Button>
+                                            )}
                                         </div>
                                     </TableCell>
                                 </TableRow>

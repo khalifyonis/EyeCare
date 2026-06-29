@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Activity, ArrowLeft, Calendar, ClipboardList, Eye, FileText, Glasses, Loader2, Pencil, Printer, TimerReset, Trash2, User } from 'lucide-react';
 import { toast } from 'sonner';
-import { hasPermission } from '@/lib/permissions';
+import { usePermission } from '@/contexts/permission-context';
 
 type AssessmentDiagnosis = {
   icdCode?: string;
@@ -151,10 +151,12 @@ export default function ViewEyeExamPage() {
   const stage = (exam.stage as string) || 'PRELIMINARY';
   const editLink = `/dashboard/eye-examinations/${String(id)}/edit?stage=${stage === 'COMPLETED' ? 'CLINICAL' : stage}`;
 
-  const canEditPreliminary = hasPermission('preliminary_exams', 'canUpdate');
-  const canEditClinical = hasPermission('clinical_exams', 'canUpdate');
-  const canDeleteExam = hasPermission('preliminary_exams', 'canDelete') || hasPermission('clinical_exams', 'canDelete');
-  const canReadClinical = hasPermission('clinical_exams', 'canRead');
+  const { can } = usePermission();
+
+  const canEditPreliminary = can('preliminary_exams', 'canUpdate');
+  const canEditClinical = can('clinical_exams', 'canUpdate');
+  const canDeleteExam = can('preliminary_exams', 'canDelete') || can('clinical_exams', 'canDelete');
+  const canReadClinical = can('clinical_exams', 'canRead');
   const canEdit = stage === 'PRELIMINARY' ? canEditPreliminary : canEditClinical;
 
   const anterior = exam.anteriorSegmentFindings as any;
@@ -171,8 +173,8 @@ export default function ViewEyeExamPage() {
           <Badge variant="outline" className={cn(
             "h-7 px-3 text-xs font-bold uppercase tracking-wider",
             stage === 'PRELIMINARY' ? "bg-blue-50 text-blue-700 border-blue-200" :
-            stage === 'CLINICAL' ? "bg-amber-50 text-amber-700 border-amber-200" :
-            "bg-emerald-50 text-emerald-700 border-emerald-200"
+              stage === 'CLINICAL' ? "bg-amber-50 text-amber-700 border-amber-200" :
+                "bg-emerald-50 text-emerald-700 border-emerald-200"
           )}>
             {stage} STAGE
           </Badge>
@@ -354,115 +356,115 @@ export default function ViewEyeExamPage() {
               <h2 className="text-lg font-bold text-slate-900">Clinical Stage Evaluation</h2>
             </div>
 
-          <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <SectionTitle icon={ClipboardList} title="Anterior Segment Findings" />
-              {anterior ? (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <SubField label="Cornea OD" value={anterior.cornea?.OD} />
-                    <SubField label="Cornea OS" value={anterior.cornea?.OS} />
-                    <SubField label="Iris OD" value={anterior.iris?.OD} />
-                    <SubField label="Iris OS" value={anterior.iris?.OS} />
-                    <SubField label="Lens OD" value={anterior.lens?.OD} />
-                    <SubField label="Lens OS" value={anterior.lens?.OS} />
-                  </div>
-                  {anterior.notes && (
-                    <div className="mt-3 pt-3 border-t border-slate-100">
-                      <p className="text-[11px] font-semibold uppercase text-slate-500">Notes</p>
-                      <p className="mt-1 text-sm text-slate-700">{anterior.notes}</p>
+            <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <SectionTitle icon={ClipboardList} title="Anterior Segment Findings" />
+                {anterior ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <SubField label="Cornea OD" value={anterior.cornea?.OD} />
+                      <SubField label="Cornea OS" value={anterior.cornea?.OS} />
+                      <SubField label="Iris OD" value={anterior.iris?.OD} />
+                      <SubField label="Iris OS" value={anterior.iris?.OS} />
+                      <SubField label="Lens OD" value={anterior.lens?.OD} />
+                      <SubField label="Lens OS" value={anterior.lens?.OS} />
                     </div>
-                  )}
-                </div>
-              ) : (
-                <p className="text-sm text-slate-500 italic">No anterior segment data recorded</p>
-              )}
-            </div>
-
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <SectionTitle icon={Eye} title="Fundus Examination" />
-              {fundus ? (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <SubField label="Optic Disc OD" value={fundus.opticDisc?.OD} />
-                    <SubField label="Optic Disc OS" value={fundus.opticDisc?.OS} />
-                    <SubField label="Macula OD" value={fundus.macula?.OD} />
-                    <SubField label="Macula OS" value={fundus.macula?.OS} />
-                  </div>
-                  {fundus.notes && (
-                    <div className="mt-3 pt-3 border-t border-slate-100">
-                      <p className="text-[11px] font-semibold uppercase text-slate-500">Notes</p>
-                      <p className="mt-1 text-sm text-slate-700">{fundus.notes}</p>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <p className="text-sm text-slate-500 italic">No fundus data recorded</p>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <SectionTitle icon={ClipboardList} title="Diagnosis & Assessment" />
-              <div className="space-y-5">
-                {diagnosisRows.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {diagnosisRows.map((row, index) => (
-                      <Badge key={`diag-${index}`} variant="secondary" className="gap-2 rounded-lg px-3 py-1.5 text-sm font-medium bg-emerald-50 text-emerald-700 border-emerald-100">
-                        <span className="font-bold">{(row.eye || 'OU').toUpperCase()}</span>
-                        <span>{row.description || row.icdCode || 'Diagnosis'}</span>
-                      </Badge>
-                    ))}
+                    {anterior.notes && (
+                      <div className="mt-3 pt-3 border-t border-slate-100">
+                        <p className="text-[11px] font-semibold uppercase text-slate-500">Notes</p>
+                        <p className="mt-1 text-sm text-slate-700">{anterior.notes}</p>
+                      </div>
+                    )}
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-500">—</p>
+                  <p className="text-sm text-slate-500 italic">No anterior segment data recorded</p>
                 )}
-                <Field label="Treatment Plan" value={(exam.plan as string) || '—'} />
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <SectionTitle icon={Eye} title="Fundus Examination" />
+                {fundus ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <SubField label="Optic Disc OD" value={fundus.opticDisc?.OD} />
+                      <SubField label="Optic Disc OS" value={fundus.opticDisc?.OS} />
+                      <SubField label="Macula OD" value={fundus.macula?.OD} />
+                      <SubField label="Macula OS" value={fundus.macula?.OS} />
+                    </div>
+                    {fundus.notes && (
+                      <div className="mt-3 pt-3 border-t border-slate-100">
+                        <p className="text-[11px] font-semibold uppercase text-slate-500">Notes</p>
+                        <p className="mt-1 text-sm text-slate-700">{fundus.notes}</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-slate-500 italic">No fundus data recorded</p>
+                )}
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <SectionTitle icon={TimerReset} title="Follow-up & Next Steps" />
-              {followUp?.recommended ? (
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                  <Field label="Interval" value={followUp?.interval || '—'} />
-                  <Field label="Reason" value={followUp?.reason || (exam.nextVisitReason as string) || '—'} />
-                  <div className="col-span-full">
-                    <Field label="Target IOP" value={
-                      exam.targetIopOD || exam.targetIopOS 
-                        ? `OD ${exam.targetIopOD ?? '—'} | OS ${exam.targetIopOS ?? '—'} mmHg`
-                        : '—'
-                    } />
+            <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <SectionTitle icon={ClipboardList} title="Diagnosis & Assessment" />
+                <div className="space-y-5">
+                  {diagnosisRows.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {diagnosisRows.map((row, index) => (
+                        <Badge key={`diag-${index}`} variant="secondary" className="gap-2 rounded-lg px-3 py-1.5 text-sm font-medium bg-emerald-50 text-emerald-700 border-emerald-100">
+                          <span className="font-bold">{(row.eye || 'OU').toUpperCase()}</span>
+                          <span>{row.description || row.icdCode || 'Diagnosis'}</span>
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-slate-500">—</p>
+                  )}
+                  <Field label="Treatment Plan" value={(exam.plan as string) || '—'} />
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <SectionTitle icon={TimerReset} title="Follow-up & Next Steps" />
+                {followUp?.recommended ? (
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <Field label="Interval" value={followUp?.interval || '—'} />
+                    <Field label="Reason" value={followUp?.reason || (exam.nextVisitReason as string) || '—'} />
+                    <div className="col-span-full">
+                      <Field label="Target IOP" value={
+                        exam.targetIopOD || exam.targetIopOS
+                          ? `OD ${exam.targetIopOD ?? '—'} | OS ${exam.targetIopOS ?? '—'} mmHg`
+                          : '—'
+                      } />
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="py-4 text-center">
-                  <p className="text-sm font-medium text-slate-400 italic">Follow-up not required at this stage</p>
-                </div>
-              )}
+                ) : (
+                  <div className="py-4 text-center">
+                    <p className="text-sm font-medium text-slate-400 italic">Follow-up not required at this stage</p>
+                  </div>
+                )}
+              </div>
             </div>
+
+            {Array.isArray(medicationRows) && medicationRows.length > 0 && (
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <SectionTitle icon={ClipboardList} title="Medications" />
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {medicationRows.map((row, index) => (
+                    <div key={`med-${index}`} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                      <p className="text-sm font-bold text-slate-900 uppercase">{row.name || 'Medication'}</p>
+                      <p className="mt-1 text-xs text-slate-600 font-medium">
+                        {[row.dosage, row.frequency, row.duration, (row.eye && !['N/A', 'NONE'].includes(row.eye.toUpperCase())) ? row.eye : null]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-
-          {Array.isArray(medicationRows) && medicationRows.length > 0 && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <SectionTitle icon={ClipboardList} title="Medications" />
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {medicationRows.map((row, index) => (
-                  <div key={`med-${index}`} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                    <p className="text-sm font-bold text-slate-900 uppercase">{row.name || 'Medication'}</p>
-                    <p className="mt-1 text-xs text-slate-600 font-medium">
-                      {[row.dosage, row.frequency, row.duration, (row.eye && !['N/A', 'NONE'].includes(row.eye.toUpperCase())) ? row.eye : null]
-                        .filter(Boolean)
-                        .join(' · ')}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+        )}
 
         <p className="text-sm text-slate-400 text-center pb-8">Record ID: {exam.id as string} · Created: {formatDateTime(exam.createdAt as string)}</p>
       </div>

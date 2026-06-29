@@ -238,7 +238,7 @@ export default function ClinicalReportPage() {
         <div className="space-y-6 animate-in fade-in duration-300">
           
           {/* Filter bar */}
-          <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+          <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 report-no-print">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">
               <Filter className="h-3.5 w-3.5" />
               Filters

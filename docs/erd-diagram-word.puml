@@ -1,0 +1,249 @@
+@startuml EyeCare_ERD_Word
+hide circle
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam nodesep 10
+skinparam ranksep 14
+skinparam defaultFontSize 7
+skinparam dpi 130
+skinparam ArrowColor #64748B
+skinparam ArrowFontSize 7
+
+skinparam entity {
+  BackgroundColor #FFFFFF
+  BorderColor #C4B5FD
+  FontColor #334155
+  HeaderBackgroundColor #DDD6FE
+  HeaderFontColor #1E293B
+}
+
+<style>
+entity {
+  Padding 4
+  RoundCorner 4
+}
+</style>
+
+title EyeCare Management System — Entity Relationship Diagram
+
+top to bottom direction
+
+entity "roles" as R {
+  **type** .. **column** .. **key**
+  --
+  string .. name ..
+  string .. description ..
+  timestamp .. created_at ..
+  * uuid .. id .. <<PK>>
+}
+
+entity "permissions" as P {
+  **type** .. **column** .. **key**
+  --
+  uuid .. role_id .. <<FK>>
+  string .. module ..
+  boolean .. can_read ..
+  boolean .. can_create ..
+  boolean .. can_update ..
+  boolean .. can_delete ..
+  * uuid .. id .. <<PK>>
+}
+
+entity "clinic_branch" as B {
+  **type** .. **column** .. **key**
+  --
+  string .. branch_name ..
+  string .. address ..
+  string .. phone ..
+  boolean .. is_active ..
+  timestamp .. created_at ..
+  * uuid .. id .. <<PK>>
+}
+
+entity "users" as U {
+  **type** .. **column** .. **key**
+  --
+  uuid .. branch_id .. <<FK>>
+  uuid .. role_id .. <<FK>>
+  string .. username ..
+  string .. password ..
+  string .. full_name ..
+  timestamp .. created_at ..
+  * uuid .. id .. <<PK>>
+}
+
+entity "pharmacy_items" as PH {
+  **type** .. **column** .. **key**
+  --
+  uuid .. branch_id .. <<FK>>
+  string .. item_name ..
+  string .. category ..
+  int .. stock_quantity ..
+  decimal .. selling_price ..
+  date .. expiry_date ..
+  * uuid .. id .. <<PK>>
+}
+
+entity "doctors" as D {
+  **type** .. **column** .. **key**
+  --
+  uuid .. user_id .. <<FK>>
+  uuid .. branch_id .. <<FK>>
+  string .. specialization ..
+  string .. license_number ..
+  timestamp .. created_at ..
+  * uuid .. id .. <<PK>>
+}
+
+entity "patients" as PT {
+  **type** .. **column** .. **key**
+  --
+  uuid .. branch_id .. <<FK>>
+  uuid .. assigned_doctor_id .. <<FK>>
+  string .. patient_number ..
+  string .. full_name ..
+  string .. phone ..
+  date .. date_of_birth ..
+  string .. gender ..
+  timestamp .. created_at ..
+  * uuid .. id .. <<PK>>
+}
+
+entity "optical_items" as OI {
+  **type** .. **column** .. **key**
+  --
+  uuid .. branch_id .. <<FK>>
+  string .. item_name ..
+  string .. item_type ..
+  int .. stock_quantity ..
+  decimal .. selling_price ..
+  * uuid .. id .. <<PK>>
+}
+
+entity "appointments" as A {
+  **type** .. **column** .. **key**
+  --
+  uuid .. patient_id .. <<FK>>
+  uuid .. doctor_id .. <<FK>>
+  uuid .. branch_id .. <<FK>>
+  uuid .. created_by .. <<FK>>
+  timestamp .. appointment_date ..
+  string .. status ..
+  string .. booking_number ..
+  timestamp .. created_at ..
+  * uuid .. id .. <<PK>>
+}
+
+entity "exam_preliminary" as EP {
+  **type** .. **column** .. **key**
+  --
+  uuid .. appointment_id .. <<FK>>
+  uuid .. patient_id .. <<FK>>
+  uuid .. doctor_id .. <<FK>>
+  text .. chief_complaint ..
+  int .. va_od ..
+  int .. va_os ..
+  timestamp .. created_at ..
+  * uuid .. id .. <<PK>>
+}
+
+entity "exam_clinical" as EC {
+  **type** .. **column** .. **key**
+  --
+  uuid .. appointment_id .. <<FK>>
+  uuid .. patient_id .. <<FK>>
+  text .. diagnosis ..
+  text .. management_plan ..
+  timestamp .. examined_at ..
+  * uuid .. id .. <<PK>>
+}
+
+entity "medicine_prescriptions" as MP {
+  **type** .. **column** .. **key**
+  --
+  uuid .. appointment_id .. <<FK>>
+  uuid .. clinical_exam_id .. <<FK>>
+  uuid .. pharmacy_item_id .. <<FK>>
+  string .. item_name ..
+  int .. quantity ..
+  text .. instructions ..
+  string .. status ..
+  timestamp .. created_at ..
+  * uuid .. id .. <<PK>>
+}
+
+entity "optical_prescriptions" as OP {
+  **type** .. **column** .. **key**
+  --
+  uuid .. patient_id .. <<FK>>
+  uuid .. frame_item_id .. <<FK>>
+  uuid .. lens_item_id .. <<FK>>
+  string .. od_sphere ..
+  string .. os_sphere ..
+  string .. status ..
+  timestamp .. created_at ..
+  * uuid .. id .. <<PK>>
+}
+
+entity "billing" as BL {
+  **type** .. **column** .. **key**
+  --
+  uuid .. patient_id .. <<FK>>
+  uuid .. appointment_id .. <<FK>>
+  uuid .. medicine_prescription_id .. <<FK>>
+  uuid .. optical_prescription_id .. <<FK>>
+  decimal .. total_amount ..
+  decimal .. paid_amount ..
+  string .. status ..
+  string .. payment_method ..
+  timestamp .. created_at ..
+  * uuid .. id .. <<PK>>
+}
+
+R -[hidden]right- P
+P -[hidden]right- B
+B -[hidden]down- U
+PH -[hidden]right- D
+D -[hidden]right- PT
+PT -[hidden]right- OI
+U -[hidden]down- D
+PT -[hidden]down- A
+A -[hidden]down- EP
+EP -[hidden]right- EC
+EC -[hidden]down- MP
+MP -[hidden]right- OP
+MP -[hidden]down- BL
+OP -[hidden]down- BL
+
+R ||--o{ P : configures
+R ||--o{ U : assigns
+B ||--o{ U : employs
+B ||--o{ PT : registers
+B ||--o{ PH : stocks
+B ||--o{ OI : stocks
+
+U ||--|| D : is_a
+U ||--o{ PT : registers
+U ||--o{ A : schedules
+
+D ||--o{ PT : cares_for
+D ||--o{ A : attends
+D ||--o{ EP : performs
+
+PT ||--o{ A : requests
+PT ||--o{ OP : receives
+
+A ||--o| EP : preliminary
+EP ||--o| EC : clinical
+
+EC ||--o{ MP : prescribes
+PH ||--o{ MP : dispenses
+OI ||--o{ OP : lens
+
+A ||--o{ BL : bill
+MP ||--o{ BL : pharmacy
+OP ||--o{ BL : optical
+PT ||--o{ BL : pays_for
+U ||--o{ BL : processes
+
+@enduml

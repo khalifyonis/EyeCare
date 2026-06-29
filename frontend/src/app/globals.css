@@ -217,8 +217,133 @@
   [data-sidebar="sidebar"] {
     background-color: hsl(var(--sidebar-background));
   }
+
   .dark [data-sidebar="sidebar"] {
     background-color: hsl(var(--sidebar-background));
+  }
+
+  /* ─── Global Dark-Mode Overrides ───
+     Aggressively catch hardcoded Tailwind classes that lack dark: variants.
+     This ensures the entire system respects dark mode without editing 100+ files. */
+  .dark .bg-white {
+    background-color: hsl(var(--card)) !important;
+  }
+
+  .dark .bg-slate-50,
+  .dark .bg-gray-50,
+  .dark .bg-zinc-50,
+  .dark .bg-neutral-50 {
+    background-color: hsl(var(--background)) !important;
+  }
+
+  .dark .bg-slate-100,
+  .dark .bg-gray-100,
+  .dark .bg-zinc-100,
+  .dark .bg-neutral-100 {
+    background-color: hsl(var(--muted) / 0.8) !important;
+  }
+
+  .dark .bg-slate-200,
+  .dark .bg-gray-200,
+  .dark .bg-zinc-200,
+  .dark .dark .bg-neutral-200 {
+    background-color: hsl(var(--muted)) !important;
+  }
+
+  /* Catch all 50-opacity backgrounds commonly used for badges/ghost buttons */
+  .dark .bg-blue-50,
+  .dark .bg-emerald-50,
+  .dark .bg-amber-50,
+  .dark .bg-red-50,
+  .dark .bg-purple-50,
+  .dark .bg-teal-50,
+  .dark .bg-orange-50 {
+    background-color: hsl(var(--muted) / 0.5) !important;
+  }
+
+  .dark [class*="bg-slate-50/"],
+  .dark [class*="bg-gray-50/"],
+  .dark [class*="bg-zinc-50/"] {
+    background-color: hsla(var(--background), var(--tw-bg-opacity, 0.5)) !important;
+  }
+
+  .dark [class*="bg-slate-100/"],
+  .dark [class*="bg-gray-100/"],
+  .dark [class*="bg-zinc-100/"] {
+    background-color: hsla(var(--muted), var(--tw-bg-opacity, 0.5)) !important;
+  }
+
+  .dark .hover\:bg-slate-50:hover,
+  .dark .hover\:bg-gray-50:hover,
+  .dark .hover\:bg-zinc-50:hover {
+    background-color: hsla(var(--accent), 0.5) !important;
+  }
+
+  .dark .hover\:bg-slate-100:hover,
+  .dark .hover\:bg-gray-100:hover,
+  .dark .hover\:bg-zinc-100:hover {
+    background-color: hsl(var(--accent)) !important;
+  }
+
+  /* Text Overrides */
+  .dark .text-slate-900,
+  .dark .text-gray-900,
+  .dark .text-zinc-900,
+  .dark .text-neutral-900,
+  .dark .text-slate-800,
+  .dark .text-gray-800,
+  .dark .text-zinc-800,
+  .dark .text-neutral-800 {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .dark .text-slate-700,
+  .dark .text-gray-700,
+  .dark .text-zinc-700,
+  .dark .text-neutral-700,
+  .dark .text-slate-600,
+  .dark .text-gray-600,
+  .dark .text-zinc-600,
+  .dark .text-neutral-600 {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  .dark .text-slate-500,
+  .dark .text-gray-500,
+  .dark .text-zinc-500,
+  .dark .text-neutral-500,
+  .dark .text-slate-400,
+  .dark .text-gray-400,
+  .dark .text-zinc-400,
+  .dark .text-neutral-400 {
+    color: hsl(var(--muted-foreground) / 0.8) !important;
+  }
+
+  /* Border Overrides */
+  .dark .border-slate-100,
+  .dark .border-gray-100,
+  .dark .border-zinc-100,
+  .dark .border-slate-200,
+  .dark .border-gray-200,
+  .dark .border-zinc-200,
+  .dark .border-slate-300,
+  .dark .border-gray-300,
+  .dark .border-zinc-300 {
+    border-color: hsl(var(--border)) !important;
+  }
+
+  .dark .border-slate-400,
+  .dark .border-gray-400,
+  .dark .border-slate-500,
+  .dark .border-gray-500 {
+    border-color: hsl(var(--border) / 0.8) !important;
+  }
+
+  /* Shadow Override */
+  .dark .shadow-sm,
+  .dark .shadow,
+  .dark .shadow-md {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3) !important;
   }
 
   .optical-page {
@@ -246,6 +371,10 @@
     font-size: 0.92rem !important;
     font-weight: 600 !important;
     color: rgb(71 85 105) !important;
+  }
+
+  .dark .optical-page label {
+    color: rgb(148 163 184) !important;
   }
 
   .optical-page input,
@@ -344,6 +473,7 @@
 @utility scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -353,13 +483,16 @@
   &::-webkit-scrollbar {
     width: 3px;
   }
+
   &::-webkit-scrollbar-track {
     background: transparent;
   }
+
   &::-webkit-scrollbar-thumb {
     background: #e2e8f0;
     border-radius: 10px;
   }
+
   &:hover::-webkit-scrollbar-thumb {
     background: #cbd5e1;
   }
@@ -367,6 +500,7 @@
 
 /* ─── Professional Print Styles ──────────────────────────────────────────── */
 @media print {
+
   /* ── 1. Hide sidebar, header bar, nav ── */
   [data-sidebar="sidebar"],
   [data-sidebar="trigger"],
@@ -383,7 +517,8 @@
   }
 
   /* ── 2. Reset page geometry ── */
-  html, body {
+  html,
+  body {
     background: white !important;
     color: black !important;
     font-size: 11pt !important;
@@ -487,10 +622,56 @@
     page-break-inside: avoid !important;
   }
 
-  /* Charts: hide recharts, show print-only data summary */
+  /* Charts: hide recharts and chart cards on report pages */
   .recharts-wrapper,
   .recharts-responsive-container {
     display: none !important;
+  }
+
+  /* Hide dashboard widgets when printing reports — tables only */
+  .report-no-print,
+  .report-kpis,
+  .report-charts,
+  .report-tools {
+    display: none !important;
+  }
+
+  [data-report-layout] .report-no-print,
+  [data-report-layout] .report-kpis,
+  [data-report-layout] .report-charts,
+  [data-report-layout] .report-tools {
+    display: none !important;
+  }
+
+  body[data-printing-report] [data-report-layout] .report-no-print,
+  body[data-printing-report] [data-report-layout] .report-kpis,
+  body[data-printing-report] [data-report-layout] .report-charts,
+  body[data-printing-report] [data-report-layout] .report-tools {
+    display: none !important;
+  }
+
+  /* Report pages: hide KPI cards and chart sections when printing */
+  [data-report-layout] .grid:has(.bg-gradient-to-br) {
+    display: none !important;
+  }
+
+  [data-report-layout] .grid:has(.recharts-responsive-container),
+  [data-report-layout] .rounded-2xl:has(.recharts-responsive-container),
+  [data-report-layout] .rounded-xl:has(.recharts-responsive-container) {
+    display: none !important;
+  }
+
+  [data-report-layout] .report-print-area {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  [data-report-layout] .report-print-area>div:first-child {
+    border: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
   .print-chart-summary {
@@ -503,9 +684,17 @@
   }
 
   /* Section headings */
-  h1 { font-size: 18pt !important; }
-  h2 { font-size: 14pt !important; }
-  h3 { font-size: 12pt !important; }
+  h1 {
+    font-size: 18pt !important;
+  }
+
+  h2 {
+    font-size: 14pt !important;
+  }
+
+  h3 {
+    font-size: 12pt !important;
+  }
 
   /* Color badges visible in print */
   [class*="bg-emerald"],

@@ -18,7 +18,6 @@ import {
     Glasses,
     Pill,
     UserCog,
-    Mail,
     ClipboardList,
     Activity,
     Scissors,
@@ -27,12 +26,7 @@ import {
     UserPlus,
     Package,
     ArrowDownToLine,
-    History,
-    List,
-    Plus,
-    CalendarPlus,
     Store,
-    ShoppingCart,
     ShieldCheck,
     Shield,
     ScrollText,
@@ -65,6 +59,8 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { clearSession, getDefaultDashboardPath, readStoredUser, resolveRoleName, type StoredUser } from '@/lib/auth'
+import { usePermission } from '@/contexts/permission-context'
+
 
 type NavSubItem = { title: string; url: string; icon?: React.ElementType }
 type NavItem = {
@@ -79,33 +75,42 @@ type NavSection = {
     items: NavItem[]
 }
 
-function getSubItemIcon(parentTitle: string, subItem: NavSubItem): React.ElementType {
-    if (subItem.icon) return subItem.icon
+const ADMIN_NAV_ITEMS: NavItem[] = [
+    { title: 'Users', icon: UserCog, url: '/dashboard/admin/users' },
+    { title: 'Permissions', icon: ShieldCheck, url: '/dashboard/admin/permissions' },
+    { title: 'Doctors', icon: Stethoscope, url: '/dashboard/admin/doctors' },
+    { title: 'Branches', icon: Building2, url: '/dashboard/admin/branches' },
+    {
+        title: 'Logs & Compliance',
+        icon: ScrollText,
+        url: '/dashboard/admin/logs',
+        subItems: [
+            { title: 'Overview', url: '/dashboard/admin/logs' },
+            { title: 'Activity Logs', url: '/dashboard/activity-log' },
+            { title: 'Audit Trail', url: '/dashboard/audit-log' },
+        ],
+    },
+]
 
-    const parent = parentTitle.toLowerCase()
-    const title = subItem.title.toLowerCase()
-
-    if (parent.includes('appointment')) {
-        if (title.includes('all')) return Calendar
-        if (title.includes('new')) return CalendarPlus
-        if (title.includes('calendar')) return Calendar
-    }
-
-    if (parent.includes('eye examination')) {
-        if (title.includes('all')) return Eye
-        if (title.includes('new')) return Plus
-        if (title.includes('preliminary')) return Activity
-        if (title.includes('clinical')) return Stethoscope
-    }
-
-    if (title.includes('all')) return List
-    if (title.includes('new')) return Plus
-    if (title.includes('calendar')) return Calendar
-    if (title.includes('purchase')) return ArrowDownToLine
-    if (title.includes('transaction') || title.includes('history')) return History
-    if (title.includes('item')) return Package
-    return ChevronRight
+const ADMIN_REPORTS_ITEM: NavItem = {
+    title: 'Reports',
+    icon: BarChart3,
+    url: '/dashboard/reports',
+    subItems: [
+        { title: 'Financial Summary', url: '/dashboard/reports/financial', icon: Receipt },
+        { title: 'Revenue Trend', url: '/dashboard/reports/revenue-trend', icon: TrendingUp },
+        { title: 'Income by Service', url: '/dashboard/reports/income-by-service', icon: ArrowDownToLine },
+        { title: 'Doctor Performance', url: '/dashboard/reports/doctor-performance', icon: Stethoscope },
+        { title: 'Branch Report', url: '/dashboard/reports/branch-report', icon: Building2 },
+        { title: 'Clinical Analytics', url: '/dashboard/reports/clinical', icon: Activity },
+        { title: 'Appointments', url: '/dashboard/reports/appointments', icon: Calendar },
+        { title: 'Patients', url: '/dashboard/reports/patients', icon: Users },
+        { title: 'Inventory', url: '/dashboard/reports/inventory', icon: Package },
+        { title: 'Operational', url: '/dashboard/reports/operational', icon: Settings },
+    ],
 }
+
+const FULL_ACCESS_ROLES = new Set(['SUPERADMIN', 'ADMIN'])
 
 const roleNavigation: Record<string, NavSection[]> = {
     SUPERADMIN: [
@@ -113,20 +118,6 @@ const roleNavigation: Record<string, NavSection[]> = {
             section: 'OVERVIEW',
             items: [
                 { title: 'Dashboard', icon: LayoutDashboard, url: '/dashboard/admin' },
-                { title: 'Users', icon: UserCog, url: '/dashboard/admin/users' },
-                { title: 'Permissions', icon: ShieldCheck, url: '/dashboard/admin/permissions' },
-                { title: 'Doctors', icon: Stethoscope, url: '/dashboard/admin/doctors' },
-                { title: 'Branches', icon: LayoutDashboard, url: '/dashboard/admin/branches' },
-                {
-                    title: 'Logs & Compliance',
-                    icon: ScrollText,
-                    url: '/dashboard/admin/logs',
-                    subItems: [
-                        { title: 'Overview', url: '/dashboard/admin/logs' },
-                        { title: 'Activity Logs', url: '/dashboard/activity-log' },
-                        { title: 'Audit Trail', url: '/dashboard/audit-log' },
-                    ],
-                },
             ],
         },
         {
@@ -168,23 +159,6 @@ const roleNavigation: Record<string, NavSection[]> = {
                         { title: 'Medicine Prescriptions', url: '/dashboard/prescription/medicine' },
                     ],
                 },
-                {
-                    title: 'Medical Reports',
-                    icon: BarChart3,
-                    url: '/dashboard/reports',
-                    subItems: [
-                        { title: 'Financial Summary', url: '/dashboard/reports/financial', icon: Receipt },
-                        { title: 'Revenue Trend', url: '/dashboard/reports/revenue-trend', icon: TrendingUp },
-                        { title: 'Income by Service', url: '/dashboard/reports/income-by-service', icon: ArrowDownToLine },
-                        { title: 'Doctor Performance', url: '/dashboard/reports/doctor-performance', icon: Stethoscope },
-                        { title: 'Branch Report', url: '/dashboard/reports/branch-report', icon: Building2 },
-                        { title: 'Clinical Analytics', url: '/dashboard/reports/clinical', icon: Activity },
-                        { title: 'Appointments', url: '/dashboard/reports/appointments', icon: Calendar },
-                        { title: 'Patients', url: '/dashboard/reports/patients', icon: Users },
-                        { title: 'Inventory', url: '/dashboard/reports/inventory', icon: Package },
-                        { title: 'Operational', url: '/dashboard/reports/operational', icon: Settings },
-                    ],
-                },
             ],
         },
         {
@@ -218,10 +192,17 @@ const roleNavigation: Record<string, NavSection[]> = {
             ],
         },
         {
+            section: 'REPORTS',
+            items: [ADMIN_REPORTS_ITEM],
+        },
+        {
+            section: 'ADMINISTRATION',
+            items: ADMIN_NAV_ITEMS,
+        },
+        {
             section: 'SYSTEM',
             items: [
                 { title: 'Tasks', icon: ClipboardList, url: '#', comingSoon: true },
-                { title: 'Notifications', icon: Mail, url: '#', comingSoon: true },
                 { title: 'Settings', icon: Settings, url: '#', comingSoon: true },
             ],
         },
@@ -231,20 +212,6 @@ const roleNavigation: Record<string, NavSection[]> = {
             section: 'OVERVIEW',
             items: [
                 { title: 'Dashboard', icon: LayoutDashboard, url: '/dashboard/admin' },
-                { title: 'Users', icon: UserCog, url: '/dashboard/admin/users' },
-                { title: 'Permissions', icon: ShieldCheck, url: '/dashboard/admin/permissions' },
-                { title: 'Doctors', icon: Stethoscope, url: '/dashboard/admin/doctors' },
-                { title: 'Branches', icon: LayoutDashboard, url: '/dashboard/admin/branches' },
-                {
-                    title: 'Logs & Compliance',
-                    icon: ScrollText,
-                    url: '/dashboard/admin/logs',
-                    subItems: [
-                        { title: 'Overview', url: '/dashboard/admin/logs' },
-                        { title: 'Activity Logs', url: '/dashboard/activity-log' },
-                        { title: 'Audit Trail', url: '/dashboard/audit-log' },
-                    ],
-                },
             ],
         },
         {
@@ -286,23 +253,6 @@ const roleNavigation: Record<string, NavSection[]> = {
                         { title: 'Medicine Prescriptions', url: '/dashboard/prescription/medicine' },
                     ],
                 },
-                {
-                    title: 'Medical Reports',
-                    icon: BarChart3,
-                    url: '/dashboard/reports',
-                    subItems: [
-                        { title: 'Financial Summary', url: '/dashboard/reports/financial', icon: Receipt },
-                        { title: 'Revenue Trend', url: '/dashboard/reports/revenue-trend', icon: TrendingUp },
-                        { title: 'Income by Service', url: '/dashboard/reports/income-by-service', icon: ArrowDownToLine },
-                        { title: 'Doctor Performance', url: '/dashboard/reports/doctor-performance', icon: Stethoscope },
-                        { title: 'Branch Report', url: '/dashboard/reports/branch-report', icon: Building2 },
-                        { title: 'Clinical Analytics', url: '/dashboard/reports/clinical', icon: Activity },
-                        { title: 'Appointments', url: '/dashboard/reports/appointments', icon: Calendar },
-                        { title: 'Patients', url: '/dashboard/reports/patients', icon: Users },
-                        { title: 'Inventory', url: '/dashboard/reports/inventory', icon: Package },
-                        { title: 'Operational', url: '/dashboard/reports/operational', icon: Settings },
-                    ],
-                },
             ],
         },
         {
@@ -336,10 +286,17 @@ const roleNavigation: Record<string, NavSection[]> = {
             ],
         },
         {
+            section: 'REPORTS',
+            items: [ADMIN_REPORTS_ITEM],
+        },
+        {
+            section: 'ADMINISTRATION',
+            items: ADMIN_NAV_ITEMS,
+        },
+        {
             section: 'SYSTEM',
             items: [
                 { title: 'Tasks', icon: ClipboardList, url: '#', comingSoon: true },
-                { title: 'Notifications', icon: Mail, url: '#', comingSoon: true },
                 { title: 'Settings', icon: Settings, url: '#', comingSoon: true },
             ],
         },
@@ -642,28 +599,28 @@ function CollapsibleNavItem({
                     className={`ml-auto size-4 transition-transform duration-300 ${open ? 'rotate-180' : ''} ${isActive ? 'text-[#0EA5E9]' : 'text-sidebar-foreground/60 group-hover/item:text-[#0EA5E9]'}`}
                 />
             </SidebarMenuButton>
-                            {open && (
-                                <SidebarMenuSub className="border-none ml-1">
-                                    {item.subItems.map((subItem) => {
-                                        const isSubActive = pathname === subItem.url
-                                        return (
-                                            <SidebarMenuSubItem key={subItem.title}>
-                                                <SidebarMenuSubButton asChild>
-                                                    <Link
-                                                        href={subItem.url}
-                                                        className={`flex items-center w-full rounded-lg px-4 py-2.5 text-[14px] leading-5 font-semibold transition-colors duration-200 whitespace-normal break-words ${isSubActive
-                                                            ? 'text-[#0EA5E9] bg-sidebar-accent'
-                                                            : 'text-sidebar-foreground hover:text-[#0EA5E9] hover:bg-sidebar-accent'
-                                                            }`}
-                                                    >
-                                                        {subItem.title}
-                                                    </Link>
-                                                </SidebarMenuSubButton>
-                                            </SidebarMenuSubItem>
-                                        )
-                                    })}
-                                </SidebarMenuSub>
-                            )}
+            {open && (
+                <SidebarMenuSub className="border-none ml-1">
+                    {item.subItems.map((subItem) => {
+                        const isSubActive = pathname === subItem.url
+                        return (
+                            <SidebarMenuSubItem key={subItem.title}>
+                                <SidebarMenuSubButton asChild>
+                                    <Link
+                                        href={subItem.url}
+                                        className={`flex items-center w-full rounded-lg px-4 py-2.5 text-[14px] leading-5 font-semibold transition-colors duration-200 whitespace-normal break-words ${isSubActive
+                                            ? 'text-[#0EA5E9] bg-sidebar-accent'
+                                            : 'text-sidebar-foreground hover:text-[#0EA5E9] hover:bg-sidebar-accent'
+                                            }`}
+                                    >
+                                        {subItem.title}
+                                    </Link>
+                                </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                        )
+                    })}
+                </SidebarMenuSub>
+            )}
         </SidebarMenuItem>
     )
 }
@@ -700,6 +657,7 @@ function CollapsibleSection({
     return (
         <SidebarGroup className="p-0">
             <button
+                type="button"
                 onClick={() => setOpen(!open)}
                 className="flex w-full items-center justify-between px-5 mt-5 mb-1.5 group/section outline-none rounded-md hover:bg-sidebar-accent/50 transition-colors"
             >
@@ -715,150 +673,69 @@ function CollapsibleSection({
     )
 }
 
+function NavSectionGroup({
+    label,
+    children,
+}: {
+    label: string
+    children: React.ReactNode
+}) {
+    return (
+        <SidebarGroup className="p-0">
+            <div className="px-5 mt-5 mb-1.5">
+                <span className="text-[12px] font-black tracking-[0.15em] uppercase text-sidebar-foreground/70 dark:text-sidebar-foreground/60">
+                    {label}
+                </span>
+            </div>
+            <SidebarGroupContent>{children}</SidebarGroupContent>
+        </SidebarGroup>
+    )
+}
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const router = useRouter()
     const params = useParams<{ role?: string }>()
     const roleParam = typeof params?.role === 'string' ? params.role : ''
 
-    const [role, setRole] = React.useState<string>(() => {
-        const storedUser = readStoredUser()
-        const roleFromUser = resolveRoleName(storedUser)
-        return roleFromUser || roleParam.toUpperCase()
-    })
-    const [user, setUser] = React.useState<StoredUser | null>(null)
-
-    React.useEffect(() => {
-        const storedUser = readStoredUser()
-        if (!storedUser) return
-
-        setUser(storedUser)
-        const roleFromUser = resolveRoleName(storedUser)
-        if (roleFromUser) setRole(roleFromUser)
-        else if (roleParam) setRole(roleParam.toUpperCase())
-    }, [roleParam])
+    const { isAllowed, user, permissions, isLoading } = usePermission()
+    const role = resolveRoleName(user).toUpperCase() || 'USER'
 
     const handleLogout = () => {
         clearSession()
         router.push('/login')
     }
 
-    let rawSections = roleNavigation[role] ?? roleNavigation['ADMIN'] ?? []
+    const rawSections = roleNavigation[role] ?? roleNavigation['ADMIN'] ?? []
 
-    const isItemAllowed = (itemUrl: string) => {
-        if (!itemUrl || itemUrl === '#') return true
-        if (role === 'SUPERADMIN') return true
-
-        if (typeof window !== 'undefined') {
-            const rawPerms = localStorage.getItem('permissions')
-            if (rawPerms) {
-                try {
-                    const permissions = JSON.parse(rawPerms)
-                    if (Array.isArray(permissions)) {
-                        let moduleKey = ''
-                        if (itemUrl.startsWith('/dashboard/patients')) moduleKey = 'patients'
-                        else if (itemUrl.startsWith('/dashboard/appointments')) moduleKey = 'appointments'
-                        else if (itemUrl.startsWith('/dashboard/eye-examinations/preliminary') || itemUrl.startsWith('/dashboard/eye-examinations/new')) moduleKey = 'preliminary_exams'
-                        else if (itemUrl.startsWith('/dashboard/eye-examinations/clinical')) moduleKey = 'clinical_exams'
-                        else if (itemUrl.startsWith('/dashboard/eye-examinations')) {
-                            // Parent "Eye Examinations" menu: show if user has either preliminary or clinical read access
-                            const p1 = permissions.find((p: any) => p.module === 'preliminary_exams')
-                            const p2 = permissions.find((p: any) => p.module === 'clinical_exams')
-                            return !!(p1?.canRead || p2?.canRead)
-                        }
-                        else if (itemUrl.startsWith('/dashboard/surgery')) moduleKey = 'surgery'
-                        else if (itemUrl.startsWith('/dashboard/prescription/medicine')) moduleKey = 'medicine_prescriptions'
-                        else if (itemUrl.startsWith('/dashboard/prescription/optical')) moduleKey = 'optical_prescriptions'
-                        else if (itemUrl.startsWith('/dashboard/prescription')) {
-                            // Parent "Prescriptions" menu: show if user has either medicine or optical read access
-                            const p1 = permissions.find((p: any) => p.module === 'medicine_prescriptions')
-                            const p2 = permissions.find((p: any) => p.module === 'optical_prescriptions')
-                            return !!(p1?.canRead || p2?.canRead)
-                        }
-                        else if (itemUrl.startsWith('/dashboard/reports')) {
-                            const p1 = permissions.find((p: any) => p.module === 'reports_financial')
-                            const p2 = permissions.find((p: any) => p.module === 'reports_clinical')
-                            const p3 = permissions.find((p: any) => p.module === 'reports_appointments')
-                            const p4 = permissions.find((p: any) => p.module === 'reports_patients')
-                            const p5 = permissions.find((p: any) => p.module === 'reports_inventory')
-                            const p6 = permissions.find((p: any) => p.module === 'reports_operational')
-                            return !!(p1?.canRead || p2?.canRead || p3?.canRead || p4?.canRead || p5?.canRead || p6?.canRead)
-                        }
-                        else if (itemUrl.startsWith('/dashboard/pharmacy') || itemUrl.startsWith('/dashboard/inventory/pharmacy')) moduleKey = 'pharmacy'
-                        else if (itemUrl.startsWith('/dashboard/optical-shop') || itemUrl.startsWith('/dashboard/inventory/optical')) moduleKey = 'optical'
-                        else if (itemUrl.startsWith('/dashboard/billing')) moduleKey = 'billing'
-                        else if (itemUrl.startsWith('/dashboard/admin/users') || itemUrl.startsWith('/dashboard/admin/doctors')) moduleKey = 'users'
-                        else if (itemUrl.startsWith('/dashboard/admin/branches')) moduleKey = 'branches'
-                        else if (itemUrl.startsWith('/dashboard/admin/logs') || itemUrl.startsWith('/dashboard/activity-log') || itemUrl.startsWith('/dashboard/audit-log')) moduleKey = 'logs'
-                        else if (itemUrl.startsWith('/dashboard/admin/permissions')) moduleKey = 'users'
-
-                        if (moduleKey) {
-                            const perm = permissions.find((p: any) => p.module === moduleKey)
-                            if (perm) {
-                                return !!perm.canRead
-                            }
-                            return false
-                        }
-                    }
-                } catch (e) {
-                    console.error('Error filtering sidebar items', e)
+    // Helper to filter items based on permissions
+    const filterNavItems = (items: NavItem[]): NavItem[] => {
+        return items
+            .map(item => {
+                if (item.subItems) {
+                    const filteredSubItems = item.subItems.filter(sub => isAllowed(sub.url))
+                    return { ...item, subItems: filteredSubItems }
                 }
-            }
-        }
-        return true
+                return item
+            })
+            .filter(item => {
+                // If it has subitems, only show if at least one subitem is allowed
+                if (item.subItems) return item.subItems.length > 0
+                // Otherwise check the item itself
+                return isAllowed(item.url)
+            })
     }
 
-    let sections = rawSections.map(section => {
-        const filteredItems = section.items.map(item => {
-            if (item.subItems) {
-                return {
-                    ...item,
-                    subItems: item.subItems.filter(sub => isItemAllowed(sub.url))
-                }
-            }
-            return item
-        }).filter(item => {
-            if (item.subItems && item.subItems.length === 0) return false
-            return isItemAllowed(item.url)
-        })
-
-        return {
+    const sections = rawSections
+        .map(section => ({
             ...section,
-            items: filteredItems
-        }
-    }).filter(section => section.items.length > 0)
+            items: filterNavItems(section.items)
+        }))
+        .filter(section => section.items.length > 0)
 
-    const specialization = (user?.doctor as { specialization?: string })?.specialization || '';
-    if (role === 'DOCTOR' && specialization.toUpperCase() === 'OPTOMETRY') {
-        sections = sections.map(section => {
-            if (section.section === 'CLINICAL') {
-                return {
-                    ...section,
-                    items: section.items
-                        .filter(item => item.title !== 'Eye Surgery')
-                        .map(item => {
-                            if (item.title === 'Eye Examinations' && item.subItems) {
-                                return {
-                                    ...item,
-                                    subItems: item.subItems.filter(sub => sub.title === 'Preliminary Exam')
-                                };
-                            }
-                            if (item.title === 'Prescriptions' && item.subItems) {
-                                return {
-                                    ...item,
-                                    subItems: item.subItems.filter(sub => sub.title === 'Optical Prescriptions')
-                                };
-                            }
-                            return item;
-                        })
-                };
-            }
-            return section;
-        });
-    }
 
     return (
         <Sidebar collapsible="icon" className="border-sidebar-border shrink-0" {...props}>
-            <SidebarHeader className="bg-white border-b border-sidebar-border px-4 sm:px-5 py-4 shrink-0">
+            <SidebarHeader className="bg-sidebar border-b border-sidebar-border px-4 sm:px-5 py-4 shrink-0">
                 <div
                     className="flex items-center gap-3.5 cursor-pointer hover:opacity-90 transition-opacity min-w-0"
                     onClick={() => router.push(getDefaultDashboardPath(role))}
@@ -875,35 +752,48 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
             <SidebarSeparator className="bg-sidebar-border/50" />
 
-            <SidebarContent className="bg-white text-slate-800 overflow-y-auto overflow-x-hidden flex-1 min-h-0">
-                {sections.map((section, sectionIndex) => (
-                    <CollapsibleSection
-                        key={section.section}
-                        label={section.section}
-                        defaultOpen={sectionIndex === 0}
-                        sectionItems={section.items}
-                    >
+            <SidebarContent className="bg-sidebar text-sidebar-foreground overflow-y-auto overflow-x-hidden flex-1 min-h-0">
+                {sections.map((section, sectionIndex) => {
+                    const menu = (
                         <SidebarMenu>
                             {section.items.map((item) => (
-                                <React.Fragment key={item.title}>
-                                    <CollapsibleNavItem
-                                        item={item}
-                                        onSelect={() => {
-                                            if (item.url && item.url !== '#' && !item.comingSoon) {
-                                                router.push(item.url)
-                                            }
-                                        }}
-                                    />
-                                </React.Fragment>
+                                <CollapsibleNavItem
+                                    key={`${section.section}-${item.title}`}
+                                    item={item}
+                                    onSelect={() => {
+                                        if (item.url && item.url !== '#' && !item.comingSoon) {
+                                            router.push(item.url)
+                                        }
+                                    }}
+                                />
                             ))}
                         </SidebarMenu>
-                    </CollapsibleSection>
-                ))}
+                    )
+
+                    if (FULL_ACCESS_ROLES.has(role)) {
+                        return (
+                            <CollapsibleSection
+                                key={section.section}
+                                label={section.section}
+                                defaultOpen={sectionIndex === 0}
+                                sectionItems={section.items}
+                            >
+                                {menu}
+                            </CollapsibleSection>
+                        )
+                    }
+
+                    return (
+                        <NavSectionGroup key={section.section} label={section.section}>
+                            {menu}
+                        </NavSectionGroup>
+                    )
+                })}
             </SidebarContent>
 
             <SidebarSeparator className="bg-sidebar-border/50" />
 
-            <SidebarFooter className="bg-white border-t border-sidebar-border relative z-50 shrink-0">
+            <SidebarFooter className="bg-sidebar border-t border-sidebar-border relative z-50 shrink-0">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <DropdownMenu>
@@ -956,7 +846,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     <Settings className="mr-2 size-4" />
                                     Settings
                                 </DropdownMenuItem>
-                                {isItemAllowed('/dashboard/admin/logs') && (
+                                {isAllowed('/dashboard/admin/logs') && (
                                     <DropdownMenuItem onClick={() => router.push('/dashboard/admin/logs')}>
                                         <ScrollText className="mr-2 size-4" />
                                         Logs & Compliance

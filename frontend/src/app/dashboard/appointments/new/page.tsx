@@ -157,8 +157,8 @@ function ScrollableColumn({
         <div className="relative h-[200px] w-14">
             {/* Center Highlight Bar (Shared across columns usually, but here per column for simplicity) */}
             <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 h-10 bg-slate-100/50 rounded-lg -z-10 pointer-events-none" />
-            
-            <div 
+
+            <div
                 ref={scrollRef}
                 className="h-full overflow-y-auto flex flex-col py-20 snap-y snap-mandatory scrollbar-hide relative"
                 onScroll={(e) => {
@@ -170,11 +170,10 @@ function ScrollableColumn({
                     <button
                         key={opt}
                         onClick={() => onChange(opt)}
-                        className={`flex h-10 w-full shrink-0 items-center justify-center text-base font-bold transition-all snap-center select-none ${
-                            value === opt
+                        className={`flex h-10 w-full shrink-0 items-center justify-center text-base font-bold transition-all snap-center select-none ${value === opt
                                 ? 'text-[#0EA5E9] scale-110'
                                 : 'text-slate-300 hover:text-slate-400'
-                        }`}
+                            }`}
                     >
                         {opt}
                     </button>
@@ -244,36 +243,36 @@ function UnifiedTimePicker({
                     {/* Visual Fading Gradients */}
                     <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white to-transparent pointer-events-none z-10" />
                     <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none z-10" />
-                    
-                    <ScrollableColumn 
-                        options={HOURS} 
-                        value={tempTime.hour} 
-                        onChange={(v) => setTempTime(t => ({ ...t, hour: v }))} 
+
+                    <ScrollableColumn
+                        options={HOURS}
+                        value={tempTime.hour}
+                        onChange={(v) => setTempTime(t => ({ ...t, hour: v }))}
                     />
                     <div className="text-2xl font-black text-slate-200 pt-1 mx-1 select-none">:</div>
-                    <ScrollableColumn 
-                        options={MINUTES} 
-                        value={tempTime.minute} 
-                        onChange={(v) => setTempTime(t => ({ ...t, minute: v }))} 
+                    <ScrollableColumn
+                        options={MINUTES}
+                        value={tempTime.minute}
+                        onChange={(v) => setTempTime(t => ({ ...t, minute: v }))}
                     />
                     <div className="w-px h-12 bg-slate-100 mx-3" />
-                    <ScrollableColumn 
-                        options={['AM', 'PM']} 
-                        value={tempTime.period} 
-                        onChange={(v) => setTempTime(t => ({ ...t, period: v }))} 
+                    <ScrollableColumn
+                        options={['AM', 'PM']}
+                        value={tempTime.period}
+                        onChange={(v) => setTempTime(t => ({ ...t, period: v }))}
                     />
                 </div>
 
                 {/* Actions */}
                 <div className="p-2 border-t border-slate-50 flex gap-2 bg-slate-50/30">
-                    <Button 
-                        variant="ghost" 
+                    <Button
+                        variant="ghost"
                         className="flex-1 text-slate-500 font-bold h-9 hover:bg-slate-100 rounded-lg text-xs"
                         onClick={() => setIsOpen(false)}
                     >
                         CANCEL
                     </Button>
-                    <Button 
+                    <Button
                         className="flex-1 bg-[#0EA5E9] hover:bg-[#0c96d4] text-white font-bold h-9 rounded-lg text-xs shadow-md shadow-blue-100"
                         onClick={handleOk}
                     >
@@ -577,7 +576,7 @@ export default function NewAppointmentPage() {
     const [appointmentType, setAppointmentType] = useState('')
     const now = new Date()
     const defaultDate = now.toISOString().split('T')[0]
-    
+
     let hours = now.getHours()
     const ampm = hours >= 12 ? 'PM' : 'AM'
     hours = hours % 12
@@ -593,7 +592,7 @@ export default function NewAppointmentPage() {
     const [location, setLocation] = useState('')
     const [reason, setReason] = useState('')
     const [eyeSide, setEyeSide] = useState('OD') // Default to Right Eye
-    
+
     // Emergency Contact state for existing patients missing it
     const [emergencyName, setEmergencyName] = useState('')
     const [emergencyPhone, setEmergencyPhone] = useState('')
@@ -607,7 +606,7 @@ export default function NewAppointmentPage() {
     const [billingAmount, setBillingAmount] = useState('')
     const [billingDiscount, setBillingDiscount] = useState('')
     const [billingStatus, setBillingStatus] = useState('UNPAID')
-    const [paymentMethod, setPaymentMethod] = useState('')
+    const [paymentMethod, setPaymentMethod] = useState('CASH')
 
     // Today's date string for min attribute on date picker
     const todayStr = new Date().toISOString().split('T')[0]
@@ -721,19 +720,19 @@ export default function NewAppointmentPage() {
         const selectedDate = new Date(dateStr + 'T00:00:00')
         const today = new Date()
         today.setHours(0, 0, 0, 0)
-        
+
         if (selectedDate < today) return true
         if (selectedDate > today) return false
-        
+
         // If today, check time
         let h = parseInt(hour)
         if (period === 'PM' && h < 12) h += 12
         if (period === 'AM' && h === 12) h = 0
-        
+
         const now = new Date()
         const selectedTime = new Date()
         selectedTime.setHours(h, parseInt(minute), 0, 0)
-        
+
         return selectedTime < now
     }
 
@@ -877,10 +876,10 @@ export default function NewAppointmentPage() {
                                 >
                                     <div
                                         className={`flex h-11 w-11 items-center justify-center rounded-full border-2 transition-all duration-200 ${completedSteps.has(i)
-                                                ? 'border-emerald-500 bg-emerald-500 text-white'
-                                                : i === step
-                                                    ? 'border-[#0EA5E9] bg-[#0EA5E9] text-white shadow-lg shadow-sky-500/25'
-                                                    : 'border-slate-200 bg-white text-slate-500 group-hover:border-slate-300'
+                                            ? 'border-emerald-500 bg-emerald-500 text-white'
+                                            : i === step
+                                                ? 'border-[#0EA5E9] bg-[#0EA5E9] text-white shadow-lg shadow-sky-500/25'
+                                                : 'border-slate-200 bg-white text-slate-500 group-hover:border-slate-300'
                                             }`}
                                     >
                                         {completedSteps.has(i) ? (
@@ -891,10 +890,10 @@ export default function NewAppointmentPage() {
                                     </div>
                                     <span
                                         className={`text-sm font-semibold transition-colors ${completedSteps.has(i)
-                                                ? 'text-emerald-600'
-                                                : i === step
-                                                    ? 'text-[#0EA5E9]'
-                                                    : 'text-slate-600'
+                                            ? 'text-emerald-600'
+                                            : i === step
+                                                ? 'text-[#0EA5E9]'
+                                                : 'text-slate-600'
                                             }`}
                                     >
                                         {s.label}
@@ -994,8 +993,8 @@ export default function NewAppointmentPage() {
                                                                         setPatientDropdownOpen(false)
                                                                     }}
                                                                     className={`w-full rounded-lg border px-3 py-2 text-left transition-colors ${patientId === p.id
-                                                                            ? 'border-blue-300 bg-blue-50'
-                                                                            : 'border-transparent hover:border-slate-200 hover:bg-slate-50'
+                                                                        ? 'border-blue-300 bg-blue-50'
+                                                                        : 'border-transparent hover:border-slate-200 hover:bg-slate-50'
                                                                         }`}
                                                                 >
                                                                     <p className="truncate text-sm font-semibold text-slate-900">
@@ -1054,7 +1053,7 @@ export default function NewAppointmentPage() {
                                                 <p className="text-xs text-slate-500">Please provide emergency contact details {appointmentType === 'surgery' ? ' (required for surgery)' : '(optional)'}.</p>
                                             </div>
                                         </div>
-                                        
+
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="space-y-1.5">
                                                 <Label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Contact Name {appointmentType === 'surgery' && <span className="text-red-500">*</span>}</Label>
@@ -1273,21 +1272,21 @@ export default function NewAppointmentPage() {
                                         </div>
                                         <h2 className="text-xl font-bold text-slate-900">Additional Information</h2>
                                     </div>
-                                                              <div className="space-y-2">
-                                    <Label className="text-sm font-semibold text-slate-800">
-                                        Reason for Visit <span className="text-red-500">*</span>
-                                    </Label>
-                                    <Textarea
-                                        placeholder="Describe the reason for the appointment"
-                                        value={reason}
-                                        onChange={(e) => setReason(e.target.value)}
-                                        rows={5}
-                                        className="text-base rounded-lg border-slate-200 resize-none"
-                                    />
+                                    <div className="space-y-2">
+                                        <Label className="text-sm font-semibold text-slate-800">
+                                            Reason for Visit <span className="text-red-500">*</span>
+                                        </Label>
+                                        <Textarea
+                                            placeholder="Describe the reason for the appointment"
+                                            value={reason}
+                                            onChange={(e) => setReason(e.target.value)}
+                                            rows={5}
+                                            className="text-base rounded-lg border-slate-200 resize-none"
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        )}
 
                         {/* Step 4 - Payment & Billing */}
                         {step === 3 && (
@@ -1358,10 +1357,6 @@ export default function NewAppointmentPage() {
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="CASH">Cash</SelectItem>
-                                                <SelectItem value="CARD">Card</SelectItem>
-                                                <SelectItem value="MOBILE">Mobile Money</SelectItem>
-                                                <SelectItem value="INSURANCE">Insurance</SelectItem>
-                                                <SelectItem value="BANK_TRANSFER">Bank Transfer</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>

@@ -9,8 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { readStoredUser, resolveRoleName } from '@/lib/auth';
-import { hasPermission } from '@/lib/permissions';
+import { usePermission } from '@/contexts/permission-context';
 import {
   Search,
   Plus,
@@ -94,11 +93,11 @@ function resolveExamId(exam: Exam): string {
 }
 
 function getLocalDateValue(): string {
-    const d = new Date();
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function getStageBadge(stage: string | null | undefined) {
@@ -128,9 +127,11 @@ export default function EyeExaminationsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const { socket } = useSocket();
 
+  const { can } = usePermission();
+
   const canWrite = useMemo(() => {
-    return hasPermission('preliminary_exams', 'canCreate') || hasPermission('clinical_exams', 'canCreate');
-  }, []);
+    return can('preliminary_exams', 'canCreate') || can('clinical_exams', 'canCreate');
+  }, [can]);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -147,9 +148,9 @@ export default function EyeExaminationsPage() {
       const params: Record<string, string | number> = { limit: pageSize, page };
       if (search) params.search = search;
       if (dateFilter) {
-          params.date = dateFilter;
+        params.date = dateFilter;
       } else if (!search) {
-          params.date = getLocalDateValue();
+        params.date = getLocalDateValue();
       }
 
       const res = await api.get('/eye-examinations', { params });
@@ -181,19 +182,19 @@ export default function EyeExaminationsPage() {
   }, [search, dateFilter, pageSize]);
 
   useEffect(() => {
-      if (!socket) return;
-      const handleUpdate = () => {
-          fetchExams();
-          fetchStats();
-      };
-      socket.on('exam:created', handleUpdate);
-      socket.on('exam:updated', handleUpdate);
-      socket.on('exam:deleted', handleUpdate);
-      return () => {
-          socket.off('exam:created', handleUpdate);
-          socket.off('exam:updated', handleUpdate);
-          socket.off('exam:deleted', handleUpdate);
-      };
+    if (!socket) return;
+    const handleUpdate = () => {
+      fetchExams();
+      fetchStats();
+    };
+    socket.on('exam:created', handleUpdate);
+    socket.on('exam:updated', handleUpdate);
+    socket.on('exam:deleted', handleUpdate);
+    return () => {
+      socket.off('exam:created', handleUpdate);
+      socket.off('exam:updated', handleUpdate);
+      socket.off('exam:deleted', handleUpdate);
+    };
   }, [socket, fetchExams, fetchStats]);
 
   const handleDelete = async (id: string) => {
@@ -269,11 +270,11 @@ export default function EyeExaminationsPage() {
           </div>
           <div className="relative w-full lg:w-48">
             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-            <Input 
-              type="date" 
-              value={dateFilter} 
-              onChange={(e) => setDateFilter(e.target.value)} 
-              className="pl-9 bg-white border-gray-200 h-10 text-sm focus:ring-1 focus:ring-blue-100 focus:border-blue-400" 
+            <Input
+              type="date"
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="pl-9 bg-white border-gray-200 h-10 text-sm focus:ring-1 focus:ring-blue-100 focus:border-blue-400"
             />
           </div>
         </div>
@@ -281,128 +282,128 @@ export default function EyeExaminationsPage() {
         <div>
           <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
             <Table className="table-fixed">
-                <TableHeader>
-                  <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-gray-200">
-                    {['PATIENT & ID', 'CHIEF COMPLAINT', 'VA (BCVA)', 'IOP', 'STAGE', 'DATE / EXAMINER', 'ACTIONS'].map((head) => (
-                      <TableHead key={head} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 whitespace-nowrap">
-                        {head}
-                      </TableHead>
-                    ))}
+              <TableHeader>
+                <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-gray-200">
+                  {['PATIENT & ID', 'CHIEF COMPLAINT', 'VA (BCVA)', 'IOP', 'STAGE', 'DATE / EXAMINER', 'ACTIONS'].map((head) => (
+                    <TableHead key={head} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-gray-400 whitespace-nowrap">
+                      {head}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="py-16 text-center">
+                      <div className="inline-flex items-center gap-2 text-gray-500">
+                        <Loader2 className="h-5 w-5 animate-spin" /> Loading examinations...
+                      </div>
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {loading ? (
-                    <TableRow>
-                      <TableCell colSpan={7} className="py-16 text-center">
-                        <div className="inline-flex items-center gap-2 text-gray-500">
-                          <Loader2 className="h-5 w-5 animate-spin" /> Loading examinations...
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ) : exams.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={7} className="py-16 text-center text-gray-500">
-                        No examinations found.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    exams.map((e) => {
-                      const examId = resolveExamId(e);
-                      const patientLabel = e.patient?.patientNumber ?? e.patient?.id ?? '—';
-                      const patientName = e.patient?.fullName?.trim() || 'Unknown Patient';
-                      return (
-                        <TableRow key={examId || `${patientName}-${formatDate(e.createdAt)}`} className="border-gray-100 hover:bg-gray-50/40 transition-colors">
-                          <TableCell className="px-4 py-3">
-                            <div className="min-w-[180px]">
-                              <p className="text-sm font-bold text-gray-900 truncate">{patientName}</p>
-                              <p className="text-[11px] font-medium text-gray-400">ID: {patientLabel}</p>
-                            </div>
-                          </TableCell>
+                ) : exams.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="py-16 text-center text-gray-500">
+                      No examinations found.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  exams.map((e) => {
+                    const examId = resolveExamId(e);
+                    const patientLabel = e.patient?.patientNumber ?? e.patient?.id ?? '—';
+                    const patientName = e.patient?.fullName?.trim() || 'Unknown Patient';
+                    return (
+                      <TableRow key={examId || `${patientName}-${formatDate(e.createdAt)}`} className="border-gray-100 hover:bg-gray-50/40 transition-colors">
+                        <TableCell className="px-4 py-3">
+                          <div className="min-w-[180px]">
+                            <p className="text-sm font-bold text-gray-900 truncate">{patientName}</p>
+                            <p className="text-[11px] font-medium text-gray-400">ID: {patientLabel}</p>
+                          </div>
+                        </TableCell>
 
-                          <TableCell className="px-4 py-3">
-                            <p className="min-w-0 text-sm text-gray-600 truncate">{e.chiefComplaint ?? '—'}</p>
-                          </TableCell>
+                        <TableCell className="px-4 py-3">
+                          <p className="min-w-0 text-sm text-gray-600 truncate">{e.chiefComplaint ?? '—'}</p>
+                        </TableCell>
 
-                          <TableCell className="px-4 py-3 text-sm font-medium text-gray-700 whitespace-nowrap">
-                            OD {e.vaBcvaOD ?? '—'} | OS {e.vaBcvaOS ?? '—'}
-                          </TableCell>
+                        <TableCell className="px-4 py-3 text-sm font-medium text-gray-700 whitespace-nowrap">
+                          OD {e.vaBcvaOD ?? '—'} | OS {e.vaBcvaOS ?? '—'}
+                        </TableCell>
 
-                          <TableCell className="px-4 py-3 text-sm font-medium text-gray-700 whitespace-nowrap">
-                            OD {e.iopOD ?? '—'} | OS {e.iopOS ?? '—'}
-                          </TableCell>
+                        <TableCell className="px-4 py-3 text-sm font-medium text-gray-700 whitespace-nowrap">
+                          OD {e.iopOD ?? '—'} | OS {e.iopOS ?? '—'}
+                        </TableCell>
 
-                          <TableCell className="px-4 py-3">
-                            {getStageBadge(e.stage)}
-                          </TableCell>
+                        <TableCell className="px-4 py-3">
+                          {getStageBadge(e.stage)}
+                        </TableCell>
 
-                          <TableCell className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
-                            <div className="space-y-0.5">
-                              <p className="font-medium">{formatDate(e.createdAt)}</p>
-                              <p className="text-[11px] text-gray-400 truncate">{formatDoctorName(e.doctor?.user?.fullName)}</p>
-                            </div>
-                          </TableCell>
+                        <TableCell className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
+                          <div className="space-y-0.5">
+                            <p className="font-medium">{formatDate(e.createdAt)}</p>
+                            <p className="text-[11px] text-gray-400 truncate">{formatDoctorName(e.doctor?.user?.fullName)}</p>
+                          </div>
+                        </TableCell>
 
-                          <TableCell className="px-4 py-3">
-                            <div className="flex items-center gap-2 whitespace-nowrap">
-                              <button
-                                className="rounded-lg px-3 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50 transition-colors border border-transparent hover:border-blue-100"
-                                onClick={() => {
-                                  if (!examId) {
-                                    toast.error('Invalid examination record');
-                                    return;
-                                  }
-                                  router.push(`/dashboard/eye-examinations/${examId}`);
-                                }}
-                              >
-                                View
-                              </button>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100">
-                                    <MoreVertical className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="rounded-xl border-gray-200 shadow-lg">
+                        <TableCell className="px-4 py-3">
+                          <div className="flex items-center gap-2 whitespace-nowrap">
+                            <button
+                              className="rounded-lg px-3 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50 transition-colors border border-transparent hover:border-blue-100"
+                              onClick={() => {
+                                if (!examId) {
+                                  toast.error('Invalid examination record');
+                                  return;
+                                }
+                                router.push(`/dashboard/eye-examinations/${examId}`);
+                              }}
+                            >
+                              View
+                            </button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="rounded-xl border-gray-200 shadow-lg">
+                                <DropdownMenuItem asChild>
+                                  <Link href={examId ? `/dashboard/eye-examinations/${examId}` : '/dashboard/eye-examinations'} className="text-xs font-medium">View Details</Link>
+                                </DropdownMenuItem>
+                                {canWrite && (
                                   <DropdownMenuItem asChild>
-                                    <Link href={examId ? `/dashboard/eye-examinations/${examId}` : '/dashboard/eye-examinations'} className="text-xs font-medium">View Details</Link>
+                                    <Link href={examId ? `/dashboard/eye-examinations/${examId}/edit` : '/dashboard/eye-examinations'} className="flex items-center gap-2 text-xs font-medium">
+                                      <Pencil className="h-3.5 w-3.5" />
+                                      Edit Examination
+                                    </Link>
                                   </DropdownMenuItem>
-                                  {canWrite && (
-                                    <DropdownMenuItem asChild>
-                                      <Link href={examId ? `/dashboard/eye-examinations/${examId}/edit` : '/dashboard/eye-examinations'} className="flex items-center gap-2 text-xs font-medium">
-                                        <Pencil className="h-3.5 w-3.5" />
-                                        Edit Examination
-                                      </Link>
+                                )}
+                                {canWrite && (
+                                  <>
+                                    <div className="h-px bg-gray-100 my-1" />
+                                    <DropdownMenuItem
+                                      className="text-red-600 focus:text-red-700 text-xs font-medium"
+                                      onClick={() => {
+                                        if (!examId) {
+                                          toast.error('Cannot delete: examination id is missing');
+                                          return;
+                                        }
+                                        void handleDelete(examId);
+                                      }}
+                                      disabled={!examId || deletingId === examId}
+                                    >
+                                      <Trash2 className="mr-2 h-3.5 w-3.5" />
+                                      {deletingId === examId ? 'Deleting...' : 'Delete'}
                                     </DropdownMenuItem>
-                                  )}
-                                  {canWrite && (
-                                    <>
-                                      <div className="h-px bg-gray-100 my-1" />
-                                      <DropdownMenuItem
-                                        className="text-red-600 focus:text-red-700 text-xs font-medium"
-                                        onClick={() => {
-                                          if (!examId) {
-                                            toast.error('Cannot delete: examination id is missing');
-                                            return;
-                                          }
-                                          void handleDelete(examId);
-                                        }}
-                                        disabled={!examId || deletingId === examId}
-                                      >
-                                        <Trash2 className="mr-2 h-3.5 w-3.5" />
-                                        {deletingId === examId ? 'Deleting...' : 'Delete'}
-                                      </DropdownMenuItem>
-                                    </>
-                                  )}
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })
-                  )}
-                </TableBody>
-              </Table>
+                                  </>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
           </div>
 
           <div className="mt-4">

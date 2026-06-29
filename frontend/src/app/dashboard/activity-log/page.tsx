@@ -12,7 +12,7 @@ import type { ActivityLogRow, LogFilters, PaginatedResponse } from '@/lib/types/
 import { ActionBadge } from '@/components/logs/action-badge';
 import { LogFiltersBar, emptyLogFilters, type LogFilterState } from '@/components/logs/log-filters';
 import { formatLogDate, formatModuleLabel } from '@/lib/logging-utils';
-import { hasPermission } from '@/lib/permissions';
+import { usePermission } from '@/contexts/permission-context';
 
 export default function ActivityLogPage() {
     const [rows, setRows] = useState<ActivityLogRow[]>([]);
@@ -23,7 +23,8 @@ export default function ActivityLogPage() {
     const [filterOptions, setFilterOptions] = useState<LogFilters | null>(null);
     const [filters, setFilters] = useState<LogFilterState>(emptyLogFilters);
     const limit = 20;
-    const canRead = hasPermission('logs', 'canRead');
+    const { can } = usePermission();
+    const canRead = can('logs', 'canRead');
 
     const buildParams = useCallback(() => {
         const params: Record<string, string | number> = { page, limit };
